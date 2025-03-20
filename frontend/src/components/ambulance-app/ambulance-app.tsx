@@ -9,8 +9,16 @@ export class AmbulanceApp {
   render() {
     return (
       <StyledHost>
-        <div class="flex justify-center rounded-md bg-indigo-500 p-2">
-          <h1 class="font-sans text-white">This is a Stencil component using Tailwind</h1>
+        <div class="flex min-h-screen items-center justify-center bg-gray-50">
+          <div class="p-6 text-center">
+            <h1 class="mb-4 text-4xl font-bold">WAC Project</h1>
+            <p class="mb-6 text-lg">
+              <span class="font-medium">Lukas Castven</span> and <span class="font-medium">Michal Kilian</span>.
+            </p>
+            <a href="https://github.com/Nesquiko/xcastven-xkilian-wac-project" class="text-lg text-blue-500 hover:underline" target="_blank" rel="noopener noreferrer">
+              View the Repository
+            </a>
+          </div>
         </div>
       </StyledHost>
     );

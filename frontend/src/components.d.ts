@@ -8,6 +8,8 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface AmbulanceApp {
     }
+    interface AppointmentScheduler {
+    }
 }
 declare global {
     interface HTMLAmbulanceAppElement extends Components.AmbulanceApp, HTMLStencilElement {
@@ -16,15 +18,25 @@ declare global {
         prototype: HTMLAmbulanceAppElement;
         new (): HTMLAmbulanceAppElement;
     };
+    interface HTMLAppointmentSchedulerElement extends Components.AppointmentScheduler, HTMLStencilElement {
+    }
+    var HTMLAppointmentSchedulerElement: {
+        prototype: HTMLAppointmentSchedulerElement;
+        new (): HTMLAppointmentSchedulerElement;
+    };
     interface HTMLElementTagNameMap {
         "ambulance-app": HTMLAmbulanceAppElement;
+        "appointment-scheduler": HTMLAppointmentSchedulerElement;
     }
 }
 declare namespace LocalJSX {
     interface AmbulanceApp {
     }
+    interface AppointmentScheduler {
+    }
     interface IntrinsicElements {
         "ambulance-app": AmbulanceApp;
+        "appointment-scheduler": AppointmentScheduler;
     }
 }
 export { LocalJSX as JSX };
@@ -32,6 +44,7 @@ declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
             "ambulance-app": LocalJSX.AmbulanceApp & JSXBase.HTMLAttributes<HTMLAmbulanceAppElement>;
+            "appointment-scheduler": LocalJSX.AppointmentScheduler & JSXBase.HTMLAttributes<HTMLAppointmentSchedulerElement>;
         }
     }
 }

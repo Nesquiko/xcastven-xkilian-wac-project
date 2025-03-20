@@ -1,0 +1,26 @@
+import '@material/web/button/filled-button';
+import '@material/web/button/icon-button';
+import '@material/web/button/outlined-button';
+import '@material/web/button/text-button';
+import '@material/web/card/elevated-card';
+import '@material/web/card/outlined-card';
+import '@material/web/checkbox/checkbox';
+import '@material/web/divider/divider';
+import '@material/web/field/filled-field';
+import '@material/web/icon/icon';
+import '@material/web/iconbutton/icon-button';
+import '@material/web/list/list';
+import '@material/web/list/list-item';
+import '@material/web/menu/menu';
+import '@material/web/menu/menu-item';
+import '@material/web/ripple/ripple';
+import '@material/web/select/filled-select';
+import '@material/web/select/outlined-select';
+import '@material/web/select/select-option';
+import '@material/web/textfield/filled-text-field';
+import '@material/web/textfield/outlined-text-field';
+
+export default function () {
+  // or export default async function()
+  // package initialization code
+}

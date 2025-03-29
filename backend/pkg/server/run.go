@@ -2,7 +2,6 @@ package server
 
 import (
 	"context"
-	"flag"
 	"log/slog"
 	"net"
 	"net/http"
@@ -16,32 +15,19 @@ import (
 	"github.com/go-chi/httplog/v2"
 )
 
-const (
-	AppHostDefault  = "localhost"
-	AppPortDefault  = "42069"
-	LogLevelDefault = slog.LevelInfo
-	TzDefault       = "Europe/Bratislava"
-)
-
 func Run(ctx context.Context, args []string) error {
 	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt)
 	defer cancel()
 
-	flags := flag.NewFlagSet("flags", flag.ExitOnError)
+	cfg, err := loadConfig("")
+	if err != nil {
+		slog.Error("failed to read config", slog.String("error", err.Error()))
+		return err
+	}
 
-	host := flags.String("host", AppHostDefault, "application host")
-	port := flags.String("port", AppPortDefault, "application port")
-	logLevel := flags.Int(
-		"log",
-		int(LogLevelDefault),
-		"application log level (-4, 0, 4, 8)",
-	)
-	tz := flags.String("tz", TzDefault, "timezone in which the app is running")
-	flags.Parse(args)
+	httpLogger := SetupLogger(cfg.Log.Level)
 
-	httpLogger := SetupLogger(slog.Level(*logLevel))
-
-	loc, err := time.LoadLocation(*tz)
+	loc, err := time.LoadLocation(cfg.App.Timezone)
 	if err != nil {
 		slog.Error("failed to load timezone", slog.String("error", err.Error()))
 		return err
@@ -63,7 +49,7 @@ func Run(ctx context.Context, args []string) error {
 	srv := NewServer(app, spec, httpLogger)
 
 	httpServer := &http.Server{
-		Addr:    net.JoinHostPort(*host, *port),
+		Addr:    net.JoinHostPort(cfg.App.Host, cfg.App.Port),
 		Handler: srv,
 	}
 

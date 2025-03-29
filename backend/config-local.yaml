@@ -1,0 +1,7 @@
+app:
+  host: "localhost"
+  port: "42069"
+  timezone: "Europe/Bratislava"
+log:
+  # Log level: -4=Debug, 0=Info, 4=Warn, 8=Error
+  level: -4

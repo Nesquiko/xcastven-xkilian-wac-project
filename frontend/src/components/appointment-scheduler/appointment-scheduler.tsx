@@ -257,7 +257,8 @@ export class AppointmentScheduler {
               </span>
             </md-icon-button>
             <h1 class="flex-1 text-center text-xl font-medium">
-              {showDetails ? "Complete your appointment" : "Schedule an appointment"}
+              {(showDetails ? 'Complete your appointment' : 'Schedule an appointment')}
+              <a class="text-gray-400 text-sm ml-5 hover:underline" target="_blank" href="https://github.com/Nesquiko/xcastven-xkilian-wac-project">Link to repo</a>
             </h1>
             <md-icon-button
               class="mr-2"

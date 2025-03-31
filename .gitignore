@@ -1,3 +1,4 @@
 api/node_modules
 api/dist
 backend/pkg/api/api.gen.go
+frontend/src/api/generated

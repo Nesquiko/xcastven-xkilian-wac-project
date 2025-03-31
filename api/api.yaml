@@ -7,7 +7,6 @@ info:
     with doctors and access to patient medical history.
   license:
     name: MIT
-    identifier: MIT
     url: https://opensource.org/licenses/MIT
 tags:
   - name: Appointments

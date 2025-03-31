@@ -71,6 +71,57 @@ paths:
                     status: 500
                     code: server.unexpected-error
                     detail: An unexpected error occurred while processing the request.
+  /doctors:
+    post:
+      tags:
+        - Doctors
+      summary: Register a new doctor
+      description: Creates a new doctor record in the system.
+      operationId: registerDoctor
+      requestBody:
+        $ref: '#/components/requestBodies/DoctorRegistrationRequest'
+      responses:
+        '201':
+          $ref: '#/components/responses/DoctorCreated'
+        '400':
+          $ref: '#/components/responses/BaseErrorResponse'
+          description: Bad Request - Invalid input data (e.g., missing fields, invalid email).
+          content:
+            application/problem+json:
+              examples:
+                validationError:
+                  summary: Example validation error (400)
+                  value:
+                    title: Validation Error
+                    status: 400
+                    code: validation.missing-field
+                    detail: Required field "specialization" is missing.
+        '409':
+          $ref: '#/components/responses/BaseErrorResponse'
+          description: Conflict - A doctor with the provided email already exists.
+          content:
+            application/problem+json:
+              examples:
+                duplicateEmail:
+                  summary: Example duplicate email error (409)
+                  value:
+                    title: Conflict
+                    status: 409
+                    code: doctor.email-exists
+                    detail: A doctor with email dr.house@example.com already exists.
+        '500':
+          $ref: '#/components/responses/BaseErrorResponse'
+          description: Internal Server Error.
+          content:
+            application/problem+json:
+              examples:
+                serverError:
+                  summary: Example internal server error (500)
+                  value:
+                    title: Internal Server Error
+                    status: 500
+                    code: server.unexpected-error
+                    detail: An unexpected error occurred while registering the doctor.
 components:
   schemas:
     Patient:
@@ -129,6 +180,56 @@ components:
         - code
         - status
         - detail
+    Doctor:
+      type: object
+      description: Data required to register a new doctor.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          example: f47ac10b-58cc-4372-a567-0e02b2c3d479
+        email:
+          type: string
+          format: email
+          description: Doctor's unique email address.
+          example: dr.gregory.house@example.com
+        firstName:
+          type: string
+          description: Doctor's first name.
+          minLength: 1
+          example: Gregory
+        lastName:
+          type: string
+          description: Doctor's last name.
+          minLength: 1
+          example: House
+        specialization:
+          type: string
+          description: Medical specialization of the doctor.
+          enum:
+            - surgeon
+            - gastroenterologist
+            - pediatrician
+            - diagnostician
+            - endocrinologist
+            - general_practitioner
+            - cardiologist
+            - dermatologist
+            - neurologist
+            - oncologist
+            - orthopedist
+            - psychiatrist
+            - radiologist
+            - urologist
+            - other
+          example: diagnostician
+      required:
+        - id
+        - email
+        - firstName
+        - lastName
+        - specialization
   requestBodies:
     PatientRegistration:
       description: Patient details for registration.
@@ -137,6 +238,21 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Patient'
+    DoctorRegistrationRequest:
+      description: Doctor details for registration.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Doctor'
+          examples:
+            newDoctor:
+              summary: Example new doctor registration
+              value:
+                email: dr.lisa.cuddy@example.com
+                firstName: Lisa
+                lastName: Cuddy
+                specialization: Endocrinology
   responses:
     PatientCreated:
       description: Patient registered successfully. Returns the created patient object.
@@ -150,3 +266,18 @@ components:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/ErrorDetail'
+    DoctorCreated:
+      description: Doctor registered successfully. Returns the created doctor object.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Doctor'
+          examples:
+            createdDoctor:
+              summary: Example created doctor response
+              value:
+                id: c3d4e5f6-a7b8-9012-3456-7890abcdef12
+                email: dr.lisa.cuddy@example.com
+                firstName: Lisa
+                lastName: Cuddy
+                specialization: Endocrinology

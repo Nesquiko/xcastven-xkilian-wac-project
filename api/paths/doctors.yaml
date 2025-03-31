@@ -1,0 +1,53 @@
+post:
+  tags:
+    - Doctors
+  summary: Register a new doctor
+  description: Creates a new doctor record in the system.
+  operationId: registerDoctor
+  requestBody:
+    $ref: "../components/requestBodies/DoctorRegistrationRequest.yaml"
+  responses:
+    "201":
+      $ref: "../components/responses/DoctorCreated.yaml"
+
+    "400":
+      $ref: "../components/responses/BaseErrorResponse.yaml"
+      description: Bad Request - Invalid input data (e.g., missing fields, invalid email).
+      content:
+        application/problem+json:
+          examples:
+            validationError:
+              summary: Example validation error (400)
+              value:
+                title: "Validation Error"
+                status: 400
+                code: "validation.missing-field"
+                detail: 'Required field "specialization" is missing.'
+
+    "409":
+      $ref: "../components/responses/BaseErrorResponse.yaml"
+      description: Conflict - A doctor with the provided email already exists.
+      content:
+        application/problem+json:
+          examples:
+            duplicateEmail:
+              summary: Example duplicate email error (409)
+              value:
+                title: "Conflict"
+                status: 409
+                code: "doctor.email-exists"
+                detail: "A doctor with email dr.house@example.com already exists."
+
+    "500":
+      $ref: "../components/responses/BaseErrorResponse.yaml"
+      description: Internal Server Error.
+      content:
+        application/problem+json:
+          examples:
+            serverError:
+              summary: Example internal server error (500)
+              value:
+                title: "Internal Server Error"
+                status: 500
+                code: "server.unexpected-error"
+                detail: "An unexpected error occurred while registering the doctor."

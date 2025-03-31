@@ -24,3 +24,5 @@ tags:
 paths:
   /patients:
     $ref: "./paths/patients.yaml"
+  /doctors:
+    $ref: "./paths/doctors.yaml"

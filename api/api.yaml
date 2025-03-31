@@ -1,0 +1,26 @@
+openapi: 3.0.4
+info:
+  title: MediCal API
+  version: 1.0.0
+  description: >
+    API for the MediCal application, managing patient appointment scheduling
+    with doctors and access to patient medical history.
+  license:
+    name: MIT
+    identifier: MIT
+    url: https://opensource.org/licenses/MIT
+tags:
+  - name: Appointments
+    description: Manage appointment lifecycle (request, view, confirm, cancel, reschedule).
+  - name: Doctors
+    description: Retrieve doctor details and available timeslots.
+  - name: Patients
+    description: Manage patient information and access patient-specific data.
+  - name: Medical History
+    description: Retrieve patient medical history (diagnoses, appointments, prescriptions).
+  - name: Resources
+    description: Manage and view resources (facilities, equipment, medicine) for appointments.
+
+paths:
+  /patients:
+    $ref: "./paths/patients.yaml"

@@ -1,0 +1,6 @@
+description: An error occurred. See specific status code for details.
+content:
+  application/problem+json:
+    schema:
+      $ref: "../schemas/ErrorDetail.yaml"
+    # examples will be added in the path definition.

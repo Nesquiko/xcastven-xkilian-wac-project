@@ -1,0 +1,52 @@
+post:
+  tags:
+    - Patients
+  summary: Register a new patient
+  description: Creates a new patient record using email, first name, and last name.
+  operationId: registerPatient
+  requestBody:
+    $ref: "../components/requestBodies/PatientRegistration.yaml"
+  responses:
+    "201":
+      $ref: "../components/responses/PatientCreated.yaml"
+    "400":
+      $ref: "../components/responses/BaseErrorResponse.yaml"
+      description: Bad Request - Invalid input data.
+      content:
+        application/problem+json:
+          examples:
+            validationError:
+              summary: Example validation error (400)
+              value:
+                title: "Validation Error"
+                status: 400
+                code: "validation.invalid-field"
+                detail: "Email must be a valid email address."
+
+    "409":
+      $ref: "../components/responses/BaseErrorResponse.yaml"
+      description: Conflict - Patient email already exists.
+      content:
+        application/problem+json:
+          examples:
+            duplicateEmail:
+              summary: Example duplicate email error (409)
+              value:
+                title: "Conflict"
+                status: 409
+                code: "patient.email-exists"
+                detail: "A patient with email john.doe@example.com already exists."
+
+    "500":
+      $ref: "../components/responses/BaseErrorResponse.yaml"
+      description: Internal Server Error.
+      content:
+        application/problem+json:
+          examples:
+            serverError:
+              summary: Example internal server error (500)
+              value:
+                title: "Internal Server Error"
+                status: 500
+                code: "server.unexpected-error"
+                detail: "An unexpected error occurred while processing the request."

@@ -1,36 +1,103 @@
 import { StyledHost } from '../StyledHost';
 import { Component, h, State } from '@stencil/core';
 
+type TimeSlot = {
+  time: string;
+  status: "available" | "unavailable";
+};
+
+type AppointmentType = {
+  id: string;
+  displayName: string;
+};
+
+type Doctor = {
+  id: string;
+  displayName: string;
+  specialty: string;
+};
+
+const DAYS_OF_WEEK: Array<{ short: string; long: string }> = [
+  { short: "Mo", long: "Monday" },
+  { short: "Tu", long: "Tuesday" },
+  { short: "We", long: "Wednesday" },
+  { short: "Th", long: "Thursday" },
+  { short: "Fr", long: "Friday" },
+  { short: "Sa", long: "Saturday" },
+  { short: "Su", long: "Sunday" },
+];
+
+const MONTHS: Array<string> = [
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
+
+const TODAY: Date = new Date();
+
+const data = {
+  availableTimes: [
+    { time: "7:00", status: "available" },
+    { time: "8:00", status: "unavailable" },
+    { time: "9:00", status: "available" },
+    { time: "10:00", status: "available" },
+    { time: "11:00", status: "unavailable" },
+    { time: "12:00", status: "available" },
+    { time: "13:00", status: "unavailable" },
+    { time: "14:00", status: "unavailable" },
+  ] satisfies Array<TimeSlot>,
+  appointmentTypes: [
+    { id: "1", displayName: "Check-Up" },
+    { id: "2", displayName: "Follow-Up" },
+    { id: "3", displayName: "Consultation" },
+  ] satisfies Array<AppointmentType>,
+  doctors: [
+    { id: "1", displayName: "Dr. John Doe", specialty: "dental" },
+    { id: "2", displayName: "Dr. Jane Smith", specialty: "optic" },
+    { id: "3", displayName: "Dr. Samuel Johnson", specialty: "pediatric" },
+  ] satisfies Array<Doctor>,
+};
+
 @Component({
   tag: 'appointment-scheduler',
   shadow: false,
 })
 export class AppointmentScheduler {
-  @State() selectedDate: Date = new Date(2021, 3, 7); // April 7th, 2021
-  @State() selectedTime: string = '7:00';
-  @State() appointmentType: string = 'Check-up';
-  @State() doctor: string = 'Dr. John Doe';
-  @State() appointmentReason: string = '';
-  @State() showTimeMenu: boolean = false;
+  @State() selectedDate: Date = null;
+  @State() selectedTime: string = null;
+  @State() selectedAppointmentType: string;
+  @State() selectedDoctor: string;
+  @State() appointmentReason: string = "";
+  @State() currentViewMonth: number = TODAY.getMonth();
+  @State() currentViewYear: number = TODAY.getFullYear();
 
-  private daysOfWeek = ['Mo', 'Tu', 'We', 'Th', 'Fr', 'Sa', 'Su'];
-  private availableTimes = ['7:00', '8:00', '9:00', '10:00'];
+  private availableTimes: Array<TimeSlot> = data.availableTimes;
+  private appointmentTypes: Array<AppointmentType> = data.appointmentTypes;
+  private doctors: Array<Doctor> = data.doctors;
 
-  // Generate days for the calendar
-  private getDaysInMonth(year: number, month: number) {
+  private getDaysInMonth = (year: number, month: number) => {
     return new Date(year, month + 1, 0).getDate();
-  }
+  };
 
-  private getFirstDayOfMonth(year: number, month: number) {
+  private getFirstDayOfMonth = (year: number, month: number) => {
     const firstDay = new Date(year, month, 1).getDay();
-    // Convert Sunday (0) to be the last day (6) to match our UI
     return firstDay === 0 ? 6 : firstDay - 1;
-  }
+  };
 
-  private renderCalendar() {
-    const year = this.selectedDate.getFullYear();
-    const month = this.selectedDate.getMonth();
-    const currentDay = this.selectedDate.getDate();
+  private renderCalendar = () => {
+    const year = this.currentViewYear;
+    const month = this.currentViewMonth;
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
 
     const daysInMonth = this.getDaysInMonth(year, month);
     const firstDayOfMonth = this.getFirstDayOfMonth(year, month);
@@ -39,94 +106,197 @@ export class AppointmentScheduler {
     const currentMonthDays = [];
     const nextMonthDays = [];
 
-    // Previous month days
     const daysInPrevMonth = this.getDaysInMonth(year, month - 1);
     for (let i = firstDayOfMonth - 1; i >= 0; i--) {
-      prevMonthDays.unshift(<div class="px-3 py-2 text-center text-sm text-gray-400">{daysInPrevMonth - i}</div>);
-    }
-
-    // Current month days
-    for (let i = 1; i <= daysInMonth; i++) {
-      const isSelected = i === currentDay;
-      currentMonthDays.push(
-        <div class={`cursor-pointer px-3 py-2 text-center text-sm ${isSelected ? 'selected-day' : 'hover:bg-gray-200'}`} onClick={() => this.selectDate(i)}>
-          {i}
-        </div>,
+      prevMonthDays.unshift(
+        <div class="px-3 py-2 text-center text-sm text-gray-400">
+          {daysInPrevMonth - i}
+        </div>
       );
     }
 
-    // Next month days
-    const totalCells = 42; // 6 rows x 7 columns
-    const remainingCells = totalCells - (prevMonthDays.length + currentMonthDays.length);
+    for (let i = 1; i <= daysInMonth; i++) {
+      const currentDate = new Date(year, month, i);
+      currentDate.setHours(0, 0, 0, 0);
+
+      const isSelected: boolean =
+        this.selectedDate &&
+        this.selectedDate.getDate() === i &&
+        this.selectedDate.getMonth() === month &&
+        this.selectedDate.getFullYear() === year;
+
+      const isPastDate = currentDate < today;
+
+      currentMonthDays.push(
+        <div
+          class={`px-3 py-2 text-center rounded-md text-sm ${
+            isSelected
+              ? "bg-[#7357be] text-white"
+              : isPastDate
+                ? "text-gray-400 cursor-not-allowed"
+                : "hover:bg-gray-200 cursor-pointer"
+          }`}
+          onClick={() => !isPastDate && this.selectDate(i)}
+        >
+          {i}
+        </div>
+      );
+    }
+
+    const totalCells = 42;
+    const remainingCells =
+      totalCells - (prevMonthDays.length + currentMonthDays.length);
     for (let i = 1; i <= remainingCells; i++) {
-      nextMonthDays.push(<div class="px-3 py-2 text-center text-sm text-gray-400">{i}</div>);
+      nextMonthDays.push(
+        <div class="px-3 py-2 text-center text-sm text-gray-400">{i}</div>
+      );
     }
 
     return [...prevMonthDays, ...currentMonthDays, ...nextMonthDays];
-  }
+  };
 
-  private selectDate(day: number) {
-    const newDate = new Date(this.selectedDate);
-    newDate.setDate(day);
-    this.selectedDate = newDate;
-  }
+  private selectDate = (day: number) => {
+    this.selectedDate = new Date(this.currentViewYear, this.currentViewMonth, day);
+  };
 
-  private getMonthName() {
-    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    return monthNames[this.selectedDate.getMonth()];
-  }
+  private getMonthName = () => {
+    return MONTHS[this.currentViewMonth];
+  };
 
-  private prevMonth() {
-    const newDate = new Date(this.selectedDate);
-    newDate.setMonth(newDate.getMonth() - 1);
-    this.selectedDate = newDate;
-  }
+  private prevMonth = () => {
+    if (this.currentViewMonth === 0) {
+      this.currentViewMonth = 11;
+      this.currentViewYear--;
+    } else {
+      this.currentViewMonth--;
+    }
+  };
 
-  private nextMonth() {
-    const newDate = new Date(this.selectedDate);
-    newDate.setMonth(newDate.getMonth() + 1);
-    this.selectedDate = newDate;
-  }
+  private nextMonth = () => {
+    if (this.currentViewMonth === 11) {
+      this.currentViewMonth = 0;
+      this.currentViewYear++;
+    } else {
+      this.currentViewMonth++;
+    }
+  };
 
-  private toggleTimeMenu() {
-    this.showTimeMenu = !this.showTimeMenu;
-  }
+  private handleYearChange = (event: Event) => {
+    this.currentViewYear = parseInt((event.target as HTMLSelectElement).value);
+  };
 
-  private selectTime(time: string) {
-    this.selectedTime = time;
-    this.showTimeMenu = false;
-  }
+  private handleTimeChange = (event: Event) => {
+    this.selectedTime = (event.target as HTMLSelectElement).value;
+  };
+
+  private handleAppointmentTypeChange = (event: Event) => {
+    this.selectedAppointmentType = (event.target as HTMLSelectElement).value;
+  };
+
+  private handleDoctorChange = (event: Event) => {
+    this.selectedDoctor = (event.target as HTMLSelectElement).value;
+  };
+
+  private handleAppointmentReasonChange = (event: Event) => {
+    this.appointmentReason = (event.target as HTMLTextAreaElement).value;
+  };
+
+  private handleScheduleAppointment = () => {
+    console.log(
+      "Schedule an appointment:" +
+      "\nDate: " +
+      this.selectedDate +
+      "\nTime: " +
+      this.selectedTime +
+      "\nType: " +
+      this.selectedAppointmentType +
+      "\nDoctor: " +
+      this.selectedDoctor +
+      "\nReason: " +
+      this.appointmentReason
+    );
+  };
+
+  private formatDate = (date: Date) => {
+    if (!date) return "";
+    return `${MONTHS[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
+  };
+
+  private resetSelection = () => {
+    this.selectedDate = null;
+    this.selectedTime = null;
+    this.selectedAppointmentType = null;
+    this.selectedDoctor = null;
+    this.appointmentReason = "";
+  };
+
+  private showDetailsPanel = () => {
+    return this.selectedDate !== null && this.selectedTime !== null;
+  };
 
   render() {
+    const currentYear: number = TODAY.getFullYear();
+    const yearOptions: Array<number> = [];
+    for (let i = 0; i <= 5; i++) {
+      yearOptions.push(currentYear + i);
+    }
+
+    const showDetails = this.showDetailsPanel();
+
     return (
       <StyledHost>
-        <div class="mx-auto flex h-screen flex-col md:max-w-4xl">
+        <div class="flex h-screen flex-col w-full flex-1 overflow-auto">
           {/* Header */}
-          <div class="bg-primary flex items-center p-4 text-white">
-            <md-icon-button class="mr-2">
-              <span class="material-symbols-outlined">arrow_back</span>
+          <div class="bg-gray-800 flex items-center p-3 text-white">
+            <md-icon-button
+              class="mr-2"
+              onClick={showDetails ? () => this.resetSelection() : undefined}
+            >
+              <span class="material-symbols-outlined text-white">
+                {showDetails ? "arrow_back" : "menu"}
+              </span>
             </md-icon-button>
-            <h1 class="flex-1 text-center text-xl font-medium">Schedule an appointment</h1>
-            <div class="h-10 w-10 overflow-hidden rounded-full bg-gray-200">
-              <span class="material-symbols-outlined flex h-full items-center justify-center">account_circle</span>
-            </div>
+            <h1 class="flex-1 text-center text-xl font-medium">
+              {showDetails ? "Complete your appointment" : "Schedule an appointment"}
+            </h1>
+            <md-icon-button
+              class="mr-2"
+              onClick={showDetails ? () => this.resetSelection() : undefined}
+            >
+              <span class="material-symbols-outlined text-white">
+                account_circle
+              </span>
+            </md-icon-button>
           </div>
 
           {/* Content */}
-          <div class="flex flex-1 flex-col md:flex-row">
+          <div class="flex flex-1 flex-col md:flex-row mx-auto w-full overflow-hidden">
             {/* Left panel - Calendar */}
-            <div class="bg-gray-100 p-6 md:w-1/2">
-              <div class="rounded-lg bg-white p-4 shadow-md">
-                <h2 class="mb-4 font-medium">Date</h2>
-
+            <div
+              class={`flex flex-col justify-center items-center bg-gray-300 p-6 transition-all duration-600 ease-in-out ${
+                showDetails ? "md:w-1/2 w-full" : "w-full"
+              }`}>
+              <div class="max-w-lg w-full rounded-lg bg-white p-4 shadow-md mb-6">
                 <div class="mb-4 flex items-center justify-between">
                   <md-icon-button onClick={() => this.prevMonth()}>
                     <span class="material-symbols-outlined">chevron_left</span>
                   </md-icon-button>
-                  <div class="text-center">
+                  <div class="text-center flex items-center">
                     <span class="font-medium">{this.getMonthName()}</span>
                     <span class="mx-1">,</span>
-                    <span>{this.selectedDate.getFullYear()}</span>
+                    <select
+                      class="bg-transparent border-none font-medium"
+                      onChange={(e: Event) => this.handleYearChange(e)}
+                    >
+                      {yearOptions.map((year) => (
+                        <option
+                          value={year.toString()}
+                          selected={year === this.currentViewYear}
+                        >
+                          {year}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <md-icon-button onClick={() => this.nextMonth()}>
                     <span class="material-symbols-outlined">chevron_right</span>
@@ -134,96 +304,120 @@ export class AppointmentScheduler {
                 </div>
 
                 <div class="grid grid-cols-7 gap-1">
-                  {this.daysOfWeek.map(day => (
-                    <div class="px-3 py-2 text-center text-sm font-medium text-gray-600">{day}</div>
+                  {DAYS_OF_WEEK.map((day) => (
+                    <div class="px-3 py-2 text-center text-sm font-medium text-gray-600">
+                      {day.short}
+                    </div>
                   ))}
                   {this.renderCalendar()}
                 </div>
               </div>
 
               {/* Time selector */}
-              <div class="mt-6">
-                <h2 class="mb-4 font-medium">Time</h2>
-                <div class="relative rounded-lg bg-white p-4 shadow-md">
-                  <div class="relative">
-                    <div class="select-wrapper" onClick={() => this.toggleTimeMenu()}>
-                      <md-filled-field class="w-full">
-                        <div slot="content" class="flex w-full items-center justify-between">
-                          <span>{this.selectedTime}</span>
-                          <span class="material-symbols-outlined">{this.showTimeMenu ? 'arrow_drop_up' : 'arrow_drop_down'}</span>
-                        </div>
-                      </md-filled-field>
-                    </div>
-
-                    {this.showTimeMenu && (
-                      <md-menu open class="time-menu">
-                        <md-list>
-                          {this.availableTimes.map(time => (
-                            <md-list-item onClick={() => this.selectTime(time)} class={time === this.selectedTime ? 'selected-time' : ''}>
-                              {time}
-                            </md-list-item>
-                          ))}
-                        </md-list>
-                      </md-menu>
-                    )}
-                  </div>
-                </div>
+              <div class="max-w-lg w-full px-4">
+                <md-filled-select
+                  label="Select a time"
+                  class="w-full"
+                  value={this.selectedTime}
+                  onInput={(e: Event) => this.handleTimeChange(e)}
+                >
+                  {this.availableTimes.map((time: TimeSlot) => (
+                    <md-select-option
+                      value={time.time}
+                      disabled={time.status !== "available"}
+                    >
+                      <div slot="headline">{time.time}</div>
+                    </md-select-option>
+                  ))}
+                </md-filled-select>
               </div>
+
+              {/* Selected date and time summary (visible on mobile when details panel is shown) */}
+              {showDetails && (
+                <div class="mt-6 p-4 bg-white rounded-lg shadow-md md:hidden">
+                  <h2 class="text-2xl text-center">
+                    {this.selectedDate && (
+                      <span class="text-[#7357be] font-bold">{this.formatDate(this.selectedDate)}</span>
+                    )}
+                    {this.selectedTime && (
+                      <span class="text-gray-600"> at <span class="text-[#7357be] font-bold">{this.selectedTime}</span></span>
+                    )}
+                  </h2>
+                </div>
+              )}
             </div>
 
             {/* Right panel - Details */}
-            <div class="p-6 md:w-1/2">
-              <div class="mb-6">
-                <h2 class="text-2xl font-bold">
-                  April 7th 2021 <span class="text-gray-500">at {this.selectedTime}</span>
-                </h2>
-              </div>
+            {showDetails && (
+              <div
+                class={`p-6 md:w-1/2 w-full transform transition-all duration-500 ease-in-out opacity-100
+                         animate-[slideInFromBottom_0.5s_ease-out]
+                         md:animate-[slideInFromRight_0.5s_ease-out]`}
+              >
+                <div class="mb-6 hidden md:block">
+                  <h2 class="text-2xl text-center">
+                    {this.selectedDate && (
+                      <span class="text-[#7357be] font-bold">{this.formatDate(this.selectedDate)}</span>
+                    )}
+                    {this.selectedTime && (
+                      <span class="text-gray-600"> at <span class="text-[#7357be] font-bold">{this.selectedTime}</span></span>
+                    )}
+                  </h2>
+                </div>
 
-              <div class="mb-6">
-                <md-filled-select label="Appointment type" class="w-full">
-                  <md-select-option value="check-up" selected>
-                    <div slot="headline">Check-up</div>
-                  </md-select-option>
-                  <md-select-option value="follow-up">
-                    <div slot="headline">Follow-up</div>
-                  </md-select-option>
-                  <md-select-option value="consultation">
-                    <div slot="headline">Consultation</div>
-                  </md-select-option>
-                </md-filled-select>
-              </div>
+                <div class="mb-6">
+                  <md-filled-select
+                    label="Appointment type"
+                    class="w-full"
+                    value={this.selectedAppointmentType}
+                    onInput={(e: Event) => this.handleAppointmentTypeChange(e)}
+                  >
+                    {this.appointmentTypes.map((appointmentType: AppointmentType) => (
+                      <md-select-option value={appointmentType.id}>
+                        <div slot="headline">{appointmentType.displayName}</div>
+                      </md-select-option>
+                    ))}
+                  </md-filled-select>
+                </div>
 
-              <div class="mb-6">
-                <md-filled-select label="Doctor / Specialist" class="w-full">
-                  <md-select-option value="dr-john-doe" selected>
-                    <div slot="headline">Dr. John Doe</div>
-                  </md-select-option>
-                  <md-select-option value="dr-jane-smith">
-                    <div slot="headline">Dr. Jane Smith</div>
-                  </md-select-option>
-                  <md-select-option value="dr-samuel-johnson">
-                    <div slot="headline">Dr. Samuel Johnson</div>
-                  </md-select-option>
-                </md-filled-select>
-              </div>
+                <div class="mb-6">
+                  <md-filled-select
+                    label="Doctor / Specialist"
+                    class="w-full"
+                    value={this.selectedDoctor}
+                    onInput={(e: Event) => this.handleDoctorChange(e)}
+                  >
+                    {this.doctors.map((doctor: Doctor) => (
+                      <md-select-option value={doctor.id}>
+                        <div slot="headline">{doctor.displayName}</div>
+                      </md-select-option>
+                    ))}
+                  </md-filled-select>
+                </div>
 
-              <div class="mb-6">
-                <md-filled-text-field
-                  class="w-full"
-                  label="Appointment reason"
-                  placeholder="Briefly describe your reason for visit (optional)"
-                  type="textarea"
-                  rows="4"
-                  value={this.appointmentReason}
-                  onInput={(e: Event) => (this.appointmentReason = (e.target as HTMLTextAreaElement).value)}
-                ></md-filled-text-field>
-              </div>
+                <div class="mb-6">
+                  <md-filled-text-field
+                    class="w-full"
+                    label="Appointment reason"
+                    placeholder="Briefly describe your reason for visit (optional)"
+                    type="textarea"
+                    rows="4"
+                    value={this.appointmentReason}
+                    onInput={(e: Event) => this.handleAppointmentReasonChange(e)}
+                  ></md-filled-text-field>
+                </div>
 
-              <md-filled-button class="w-full">Schedule</md-filled-button>
-            </div>
+                <md-filled-button
+                  class="w-full rounded-full bg-[#7357be] text-white"
+                  onClick={() => this.handleScheduleAppointment()}
+                >
+                  Schedule
+                </md-filled-button>
+              </div>
+            )}
           </div>
         </div>
       </StyledHost>
     );
-  }
+  };
 }

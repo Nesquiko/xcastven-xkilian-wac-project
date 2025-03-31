@@ -1,0 +1,152 @@
+openapi: 3.0.4
+info:
+  title: MediCal API
+  version: 1.0.0
+  description: |
+    API for the MediCal application, managing patient appointment scheduling with doctors and access to patient medical history.
+  license:
+    name: MIT
+    identifier: MIT
+    url: https://opensource.org/licenses/MIT
+tags:
+  - name: Appointments
+    description: Manage appointment lifecycle (request, view, confirm, cancel, reschedule).
+  - name: Doctors
+    description: Retrieve doctor details and available timeslots.
+  - name: Patients
+    description: Manage patient information and access patient-specific data.
+  - name: Medical History
+    description: Retrieve patient medical history (diagnoses, appointments, prescriptions).
+  - name: Resources
+    description: Manage and view resources (facilities, equipment, medicine) for appointments.
+paths:
+  /patients:
+    post:
+      tags:
+        - Patients
+      summary: Register a new patient
+      description: Creates a new patient record using email, first name, and last name.
+      operationId: registerPatient
+      requestBody:
+        $ref: '#/components/requestBodies/PatientRegistration'
+      responses:
+        '201':
+          $ref: '#/components/responses/PatientCreated'
+        '400':
+          $ref: '#/components/responses/BaseErrorResponse'
+          description: Bad Request - Invalid input data.
+          content:
+            application/problem+json:
+              examples:
+                validationError:
+                  summary: Example validation error (400)
+                  value:
+                    title: Validation Error
+                    status: 400
+                    code: validation.invalid-field
+                    detail: Email must be a valid email address.
+        '409':
+          $ref: '#/components/responses/BaseErrorResponse'
+          description: Conflict - Patient email already exists.
+          content:
+            application/problem+json:
+              examples:
+                duplicateEmail:
+                  summary: Example duplicate email error (409)
+                  value:
+                    title: Conflict
+                    status: 409
+                    code: patient.email-exists
+                    detail: A patient with email john.doe@example.com already exists.
+        '500':
+          $ref: '#/components/responses/BaseErrorResponse'
+          description: Internal Server Error.
+          content:
+            application/problem+json:
+              examples:
+                serverError:
+                  summary: Example internal server error (500)
+                  value:
+                    title: Internal Server Error
+                    status: 500
+                    code: server.unexpected-error
+                    detail: An unexpected error occurred while processing the request.
+components:
+  schemas:
+    Patient:
+      type: object
+      description: Represents a patient resource.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+          example: f47ac10b-58cc-4372-a567-0e02b2c3d479
+        email:
+          type: string
+          format: email
+          description: Patient's unique email address.
+          example: jane.roe@example.com
+        firstName:
+          type: string
+          description: Patient's first name.
+          example: Jane
+        lastName:
+          type: string
+          description: Patient's last name.
+          example: Roe
+      required:
+        - id
+        - email
+        - firstName
+        - lastName
+    ErrorDetail:
+      type: object
+      description: Standardized error details (RFC 9457).
+      properties:
+        title:
+          type: string
+          description: Short, human-readable summary of the error type.
+          example: Validation Error
+        code:
+          type: string
+          description: Unique, machine-readable error code (e.g., 'namespace.error-name').
+          example: validation.invalid-start-time
+        status:
+          type: integer
+          format: int
+          description: HTTP status code for this error occurrence.
+          minimum: 100
+          maximum: 599
+          example: 400
+        detail:
+          type: string
+          description: Human-readable explanation specific to this occurrence.
+          example: One or more fields submitted are invalid.
+      additionalProperties: true
+      required:
+        - title
+        - code
+        - status
+        - detail
+  requestBodies:
+    PatientRegistration:
+      description: Patient details for registration.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Patient'
+  responses:
+    PatientCreated:
+      description: Patient registered successfully. Returns the created patient object.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Patient'
+    BaseErrorResponse:
+      description: An error occurred. See specific status code for details.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ErrorDetail'

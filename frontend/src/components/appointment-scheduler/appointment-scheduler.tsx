@@ -1,48 +1,7 @@
 import { StyledHost } from '../StyledHost';
 import { Component, h, State } from '@stencil/core';
-
-type TimeSlot = {
-  time: string;
-  status: "available" | "unavailable";
-};
-
-type AppointmentType = {
-  id: string;
-  displayName: string;
-};
-
-type Doctor = {
-  id: string;
-  displayName: string;
-  specialty: string;
-};
-
-const DAYS_OF_WEEK: Array<{ short: string; long: string }> = [
-  { short: "Mo", long: "Monday" },
-  { short: "Tu", long: "Tuesday" },
-  { short: "We", long: "Wednesday" },
-  { short: "Th", long: "Thursday" },
-  { short: "Fr", long: "Friday" },
-  { short: "Sa", long: "Saturday" },
-  { short: "Su", long: "Sunday" },
-];
-
-const MONTHS: Array<string> = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
-
-const TODAY: Date = new Date();
+import { AppointmentType, Doctor, TimeSlot } from '../../lib/types';
+import { DAYS_OF_WEEK, getDateAndTimeTitle, MONTHS, TODAY } from '../../utils/utils';
 
 const data = {
   availableTimes: [
@@ -217,11 +176,6 @@ export class AppointmentScheduler {
     );
   };
 
-  private formatDate = (date: Date) => {
-    if (!date) return "";
-    return `${MONTHS[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
-  };
-
   private resetSelection = () => {
     this.selectedDate = null;
     this.selectedTime = null;
@@ -271,13 +225,13 @@ export class AppointmentScheduler {
           </div>
 
           {/* Content */}
-          <div class="flex flex-1 flex-col md:flex-row mx-auto w-full overflow-hidden">
+          <div class="flex flex-1 flex-col md:flex-row mx-auto w-full">
             {/* Left panel - Calendar */}
             <div
               class={`flex flex-col justify-center items-center bg-gray-300 p-6 transition-all duration-600 ease-in-out ${
                 showDetails ? "md:w-1/2 w-full" : "w-full"
               }`}>
-              <div class="max-w-lg w-full rounded-lg bg-white p-4 shadow-md mb-6">
+              <div class="max-w-md w-full rounded-lg bg-white p-4 shadow-md mb-6">
                 <div class="mb-4 flex items-center justify-between">
                   <md-icon-button onClick={() => this.prevMonth()}>
                     <span class="material-symbols-outlined">chevron_left</span>
@@ -336,14 +290,7 @@ export class AppointmentScheduler {
               {/* Selected date and time summary (visible on mobile when details panel is shown) */}
               {showDetails && (
                 <div class="mt-6 p-4 bg-white rounded-lg shadow-md md:hidden">
-                  <h2 class="text-2xl text-center">
-                    {this.selectedDate && (
-                      <span class="text-[#7357be] font-bold">{this.formatDate(this.selectedDate)}</span>
-                    )}
-                    {this.selectedTime && (
-                      <span class="text-gray-600"> at <span class="text-[#7357be] font-bold">{this.selectedTime}</span></span>
-                    )}
-                  </h2>
+                  {getDateAndTimeTitle(this.selectedDate, this.selectedTime)}
                 </div>
               )}
             </div>
@@ -351,19 +298,12 @@ export class AppointmentScheduler {
             {/* Right panel - Details */}
             {showDetails && (
               <div
-                class={`p-6 md:w-1/2 w-full transform transition-all duration-500 ease-in-out opacity-100
+                class={`m-auto p-6 md:w-1/2 max-w-lg w-full flex flex-col justify-center transform transition-all duration-500 ease-in-out opacity-100
                          animate-[slideInFromBottom_0.5s_ease-out]
                          md:animate-[slideInFromRight_0.5s_ease-out]`}
               >
                 <div class="mb-6 hidden md:block">
-                  <h2 class="text-2xl text-center">
-                    {this.selectedDate && (
-                      <span class="text-[#7357be] font-bold">{this.formatDate(this.selectedDate)}</span>
-                    )}
-                    {this.selectedTime && (
-                      <span class="text-gray-600"> at <span class="text-[#7357be] font-bold">{this.selectedTime}</span></span>
-                    )}
-                  </h2>
+                  {getDateAndTimeTitle(this.selectedDate, this.selectedTime)}
                 </div>
 
                 <div class="mb-6">

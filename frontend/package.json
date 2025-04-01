@@ -32,13 +32,13 @@
     "loader/"
   ],
   "scripts": {
-    "build": "bun openapi && stencil build",
+    "build": "tailwindcss -i ./src/tailwind.css -o ./www/tailwind.css && stencil build",
     "start": "bun openapi && concurrently \"stencil build --dev --watch --serve\" \"tailwindcss -i ./src/tailwind.css -o ./www/tailwind.css --watch\"",
     "test": "stencil test --spec --e2e",
     "test.watch": "stencil test --spec --e2e --watchAll",
     "generate": "stencil generate",
     "format": "prettier --write './**/*.{ts,tsx,js,jsx,json}'",
-    "openapi": "openapi-generator-cli generate"
+    "openapi": "openapi-generator-cli generate -g typescript-fetch -i api.bundled.yaml -o src/api/generated"
   },
   "devDependencies": {
     "@stencil/core": "^4.27.1",

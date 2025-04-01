@@ -35,6 +35,6 @@ FROM ghcr.io/polyfea/spa-base
 
 COPY --from=builder /build/www /spa/public
 
-ENV OTEL_SERVICE_NAME=xcastven-ambulance-ufe
+ENV OTEL_SERVICE_NAME=xcastven-xkilian-project
 ENV SPA_BASE_PORT=8080
 EXPOSE 8080

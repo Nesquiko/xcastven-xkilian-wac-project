@@ -10,7 +10,7 @@ export namespace Components {
     }
     interface AppointmentScheduler {
     }
-    interface HomePage {
+    interface XcastvenXkilianProjectHomePage {
     }
 }
 declare global {
@@ -26,16 +26,16 @@ declare global {
         prototype: HTMLAppointmentSchedulerElement;
         new (): HTMLAppointmentSchedulerElement;
     };
-    interface HTMLHomePageElement extends Components.HomePage, HTMLStencilElement {
+    interface HTMLXcastvenXkilianProjectHomePageElement extends Components.XcastvenXkilianProjectHomePage, HTMLStencilElement {
     }
-    var HTMLHomePageElement: {
-        prototype: HTMLHomePageElement;
-        new (): HTMLHomePageElement;
+    var HTMLXcastvenXkilianProjectHomePageElement: {
+        prototype: HTMLXcastvenXkilianProjectHomePageElement;
+        new (): HTMLXcastvenXkilianProjectHomePageElement;
     };
     interface HTMLElementTagNameMap {
         "ambulance-app": HTMLAmbulanceAppElement;
         "appointment-scheduler": HTMLAppointmentSchedulerElement;
-        "home-page": HTMLHomePageElement;
+        "xcastven-xkilian-project-home-page": HTMLXcastvenXkilianProjectHomePageElement;
     }
 }
 declare namespace LocalJSX {
@@ -43,12 +43,12 @@ declare namespace LocalJSX {
     }
     interface AppointmentScheduler {
     }
-    interface HomePage {
+    interface XcastvenXkilianProjectHomePage {
     }
     interface IntrinsicElements {
         "ambulance-app": AmbulanceApp;
         "appointment-scheduler": AppointmentScheduler;
-        "home-page": HomePage;
+        "xcastven-xkilian-project-home-page": XcastvenXkilianProjectHomePage;
     }
 }
 export { LocalJSX as JSX };
@@ -57,7 +57,7 @@ declare module "@stencil/core" {
         interface IntrinsicElements {
             "ambulance-app": LocalJSX.AmbulanceApp & JSXBase.HTMLAttributes<HTMLAmbulanceAppElement>;
             "appointment-scheduler": LocalJSX.AppointmentScheduler & JSXBase.HTMLAttributes<HTMLAppointmentSchedulerElement>;
-            "home-page": LocalJSX.HomePage & JSXBase.HTMLAttributes<HTMLHomePageElement>;
+            "xcastven-xkilian-project-home-page": LocalJSX.XcastvenXkilianProjectHomePage & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectHomePageElement>;
         }
     }
 }

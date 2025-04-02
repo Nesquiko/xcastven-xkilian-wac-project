@@ -156,7 +156,7 @@ const data = {
 };
 
 @Component({
-  tag: 'home-page',
+  tag: 'xcastven-xkilian-project-home-page',
   shadow: false,
 })
 export class Homepage {

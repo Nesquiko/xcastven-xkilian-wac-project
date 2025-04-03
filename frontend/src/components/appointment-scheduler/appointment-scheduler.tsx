@@ -1,4 +1,3 @@
-import { StyledHost } from '../StyledHost';
 import { Component, h, State } from '@stencil/core';
 import { AppointmentType, Doctor, TimeSlot } from '../../lib/types';
 import { DAYS_OF_WEEK, getDateAndTimeTitle, MONTHS, TODAY } from '../../utils/utils';
@@ -198,7 +197,6 @@ export class AppointmentScheduler {
     const showDetails = this.showDetailsPanel();
 
     return (
-      <StyledHost>
         <div class="flex h-screen flex-col w-full flex-1 overflow-auto">
           {/* Header */}
           <div class="bg-gray-800 flex items-center p-3 text-white">
@@ -358,7 +356,6 @@ export class AppointmentScheduler {
             )}
           </div>
         </div>
-      </StyledHost>
     );
   };
 }

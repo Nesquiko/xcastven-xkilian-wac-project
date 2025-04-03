@@ -1,4 +1,3 @@
-import { StyledHost } from '../StyledHost';
 import { Component, h } from '@stencil/core';
 
 @Component({
@@ -8,7 +7,6 @@ import { Component, h } from '@stencil/core';
 export class AmbulanceApp {
   render() {
     return (
-      <StyledHost>
         <div class="flex min-h-screen items-center justify-center bg-gray-50">
           <div class="p-6 text-center">
             <h1 class="mb-4 text-4xl font-bold">WAC Project</h1>
@@ -20,7 +18,6 @@ export class AmbulanceApp {
             </a>
           </div>
         </div>
-      </StyledHost>
     );
   }
 }

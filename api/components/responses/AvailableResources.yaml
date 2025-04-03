@@ -1,0 +1,5 @@
+description: Successfully retrieved available resources for the specified time slot.
+content:
+  application/json:
+    schema:
+      $ref: "../schemas/resources/AvailableResources.yaml"

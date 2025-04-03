@@ -1,0 +1,20 @@
+type: object
+description: Data required for a patient to reschedule their appointment.
+properties:
+  newAppointmentDate:
+    type: string
+    format: date
+    description: The desired new date for the appointment (YYYY-MM-DD).
+    example: "2024-07-22"
+  newAppointmentTime:
+    type: string
+    description: The desired new time slot (HH:MM format, 24-hour clock).
+    pattern: '^([01]\d|2[0-3]):([0-5]\d)$'
+    example: "14:00"
+  reason:
+    type: string
+    description: Optional reason for rescheduling provided by the patient.
+    example: "Work conflict arose."
+required:
+  - newAppointmentDate
+  - newAppointmentTime

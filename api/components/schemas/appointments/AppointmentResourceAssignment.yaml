@@ -1,0 +1,22 @@
+type: object
+properties:
+  facilityIds:
+    type: array
+    description: List of unique identifiers (UUIDs) for required facilities.
+    items:
+      type: string
+      format: uuid
+    example: ["fac-001-a2b3-c4d5-e6f7"]
+  equipmentIds:
+    type: array
+    description: List of unique identifiers (UUIDs) for required equipment.
+    items:
+      type: string
+      format: uuid
+    example: ["eqp-002-f7e6-d5c4-b3a2", "eqp-005-1a2b-3c4d-5e6f"]
+  medicineIds:
+    type: array
+    description: List of unique identifiers (UUIDs) for required medicine.
+    items:
+      type: string
+      format: uuid

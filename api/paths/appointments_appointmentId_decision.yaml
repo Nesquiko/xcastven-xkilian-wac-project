@@ -1,0 +1,15 @@
+post:
+  tags:
+    - Appointments
+  summary: Accept or reject an appointment request
+  operationId: decideAppointmentRequest
+  parameters:
+    - $ref: "../components/parameters/path/appointmentId.yaml"
+  requestBody:
+    $ref: "../components/requestBodies/AppointmentDecisionRequest.yaml"
+  responses:
+    "200":
+      $ref: "../components/responses/AppointmentDecision.yaml"
+
+    "default":
+      $ref: "../components/responses/BaseErrorResponse.yaml"

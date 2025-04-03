@@ -1,0 +1,15 @@
+put:
+  tags:
+    - Resources
+  summary: Assign/Update resources for an appointment
+  operationId: assignAppointmentResources
+  parameters:
+    - $ref: "../components/parameters/path/appointmentId.yaml"
+  requestBody:
+    $ref: "../components/requestBodies/AppointmentResourceAssignmentRequest.yaml"
+  responses:
+    "200":
+      $ref: "../components/responses/AppointmentResourcesUpdated.yaml"
+
+    "default":
+      $ref: "../components/responses/BaseErrorResponse.yaml"

@@ -13,7 +13,7 @@ properties:
     description: The date of the appointment.
     example: "2024-07-16"
   timeSlot:
-    $ref: "../common/TimeSlot.yaml"
+    $ref: "../TimeSlot.yaml"
   type:
     $ref: "./AppointmentType.yaml"
   patient:

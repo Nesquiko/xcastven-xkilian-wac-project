@@ -1,0 +1,114 @@
+post:
+  tags:
+    - Appointments
+  summary: Reschedule my appointment
+  description: >-
+    Allows an authenticated patient to request rescheduling their own existing
+    appointment to a new date and time. This may require re-confirmation by
+    staff. Authentication is required.
+  operationId: rescheduleMyAppointment
+  parameters:
+    - $ref: "../components/parameters/path/appointmentId.yaml"
+  requestBody:
+    $ref: "../components/requestBodies/AppointmentRescheduleRequest.yaml"
+  responses:
+    "200":
+      $ref: "../components/responses/AppointmentRescheduled.yaml"
+
+    "400":
+      $ref: "../components/responses/BaseErrorResponse.yaml"
+      description: Bad Request - Invalid input data (e.g., invalid format, date in past, same time).
+      content:
+        application/problem+json:
+          examples:
+            invalidDateFormat:
+              summary: Example invalid date format (400)
+              value:
+                title: "Validation Error"
+                status: 400
+                code: "validation.invalid-date-format"
+                detail: "newAppointmentDate must be in YYYY-MM-DD format."
+            rescheduleToSameTime:
+              summary: Example rescheduling to the same time (400)
+              value:
+                title: "Validation Error"
+                status: 400
+                code: "validation.no-change"
+                detail: "The requested reschedule time is the same as the current appointment time."
+
+    "401":
+      $ref: "../components/responses/BaseErrorResponse.yaml"
+      description: Unauthorized - Authentication required.
+      content:
+        application/problem+json:
+          examples:
+            unauthorized:
+              summary: Example unauthorized access (401)
+              value:
+                title: "Unauthorized"
+                status: 401
+                code: "auth.unauthorized"
+                detail: "Authentication is required to reschedule an appointment."
+
+    "403":
+      $ref: "../components/responses/BaseErrorResponse.yaml"
+      description: Forbidden - Patient does not own this appointment.
+      content:
+        application/problem+json:
+          examples:
+            permissionDenied:
+              summary: Example permission denied (403)
+              value:
+                title: "Forbidden"
+                status: 403
+                code: "auth.forbidden"
+                detail: "You can only reschedule your own appointments."
+
+    "404":
+      $ref: "../components/responses/BaseErrorResponse.yaml"
+      description: Not Found - The specified appointment ID does not exist.
+      content:
+        application/problem+json:
+          examples:
+            appointmentNotFound:
+              summary: Example appointment not found (404)
+              value:
+                title: "Resource Not Found"
+                status: 404
+                code: "appointment.not-found"
+                detail: "Appointment with ID d4e5f6a7-b8c9-0123-4567-890abcdef123 not found."
+
+    "409":
+      $ref: "../components/responses/BaseErrorResponse.yaml"
+      description: Conflict - Cannot reschedule (e.g., appointment completed/cancelled, new slot unavailable).
+      content:
+        application/problem+json:
+          examples:
+            alreadyCompleted:
+              summary: Example already completed (409)
+              value:
+                title: "Conflict"
+                status: 409
+                code: "appointment.invalid-state-for-reschedule"
+                detail: "Cannot reschedule an appointment that is already completed or cancelled."
+            newSlotUnavailable:
+              summary: Example new slot unavailable (409)
+              value:
+                title: "Conflict"
+                status: 409
+                code: "appointment.slot-unavailable"
+                detail: "The requested new time slot 14:00 on 2024-07-22 is not available."
+
+    "500":
+      $ref: "../components/responses/BaseErrorResponse.yaml"
+      description: Internal Server Error.
+      content:
+        application/problem+json:
+          examples:
+            serverError:
+              summary: Example internal server error (500)
+              value:
+                title: "Internal Server Error"
+                status: 500
+                code: "server.unexpected-error"
+                detail: "An unexpected error occurred while rescheduling the appointment."

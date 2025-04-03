@@ -1,0 +1,14 @@
+description: Reason for cancelling the appointment.
+content:
+  application/json:
+    schema:
+      $ref: "../schemas/appointments/AppointmentCancellation.yaml"
+    examples:
+      patientCancellation:
+        summary: Example cancellation by patient
+        value:
+          cancellationReason: "Scheduling conflict."
+      staffCancellation:
+        summary: Example cancellation by staff
+        value:
+          cancellationReason: "Doctor unavailable due to emergency."

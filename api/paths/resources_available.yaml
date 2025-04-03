@@ -1,0 +1,14 @@
+get:
+  tags:
+    - Resources
+  summary: Get available resources for a time slot
+  operationId: getAvailableResources
+  parameters:
+    - $ref: "../components/parameters/query/date.yaml"
+    - $ref: "../components/parameters/query/time.yaml"
+  responses:
+    "200":
+      $ref: "../components/responses/AvailableResources.yaml"
+
+    "default":
+      $ref: "../components/responses/BaseErrorResponse.yaml"

@@ -168,6 +168,7 @@ export class Homepage {
   render() {
     return (
         <div class="flex h-screen flex-col w-full flex-1 overflow-auto">
+          <link href="/build/xcastven-xkilian-project.css" rel="stylesheet" />
           {/* Header */}
           <div class="bg-gray-800 flex items-center p-3 text-white">
             <md-icon-button

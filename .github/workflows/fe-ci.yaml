@@ -59,7 +59,7 @@ jobs:
         uses: docker/metadata-action@v5
         with:
           images: |
-            nesquiko/ambulance-ufe
+            nesquiko/xcastven-xkilian-wac-fe
           tags: |
             type=schedule
             type=ref,event=branch

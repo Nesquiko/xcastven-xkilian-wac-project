@@ -121,6 +121,63 @@ paths:
                     status: 500
                     code: server.unexpected-error
                     detail: An unexpected error occurred while registering the doctor.
+  /doctors/{id}/timeslots:
+    get:
+      tags:
+        - Doctors
+      summary: Get doctor's timeslots for a specific day
+      description: Retrieves a list of available and unavailable time slots for a given doctor ID and date.
+      operationId: getDoctorTimeslots
+      parameters:
+        - $ref: '#/components/parameters/doctorId'
+        - $ref: '#/components/parameters/date'
+      responses:
+        '200':
+          $ref: '#/components/responses/DoctorTimeslots'
+        '400':
+          $ref: '#/components/responses/BaseErrorResponse'
+          description: Bad Request - Invalid date format.
+          content:
+            application/problem+json:
+              examples:
+                invalidDateFormat:
+                  summary: Example invalid date format (400)
+                  value:
+                    title: Validation Error
+                    status: 400
+                    code: validation.invalid-date-format
+                    detail: Date parameter must be in YYYY-MM-DD format.
+                    instance: /doctors/b2c3d4e5-f6a7-8901-2345-67890abcdef1/timeslots?date=15-07-2024
+                    invalid-parameter: date
+        '404':
+          $ref: '#/components/responses/BaseErrorResponse'
+          description: Not Found - The specified doctor ID does not exist.
+          content:
+            application/problem+json:
+              examples:
+                doctorNotFound:
+                  summary: Example doctor not found (404)
+                  value:
+                    title: Resource Not Found
+                    status: 404
+                    code: doctor.not-found
+                    detail: Doctor with ID b2c3d4e5-f6a7-8901-2345-67890abcdef1 not found.
+                    instance: /doctors/b2c3d4e5-f6a7-8901-2345-67890abcdef1/timeslots?date=2024-07-15
+                    missing-resource-id: b2c3d4e5-f6a7-8901-2345-67890abcdef1
+        '500':
+          $ref: '#/components/responses/BaseErrorResponse'
+          description: Internal Server Error.
+          content:
+            application/problem+json:
+              examples:
+                serverError:
+                  summary: Example internal server error (500)
+                  value:
+                    title: Internal Server Error
+                    status: 500
+                    code: server.unexpected-error
+                    detail: An unexpected error occurred while retrieving timeslots.
+                    instance: /doctors/b2c3d4e5-f6a7-8901-2345-67890abcdef1/timeslots?date=2024-07-15
 components:
   schemas:
     Patient:
@@ -229,6 +286,25 @@ components:
         - firstName
         - lastName
         - specialization
+    TimeSlot:
+      type: object
+      description: Represents a single time slot for a doctor on a specific day.
+      properties:
+        time:
+          type: string
+          description: The time of the slot (HH:MM format, 24-hour clock).
+          pattern: ^([01]\d|2[0-3]):([0-5]\d)$
+          example: '09:30'
+        status:
+          type: string
+          description: Indicates whether the time slot is available or not.
+          enum:
+            - available
+            - unavailable
+          example: available
+      required:
+        - time
+        - status
   requestBodies:
     PatientRegistration:
       description: Patient details for registration.
@@ -280,3 +356,50 @@ components:
                 firstName: Lisa
                 lastName: Cuddy
                 specialization: Endocrinology
+    DoctorTimeslots:
+      description: Successfully retrieved the list of time slots.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              slots:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TimeSlot'
+          examples:
+            timeslotsExample:
+              summary: Example timeslots for a doctor on a specific day
+              value:
+                slots:
+                  - time: '09:00'
+                    status: available
+                  - time: '09:30'
+                    status: unavailable
+                  - time: '10:00'
+                    status: available
+                  - time: '10:30'
+                    status: available
+                  - time: '11:00'
+                    status: unavailable
+                  - time: '14:00'
+                    status: available
+  parameters:
+    doctorId:
+      name: doctorId
+      in: path
+      required: true
+      description: The unique identifier (UUID) of the doctor.
+      schema:
+        type: string
+        format: uuid
+      example: b2c3d4e5-f6a7-8901-2345-67890abcdef1
+    date:
+      name: date
+      in: query
+      required: true
+      description: The specific day for which to retrieve timeslots (YYYY-MM-DD format).
+      schema:
+        type: string
+        format: date
+      example: '2024-07-15'

@@ -71,6 +71,44 @@ paths:
                     code: server.unexpected-error
                     detail: An unexpected error occurred while processing the request.
   /doctors:
+    get:
+      tags:
+        - Doctors
+      summary: List all doctors
+      description: Retrieves a paginated list of all registered doctors.
+      operationId: listDoctors
+      parameters:
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/pageSize'
+      responses:
+        '200':
+          $ref: '#/components/responses/DoctorList'
+        '400':
+          $ref: '#/components/responses/BaseErrorResponse'
+          description: Bad Request - Invalid pagination parameters.
+          content:
+            application/problem+json:
+              examples:
+                invalidPageSize:
+                  summary: Example invalid page size (400)
+                  value:
+                    title: Validation Error
+                    status: 400
+                    code: validation.invalid-parameter
+                    detail: pageSize must be an integer between 1 and 100.
+        '500':
+          $ref: '#/components/responses/BaseErrorResponse'
+          description: Internal Server Error.
+          content:
+            application/problem+json:
+              examples:
+                serverError:
+                  summary: Example internal server error (500)
+                  value:
+                    title: Internal Server Error
+                    status: 500
+                    code: server.unexpected-error
+                    detail: An unexpected error occurred while retrieving doctors.
     post:
       tags:
         - Doctors
@@ -147,7 +185,6 @@ paths:
                     status: 400
                     code: validation.invalid-date-format
                     detail: Date parameter must be in YYYY-MM-DD format.
-                    instance: /doctors/b2c3d4e5-f6a7-8901-2345-67890abcdef1/timeslots?date=15-07-2024
                     invalid-parameter: date
         '404':
           $ref: '#/components/responses/BaseErrorResponse'
@@ -162,7 +199,6 @@ paths:
                     status: 404
                     code: doctor.not-found
                     detail: Doctor with ID b2c3d4e5-f6a7-8901-2345-67890abcdef1 not found.
-                    instance: /doctors/b2c3d4e5-f6a7-8901-2345-67890abcdef1/timeslots?date=2024-07-15
                     missing-resource-id: b2c3d4e5-f6a7-8901-2345-67890abcdef1
         '500':
           $ref: '#/components/responses/BaseErrorResponse'
@@ -177,7 +213,6 @@ paths:
                     status: 500
                     code: server.unexpected-error
                     detail: An unexpected error occurred while retrieving timeslots.
-                    instance: /doctors/b2c3d4e5-f6a7-8901-2345-67890abcdef1/timeslots?date=2024-07-15
 components:
   schemas:
     Patient:
@@ -286,6 +321,29 @@ components:
         - firstName
         - lastName
         - specialization
+    Pagination:
+      type: object
+      description: Structure for paginated list responses.
+      properties:
+        page:
+          type: integer
+          format: int
+          description: Current page number (0-indexed).
+          example: 0
+        pageSize:
+          type: integer
+          format: int
+          description: Number of items per page.
+          example: 20
+        total:
+          type: integer
+          format: int
+          description: Total number of items available.
+          example: 153
+      required:
+        - page
+        - pageSize
+        - total
     TimeSlot:
       type: object
       description: Represents a single time slot for a doctor on a specific day.
@@ -341,6 +399,47 @@ components:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/ErrorDetail'
+    DoctorList:
+      description: Successfully retrieved a paginated list of doctors.
+      content:
+        application/json:
+          schema:
+            type: object
+            description: A paginated list of doctors.
+            properties:
+              doctors:
+                type: array
+                description: The list of doctor objects for the current page.
+                items:
+                  $ref: '#/components/schemas/Doctor'
+              pagination:
+                $ref: '#/components/schemas/Pagination'
+            required:
+              - data
+              - pagination
+          examples:
+            doctorListExample:
+              summary: Example list of doctors with pagination
+              value:
+                doctors:
+                  - id: b2c3d4e5-f6a7-8901-2345-67890abcdef1
+                    email: dr.gregory.house@example.com
+                    firstName: Gregory
+                    lastName: House
+                    specialization: DIAGNOSTICIAN
+                    createdAt: '2024-05-21T11:00:00Z'
+                    updatedAt: '2024-05-21T11:00:00Z'
+                  - id: c3d4e5f6-a7b8-9012-3456-7890abcdef12
+                    email: dr.lisa.cuddy@example.com
+                    firstName: Lisa
+                    lastName: Cuddy
+                    specialization: ENDOCRINOLOGIST
+                    createdAt: '2024-05-21T11:05:00Z'
+                    updatedAt: '2024-05-21T11:05:00Z'
+                pagination:
+                  page: 0
+                  pageSize: 20
+                  total: 2
     DoctorCreated:
       description: Doctor registered successfully. Returns the created doctor object.
       content:
@@ -385,6 +484,27 @@ components:
                   - time: '14:00'
                     status: available
   parameters:
+    page:
+      name: page
+      in: query
+      required: false
+      description: The page number to retrieve (0-indexed).
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      example: 1
+    pageSize:
+      name: pageSize
+      in: query
+      required: false
+      description: The number of doctors to return per page.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+      example: 50
     doctorId:
       name: doctorId
       in: path

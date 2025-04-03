@@ -577,7 +577,7 @@ paths:
         $ref: '#/components/requestBodies/AppointmentDecisionRequest'
       responses:
         '200':
-          $ref: '#/components/responses/AppointmentDecision'
+          $ref: '#/components/responses/AppointmentDecisionResponse'
         default:
           $ref: '#/components/responses/BaseErrorResponse'
   /resources/available:
@@ -1316,7 +1316,7 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Appointment'
-    AppointmentDecision:
+    AppointmentDecisionResponse:
       description: Appointment successfully accepted (scheduled) or rejected (denied). Returns the full updated appointment details.
       content:
         application/json:

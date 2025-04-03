@@ -9,7 +9,7 @@ post:
     $ref: "../components/requestBodies/AppointmentDecisionRequest.yaml"
   responses:
     "200":
-      $ref: "../components/responses/AppointmentDecision.yaml"
+      $ref: "../components/responses/AppointmentDecisionResponse.yaml"
 
     "default":
       $ref: "../components/responses/BaseErrorResponse.yaml"

@@ -7,12 +7,13 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/Nesquiko/wac/pkg/api"
-	"github.com/Nesquiko/wac/pkg/app"
 	"github.com/getkin/kin-openapi/openapi3"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/httplog/v2"
 	"github.com/google/uuid"
+
+	"github.com/Nesquiko/wac/pkg/api"
+	"github.com/Nesquiko/wac/pkg/app"
 )
 
 const (

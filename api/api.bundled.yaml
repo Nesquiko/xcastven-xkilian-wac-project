@@ -159,7 +159,7 @@ paths:
                     status: 500
                     code: server.unexpected-error
                     detail: An unexpected error occurred while registering the doctor.
-  /doctors/{id}/timeslots:
+  /doctors/{doctorId}/timeslots:
     get:
       tags:
         - Doctors
@@ -213,6 +213,101 @@ paths:
                     status: 500
                     code: server.unexpected-error
                     detail: An unexpected error occurred while retrieving timeslots.
+  /appointments:
+    post:
+      tags:
+        - Appointments
+      summary: Request a new appointment
+      description: Allows an authenticated patient to request an appointment with a specific doctor at a given date and time slot.
+      operationId: requestAppointment
+      requestBody:
+        $ref: '#/components/requestBodies/AppointmentRequest'
+      responses:
+        '201':
+          $ref: '#/components/responses/AppointmentCreated'
+        '400':
+          $ref: '#/components/responses/BaseErrorResponse'
+          description: Bad Request - Invalid input data (e.g., missing fields, invalid format, date in past).
+          content:
+            application/problem+json:
+              examples:
+                invalidTimeFormat:
+                  summary: Example invalid time format (400)
+                  value:
+                    title: Validation Error
+                    status: 400
+                    code: validation.invalid-time-format
+                    detail: appointmentTime must be in HH:MM format.
+                    invalid-field: appointmentTime
+                dateInPast:
+                  summary: Example date in past (400)
+                  value:
+                    title: Validation Error
+                    status: 400
+                    code: validation.date-in-past
+                    detail: Appointment date cannot be in the past.
+                    invalid-field: appointmentDate
+        '401':
+          $ref: '#/components/responses/BaseErrorResponse'
+          description: Unauthorized - Patient authentication required.
+          content:
+            application/problem+json:
+              examples:
+                unauthorized:
+                  summary: Example unauthorized access (401)
+                  value:
+                    title: Unauthorized
+                    status: 401
+                    code: auth.unauthorized
+                    detail: Authentication is required to request an appointment.
+        '404':
+          $ref: '#/components/responses/BaseErrorResponse'
+          description: Not Found - The specified doctor ID does not exist.
+          content:
+            application/problem+json:
+              examples:
+                doctorNotFound:
+                  summary: Example doctor not found (404)
+                  value:
+                    title: Resource Not Found
+                    status: 404
+                    code: doctor.not-found
+                    detail: Doctor with ID b2c3d4e5-f6a7-8901-2345-67890abcdef1 not found.
+                    missing-resource-id: b2c3d4e5-f6a7-8901-2345-67890abcdef1
+        '409':
+          $ref: '#/components/responses/BaseErrorResponse'
+          description: Conflict - The requested time slot is not available or already booked by the patient.
+          content:
+            application/problem+json:
+              examples:
+                slotUnavailable:
+                  summary: Example timeslot unavailable (409)
+                  value:
+                    title: Conflict
+                    status: 409
+                    code: appointment.slot-unavailable
+                    detail: The requested time slot 10:00 on 2024-07-15 is no longer available.
+                    conflicting-slot: 2024-07-15T10:00
+                duplicateRequest:
+                  summary: Example duplicate patient booking (409)
+                  value:
+                    title: Conflict
+                    status: 409
+                    code: appointment.duplicate-request
+                    detail: You already have an appointment requested or scheduled at this time.
+        '500':
+          $ref: '#/components/responses/BaseErrorResponse'
+          description: Internal Server Error.
+          content:
+            application/problem+json:
+              examples:
+                serverError:
+                  summary: Example internal server error (500)
+                  value:
+                    title: Internal Server Error
+                    status: 500
+                    code: server.unexpected-error
+                    detail: An unexpected error occurred while requesting the appointment.
 components:
   schemas:
     Patient:
@@ -363,6 +458,97 @@ components:
       required:
         - time
         - status
+    NewAppointment:
+      type: object
+      description: Data sent by a patient to request an appointment time slot.
+      properties:
+        doctorId:
+          type: string
+          format: uuid
+          description: The unique identifier of the desired doctor.
+          example: b2c3d4e5-f6a7-8901-2345-67890abcdef1
+        appointmentDate:
+          type: string
+          format: date
+          description: The requested date for the appointment (YYYY-MM-DD).
+          example: '2024-07-16'
+        appointmentTime:
+          type: string
+          description: The requested time slot (HH:MM format, 24-hour clock).
+          pattern: ^([01]\d|2[0-3]):([0-5]\d)$
+          example: '11:30'
+        reason:
+          type: string
+          description: Optional reason for the appointment provided by the patient.
+          example: Feeling unwell, general check-up needed.
+      required:
+        - doctorId
+        - appointmentDate
+        - appointmentTime
+    AppointmentType:
+      type: object
+      description: Represents the type or category of an appointment.
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the appointment type.
+          readOnly: true
+          example: e5f6a7b8-c9d0-1234-5678-90abcdef1234
+        displayName:
+          type: string
+          description: Human-readable name of the appointment type.
+          example: Consultation
+      required:
+        - id
+        - displayName
+    PatientAppointment:
+      type: object
+      description: Represents an appointment from the patient's perspective.
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the appointment.
+          readOnly: true
+          example: d4e5f6a7-b8c9-0123-4567-890abcdef123
+        appointmentDate:
+          type: string
+          format: date
+          description: The date of the appointment.
+          example: '2024-07-16'
+        timeSlot:
+          $ref: '#/components/schemas/TimeSlot'
+        type:
+          $ref: '#/components/schemas/AppointmentType'
+        doctor:
+          $ref: '#/components/schemas/Doctor'
+        illness:
+          type: string
+          description: Associated illness diagnosis (if applicable).
+          example: Acute Bronchitis
+        status:
+          type: string
+          description: The current status of the appointment.
+          enum:
+            - requested
+            - canceled
+            - scheduled
+            - completed
+            - denied
+          readOnly: true
+          example: scheduled
+        reason:
+          type: string
+          description: Reason for the appointment provided by the patient.
+          example: Feeling unwell, general check-up needed.
+      required:
+        - id
+        - appointmentDate
+        - timeSlot
+        - type
+        - doctor
+        - status
   requestBodies:
     PatientRegistration:
       description: Patient details for registration.
@@ -386,6 +572,21 @@ components:
                 firstName: Lisa
                 lastName: Cuddy
                 specialization: Endocrinology
+    AppointmentRequest:
+      description: Details for requesting a new appointment.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/NewAppointment'
+          examples:
+            newAppointmentRequest:
+              summary: Example appointment request
+              value:
+                doctorId: b2c3d4e5-f6a7-8901-2345-67890abcdef1
+                appointmentDate: '2024-07-15'
+                appointmentTime: '10:00'
+                reason: Annual physical exam.
   responses:
     PatientCreated:
       description: Patient registered successfully. Returns the created patient object.
@@ -427,15 +628,11 @@ components:
                     firstName: Gregory
                     lastName: House
                     specialization: DIAGNOSTICIAN
-                    createdAt: '2024-05-21T11:00:00Z'
-                    updatedAt: '2024-05-21T11:00:00Z'
                   - id: c3d4e5f6-a7b8-9012-3456-7890abcdef12
                     email: dr.lisa.cuddy@example.com
                     firstName: Lisa
                     lastName: Cuddy
                     specialization: ENDOCRINOLOGIST
-                    createdAt: '2024-05-21T11:05:00Z'
-                    updatedAt: '2024-05-21T11:05:00Z'
                 pagination:
                   page: 0
                   pageSize: 20
@@ -483,6 +680,12 @@ components:
                     status: unavailable
                   - time: '14:00'
                     status: available
+    AppointmentCreated:
+      description: Appointment requested successfully. Returns the created appointment object with 'requested' status.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/PatientAppointment'
   parameters:
     page:
       name: page

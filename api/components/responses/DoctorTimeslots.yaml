@@ -7,7 +7,7 @@ content:
         slots:
           type: array
           items:
-            $ref: "../schemas/doctors/TimeSlot.yaml"
+            $ref: "../schemas/TimeSlot.yaml"
     examples:
       timeslotsExample:
         summary: Example timeslots for a doctor on a specific day

@@ -1,0 +1,5 @@
+description: Appointment requested successfully. Returns the created appointment object with 'requested' status.
+content:
+  application/json:
+    schema:
+      $ref: "../schemas/appointments/PatientAppointment.yaml"

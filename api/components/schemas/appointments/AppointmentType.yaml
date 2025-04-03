@@ -1,0 +1,16 @@
+type: object
+description: Represents the type or category of an appointment.
+properties:
+  id:
+    type: string
+    format: uuid
+    description: Unique identifier for the appointment type.
+    readOnly: true
+    example: "e5f6a7b8-c9d0-1234-5678-90abcdef1234"
+  displayName:
+    type: string
+    description: Human-readable name of the appointment type.
+    example: "Consultation"
+required:
+  - id
+  - displayName

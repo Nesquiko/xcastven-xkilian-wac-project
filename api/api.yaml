@@ -25,5 +25,7 @@ paths:
     $ref: "./paths/patients.yaml"
   /doctors:
     $ref: "./paths/doctors.yaml"
-  /doctors/{id}/timeslots:
-    $ref: "./paths/doctors_{id}.yaml"
+  /doctors/{doctorId}/timeslots:
+    $ref: "./paths/doctors_doctorId.yaml"
+  /appointments:
+    $ref: "./paths/appointments.yaml"

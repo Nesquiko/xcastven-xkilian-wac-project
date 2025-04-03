@@ -1,0 +1,26 @@
+type: object
+description: Data sent by a patient to request an appointment time slot.
+properties:
+  doctorId:
+    type: string
+    format: uuid
+    description: The unique identifier of the desired doctor.
+    example: "b2c3d4e5-f6a7-8901-2345-67890abcdef1"
+  appointmentDate:
+    type: string
+    format: date
+    description: The requested date for the appointment (YYYY-MM-DD).
+    example: "2024-07-16"
+  appointmentTime:
+    type: string
+    description: The requested time slot (HH:MM format, 24-hour clock).
+    pattern: '^([01]\d|2[0-3]):([0-5]\d)$'
+    example: "11:30"
+  reason:
+    type: string
+    description: Optional reason for the appointment provided by the patient.
+    example: "Feeling unwell, general check-up needed."
+required:
+  - doctorId
+  - appointmentDate
+  - appointmentTime

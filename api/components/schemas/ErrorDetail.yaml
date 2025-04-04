@@ -4,22 +4,18 @@ properties:
   title:
     type: string
     description: Short, human-readable summary of the error type.
-    example: "Validation Error"
   code:
     type: string
     description: Unique, machine-readable error code (e.g., 'namespace.error-name').
-    example: "validation.invalid-start-time"
   status:
     type: integer
     format: int
     description: HTTP status code for this error occurrence.
     minimum: 100
     maximum: 599
-    example: 400
   detail:
     type: string
     description: Human-readable explanation specific to this occurrence.
-    example: "One or more fields submitted are invalid."
 additionalProperties: true
 required:
   - title

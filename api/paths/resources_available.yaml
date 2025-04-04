@@ -10,5 +10,5 @@ get:
     "200":
       $ref: "../components/responses/AvailableResources.yaml"
 
-    "default":
-      $ref: "../components/responses/BaseErrorResponse.yaml"
+    "500":
+      $ref: "../components/responses/InternalServerErrorResponse.yaml"

@@ -3,4 +3,8 @@ content:
   application/problem+json:
     schema:
       $ref: "../schemas/ErrorDetail.yaml"
-    # examples will be added in the path definition.
+    example:
+      title: "Internal server error"
+      status: 500
+      code: "internal.server.error"
+      detail: "An unknwon server error occured"

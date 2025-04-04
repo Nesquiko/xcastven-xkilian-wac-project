@@ -11,10 +11,11 @@ post:
       $ref: "../components/responses/AppointmentCreated.yaml"
 
     "400":
-      $ref: "../components/responses/BaseErrorResponse.yaml"
       description: Bad Request - Invalid input data (e.g., missing fields, invalid format, date in past).
       content:
         application/problem+json:
+          schema:
+            $ref: "../components/schemas/ErrorDetail.yaml"
           examples:
             invalidTimeFormat:
               summary: Example invalid time format (400)
@@ -34,25 +35,14 @@ post:
                 invalid-field: "appointmentDate"
 
     "401":
-      # Assuming BaseErrorResponse can handle 401 structure too
-      $ref: "../components/responses/BaseErrorResponse.yaml"
-      description: Unauthorized - Patient authentication required.
-      content:
-        application/problem+json:
-          examples:
-            unauthorized:
-              summary: Example unauthorized access (401)
-              value:
-                title: "Unauthorized"
-                status: 401
-                code: "auth.unauthorized"
-                detail: "Authentication is required to request an appointment."
+      $ref: "../components/responses/UnauthorizedErrorResponse.yaml"
 
     "404":
-      $ref: "../components/responses/BaseErrorResponse.yaml"
       description: Not Found - The specified doctor ID does not exist.
       content:
         application/problem+json:
+          schema:
+            $ref: "../components/schemas/ErrorDetail.yaml"
           examples:
             doctorNotFound:
               summary: Example doctor not found (404)
@@ -64,10 +54,11 @@ post:
                 missing-resource-id: "b2c3d4e5-f6a7-8901-2345-67890abcdef1"
 
     "409":
-      $ref: "../components/responses/BaseErrorResponse.yaml"
       description: Conflict - The requested time slot is not available or already booked by the patient.
       content:
         application/problem+json:
+          schema:
+            $ref: "../components/schemas/ErrorDetail.yaml"
           examples:
             slotUnavailable:
               summary: Example timeslot unavailable (409)
@@ -76,7 +67,6 @@ post:
                 status: 409
                 code: "appointment.slot-unavailable"
                 detail: "The requested time slot 10:00 on 2024-07-15 is no longer available."
-                conflicting-slot: "2024-07-15T10:00"
             duplicateRequest:
               summary: Example duplicate patient booking (409)
               value:
@@ -86,15 +76,4 @@ post:
                 detail: "You already have an appointment requested or scheduled at this time."
 
     "500":
-      $ref: "../components/responses/BaseErrorResponse.yaml"
-      description: Internal Server Error.
-      content:
-        application/problem+json:
-          examples:
-            serverError:
-              summary: Example internal server error (500)
-              value:
-                title: "Internal Server Error"
-                status: 500
-                code: "server.unexpected-error"
-                detail: "An unexpected error occurred while requesting the appointment."
+      $ref: "../components/responses/InternalServerErrorResponse.yaml"

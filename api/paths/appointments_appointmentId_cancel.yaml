@@ -17,25 +17,14 @@ post:
       description: Appointment successfully cancelled.
 
     "401":
-      $ref: "../components/responses/BaseErrorResponse.yaml"
-      description: Unauthorized - Authentication required.
-      content:
-        application/problem+json:
-          examples:
-            unauthorized:
-              summary: Example unauthorized access (401)
-              value:
-                title: "Unauthorized"
-                status: 401
-                code: "auth.unauthorized"
-                detail: "Authentication is required to cancel an appointment."
-                instance: "/appointments/d4e5f6a7-b8c9-0123-4567-890abcdef123/cancel"
+      $ref: "../components/responses/UnauthorizedErrorResponse.yaml"
 
     "403":
-      $ref: "../components/responses/BaseErrorResponse.yaml"
       description: Forbidden - User does not have permission to cancel this appointment.
       content:
         application/problem+json:
+          schema:
+            $ref: "../components/schemas/ErrorDetail.yaml"
           examples:
             permissionDenied:
               summary: Example permission denied (403)
@@ -46,10 +35,11 @@ post:
                 detail: "You do not have permission to cancel this appointment."
 
     "404":
-      $ref: "../components/responses/BaseErrorResponse.yaml"
       description: Not Found - The specified appointment ID does not exist.
       content:
         application/problem+json:
+          schema:
+            $ref: "../components/schemas/ErrorDetail.yaml"
           examples:
             appointmentNotFound:
               summary: Example appointment not found (404)
@@ -60,10 +50,11 @@ post:
                 detail: "Appointment with ID d4e5f6a7-b8c9-0123-4567-890abcdef123 not found."
 
     "409":
-      $ref: "../components/responses/BaseErrorResponse.yaml"
       description: Conflict - The appointment cannot be cancelled (e.g., already completed or cancelled).
       content:
         application/problem+json:
+          schema:
+            $ref: "../components/schemas/ErrorDetail.yaml"
           examples:
             alreadyCompleted:
               summary: Example already completed (409)
@@ -74,15 +65,4 @@ post:
                 detail: "Cannot cancel an appointment that is already completed."
 
     "500":
-      $ref: "../components/responses/BaseErrorResponse.yaml"
-      description: Internal Server Error.
-      content:
-        application/problem+json:
-          examples:
-            serverError:
-              summary: Example internal server error (500)
-              value:
-                title: "Internal Server Error"
-                status: 500
-                code: "server.unexpected-error"
-                detail: "An unexpected error occurred while cancelling the appointment."
+      $ref: "../components/responses/InternalServerErrorResponse.yaml"

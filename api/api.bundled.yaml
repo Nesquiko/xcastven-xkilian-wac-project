@@ -31,24 +31,12 @@ paths:
       responses:
         '201':
           $ref: '#/components/responses/PatientCreated'
-        '400':
-          $ref: '#/components/responses/BaseErrorResponse'
-          description: Bad Request - Invalid input data.
-          content:
-            application/problem+json:
-              examples:
-                validationError:
-                  summary: Example validation error (400)
-                  value:
-                    title: Validation Error
-                    status: 400
-                    code: validation.invalid-field
-                    detail: Email must be a valid email address.
         '409':
-          $ref: '#/components/responses/BaseErrorResponse'
           description: Conflict - Patient email already exists.
           content:
             application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetail'
               examples:
                 duplicateEmail:
                   summary: Example duplicate email error (409)
@@ -58,18 +46,7 @@ paths:
                     code: patient.email-exists
                     detail: A patient with email john.doe@example.com already exists.
         '500':
-          $ref: '#/components/responses/BaseErrorResponse'
-          description: Internal Server Error.
-          content:
-            application/problem+json:
-              examples:
-                serverError:
-                  summary: Example internal server error (500)
-                  value:
-                    title: Internal Server Error
-                    status: 500
-                    code: server.unexpected-error
-                    detail: An unexpected error occurred while processing the request.
+          $ref: '#/components/responses/InternalServerErrorResponse'
   /patients/{patientId}/medical-history/files:
     get:
       tags:
@@ -84,10 +61,11 @@ paths:
         '200':
           $ref: '#/components/responses/MedicalRecordFileList'
         '400':
-          $ref: '#/components/responses/BaseErrorResponse'
           description: Bad Request - Invalid pagination parameters.
           content:
             application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetail'
               examples:
                 invalidPageParam:
                   summary: Example invalid page parameter (400)
@@ -96,36 +74,10 @@ paths:
                     status: 400
                     code: validation.invalid-parameter
                     detail: page must be a non-negative integer.
-                    instance: /patients/me/medical-history/files?page=-1
-                    invalid-parameter: page
         '401':
-          $ref: '#/components/responses/BaseErrorResponse'
-          description: Unauthorized - Authentication required.
-          content:
-            application/problem+json:
-              examples:
-                unauthorized:
-                  summary: Example unauthorized access (401)
-                  value:
-                    title: Unauthorized
-                    status: 401
-                    code: auth.unauthorized
-                    detail: Authentication is required to access medical history.
-                    instance: /patients/me/medical-history/files
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
         '500':
-          $ref: '#/components/responses/BaseErrorResponse'
-          description: Internal Server Error.
-          content:
-            application/problem+json:
-              examples:
-                serverError:
-                  summary: Example internal server error (500)
-                  value:
-                    title: Internal Server Error
-                    status: 500
-                    code: server.unexpected-error
-                    detail: An unexpected error occurred while retrieving medical history files.
-                    instance: /patients/me/medical-history/files
+          $ref: '#/components/responses/InternalServerErrorResponse'
   /doctors:
     get:
       tags:
@@ -140,10 +92,11 @@ paths:
         '200':
           $ref: '#/components/responses/DoctorList'
         '400':
-          $ref: '#/components/responses/BaseErrorResponse'
           description: Bad Request - Invalid pagination parameters.
           content:
             application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetail'
               examples:
                 invalidPageSize:
                   summary: Example invalid page size (400)
@@ -153,18 +106,7 @@ paths:
                     code: validation.invalid-parameter
                     detail: pageSize must be an integer between 1 and 100.
         '500':
-          $ref: '#/components/responses/BaseErrorResponse'
-          description: Internal Server Error.
-          content:
-            application/problem+json:
-              examples:
-                serverError:
-                  summary: Example internal server error (500)
-                  value:
-                    title: Internal Server Error
-                    status: 500
-                    code: server.unexpected-error
-                    detail: An unexpected error occurred while retrieving doctors.
+          $ref: '#/components/responses/InternalServerErrorResponse'
     post:
       tags:
         - Doctors
@@ -177,10 +119,11 @@ paths:
         '201':
           $ref: '#/components/responses/DoctorCreated'
         '400':
-          $ref: '#/components/responses/BaseErrorResponse'
           description: Bad Request - Invalid input data (e.g., missing fields, invalid email).
           content:
             application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetail'
               examples:
                 validationError:
                   summary: Example validation error (400)
@@ -190,10 +133,11 @@ paths:
                     code: validation.missing-field
                     detail: Required field "specialization" is missing.
         '409':
-          $ref: '#/components/responses/BaseErrorResponse'
           description: Conflict - A doctor with the provided email already exists.
           content:
             application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetail'
               examples:
                 duplicateEmail:
                   summary: Example duplicate email error (409)
@@ -203,18 +147,7 @@ paths:
                     code: doctor.email-exists
                     detail: A doctor with email dr.house@example.com already exists.
         '500':
-          $ref: '#/components/responses/BaseErrorResponse'
-          description: Internal Server Error.
-          content:
-            application/problem+json:
-              examples:
-                serverError:
-                  summary: Example internal server error (500)
-                  value:
-                    title: Internal Server Error
-                    status: 500
-                    code: server.unexpected-error
-                    detail: An unexpected error occurred while registering the doctor.
+          $ref: '#/components/responses/InternalServerErrorResponse'
   /doctors/{doctorId}/timeslots:
     get:
       tags:
@@ -229,10 +162,11 @@ paths:
         '200':
           $ref: '#/components/responses/DoctorTimeslots'
         '400':
-          $ref: '#/components/responses/BaseErrorResponse'
           description: Bad Request - Invalid date format.
           content:
             application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetail'
               examples:
                 invalidDateFormat:
                   summary: Example invalid date format (400)
@@ -243,10 +177,11 @@ paths:
                     detail: Date parameter must be in YYYY-MM-DD format.
                     invalid-parameter: date
         '404':
-          $ref: '#/components/responses/BaseErrorResponse'
           description: Not Found - The specified doctor ID does not exist.
           content:
             application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetail'
               examples:
                 doctorNotFound:
                   summary: Example doctor not found (404)
@@ -255,20 +190,8 @@ paths:
                     status: 404
                     code: doctor.not-found
                     detail: Doctor with ID b2c3d4e5-f6a7-8901-2345-67890abcdef1 not found.
-                    missing-resource-id: b2c3d4e5-f6a7-8901-2345-67890abcdef1
         '500':
-          $ref: '#/components/responses/BaseErrorResponse'
-          description: Internal Server Error.
-          content:
-            application/problem+json:
-              examples:
-                serverError:
-                  summary: Example internal server error (500)
-                  value:
-                    title: Internal Server Error
-                    status: 500
-                    code: server.unexpected-error
-                    detail: An unexpected error occurred while retrieving timeslots.
+          $ref: '#/components/responses/InternalServerErrorResponse'
   /appointments:
     post:
       tags:
@@ -282,10 +205,11 @@ paths:
         '201':
           $ref: '#/components/responses/AppointmentCreated'
         '400':
-          $ref: '#/components/responses/BaseErrorResponse'
           description: Bad Request - Invalid input data (e.g., missing fields, invalid format, date in past).
           content:
             application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetail'
               examples:
                 invalidTimeFormat:
                   summary: Example invalid time format (400)
@@ -304,23 +228,13 @@ paths:
                     detail: Appointment date cannot be in the past.
                     invalid-field: appointmentDate
         '401':
-          $ref: '#/components/responses/BaseErrorResponse'
-          description: Unauthorized - Patient authentication required.
-          content:
-            application/problem+json:
-              examples:
-                unauthorized:
-                  summary: Example unauthorized access (401)
-                  value:
-                    title: Unauthorized
-                    status: 401
-                    code: auth.unauthorized
-                    detail: Authentication is required to request an appointment.
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
         '404':
-          $ref: '#/components/responses/BaseErrorResponse'
           description: Not Found - The specified doctor ID does not exist.
           content:
             application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetail'
               examples:
                 doctorNotFound:
                   summary: Example doctor not found (404)
@@ -331,10 +245,11 @@ paths:
                     detail: Doctor with ID b2c3d4e5-f6a7-8901-2345-67890abcdef1 not found.
                     missing-resource-id: b2c3d4e5-f6a7-8901-2345-67890abcdef1
         '409':
-          $ref: '#/components/responses/BaseErrorResponse'
           description: Conflict - The requested time slot is not available or already booked by the patient.
           content:
             application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetail'
               examples:
                 slotUnavailable:
                   summary: Example timeslot unavailable (409)
@@ -343,7 +258,6 @@ paths:
                     status: 409
                     code: appointment.slot-unavailable
                     detail: The requested time slot 10:00 on 2024-07-15 is no longer available.
-                    conflicting-slot: 2024-07-15T10:00
                 duplicateRequest:
                   summary: Example duplicate patient booking (409)
                   value:
@@ -352,18 +266,7 @@ paths:
                     code: appointment.duplicate-request
                     detail: You already have an appointment requested or scheduled at this time.
         '500':
-          $ref: '#/components/responses/BaseErrorResponse'
-          description: Internal Server Error.
-          content:
-            application/problem+json:
-              examples:
-                serverError:
-                  summary: Example internal server error (500)
-                  value:
-                    title: Internal Server Error
-                    status: 500
-                    code: server.unexpected-error
-                    detail: An unexpected error occurred while requesting the appointment.
+          $ref: '#/components/responses/InternalServerErrorResponse'
   /appointments/{appointmentId}/cancel:
     post:
       tags:
@@ -379,24 +282,13 @@ paths:
         '204':
           description: Appointment successfully cancelled.
         '401':
-          $ref: '#/components/responses/BaseErrorResponse'
-          description: Unauthorized - Authentication required.
-          content:
-            application/problem+json:
-              examples:
-                unauthorized:
-                  summary: Example unauthorized access (401)
-                  value:
-                    title: Unauthorized
-                    status: 401
-                    code: auth.unauthorized
-                    detail: Authentication is required to cancel an appointment.
-                    instance: /appointments/d4e5f6a7-b8c9-0123-4567-890abcdef123/cancel
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
         '403':
-          $ref: '#/components/responses/BaseErrorResponse'
           description: Forbidden - User does not have permission to cancel this appointment.
           content:
             application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetail'
               examples:
                 permissionDenied:
                   summary: Example permission denied (403)
@@ -406,10 +298,11 @@ paths:
                     code: auth.forbidden
                     detail: You do not have permission to cancel this appointment.
         '404':
-          $ref: '#/components/responses/BaseErrorResponse'
           description: Not Found - The specified appointment ID does not exist.
           content:
             application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetail'
               examples:
                 appointmentNotFound:
                   summary: Example appointment not found (404)
@@ -419,10 +312,11 @@ paths:
                     code: appointment.not-found
                     detail: Appointment with ID d4e5f6a7-b8c9-0123-4567-890abcdef123 not found.
         '409':
-          $ref: '#/components/responses/BaseErrorResponse'
           description: Conflict - The appointment cannot be cancelled (e.g., already completed or cancelled).
           content:
             application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetail'
               examples:
                 alreadyCompleted:
                   summary: Example already completed (409)
@@ -432,18 +326,7 @@ paths:
                     code: appointment.invalid-state-for-cancel
                     detail: Cannot cancel an appointment that is already completed.
         '500':
-          $ref: '#/components/responses/BaseErrorResponse'
-          description: Internal Server Error.
-          content:
-            application/problem+json:
-              examples:
-                serverError:
-                  summary: Example internal server error (500)
-                  value:
-                    title: Internal Server Error
-                    status: 500
-                    code: server.unexpected-error
-                    detail: An unexpected error occurred while cancelling the appointment.
+          $ref: '#/components/responses/InternalServerErrorResponse'
   /appointments/{appointmentId}/reschedule:
     post:
       tags:
@@ -459,10 +342,11 @@ paths:
         '200':
           $ref: '#/components/responses/AppointmentRescheduled'
         '400':
-          $ref: '#/components/responses/BaseErrorResponse'
           description: Bad Request - Invalid input data (e.g., invalid format, date in past, same time).
           content:
             application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetail'
               examples:
                 invalidDateFormat:
                   summary: Example invalid date format (400)
@@ -479,23 +363,13 @@ paths:
                     code: validation.no-change
                     detail: The requested reschedule time is the same as the current appointment time.
         '401':
-          $ref: '#/components/responses/BaseErrorResponse'
-          description: Unauthorized - Authentication required.
-          content:
-            application/problem+json:
-              examples:
-                unauthorized:
-                  summary: Example unauthorized access (401)
-                  value:
-                    title: Unauthorized
-                    status: 401
-                    code: auth.unauthorized
-                    detail: Authentication is required to reschedule an appointment.
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
         '403':
-          $ref: '#/components/responses/BaseErrorResponse'
           description: Forbidden - Patient does not own this appointment.
           content:
             application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetail'
               examples:
                 permissionDenied:
                   summary: Example permission denied (403)
@@ -505,10 +379,11 @@ paths:
                     code: auth.forbidden
                     detail: You can only reschedule your own appointments.
         '404':
-          $ref: '#/components/responses/BaseErrorResponse'
           description: Not Found - The specified appointment ID does not exist.
           content:
             application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetail'
               examples:
                 appointmentNotFound:
                   summary: Example appointment not found (404)
@@ -518,10 +393,11 @@ paths:
                     code: appointment.not-found
                     detail: Appointment with ID d4e5f6a7-b8c9-0123-4567-890abcdef123 not found.
         '409':
-          $ref: '#/components/responses/BaseErrorResponse'
           description: Conflict - Cannot reschedule (e.g., appointment completed/cancelled, new slot unavailable).
           content:
             application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetail'
               examples:
                 alreadyCompleted:
                   summary: Example already completed (409)
@@ -538,18 +414,7 @@ paths:
                     code: appointment.slot-unavailable
                     detail: The requested new time slot 14:00 on 2024-07-22 is not available.
         '500':
-          $ref: '#/components/responses/BaseErrorResponse'
-          description: Internal Server Error.
-          content:
-            application/problem+json:
-              examples:
-                serverError:
-                  summary: Example internal server error (500)
-                  value:
-                    title: Internal Server Error
-                    status: 500
-                    code: server.unexpected-error
-                    detail: An unexpected error occurred while rescheduling the appointment.
+          $ref: '#/components/responses/InternalServerErrorResponse'
   /appointments/{appointmentId}/resources:
     put:
       tags:
@@ -563,8 +428,8 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/AppointmentResourcesUpdated'
-        default:
-          $ref: '#/components/responses/BaseErrorResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
   /appointments/{appointmentId}/decision:
     post:
       tags:
@@ -578,8 +443,8 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/AppointmentDecisionResponse'
-        default:
-          $ref: '#/components/responses/BaseErrorResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
   /resources/available:
     get:
       tags:
@@ -592,8 +457,8 @@ paths:
       responses:
         '200':
           $ref: '#/components/responses/AvailableResources'
-        default:
-          $ref: '#/components/responses/BaseErrorResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 components:
   schemas:
     Patient:
@@ -630,22 +495,18 @@ components:
         title:
           type: string
           description: Short, human-readable summary of the error type.
-          example: Validation Error
         code:
           type: string
           description: Unique, machine-readable error code (e.g., 'namespace.error-name').
-          example: validation.invalid-start-time
         status:
           type: integer
           format: int
           description: HTTP status code for this error occurrence.
           minimum: 100
           maximum: 599
-          example: 400
         detail:
           type: string
           description: Human-readable explanation specific to this occurrence.
-          example: One or more fields submitted are invalid.
       additionalProperties: true
       required:
         - title
@@ -1177,12 +1038,17 @@ components:
         application/json:
           schema:
             $ref: '#/components/schemas/Patient'
-    BaseErrorResponse:
+    InternalServerErrorResponse:
       description: An error occurred. See specific status code for details.
       content:
         application/problem+json:
           schema:
             $ref: '#/components/schemas/ErrorDetail'
+          example:
+            title: Internal server error
+            status: 500
+            code: internal.server.error
+            detail: An unknwon server error occured
     MedicalRecordFileList:
       description: Successfully retrieved the paginated list of medical history filenames.
       content:
@@ -1202,6 +1068,17 @@ components:
                   page: 0
                   pageSize: 10
                   total: 4
+    UnauthorizedErrorResponse:
+      description: Example unauthorized access (401)
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ErrorDetail'
+          example:
+            title: Unauthorized
+            status: 401
+            code: auth.unauthorized
+            detail: Authentication is required
     DoctorList:
       description: Successfully retrieved a paginated list of doctors.
       content:

@@ -12,10 +12,11 @@ get:
       $ref: "../components/responses/DoctorTimeslots.yaml"
 
     "400":
-      $ref: "../components/responses/BaseErrorResponse.yaml"
       description: Bad Request - Invalid date format.
       content:
         application/problem+json:
+          schema:
+            $ref: "../components/schemas/ErrorDetail.yaml"
           examples:
             invalidDateFormat:
               summary: Example invalid date format (400)
@@ -27,10 +28,11 @@ get:
                 invalid-parameter: "date"
 
     "404":
-      $ref: "../components/responses/BaseErrorResponse.yaml"
       description: Not Found - The specified doctor ID does not exist.
       content:
         application/problem+json:
+          schema:
+            $ref: "../components/schemas/ErrorDetail.yaml"
           examples:
             doctorNotFound:
               summary: Example doctor not found (404)
@@ -39,18 +41,6 @@ get:
                 status: 404
                 code: "doctor.not-found"
                 detail: "Doctor with ID b2c3d4e5-f6a7-8901-2345-67890abcdef1 not found."
-                missing-resource-id: "b2c3d4e5-f6a7-8901-2345-67890abcdef1"
 
     "500":
-      $ref: "../components/responses/BaseErrorResponse.yaml"
-      description: Internal Server Error.
-      content:
-        application/problem+json:
-          examples:
-            serverError:
-              summary: Example internal server error (500)
-              value:
-                title: "Internal Server Error"
-                status: 500
-                code: "server.unexpected-error"
-                detail: "An unexpected error occurred while retrieving timeslots."
+      $ref: "../components/responses/InternalServerErrorResponse.yaml"

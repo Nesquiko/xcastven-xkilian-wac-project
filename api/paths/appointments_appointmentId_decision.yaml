@@ -11,5 +11,5 @@ post:
     "200":
       $ref: "../components/responses/AppointmentDecisionResponse.yaml"
 
-    "default":
-      $ref: "../components/responses/BaseErrorResponse.yaml"
+    "500":
+      $ref: "../components/responses/InternalServerErrorResponse.yaml"

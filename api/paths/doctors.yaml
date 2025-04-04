@@ -12,10 +12,11 @@ get:
       $ref: "../components/responses/DoctorList.yaml"
 
     "400":
-      $ref: "../components/responses/BaseErrorResponse.yaml"
       description: Bad Request - Invalid pagination parameters.
       content:
         application/problem+json:
+          schema:
+            $ref: "../components/schemas/ErrorDetail.yaml"
           examples:
             invalidPageSize:
               summary: Example invalid page size (400)
@@ -26,18 +27,7 @@ get:
                 detail: "pageSize must be an integer between 1 and 100."
 
     "500":
-      $ref: "../components/responses/BaseErrorResponse.yaml"
-      description: Internal Server Error.
-      content:
-        application/problem+json:
-          examples:
-            serverError:
-              summary: Example internal server error (500)
-              value:
-                title: "Internal Server Error"
-                status: 500
-                code: "server.unexpected-error"
-                detail: "An unexpected error occurred while retrieving doctors."
+      $ref: "../components/responses/InternalServerErrorResponse.yaml"
 
 post:
   tags:
@@ -52,10 +42,11 @@ post:
       $ref: "../components/responses/DoctorCreated.yaml"
 
     "400":
-      $ref: "../components/responses/BaseErrorResponse.yaml"
       description: Bad Request - Invalid input data (e.g., missing fields, invalid email).
       content:
         application/problem+json:
+          schema:
+            $ref: "../components/schemas/ErrorDetail.yaml"
           examples:
             validationError:
               summary: Example validation error (400)
@@ -66,10 +57,11 @@ post:
                 detail: 'Required field "specialization" is missing.'
 
     "409":
-      $ref: "../components/responses/BaseErrorResponse.yaml"
       description: Conflict - A doctor with the provided email already exists.
       content:
         application/problem+json:
+          schema:
+            $ref: "../components/schemas/ErrorDetail.yaml"
           examples:
             duplicateEmail:
               summary: Example duplicate email error (409)
@@ -80,15 +72,4 @@ post:
                 detail: "A doctor with email dr.house@example.com already exists."
 
     "500":
-      $ref: "../components/responses/BaseErrorResponse.yaml"
-      description: Internal Server Error.
-      content:
-        application/problem+json:
-          examples:
-            serverError:
-              summary: Example internal server error (500)
-              value:
-                title: "Internal Server Error"
-                status: 500
-                code: "server.unexpected-error"
-                detail: "An unexpected error occurred while registering the doctor."
+      $ref: "../components/responses/InternalServerErrorResponse.yaml"

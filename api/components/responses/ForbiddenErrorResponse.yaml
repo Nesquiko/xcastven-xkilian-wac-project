@@ -1,0 +1,10 @@
+description: Example unauthorized access (401)
+content:
+  application/problem+json:
+    schema:
+      $ref: "../schemas/ErrorDetail.yaml"
+    example:
+      title: "Unauthorized"
+      status: 401
+      code: "auth.unauthorized"
+      detail: "Authentication is required to reschedule an appointment."

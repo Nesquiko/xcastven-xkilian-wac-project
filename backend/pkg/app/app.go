@@ -31,3 +31,16 @@ func (a App) CreatePatient(ctx context.Context, p api.Patient) (api.Patient, err
 
 	return dataPatientToApiPatient(patient), nil
 }
+
+func (a App) CreateDoctor(ctx context.Context, d api.Doctor) (api.Doctor, error) {
+	doctor := apiDoctorToDataDoctor(d)
+
+	doctor, err := a.db.CreateDoctor(ctx, doctor)
+	if errors.Is(err, data.ErrDuplicateEmail) {
+		return api.Doctor{}, fmt.Errorf("CreateDoctor duplicate emall: %w", ErrDuplicateEmail)
+	} else if err != nil {
+		return api.Doctor{}, fmt.Errorf("CreateDoctor: %w", err)
+	}
+
+	return dataDoctorToApiDoctor(doctor), nil
+}

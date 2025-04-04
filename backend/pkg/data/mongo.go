@@ -16,9 +16,12 @@ type MongoDb struct {
 
 var _ Db = (*MongoDb)(nil)
 
-const patientsCollection = "patients"
+const (
+	patientsCollection = "patients"
+	doctorsCollection  = "doctors"
+)
 
-var Collections = []string{patientsCollection, "doctors", "appointments"}
+var Collections = []string{patientsCollection, doctorsCollection, "appointments"}
 
 func ConnectMongo(ctx context.Context, uri string, db string) (*MongoDb, error) {
 	client, err := mongo.Connect(options.Client().ApplyURI(uri))
@@ -69,18 +72,29 @@ func initCollections(ctx context.Context, mongoDb *mongo.Database, cols []string
 }
 
 func initIndexes(ctx context.Context, mongoDb *mongo.Database) error {
-	patientColl := mongoDb.Collection(patientsCollection)
-	indexModel := mongo.IndexModel{
-		Keys:    bson.M{"email": 1},
-		Options: options.Index().SetUnique(true),
+	indexes := map[string]mongo.IndexModel{
+		patientsCollection: {
+			Keys:    bson.M{"email": 1},
+			Options: options.Index().SetUnique(true),
+		},
+		doctorsCollection: {
+			Keys:    bson.M{"email": 1},
+			Options: options.Index().SetUnique(true),
+		},
 	}
-	indexName, err := patientColl.Indexes().CreateOne(ctx, indexModel)
-	if err != nil {
-		slog.Warn(
-			"Could not ensure unique index on patients.email ",
-			slog.String("error", err.Error()),
-			slog.String("index", indexName),
-		)
+
+	for collName, indexModel := range indexes {
+		coll := mongoDb.Collection(collName)
+		indexName, err := coll.Indexes().CreateOne(ctx, indexModel)
+		if err != nil {
+			slog.Warn(
+				"Could not create index (may already exist with different options or other issue)",
+				slog.String("collection", collName),
+				slog.Any("keys", indexModel.Keys),
+				slog.String("error", err.Error()),
+				slog.String("indexName", indexName),
+			)
+		}
 	}
 	return nil
 }

@@ -39,7 +39,32 @@ func (s Server) RegisterPatient(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s Server) RegisterDoctor(w http.ResponseWriter, r *http.Request) {
-	panic("unimplemented")
+	request, decodeErr := Decode[api.Doctor](w, r)
+	if decodeErr != nil {
+		encodeError(w, decodeErr)
+		return
+	}
+	slog.Info("doctor email", "email", request.Email)
+
+	doc, err := s.app.CreateDoctor(r.Context(), request)
+	if errors.Is(err, app.ErrDuplicateEmail) {
+		apiErr := &ApiError{
+			ErrorDetail: api.ErrorDetail{
+				Code:   "doctor.email-exists",
+				Title:  "Conflict",
+				Detail: fmt.Sprintf("A doctor with email %q already exists.", request.Email),
+				Status: http.StatusConflict,
+			},
+		}
+		encodeError(w, apiErr)
+		return
+	} else if err != nil {
+		slog.Error(UnexpectedError, slog.String("error", err.Error()), slog.String("where", "RegisterDoctor"))
+		encodeError(w, internalServerError())
+		return
+	}
+
+	encode(w, http.StatusCreated, doc)
 }
 
 func (s Server) AssignAppointmentResources(

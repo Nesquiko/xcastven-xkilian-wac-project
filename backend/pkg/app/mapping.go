@@ -29,3 +29,28 @@ func dataPatientToApiPatient(p data.Patient) api.Patient {
 		LastName:  p.LastName,
 	}
 }
+
+func apiDoctorToDataDoctor(d api.Doctor) data.Doctor {
+	doctor := data.Doctor{
+		Email:          string(d.Email),
+		FirstName:      d.FirstName,
+		LastName:       d.LastName,
+		Specialization: string(d.Specialization),
+	}
+
+	if d.Id != nil {
+		doctor.Id = *d.Id
+	}
+
+	return doctor
+}
+
+func dataDoctorToApiDoctor(d data.Doctor) api.Doctor {
+	return api.Doctor{
+		Id:             &d.Id,
+		Email:          types.Email(d.Email),
+		FirstName:      d.FirstName,
+		LastName:       d.LastName,
+		Specialization: api.DoctorSpecialization(d.Specialization),
+	}
+}

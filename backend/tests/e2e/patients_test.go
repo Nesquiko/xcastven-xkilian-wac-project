@@ -20,8 +20,6 @@ import (
 )
 
 func TestCreatePatient(t *testing.T) {
-	t.Parallel()
-
 	require := require.New(t)
 	patient := newPatient("test@one.com")
 	req, err := json.Marshal(patient)
@@ -44,8 +42,6 @@ func TestCreatePatient(t *testing.T) {
 }
 
 func TestCreatePatient_Conflict(t *testing.T) {
-	t.Parallel()
-
 	require := require.New(t)
 	assert := assert.New(t)
 

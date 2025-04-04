@@ -28,24 +28,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/User'
-              examples:
-                createdPatient:
-                  summary: Example created patient response
-                  value:
-                    id: a1b2c3d4-e5f6-7890-1234-567890abcdef
-                    email: new.patient@example.com
-                    firstName: Pat
-                    lastName: Ient
-                    role: patient
-                createdDoctor:
-                  summary: Example created doctor response
-                  value:
-                    id: b2c3d4e5-f6a7-8901-2345-67890abcde1
-                    email: new.doctor@example.com
-                    firstName: Doc
-                    lastName: Tor
-                    role: doctor
-                    specialization: CARDIOLOGIST
         '409':
           description: Conflict - A user with the provided email already exists.
           content:
@@ -132,8 +114,125 @@ paths:
                     detail: No user found with the provided email and role.
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
+  /patients/{patientId}:
+    get:
+      tags:
+        - Patients
+      summary: Get patient by ID
+      description: Retrieves the details of a specific patient by their unique identifier.
+      operationId: getPatientById
+      parameters:
+        - $ref: '#/components/parameters/patientId'
+      responses:
+        '200':
+          description: Successfully retrieved patient details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patient'
+        '404':
+          description: Not Found - The specified patient ID does not exist.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetail'
+              examples:
+                patientNotFound:
+                  summary: Example patient not found (404)
+                  value:
+                    title: Resource Not Found
+                    status: 404
+                    code: patient.not-found
+                    detail: Patient with ID f47ac10b-58cc-4372-a567-0e02b2c3d479 not found.
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /patients/{patientId}/medical-history/files:
+    get:
+      tags:
+        - Medical History
+      summary: Get medical history filenames
+      operationId: patientsMedicalHistoryFiles
+      parameters:
+        - $ref: '#/components/parameters/patientId'
+        - $ref: '#/components/parameters/page'
+        - $ref: '#/components/parameters/pageSize'
+      responses:
+        '200':
+          description: Successfully retrieved the paginated list of medical history filenames.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MedicalHistoryFileList'
+              examples:
+                fileListExample:
+                  summary: Example list of medical history filenames
+                  value:
+                    files:
+                      - consultation_notes_2023-11-20.docx
+                      - xray_report_2024-02-01.pdf
+                      - prescription_history_2024-05-01.txt
+                      - lab_results_2024-05-10.pdf
+                    pagination:
+                      page: 0
+                      pageSize: 10
+                      total: 4
+        '400':
+          description: Bad Request - Invalid pagination parameters.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetail'
+              examples:
+                invalidPageParam:
+                  summary: Example invalid page parameter (400)
+                  value:
+                    title: Validation Error
+                    status: 400
+                    code: validation.invalid-parameter
+                    detail: page must be a non-negative integer.
+        '401':
+          $ref: '#/components/responses/UnauthorizedErrorResponse'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 components:
   schemas:
+    Registration:
+      type: object
+      required:
+        - email
+        - firstName
+        - lastName
+        - role
+      properties:
+        email:
+          type: string
+          format: email
+          example: new.user@example.com
+        firstName:
+          type: string
+          minLength: 1
+          example: John
+        lastName:
+          type: string
+          minLength: 1
+          example: Doe
+        role:
+          type: string
+          enum:
+            - patient
+            - doctor
+          example: patient
+      oneOf:
+        - $ref: '#/components/schemas/PatientRegistration'
+        - $ref: '#/components/schemas/DoctorRegistration'
+      discriminator:
+        propertyName: role
+        mapping:
+          patient: '#/components/schemas/PatientRegistration'
+          doctor: '#/components/schemas/DoctorRegistration'
+    PatientRegistration:
+      allOf:
+        - $ref: '#/components/schemas/Registration'
     SpecializationEnum:
       type: string
       description: Medical specialization of a doctor.
@@ -155,24 +254,14 @@ components:
         - OTHER
       example: DIAGNOSTICIAN
     DoctorRegistration:
-      type: object
-      properties:
-        role:
-          type: string
-          const: doctor
-        specialization:
-          $ref: '#/components/schemas/SpecializationEnum'
-      required:
-        - role
-        - specialization
-    PatientRegistration:
-      type: object
-      properties:
-        role:
-          type: string
-          const: patient
-      required:
-        - role
+      allOf:
+        - $ref: '#/components/schemas/Registration'
+        - type: object
+          properties:
+            specialization:
+              $ref: '#/components/schemas/SpecializationEnum'
+          required:
+            - specialization
     User:
       type: object
       required:
@@ -205,6 +294,24 @@ components:
         mapping:
           patient: '#/components/schemas/Patient'
           doctor: '#/components/schemas/Doctor'
+      examples:
+        patient:
+          summary: Example created patient response
+          value:
+            id: a1b2c3d4-e5f6-7890-1234-567890abcdef
+            email: new.patient@example.com
+            firstName: Pat
+            lastName: Ient
+            role: patient
+        doctor:
+          summary: Example created doctor response
+          value:
+            id: b2c3d4e5-f6a7-8901-2345-67890abcde1
+            email: new.doctor@example.com
+            firstName: Doc
+            lastName: Tor
+            role: doctor
+            specialization: CARDIOLOGIST
     Patient:
       allOf:
         - $ref: '#/components/schemas/User'
@@ -242,6 +349,45 @@ components:
         - code
         - status
         - detail
+    Pagination:
+      type: object
+      description: Structure for paginated list responses.
+      properties:
+        page:
+          type: integer
+          format: int
+          description: Current page number (0-indexed).
+          example: 0
+        pageSize:
+          type: integer
+          format: int
+          description: Number of items per page.
+          example: 20
+        total:
+          type: integer
+          format: int
+          description: Total number of items available.
+          example: 153
+      required:
+        - page
+        - pageSize
+        - total
+    MedicalHistoryFileList:
+      type: object
+      description: A paginated list of medical history filenames for the authenticated patient.
+      properties:
+        files:
+          type: array
+          description: List of filenames for the medical history records on the current page.
+          items:
+            type: string
+            description: Filename of a medical record document.
+            example: lab_results_2024-01-15.pdf
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+      required:
+        - files
+        - pagination
   requestBodies:
     RegisterRequest:
       description: Doctor details for registration.
@@ -249,35 +395,7 @@ components:
       content:
         application/json:
           schema:
-            type: object
-            description: Data required to register a new user.
-            properties:
-              email:
-                type: string
-                format: email
-                example: new.user@example.com
-              firstName:
-                type: string
-                minLength: 1
-                example: John
-              lastName:
-                type: string
-                minLength: 1
-                example: Doe
-              role:
-                type: string
-                enum:
-                  - patient
-                  - doctor
-                example: patient
-            oneOf:
-              - $ref: '#/components/schemas/PatientRegistration'
-              - $ref: '#/components/schemas/DoctorRegistration'
-            discriminator:
-              propertyName: role
-              mapping:
-                patient: '#/components/schemas/DoctorRegistration'
-                doctor: '#/components/schemas/DoctorRegistration'
+            $ref: '#/components/schemas/Registration'
   responses:
     InternalServerErrorResponse:
       description: An error occurred. See specific status code for details.
@@ -290,3 +408,45 @@ components:
             status: 500
             code: internal.server.error
             detail: An unknwon server error occured
+    UnauthorizedErrorResponse:
+      description: Example unauthorized access (401)
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/ErrorDetail'
+          example:
+            title: Unauthorized
+            status: 401
+            code: auth.unauthorized
+            detail: Authentication is required
+  parameters:
+    patientId:
+      name: patientId
+      in: path
+      required: true
+      description: The unique identifier (UUID) of the patient.
+      schema:
+        type: string
+        format: uuid
+      example: b2c3d4e5-f6a7-8901-2345-67890abcdef1
+    page:
+      name: page
+      in: query
+      required: false
+      description: The page number to retrieve (0-indexed).
+      schema:
+        type: integer
+        minimum: 0
+        default: 0
+      example: 1
+    pageSize:
+      name: pageSize
+      in: query
+      required: false
+      description: The number of doctors to return per page.
+      schema:
+        type: integer
+        minimum: 1
+        maximum: 100
+        default: 20
+      example: 50

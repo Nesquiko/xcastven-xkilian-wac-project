@@ -8,7 +8,11 @@ get:
     - $ref: "../components/parameters/path/doctorId.yaml"
   responses:
     "200":
-      $ref: "../components/responses/DoctorResponse.yaml"
+      description: Successfully retrieved doctor details.
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/Doctor.yaml"
 
     "404":
       description: Not Found - The specified doctor ID does not exist.

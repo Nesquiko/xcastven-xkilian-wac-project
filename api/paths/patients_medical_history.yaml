@@ -9,25 +9,24 @@ get:
     - $ref: "../components/parameters/query/pageSize.yaml"
   responses:
     "200":
-      $ref: "../components/responses/MedicalRecordFileList.yaml"
-
-    "400":
-      description: Bad Request - Invalid pagination parameters.
+      description: Successfully retrieved the paginated list of medical history filenames.
       content:
-        application/problem+json:
+        application/json:
           schema:
-            $ref: "../components/schemas/ErrorDetail.yaml"
+            $ref: "../components/schemas/medicalRecords/MedicalHistoryFileList.yaml"
           examples:
-            invalidPageParam:
-              summary: Example invalid page parameter (400)
+            fileListExample:
+              summary: Example list of medical history filenames
               value:
-                title: "Validation Error"
-                status: 400
-                code: "validation.invalid-parameter"
-                detail: "page must be a non-negative integer."
-
-    "401":
-      $ref: "../components/responses/UnauthorizedErrorResponse.yaml"
+                files:
+                  - "consultation_notes_2023-11-20.docx"
+                  - "xray_report_2024-02-01.pdf"
+                  - "prescription_history_2024-05-01.txt"
+                  - "lab_results_2024-05-10.pdf"
+                pagination:
+                  page: 0
+                  pageSize: 10
+                  total: 4
 
     "500":
       $ref: "../components/responses/InternalServerErrorResponse.yaml"

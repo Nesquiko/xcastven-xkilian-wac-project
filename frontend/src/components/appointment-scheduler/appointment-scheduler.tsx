@@ -1,6 +1,6 @@
 import { Component, h, State } from '@stencil/core';
-import { AppointmentType, Doctor, TimeSlot } from '../../lib/types';
 import { DAYS_OF_WEEK, getDateAndTimeTitle, MONTHS, TODAY } from '../../utils/utils';
+import { AppointmentType, Doctor, TimeSlot } from '../../api/generated';
 
 const data = {
   availableTimes: [
@@ -19,9 +19,9 @@ const data = {
     { id: "3", displayName: "Consultation" },
   ] satisfies Array<AppointmentType>,
   doctors: [
-    { id: "1", displayName: "Dr. John Doe", specialty: "dental" },
-    { id: "2", displayName: "Dr. Jane Smith", specialty: "optic" },
-    { id: "3", displayName: "Dr. Samuel Johnson", specialty: "pediatric" },
+    { id: "1", firstName: "John", lastName: "Doe", email: "email@email.sk", specialization: "cardiologist" },
+    { id: "2", firstName: "Jane", lastName: "Smith", email: "email@gmail.com", specialization: "endocrinologist" },
+    { id: "3", firstName: "Samuel", lastName: "Johnson", email: "g@g.sk", specialization: "dermatologist" },
   ] satisfies Array<Doctor>,
 };
 
@@ -199,7 +199,7 @@ export class AppointmentScheduler {
     return (
         <div class="flex h-screen flex-col w-full flex-1 overflow-auto">
           {/* Header */}
-          <div class="bg-gray-800 flex items-center p-3 text-white">
+          <div class="bg-gray-800 flex items-center px-3 py-1 text-white">
             <md-icon-button
               class="mr-2"
               onClick={showDetails ? () => this.resetSelection() : undefined}
@@ -288,7 +288,7 @@ export class AppointmentScheduler {
               {/* Selected date and time summary (visible on mobile when details panel is shown) */}
               {showDetails && (
                 <div class="mt-6 p-4 bg-white rounded-lg shadow-md md:hidden">
-                  {getDateAndTimeTitle(this.selectedDate, this.selectedTime)}
+                  {getDateAndTimeTitle(this.selectedDate, this.selectedTime, "bold")}
                 </div>
               )}
             </div>
@@ -301,7 +301,7 @@ export class AppointmentScheduler {
                          md:animate-[slideInFromRight_0.5s_ease-out]`}
               >
                 <div class="mb-6 hidden md:block">
-                  {getDateAndTimeTitle(this.selectedDate, this.selectedTime)}
+                  {getDateAndTimeTitle(this.selectedDate, this.selectedTime, "bold")}
                 </div>
 
                 <div class="mb-6">
@@ -328,7 +328,7 @@ export class AppointmentScheduler {
                   >
                     {this.doctors.map((doctor: Doctor) => (
                       <md-select-option value={doctor.id}>
-                        <div slot="headline">{doctor.displayName}</div>
+                        <div slot="headline">Dr. {doctor.firstName} {doctor.lastName}</div>
                       </md-select-option>
                     ))}
                   </md-filled-select>

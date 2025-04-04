@@ -10,6 +10,8 @@ export namespace Components {
     }
     interface AppointmentScheduler {
     }
+    interface XcastvenXkilianProjectAppointmentsIllnesses {
+    }
     interface XcastvenXkilianProjectHomePage {
     }
 }
@@ -26,6 +28,12 @@ declare global {
         prototype: HTMLAppointmentSchedulerElement;
         new (): HTMLAppointmentSchedulerElement;
     };
+    interface HTMLXcastvenXkilianProjectAppointmentsIllnessesElement extends Components.XcastvenXkilianProjectAppointmentsIllnesses, HTMLStencilElement {
+    }
+    var HTMLXcastvenXkilianProjectAppointmentsIllnessesElement: {
+        prototype: HTMLXcastvenXkilianProjectAppointmentsIllnessesElement;
+        new (): HTMLXcastvenXkilianProjectAppointmentsIllnessesElement;
+    };
     interface HTMLXcastvenXkilianProjectHomePageElement extends Components.XcastvenXkilianProjectHomePage, HTMLStencilElement {
     }
     var HTMLXcastvenXkilianProjectHomePageElement: {
@@ -35,6 +43,7 @@ declare global {
     interface HTMLElementTagNameMap {
         "ambulance-app": HTMLAmbulanceAppElement;
         "appointment-scheduler": HTMLAppointmentSchedulerElement;
+        "xcastven-xkilian-project-appointments-illnesses": HTMLXcastvenXkilianProjectAppointmentsIllnessesElement;
         "xcastven-xkilian-project-home-page": HTMLXcastvenXkilianProjectHomePageElement;
     }
 }
@@ -43,11 +52,14 @@ declare namespace LocalJSX {
     }
     interface AppointmentScheduler {
     }
+    interface XcastvenXkilianProjectAppointmentsIllnesses {
+    }
     interface XcastvenXkilianProjectHomePage {
     }
     interface IntrinsicElements {
         "ambulance-app": AmbulanceApp;
         "appointment-scheduler": AppointmentScheduler;
+        "xcastven-xkilian-project-appointments-illnesses": XcastvenXkilianProjectAppointmentsIllnesses;
         "xcastven-xkilian-project-home-page": XcastvenXkilianProjectHomePage;
     }
 }
@@ -57,6 +69,7 @@ declare module "@stencil/core" {
         interface IntrinsicElements {
             "ambulance-app": LocalJSX.AmbulanceApp & JSXBase.HTMLAttributes<HTMLAmbulanceAppElement>;
             "appointment-scheduler": LocalJSX.AppointmentScheduler & JSXBase.HTMLAttributes<HTMLAppointmentSchedulerElement>;
+            "xcastven-xkilian-project-appointments-illnesses": LocalJSX.XcastvenXkilianProjectAppointmentsIllnesses & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectAppointmentsIllnessesElement>;
             "xcastven-xkilian-project-home-page": LocalJSX.XcastvenXkilianProjectHomePage & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectHomePageElement>;
         }
     }

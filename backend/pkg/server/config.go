@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"log/slog"
+	"strings"
 
 	"github.com/spf13/viper"
 )
@@ -45,31 +46,30 @@ const (
 	TzDefault        = "Europe/Bratislava"
 	MongoHostDefault = "localhost"
 	MongoPortDefault = 27017
+	MongoDbDefault   = "xcastven-xkilian-db"
 )
 
-func loadConfig(configPath string) (*Config, error) {
+const EnvPrefix = "wac"
+
+func loadConfig() (*Config, error) {
 	v := viper.New()
+
+	v.SetEnvPrefix(EnvPrefix)
+	v.SetEnvKeyReplacer(strings.NewReplacer(".", "_"))
+	v.AutomaticEnv()
 
 	v.SetDefault("app.host", AppHostDefault)
 	v.SetDefault("app.port", AppPortDefault)
 	v.SetDefault("app.timezone", TzDefault)
-	v.SetDefault("log.level", int(LogLevelDefault))
+	v.SetDefault("log.level", LogLevelDefault)
 	v.SetDefault("mongo.host", MongoHostDefault)
 	v.SetDefault("mongo.port", MongoPortDefault)
-
-	if configPath != "" {
-		v.SetConfigFile(configPath)
-	} else {
-		v.SetConfigFile("config-local.yaml")
-	}
-
-	err := v.ReadInConfig()
-	if _, ok := err.(viper.ConfigFileNotFoundError); !ok && err != nil {
-		return nil, fmt.Errorf("loadConfig failed to read config file: %w", err)
-	}
+	v.SetDefault("mongo.db", MongoDbDefault)
+	v.SetDefault("mongo.user", "")
+	v.SetDefault("mongo.password", "")
 
 	var cfg Config
-	err = v.Unmarshal(&cfg)
+	err := v.Unmarshal(&cfg)
 	if err != nil {
 		return nil, fmt.Errorf("loadConfig failed to unmarshal config: %w", err)
 	}

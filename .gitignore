@@ -3,3 +3,4 @@ api/dist
 backend/pkg/api/api.gen.go
 frontend/src/api/generated
 backend/tmp
+backend/c.out

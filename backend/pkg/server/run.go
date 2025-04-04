@@ -17,11 +17,11 @@ import (
 	"github.com/Nesquiko/wac/pkg/data"
 )
 
-func Run(ctx context.Context, args []string) error {
+func Run(ctx context.Context) error {
 	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt)
 	defer cancel()
 
-	cfg, err := loadConfig("")
+	cfg, err := loadConfig()
 	if err != nil {
 		slog.Error("failed to read config", slog.String("error", err.Error()))
 		os.Exit(1)

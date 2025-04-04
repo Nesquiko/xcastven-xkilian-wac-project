@@ -1,4 +1,5 @@
 include ./deployments/local.env
+export
 
 .PHONY: all
 all: local
@@ -24,3 +25,7 @@ mongo-up:
 .PHONY: mongo-down
 mongo-down:
 	$(DOCKER_COMPOSE_CMD) down
+
+.PHONY: test
+test:
+	go test ./... -v -tags=e2e -coverprofile=c.out -coverpkg=github.com/Nesquiko/wac/pkg/...

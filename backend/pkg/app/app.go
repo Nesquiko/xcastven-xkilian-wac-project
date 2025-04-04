@@ -1,7 +1,11 @@
 package app
 
-func New() App {
-	return App{}
+import "github.com/Nesquiko/wac/pkg/data"
+
+func New(db data.Db) App {
+	return App{db}
 }
 
-type App struct{}
+type App struct {
+	db data.Db
+}

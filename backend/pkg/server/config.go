@@ -17,13 +17,34 @@ type Config struct {
 	Log struct {
 		Level slog.Level `mapstructure:"level"`
 	} `mapstructure:"log"`
+
+	Mongo struct {
+		Host     string `mapstructure:"host"`
+		Port     int    `mapstructure:"port"`
+		User     string `mapstructure:"user"`
+		Password string `mapstructure:"password"`
+		Db       string `mapstructure:"db"`
+	} `mapstructure:"mongo"`
+}
+
+func (c Config) MongoURI() string {
+	return fmt.Sprintf(
+		"mongodb://%s:%s@%s:%d/%s?authSource=admin",
+		c.Mongo.User,
+		c.Mongo.Password,
+		c.Mongo.Host,
+		c.Mongo.Port,
+		c.Mongo.Db,
+	)
 }
 
 const (
-	AppHostDefault  = "localhost"
-	AppPortDefault  = "42069"
-	LogLevelDefault = slog.LevelInfo
-	TzDefault       = "Europe/Bratislava"
+	AppHostDefault   = "localhost"
+	AppPortDefault   = "42069"
+	LogLevelDefault  = slog.LevelInfo
+	TzDefault        = "Europe/Bratislava"
+	MongoHostDefault = "localhost"
+	MongoPortDefault = 27017
 )
 
 func loadConfig(configPath string) (*Config, error) {
@@ -33,6 +54,8 @@ func loadConfig(configPath string) (*Config, error) {
 	v.SetDefault("app.port", AppPortDefault)
 	v.SetDefault("app.timezone", TzDefault)
 	v.SetDefault("log.level", int(LogLevelDefault))
+	v.SetDefault("mongo.host", MongoHostDefault)
+	v.SetDefault("mongo.port", MongoPortDefault)
 
 	if configPath != "" {
 		v.SetConfigFile(configPath)

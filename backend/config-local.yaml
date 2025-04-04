@@ -5,3 +5,9 @@ app:
 log:
   # Log level: -4=Debug, 0=Info, 4=Warn, 8=Error
   level: -4
+mongo:
+  host: localhost
+  port: 27017
+  user: root
+  password: mysecret
+  db: xcastven-xkilian-db

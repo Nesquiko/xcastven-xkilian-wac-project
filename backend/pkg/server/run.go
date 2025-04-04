@@ -10,9 +10,11 @@ import (
 	"sync"
 	"time"
 
+	"github.com/go-chi/httplog/v2"
+
 	"github.com/Nesquiko/wac/pkg/api"
 	"github.com/Nesquiko/wac/pkg/app"
-	"github.com/go-chi/httplog/v2"
+	"github.com/Nesquiko/wac/pkg/data"
 )
 
 func Run(ctx context.Context, args []string) error {
@@ -22,7 +24,7 @@ func Run(ctx context.Context, args []string) error {
 	cfg, err := loadConfig("")
 	if err != nil {
 		slog.Error("failed to read config", slog.String("error", err.Error()))
-		return err
+		os.Exit(1)
 	}
 
 	httpLogger := SetupLogger(cfg.Log.Level)
@@ -30,13 +32,15 @@ func Run(ctx context.Context, args []string) error {
 	loc, err := time.LoadLocation(cfg.App.Timezone)
 	if err != nil {
 		slog.Error("failed to load timezone", slog.String("error", err.Error()))
-		return err
+		os.Exit(1)
 	}
 	httpLogger.Info("loaded timezone", slog.String("tz", loc.String()))
 	time.Local = loc
 
+	db, err := data.ConnectMongo(ctx, cfg.MongoURI(), cfg.Mongo.Db)
 	if err != nil {
 		slog.Error("failed to connect to database", slog.String("error", err.Error()))
+		os.Exit(1)
 	}
 
 	spec, err := api.GetSwagger()
@@ -45,7 +49,7 @@ func Run(ctx context.Context, args []string) error {
 		os.Exit(1)
 	}
 
-	app := app.New()
+	app := app.New(db)
 	srv := NewServer(app, spec, httpLogger)
 
 	httpServer := &http.Server{
@@ -77,7 +81,7 @@ func Run(ctx context.Context, args []string) error {
 }
 
 func SetupLogger(logLevel slog.Level) *httplog.Logger {
-	logger := httplog.NewLogger("swimlogs-api", httplog.Options{
+	logger := httplog.NewLogger("wac", httplog.Options{
 		LogLevel: slog.Level(logLevel),
 	})
 	slog.SetDefault(logger.Logger)

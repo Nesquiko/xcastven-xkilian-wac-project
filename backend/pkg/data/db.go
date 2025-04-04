@@ -1,8 +1,11 @@
 package data
 
-import "context"
+import (
+	"context"
+)
 
 type Db interface {
-	Disconnect(context.Context) error
-}
+	Disconnect(ctx context.Context) error
 
+	CreatePatient(ctx context.Context, patient Patient) (Patient, error)
+}

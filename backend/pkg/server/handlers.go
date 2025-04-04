@@ -1,13 +1,41 @@
 package server
 
 import (
+	"errors"
+	"fmt"
+	"log/slog"
 	"net/http"
 
 	"github.com/Nesquiko/wac/pkg/api"
+	"github.com/Nesquiko/wac/pkg/app"
 )
 
 func (s Server) RegisterPatient(w http.ResponseWriter, r *http.Request) {
-	panic("unimplemented")
+	request, decodeErr := Decode[api.Patient](w, r)
+	if decodeErr != nil {
+		encodeError(w, decodeErr)
+		return
+	}
+
+	p, err := s.app.CreatePatient(r.Context(), request)
+	if errors.Is(err, app.ErrDuplicateEmail) {
+		apiErr := &ApiError{
+			ErrorDetail: api.ErrorDetail{
+				Code:   "patient.email-exists",
+				Title:  "Conflict",
+				Detail: fmt.Sprintf("A patient with email %q already exists.", request.Email),
+				Status: http.StatusConflict,
+			},
+		}
+		encodeError(w, apiErr)
+		return
+	} else if err != nil {
+		slog.Error(UnexpectedError, slog.String("error", err.Error()), slog.String("where", "RegisterPatient"))
+		encodeError(w, internalServerError())
+		return
+	}
+
+	encode(w, http.StatusCreated, p)
 }
 
 func (s Server) RegisterDoctor(w http.ResponseWriter, r *http.Request) {

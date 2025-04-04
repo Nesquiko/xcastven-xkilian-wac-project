@@ -1,0 +1,50 @@
+post:
+  tags:
+    - Auth
+  summary: Register a new user
+  operationId: registerUser
+  requestBody:
+    $ref: "../components/requestBodies/RegisterRequest.yaml"
+  responses:
+    "201":
+      description: User registered successfully. Returns the created user object.
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/User.yaml"
+          examples:
+            createdPatient:
+              summary: Example created patient response
+              value:
+                id: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+                email: "new.patient@example.com"
+                firstName: "Pat"
+                lastName: "Ient"
+                role: "patient"
+            createdDoctor:
+              summary: Example created doctor response
+              value:
+                id: "b2c3d4e5-f6a7-8901-2345-67890abcde1"
+                email: "new.doctor@example.com"
+                firstName: "Doc"
+                lastName: "Tor"
+                role: "doctor"
+                specialization: "CARDIOLOGIST"
+
+    "409":
+      description: Conflict - A user with the provided email already exists.
+      content:
+        application/problem+json:
+          schema:
+            $ref: "../components/schemas/ErrorDetail.yaml"
+          examples:
+            duplicateEmail:
+              summary: Example duplicate email error (409)
+              value:
+                title: "Conflict"
+                status: 409
+                code: "user.email-exists"
+                detail: "A user with email new.patient@example.com already exists."
+
+    "500":
+      $ref: "../components/responses/InternalServerErrorResponse.yaml"

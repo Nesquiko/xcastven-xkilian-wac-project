@@ -5,5 +5,3 @@ properties:
     type: string
     description: Optional reason provided for the cancellation.
     example: "Feeling better, no longer need the consultation."
-required:
-  - cancellationReason

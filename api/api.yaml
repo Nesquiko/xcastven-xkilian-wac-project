@@ -2,42 +2,45 @@ openapi: 3.0.4
 info:
   title: MediCal API
   version: 1.0.0
-  description: >
-    API for the MediCal application, managing patient appointment scheduling
-    with doctors and access to patient medical history.
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
 tags:
+  - name: Auth
   - name: Appointments
-    description: Manage appointment lifecycle (request, view, confirm, cancel, reschedule).
   - name: Doctors
-    description: Retrieve doctor details and available timeslots.
   - name: Patients
-    description: Manage patient information and access patient-specific data.
   - name: Medical History
-    description: Retrieve patient medical history (diagnoses, appointments, prescriptions).
   - name: Resources
-    description: Manage and view resources (facilities, equipment, medicine) for appointments.
 
 paths:
-  /patients:
-    $ref: "./paths/patients.yaml"
-  /patients/{patientId}/medical-history/files:
-    $ref: "./paths/patients_medical_history.yaml"
-  /doctors:
-    $ref: "./paths/doctors.yaml"
-  /doctors/{doctorId}/timeslots:
-    $ref: "./paths/doctors_doctorId.yaml"
-  /appointments:
-    $ref: "./paths/appointments.yaml"
-  /appointments/{appointmentId}/cancel:
-    $ref: "./paths/appointments_appointmentId_cancel.yaml"
-  /appointments/{appointmentId}/reschedule:
-    $ref: "./paths/appointments_appointmentId_reschedule.yaml"
-  /appointments/{appointmentId}/resources:
-    $ref: "./paths/appointments_appointmentId_resources.yaml"
-  /appointments/{appointmentId}/decision:
-    $ref: "./paths/appointments_appointmentId_decision.yaml"
-  /resources/available:
-    $ref: "./paths/resources_available.yaml"
+  /auth/register:
+    $ref: "./paths/auth_register.yaml"
+  /auth/login:
+    $ref: "./paths/auth_login.yaml"
+
+  # /patients:
+  #   $ref: "./paths/patients.yaml"
+  # /patients/{patientId}:
+  #   $ref: "./paths/patients_patientId.yaml"
+  #
+  # /patients/{patientId}/medical-history/files:
+  #   $ref: "./paths/patients_medical_history.yaml"
+  # /doctors:
+  #   $ref: "./paths/doctors.yaml"
+  # /doctors/{doctorId}:
+  #   $ref: "./paths/doctors_doctorId.yaml"
+  # /doctors/{doctorId}/timeslots:
+  #   $ref: "./paths/doctors_doctorId_timeslots.yaml"
+  # /appointments:
+  #   $ref: "./paths/appointments.yaml"
+  # /appointments/{appointmentId}/cancel:
+  #   $ref: "./paths/appointments_appointmentId_cancel.yaml"
+  # /appointments/{appointmentId}/reschedule:
+  #   $ref: "./paths/appointments_appointmentId_reschedule.yaml"
+  # /appointments/{appointmentId}/resources:
+  #   $ref: "./paths/appointments_appointmentId_resources.yaml"
+  # /appointments/{appointmentId}/decision:
+  #   $ref: "./paths/appointments_appointmentId_decision.yaml"
+  # /resources/available:
+  #   $ref: "./paths/resources_available.yaml"

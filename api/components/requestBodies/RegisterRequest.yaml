@@ -1,0 +1,6 @@
+description: Doctor details for registration.
+required: true
+content:
+  application/json:
+    schema:
+      $ref: "../schemas/auth/Registration.yaml"

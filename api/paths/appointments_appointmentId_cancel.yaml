@@ -5,13 +5,15 @@ post:
   description: >-
     Marks an existing appointment as 'canceled'. Can be initiated by the
     patient who booked it, or by authorized staff (doctor/nurse).
-    Authentication is required. An optional reason can be provided in the
-    request body.
   operationId: cancelAppointment
   parameters:
     - $ref: "../components/parameters/path/appointmentId.yaml"
   requestBody:
-    $ref: "../components/requestBodies/AppointmentCancellationRequest.yaml"
+    description: Reason for cancelling the appointment.
+    content:
+      application/json:
+        schema:
+          $ref: "../components/schemas/appointments/AppointmentCancellation.yaml"
   responses:
     "204":
       description: Appointment successfully cancelled.
@@ -50,7 +52,7 @@ post:
                 detail: "Appointment with ID d4e5f6a7-b8c9-0123-4567-890abcdef123 not found."
 
     "409":
-      description: Conflict - The appointment cannot be cancelled (e.g., already completed or cancelled).
+      description: The appointment cannot be cancelled (e.g., already completed or cancelled).
       content:
         application/problem+json:
           schema:

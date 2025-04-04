@@ -1,0 +1,14 @@
+description: Successfully retrieved doctor details.
+content:
+  application/json:
+    schema:
+      $ref: "../schemas/doctors/Doctor.yaml"
+    examples:
+      getDoctorExample:
+        summary: Example doctor response
+        value:
+          id: "b2c3d4e5-f6a7-8901-2345-67890abcdef1"
+          email: "dr.gregory.house@example.com"
+          firstName: "Gregory"
+          lastName: "House"
+          specialization: "DIAGNOSTICIAN"

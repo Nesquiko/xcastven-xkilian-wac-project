@@ -1,0 +1,29 @@
+type: object
+required:
+  - id
+  - firstName
+  - lastName
+  - email
+  - role
+properties:
+  id:
+    type: string
+    format: uuid
+  firstName:
+    type: string
+  lastName:
+    type: string
+  email:
+    type: string
+    format: email
+  role:
+    type: string
+    enum: [patient, doctor]
+oneOf:
+  - $ref: "./Patient.yaml"
+  - $ref: "./Doctor.yaml"
+discriminator:
+  propertyName: role
+  mapping:
+    patient: "./Patient.yaml"
+    doctor: "./Doctor.yaml"

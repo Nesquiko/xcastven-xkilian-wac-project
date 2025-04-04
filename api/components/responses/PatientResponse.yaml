@@ -2,7 +2,7 @@ description: Successfully retrieved patient details.
 content:
   application/json:
     schema:
-      $ref: "../schemas/patients/Patient.yaml"
+      $ref: "../schemas/Patient.yaml"
     examples:
       getPatientExample:
         summary: Example patient response

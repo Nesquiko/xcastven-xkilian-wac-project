@@ -19,11 +19,8 @@ paths:
   /auth/login:
     $ref: "./paths/auth_login.yaml"
 
-  # /patients:
-  #   $ref: "./paths/patients.yaml"
-  # /patients/{patientId}:
-  #   $ref: "./paths/patients_patientId.yaml"
-  #
+  /patients/{patientId}:
+    $ref: "./paths/patients_patientId.yaml"
   # /patients/{patientId}/medical-history/files:
   #   $ref: "./paths/patients_medical_history.yaml"
   # /doctors:

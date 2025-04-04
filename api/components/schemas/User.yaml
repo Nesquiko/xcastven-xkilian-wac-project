@@ -27,3 +27,21 @@ discriminator:
   mapping:
     patient: "./Patient.yaml"
     doctor: "./Doctor.yaml"
+examples:
+  patient:
+    summary: Example created patient response
+    value:
+      id: "a1b2c3d4-e5f6-7890-1234-567890abcdef"
+      email: "new.patient@example.com"
+      firstName: "Pat"
+      lastName: "Ient"
+      role: "patient"
+  doctor:
+    summary: Example created doctor response
+    value:
+      id: "b2c3d4e5-f6a7-8901-2345-67890abcde1"
+      email: "new.doctor@example.com"
+      firstName: "Doc"
+      lastName: "Tor"
+      role: "doctor"
+      specialization: "CARDIOLOGIST"

@@ -8,6 +8,7 @@ info:
 tags:
   - name: Auth
   - name: Appointments
+  - name: Conditions
   - name: Doctors
   - name: Patients
   - name: Resources
@@ -130,6 +131,23 @@ paths:
       responses:
         '204':
           description: Appointment successfully cancelled.
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /conditions/{conditionId}:
+    get:
+      tags:
+        - Conditions
+      summary: Condition detail
+      operationId: conditionDetail
+      parameters:
+        - $ref: '#/components/parameters/conditionId'
+      responses:
+        '200':
+          description: Login successful. Sets session cookie and returns user details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
   /patients/{patientId}:
@@ -819,6 +837,15 @@ components:
       in: path
       required: true
       description: The unique identifier (UUID) of the appointment.
+      schema:
+        type: string
+        format: uuid
+      example: d4e5f6a7-b8c9-0123-4567-890abcdef123
+    conditionId:
+      name: conditionId
+      in: path
+      required: true
+      description: The unique identifier (UUID) of a condition.
       schema:
         type: string
         format: uuid

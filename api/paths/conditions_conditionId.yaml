@@ -1,0 +1,17 @@
+get:
+  tags:
+    - Conditions
+  summary: Condition detail
+  operationId: conditionDetail
+  parameters:
+    - $ref: "../components/parameters/path/conditionId.yaml"
+  responses:
+    "200":
+      description: Login successful. Sets session cookie and returns user details.
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/User.yaml"
+
+    "500":
+      $ref: "../components/responses/InternalServerErrorResponse.yaml"

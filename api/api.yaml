@@ -8,6 +8,7 @@ info:
 tags:
   - name: Auth
   - name: Appointments
+  - name: Conditions
   - name: Doctors
   - name: Patients
   - name: Resources
@@ -20,6 +21,9 @@ paths:
 
   /appointments/{appointmentId}:
     $ref: "./paths/appointments_appointmentId.yaml"
+
+  /conditions/{conditionId}:
+    $ref: "./paths/conditions_conditionId.yaml"
 
   /patients/{patientId}:
     $ref: "./paths/patients_patientId.yaml"

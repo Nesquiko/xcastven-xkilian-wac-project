@@ -25,11 +25,17 @@ paths:
     $ref: "./paths/patients_patientId_calendar.yaml"
   /patients/{patientId}/medical-history/files:
     $ref: "./paths/patients_medical_history.yaml"
+  /patients/{patientId}/appointment/{appointmentId}:
+    $ref: "./paths/doctors_doctorId_appointment_appointmentId.yaml"
 
   /doctors/{doctorId}:
     $ref: "./paths/doctors_doctorId.yaml"
   /doctors/{doctorId}/calendar:
     $ref: "./paths/patients_patientId_calendar.yaml"
+
+  /doctors/{doctorId}/appointment/{appointmentId}:
+    $ref: "./paths/doctors_doctorId_appointment_appointmentId.yaml"
+
   # /doctors/{doctorId}/timeslots:
   #   $ref: "./paths/doctors_doctorId_timeslots.yaml"
   # /appointments:

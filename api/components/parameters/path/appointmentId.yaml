@@ -1,7 +1,7 @@
 name: appointmentId
 in: path
 required: true
-description: The unique identifier (UUID) of the appointment to cancel.
+description: The unique identifier (UUID) of the appointment.
 schema:
   type: string
   format: uuid

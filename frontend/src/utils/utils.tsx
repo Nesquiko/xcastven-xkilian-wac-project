@@ -1,5 +1,5 @@
 import { h } from "@stencil/core";
-import { AppointmentStatusEnum } from '../api/generated';
+import { Appointment, AppointmentStatusEnum } from '../api/generated';
 
 export const DAYS_OF_WEEK: Array<{ short: string; long: string }> = [
   { short: "Mo", long: "Monday" },
@@ -120,7 +120,59 @@ export const AppointmentStatusColor = {
     foreground: "#ffffff",
   },
   "denied": {
-    background: "#D3D3D3",
+    background: "#4f4f4f",
     foreground: "#000000",
+  }
+};
+
+export const getAppointmentActions = (
+  appointmentStatus: AppointmentStatusEnum,
+  handleRescheduleAppointment: (appointment: Appointment) => void,
+  handleCancelAppointment: (appointment: Appointment) => void,
+) => {
+  const rescheduleButton = (
+    displayTitle: string,
+    widthClass: string,
+  ) => {
+    return (
+      <md-filled-button
+        class={`${widthClass} rounded-full bg-[#7357be]`}
+        onClick={handleRescheduleAppointment}
+      >
+        {displayTitle}
+      </md-filled-button>
+    )
+  };
+
+  const cancelButton = (
+    displayTitle: string,
+    widthClass: string,
+  ) => {
+    return (
+      <md-filled-button
+        class={`${widthClass} rounded-full bg-[#7357be]`}
+        onClick={handleCancelAppointment}
+      >
+        {displayTitle}
+      </md-filled-button>
+    );
+  };
+
+  switch (appointmentStatus) {
+    case 'scheduled':
+      return (
+        <div class="w-full max-w-md flex flex-row justify-between items-center gap-x-3">
+          {rescheduleButton("Re-schedule", "w-1/2")}
+          {cancelButton("Cancel", "w-1/2")}
+        </div>
+      );
+    case "requested":
+      return (
+        <div class="w-full max-w-md flex flex-row justify-between items-center gap-x-3">
+          {cancelButton("Cancel request", "w-full")}
+        </div>
+      );
+    default:
+      return null;
   }
 };

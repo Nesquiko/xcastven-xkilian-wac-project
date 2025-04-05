@@ -1,46 +1,15 @@
 get:
   tags:
     - Doctors
-  summary: Get doctor's timeslots for a specific day
+  summary: Get doctor's timeslots for a specific date
   description: Retrieves a list of available and unavailable time slots for a given doctor ID and date.
-  operationId: getDoctorTimeslots
+  operationId: doctorsTimeslots
   parameters:
     - $ref: "../components/parameters/path/doctorId.yaml"
     - $ref: "../components/parameters/query/date.yaml"
   responses:
     "200":
       $ref: "../components/responses/DoctorTimeslots.yaml"
-
-    "400":
-      description: Bad Request - Invalid date format.
-      content:
-        application/problem+json:
-          schema:
-            $ref: "../components/schemas/ErrorDetail.yaml"
-          examples:
-            invalidDateFormat:
-              summary: Example invalid date format (400)
-              value:
-                title: "Validation Error"
-                status: 400
-                code: "validation.invalid-date-format"
-                detail: "Date parameter must be in YYYY-MM-DD format."
-                invalid-parameter: "date"
-
-    "404":
-      description: Not Found - The specified doctor ID does not exist.
-      content:
-        application/problem+json:
-          schema:
-            $ref: "../components/schemas/ErrorDetail.yaml"
-          examples:
-            doctorNotFound:
-              summary: Example doctor not found (404)
-              value:
-                title: "Resource Not Found"
-                status: 404
-                code: "doctor.not-found"
-                detail: "Doctor with ID b2c3d4e5-f6a7-8901-2345-67890abcdef1 not found."
 
     "500":
       $ref: "../components/responses/InternalServerErrorResponse.yaml"

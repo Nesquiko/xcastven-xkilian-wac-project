@@ -1,7 +1,0 @@
-description: >-
-  Appointment successfully accepted (scheduled) or rejected (denied).
-  Returns the full updated appointment details.
-content:
-  application/json:
-    schema:
-      $ref: "../schemas/appointments/Appointment.yaml"

@@ -3,25 +3,10 @@ content:
   application/json:
     schema:
       type: object
+      required:
+        - slots
       properties:
         slots:
           type: array
           items:
             $ref: "../schemas/TimeSlot.yaml"
-    examples:
-      timeslotsExample:
-        summary: Example timeslots for a doctor on a specific day
-        value:
-          slots:
-            - time: "09:00"
-              status: "available"
-            - time: "09:30"
-              status: "unavailable"
-            - time: "10:00"
-              status: "available"
-            - time: "10:30"
-              status: "available"
-            - time: "11:00"
-              status: "unavailable"
-            - time: "14:00"
-              status: "available"

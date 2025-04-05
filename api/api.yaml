@@ -26,20 +26,17 @@ paths:
   /patients/{patientId}/medical-history/files:
     $ref: "./paths/patients_medical_history.yaml"
   /patients/{patientId}/appointment/{appointmentId}:
-    $ref: "./paths/doctors_doctorId_appointment_appointmentId.yaml"
+    $ref: "./paths/patients_patientId_appointment_appointmentId.yaml"
 
   /doctors/{doctorId}:
     $ref: "./paths/doctors_doctorId.yaml"
   /doctors/{doctorId}/calendar:
-    $ref: "./paths/patients_patientId_calendar.yaml"
-
+    $ref: "./paths/doctors_doctorId_calendar.yaml"
   /doctors/{doctorId}/appointment/{appointmentId}:
     $ref: "./paths/doctors_doctorId_appointment_appointmentId.yaml"
 
-  # /doctors/{doctorId}/timeslots:
-  #   $ref: "./paths/doctors_doctorId_timeslots.yaml"
-  # /appointments:
-  #   $ref: "./paths/appointments.yaml"
+  /doctors/{doctorId}/timeslots:
+    $ref: "./paths/doctors_doctorId_timeslots.yaml"
   # /appointments/{appointmentId}/cancel:
   #   $ref: "./paths/appointments_appointmentId_cancel.yaml"
   # /appointments/{appointmentId}/reschedule:

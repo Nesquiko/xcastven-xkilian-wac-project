@@ -7,7 +7,7 @@ properties:
   conditions:
     type: array
     items:
-      $ref: "./ConditionDisplay.yaml"
+      $ref: "./conditions/ConditionDisplay.yaml"
   medicine:
     type: array
     items:

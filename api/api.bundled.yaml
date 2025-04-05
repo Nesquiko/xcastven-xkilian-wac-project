@@ -200,11 +200,11 @@ paths:
   /patients/{patientId}/appointment/{appointmentId}:
     get:
       tags:
-        - Doctors
-      summary: Get an appointment scheduled to a doctor
+        - Appointments
+      summary: Appointment scheduled to a doctor
       operationId: null
       parameters:
-        - $ref: '#/components/parameters/doctorId'
+        - $ref: '#/components/parameters/patientId'
         - $ref: '#/components/parameters/appointmentId'
       responses:
         '200':
@@ -212,7 +212,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DoctorAppointment'
+                $ref: '#/components/schemas/PatientAppointment'
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
   /doctors/{doctorId}:
@@ -250,27 +250,27 @@ paths:
   /doctors/{doctorId}/calendar:
     get:
       tags:
-        - Patients
-      summary: Get patient's calendar
-      operationId: patientsCalendar
+        - Doctors
+      summary: Get doctors's calendar
+      operationId: doctorsCalendar
       parameters:
-        - $ref: '#/components/parameters/patientId'
+        - $ref: '#/components/parameters/doctorId'
         - $ref: '#/components/parameters/from'
         - $ref: '#/components/parameters/to'
       responses:
         '200':
-          description: Returned patient's calendar for a given time period
+          description: Returned doctor's calendar for a given time period
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/PatientsCalendar'
+                $ref: '#/components/schemas/DoctorsCalendar'
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
   /doctors/{doctorId}/appointment/{appointmentId}:
     get:
       tags:
-        - Doctors
-      summary: Get an appointment scheduled to a doctor
+        - Appointments
+      summary: Appointment scheduled by patient
       operationId: null
       parameters:
         - $ref: '#/components/parameters/doctorId'
@@ -282,6 +282,21 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/DoctorAppointment'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /doctors/{doctorId}/timeslots:
+    get:
+      tags:
+        - Doctors
+      summary: Get doctor's timeslots for a specific date
+      description: Retrieves a list of available and unavailable time slots for a given doctor ID and date.
+      operationId: doctorsTimeslots
+      parameters:
+        - $ref: '#/components/parameters/doctorId'
+        - $ref: '#/components/parameters/date'
+      responses:
+        '200':
+          $ref: '#/components/responses/DoctorTimeslots'
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
 components:
@@ -591,6 +606,22 @@ components:
           type: string
           description: Reason for the appointment provided by the patient.
           example: Feeling unwell, general check-up needed.
+    PatientAppointment:
+      allOf:
+        - $ref: '#/components/schemas/AppointmentBase'
+        - type: object
+          required:
+            - doctor
+          properties:
+            doctor:
+              $ref: '#/components/schemas/Doctor'
+    DoctorsCalendar:
+      type: object
+      properties:
+        appointments:
+          type: array
+          items:
+            $ref: '#/components/schemas/AppointmentDisplay'
     Facility:
       type: object
       description: Represents a required facility resource.
@@ -663,6 +694,25 @@ components:
               description: List of required medicine for the appointment.
               items:
                 $ref: '#/components/schemas/Medicine'
+    TimeSlot:
+      type: object
+      description: Represents a single time slot for a doctor on a specific day.
+      properties:
+        time:
+          type: string
+          description: The time of the slot (HH:MM format, 24-hour clock).
+          pattern: ^([01]\d|2[0-3]):([0-5]\d)$
+          example: '09:30'
+        status:
+          type: string
+          description: Indicates whether the time slot is available or not.
+          enum:
+            - available
+            - unavailable
+          example: available
+      required:
+        - time
+        - status
   requestBodies:
     RegisterRequest:
       description: Doctor details for registration.
@@ -683,6 +733,19 @@ components:
             status: 500
             code: internal.server.error
             detail: An unknwon server error occured
+    DoctorTimeslots:
+      description: Successfully retrieved the list of time slots.
+      content:
+        application/json:
+          schema:
+            type: object
+            required:
+              - slots
+            properties:
+              slots:
+                type: array
+                items:
+                  $ref: '#/components/schemas/TimeSlot'
   parameters:
     patientId:
       name: patientId
@@ -731,15 +794,6 @@ components:
         maximum: 100
         default: 20
       example: 50
-    doctorId:
-      name: doctorId
-      in: path
-      required: true
-      description: The unique identifier (UUID) of the doctor.
-      schema:
-        type: string
-        format: uuid
-      example: b2c3d4e5-f6a7-8901-2345-67890abcdef1
     appointmentId:
       name: appointmentId
       in: path
@@ -749,3 +803,21 @@ components:
         type: string
         format: uuid
       example: d4e5f6a7-b8c9-0123-4567-890abcdef123
+    doctorId:
+      name: doctorId
+      in: path
+      required: true
+      description: The unique identifier (UUID) of the doctor.
+      schema:
+        type: string
+        format: uuid
+      example: b2c3d4e5-f6a7-8901-2345-67890abcdef1
+    date:
+      name: date
+      in: query
+      required: true
+      description: The specific day for which to retrieve timeslots (YYYY-MM-DD format).
+      schema:
+        type: string
+        format: date
+      example: '2024-07-15'

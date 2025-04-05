@@ -1,5 +1,0 @@
-description: Resources successfully assigned/updated for the appointment. Returns the full updated appointment details.
-content:
-  application/json:
-    schema:
-      $ref: "../schemas/appointments/Appointment.yaml"

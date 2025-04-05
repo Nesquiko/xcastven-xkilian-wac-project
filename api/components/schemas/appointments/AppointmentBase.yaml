@@ -16,7 +16,7 @@ properties:
   type:
     $ref: "./AppointmentType.yaml"
   condition:
-    $ref: "../ConditionDisplay.yaml"
+    $ref: "../conditions/ConditionDisplay.yaml"
   status:
     $ref: "./AppointmentStatus.yaml"
   reason:

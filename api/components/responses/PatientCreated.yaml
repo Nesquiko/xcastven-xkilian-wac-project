@@ -1,5 +1,0 @@
-description: Patient registered successfully. Returns the created patient object.
-content:
-  application/json:
-    schema:
-      $ref: "../schemas/patients/Patient.yaml"

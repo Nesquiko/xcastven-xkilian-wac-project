@@ -7,11 +7,11 @@ get:
     - $ref: "../components/parameters/path/conditionId.yaml"
   responses:
     "200":
-      description: Login successful. Sets session cookie and returns user details.
+      description: Condition details
       content:
         application/json:
           schema:
-            $ref: "../components/schemas/User.yaml"
+            $ref: "../components/schemas/conditions/Condition.yaml"
 
     "500":
       $ref: "../components/responses/InternalServerErrorResponse.yaml"

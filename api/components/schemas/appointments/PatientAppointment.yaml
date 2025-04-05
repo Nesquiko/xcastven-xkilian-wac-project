@@ -5,4 +5,4 @@ allOf:
       - doctor
     properties:
       doctor:
-        $ref: "../Doctor.yaml"
+        $ref: "../auth/Doctor.yaml"

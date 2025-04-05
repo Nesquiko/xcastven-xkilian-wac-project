@@ -20,7 +20,12 @@ paths:
       summary: Register a new user
       operationId: registerUser
       requestBody:
-        $ref: '#/components/requestBodies/RegisterRequest'
+        description: Doctor details for registration.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Registration'
       responses:
         '201':
           description: User registered successfully. Returns the created user object.
@@ -65,12 +70,7 @@ paths:
                   description: User's email address.
                   example: john.doe@example.com
                 role:
-                  type: string
-                  description: The role the user is logging in as.
-                  enum:
-                    - patient
-                    - doctor
-                  example: patient
+                  $ref: '#/components/schemas/UserRole'
               required:
                 - email
                 - role
@@ -189,11 +189,11 @@ paths:
         - $ref: '#/components/parameters/conditionId'
       responses:
         '200':
-          description: Login successful. Sets session cookie and returns user details.
+          description: Condition details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/User'
+                $ref: '#/components/schemas/Condition'
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
   /patients/{patientId}:
@@ -401,7 +401,12 @@ paths:
           $ref: '#/components/responses/InternalServerErrorResponse'
 components:
   schemas:
-    Registration:
+    UserRole:
+      type: string
+      enum:
+        - patient
+        - doctor
+    PatientRegistration:
       type: object
       required:
         - email
@@ -422,22 +427,7 @@ components:
           minLength: 1
           example: Doe
         role:
-          type: string
-          enum:
-            - patient
-            - doctor
-          example: patient
-      oneOf:
-        - $ref: '#/components/schemas/PatientRegistration'
-        - $ref: '#/components/schemas/DoctorRegistration'
-      discriminator:
-        propertyName: role
-        mapping:
-          patient: '#/components/schemas/PatientRegistration'
-          doctor: '#/components/schemas/DoctorRegistration'
-    PatientRegistration:
-      allOf:
-        - $ref: '#/components/schemas/Registration'
+          $ref: '#/components/schemas/UserRole'
     SpecializationEnum:
       type: string
       description: Medical specialization of a doctor.
@@ -460,14 +450,26 @@ components:
       example: DIAGNOSTICIAN
     DoctorRegistration:
       allOf:
-        - $ref: '#/components/schemas/Registration'
+        - $ref: '#/components/schemas/PatientRegistration'
         - type: object
           properties:
+            role:
+              $ref: '#/components/schemas/UserRole'
             specialization:
               $ref: '#/components/schemas/SpecializationEnum'
           required:
+            - role
             - specialization
-    User:
+    Registration:
+      oneOf:
+        - $ref: '#/components/schemas/PatientRegistration'
+        - $ref: '#/components/schemas/DoctorRegistration'
+      discriminator:
+        propertyName: role
+        mapping:
+          patient: '#/components/schemas/PatientRegistration'
+          doctor: '#/components/schemas/DoctorRegistration'
+    Patient:
       type: object
       required:
         - id
@@ -487,10 +489,17 @@ components:
           type: string
           format: email
         role:
-          type: string
-          enum:
-            - patient
-            - doctor
+          $ref: '#/components/schemas/UserRole'
+    Doctor:
+      allOf:
+        - $ref: '#/components/schemas/Patient'
+        - type: object
+          required:
+            - specialization
+          properties:
+            specialization:
+              $ref: '#/components/schemas/SpecializationEnum'
+    User:
       oneOf:
         - $ref: '#/components/schemas/Patient'
         - $ref: '#/components/schemas/Doctor'
@@ -499,36 +508,6 @@ components:
         mapping:
           patient: '#/components/schemas/Patient'
           doctor: '#/components/schemas/Doctor'
-      examples:
-        patient:
-          summary: Example created patient response
-          value:
-            id: a1b2c3d4-e5f6-7890-1234-567890abcdef
-            email: new.patient@example.com
-            firstName: Pat
-            lastName: Ient
-            role: patient
-        doctor:
-          summary: Example created doctor response
-          value:
-            id: b2c3d4e5-f6a7-8901-2345-67890abcde1
-            email: new.doctor@example.com
-            firstName: Doc
-            lastName: Tor
-            role: doctor
-            specialization: CARDIOLOGIST
-    Patient:
-      allOf:
-        - $ref: '#/components/schemas/User'
-    Doctor:
-      allOf:
-        - $ref: '#/components/schemas/User'
-        - type: object
-          required:
-            - specialization
-          properties:
-            specialization:
-              $ref: '#/components/schemas/SpecializationEnum'
     ErrorDetail:
       type: object
       description: Standardized error details (RFC 9457).
@@ -687,7 +666,7 @@ components:
             - patient
           properties:
             patient:
-              $ref: '#/components/schemas/Doctor'
+              $ref: '#/components/schemas/Patient'
             facilities:
               type: array
               description: List of required facilities for the appointment.
@@ -752,6 +731,17 @@ components:
         - id
         - appointmentDateTime
         - status
+    Condition:
+      allOf:
+        - $ref: '#/components/schemas/ConditionDisplay'
+        - type: object
+          properties:
+            appointments:
+              type: array
+              items:
+                $ref: '#/components/schemas/AppointmentDisplay'
+          required:
+            - appointments
     MedicineDisplay:
       type: object
       description: Basic info about a patient's condition.
@@ -874,14 +864,6 @@ components:
         - facilities
         - equipment
         - medicine
-  requestBodies:
-    RegisterRequest:
-      description: Doctor details for registration.
-      required: true
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Registration'
   responses:
     InternalServerErrorResponse:
       description: An error occurred. See specific status code for details.

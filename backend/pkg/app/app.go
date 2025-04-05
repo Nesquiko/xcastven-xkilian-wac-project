@@ -19,8 +19,8 @@ type App struct {
 
 var ErrDuplicateEmail = errors.New("email address already exists")
 
-func (a App) CreatePatient(ctx context.Context, p api.Patient) (api.Patient, error) {
-	patient := apiPatientToDataPatient(p)
+func (a App) CreatePatient(ctx context.Context, p api.PatientRegistration) (api.Patient, error) {
+	patient := patientRegToDataPatient(p)
 
 	patient, err := a.db.CreatePatient(ctx, patient)
 	if errors.Is(err, data.ErrDuplicateEmail) {
@@ -32,8 +32,8 @@ func (a App) CreatePatient(ctx context.Context, p api.Patient) (api.Patient, err
 	return dataPatientToApiPatient(patient), nil
 }
 
-func (a App) CreateDoctor(ctx context.Context, d api.Doctor) (api.Doctor, error) {
-	doctor := apiDoctorToDataDoctor(d)
+func (a App) CreateDoctor(ctx context.Context, d api.DoctorRegistration) (api.Doctor, error) {
+	doctor := doctorRegToDataDoctor(d)
 
 	doctor, err := a.db.CreateDoctor(ctx, doctor)
 	if errors.Is(err, data.ErrDuplicateEmail) {

@@ -59,7 +59,7 @@ func TestCreateDoctor_Conflict(t *testing.T) {
 	)
 }
 
-func mustCreateDoctor(t *testing.T, request *api.Doctor) api.Doctor {
+func mustCreateDoctor(t *testing.T, request *api.DoctorRegistration) api.Doctor {
 	t.Helper()
 	require := require.New(t)
 
@@ -85,7 +85,7 @@ func mustCreateDoctor(t *testing.T, request *api.Doctor) api.Doctor {
 	return createdDoctor
 }
 
-func createDoctor(request *api.Doctor) (*http.Response, error) {
+func createDoctor(request *api.DoctorRegistration) (*http.Response, error) {
 	if request == nil {
 		request = newDoctorRequest("")
 	}
@@ -94,7 +94,7 @@ func createDoctor(request *api.Doctor) (*http.Response, error) {
 		return nil, fmt.Errorf("createDoctor marshal: %w", err)
 	}
 
-	url := ServerUrl + "/doctors"
+	url := ServerUrl + "/auth/register"
 	res, err := http.Post(url, server.ApplicationJSON, bytes.NewBuffer(reqBytes))
 	if err != nil {
 		return nil, fmt.Errorf("createDoctor post: %w", err)
@@ -102,12 +102,13 @@ func createDoctor(request *api.Doctor) (*http.Response, error) {
 	return res, nil
 }
 
-func newDoctorRequest(email string) *api.Doctor {
-	d := &api.Doctor{
+func newDoctorRequest(email string) *api.DoctorRegistration {
+	d := &api.DoctorRegistration{
 		Email:          "dr.default@example.com",
 		FirstName:      "Gregory",
 		LastName:       "House",
-		Specialization: api.Urologist,
+		Specialization: api.UROLOGIST,
+		Role:           api.UserRoleDoctor,
 	}
 	if email != "" {
 		d.Email = types.Email(email)

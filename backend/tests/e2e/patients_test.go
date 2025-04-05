@@ -25,7 +25,7 @@ func TestCreatePatient(t *testing.T) {
 	req, err := json.Marshal(patient)
 	require.NoError(err)
 
-	url := ServerUrl + "/patients"
+	url := ServerUrl + "/auth/register"
 	res, err := http.Post(url, server.ApplicationJSON, bytes.NewBuffer(req))
 	require.NoError(err)
 
@@ -69,7 +69,7 @@ func TestCreatePatient_Conflict(t *testing.T) {
 	)
 }
 
-func mustCreatePatient(t *testing.T, request *api.Patient) api.Patient {
+func mustCreatePatient(t *testing.T, request *api.PatientRegistration) api.Patient {
 	t.Helper()
 	require := require.New(t)
 
@@ -94,7 +94,7 @@ func mustCreatePatient(t *testing.T, request *api.Patient) api.Patient {
 	return createdPatient
 }
 
-func createPatient(request *api.Patient) (*http.Response, error) {
+func createPatient(request *api.PatientRegistration) (*http.Response, error) {
 	if request == nil {
 		request = newPatient("")
 	}
@@ -103,7 +103,7 @@ func createPatient(request *api.Patient) (*http.Response, error) {
 		return nil, fmt.Errorf("createPatient marshal: %w", err)
 	}
 
-	url := ServerUrl + "/patients"
+	url := ServerUrl + "/auth/register"
 	res, err := http.Post(url, server.ApplicationJSON, bytes.NewBuffer(req))
 	if err != nil {
 		return nil, fmt.Errorf("createPatient post: %w", err)
@@ -111,11 +111,12 @@ func createPatient(request *api.Patient) (*http.Response, error) {
 	return res, nil
 }
 
-func newPatient(email string) *api.Patient {
-	p := &api.Patient{
+func newPatient(email string) *api.PatientRegistration {
+	p := &api.PatientRegistration{
 		Email:     "email@email.com",
 		FirstName: "John",
 		LastName:  "Doe",
+		Role:      api.UserRolePatient,
 	}
 	if email != "" {
 		p.Email = types.Email(email)

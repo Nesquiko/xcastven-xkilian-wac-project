@@ -10,7 +10,6 @@ tags:
   - name: Appointments
   - name: Doctors
   - name: Patients
-  - name: Medical History
   - name: Resources
 
 paths:
@@ -18,6 +17,9 @@ paths:
     $ref: "./paths/auth_register.yaml"
   /auth/login:
     $ref: "./paths/auth_login.yaml"
+
+  /appointments/{appointmentId}:
+    $ref: "./paths/appointments_appointmentId.yaml"
 
   /patients/{patientId}:
     $ref: "./paths/patients_patientId.yaml"

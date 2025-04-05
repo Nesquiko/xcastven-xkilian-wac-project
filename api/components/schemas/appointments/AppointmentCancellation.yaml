@@ -1,7 +1,7 @@
 type: object
 description: Data required to cancel an appointment.
 properties:
-  cancellationReason:
+  reason:
     type: string
     description: Optional reason provided for the cancellation.
     example: "Feeling better, no longer need the consultation."

@@ -1,0 +1,18 @@
+delete:
+  tags:
+    - Appointments
+  summary: Cancel an appointment
+  operationId: cancelAppointment
+  parameters:
+    - $ref: "../components/parameters/path/appointmentId.yaml"
+  requestBody:
+    description: Reason for cancelling the appointment.
+    content:
+      application/json:
+        schema:
+          $ref: "../components/schemas/appointments/AppointmentCancellation.yaml"
+  responses:
+    "204":
+      description: Appointment successfully cancelled.
+    "500":
+      $ref: "../components/responses/InternalServerErrorResponse.yaml"

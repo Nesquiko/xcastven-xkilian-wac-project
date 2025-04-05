@@ -10,7 +10,6 @@ tags:
   - name: Appointments
   - name: Doctors
   - name: Patients
-  - name: Medical History
   - name: Resources
 paths:
   /auth/register:
@@ -112,6 +111,25 @@ paths:
                     status: 401
                     code: auth.invalid-credentials
                     detail: No user found with the provided email and role.
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /appointments/{appointmentId}:
+    delete:
+      tags:
+        - Appointments
+      summary: Cancel an appointment
+      operationId: cancelAppointment
+      parameters:
+        - $ref: '#/components/parameters/appointmentId'
+      requestBody:
+        description: Reason for cancelling the appointment.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppointmentCancellation'
+      responses:
+        '204':
+          description: Appointment successfully cancelled.
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
   /patients/{patientId}:
@@ -472,6 +490,14 @@ components:
         - code
         - status
         - detail
+    AppointmentCancellation:
+      type: object
+      description: Data required to cancel an appointment.
+      properties:
+        reason:
+          type: string
+          description: Optional reason provided for the cancellation.
+          example: Feeling better, no longer need the consultation.
     AppointmentStatus:
       type: string
       description: The current status of the appointment.
@@ -788,6 +814,15 @@ components:
                 items:
                   $ref: '#/components/schemas/TimeSlot'
   parameters:
+    appointmentId:
+      name: appointmentId
+      in: path
+      required: true
+      description: The unique identifier (UUID) of the appointment.
+      schema:
+        type: string
+        format: uuid
+      example: d4e5f6a7-b8c9-0123-4567-890abcdef123
     patientId:
       name: patientId
       in: path
@@ -835,15 +870,6 @@ components:
         maximum: 100
         default: 20
       example: 50
-    appointmentId:
-      name: appointmentId
-      in: path
-      required: true
-      description: The unique identifier (UUID) of the appointment.
-      schema:
-        type: string
-        format: uuid
-      example: d4e5f6a7-b8c9-0123-4567-890abcdef123
     doctorId:
       name: doctorId
       in: path

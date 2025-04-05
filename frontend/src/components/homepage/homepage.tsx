@@ -3,8 +3,11 @@ import { MdMenu } from '@material/web/all';
 import { Appointment, AppointmentStatusEnum, TimeSlot } from '../../api/generated';
 import {
   AppointmentStatusColor,
+  ConditionOrderColors,
   DAYS_OF_WEEK,
-  formatDate, formatDateDelta, getAppointmentActions,
+  formatDate,
+  formatDateDelta,
+  getAppointmentActions,
   getDateAndTimeTitle,
   MONTHS,
   TODAY,
@@ -469,8 +472,8 @@ const data = {
     {
       id: 'cond-2',
       displayName: 'Broken leg',
-      startDate: new Date(2025, 4, 2),
-      endDate: new Date(2025, 4, 3),
+      startDate: new Date(2025, 3, 23),
+      endDate: new Date(2025, 3, 25),
       ended: true,
       appointments: [],
     },
@@ -485,7 +488,7 @@ const data = {
     {
       id: 'cond-4',
       displayName: 'Migraine',
-      startDate: new Date(2025, 3, 23),
+      startDate: new Date(2025, 3, 24),
       endDate: new Date(2025, 3, 30),
       ended: true,
       appointments: [],
@@ -552,7 +555,7 @@ export class Homepage {
 
     const appointmentsByDate = new Map<string, Array<Appointment>>();
 
-    data.appointments.forEach(appointment => {
+    this.appointments.forEach((appointment: Appointment) => {
       const date: Date = appointment.appointmentDate;
       const dateKey: string = date.getFullYear() + "-" + date.getMonth() + "-" + date.getDate();
 
@@ -564,13 +567,21 @@ export class Homepage {
     });
 
     const daysInPrevMonth: number = this.getDaysInMonth(year, month - 1);
-    for (let i = firstDayOfMonth - 1; i >= 0; i--) {
-      prevMonthDays.unshift(
-        <div class="px-3 py-2 text-center text-sm text-gray-400 h-20">
+    for (let i: number = firstDayOfMonth - 1; i >= 0; i--) {
+      prevMonthDays.push(
+        <div class="px-3 py-2 text-center text-sm text-gray-400 bg-gray-100 w-full flex items-center justify-center">
           {daysInPrevMonth - i}
         </div>,
       );
     }
+
+    const conditionHeightMap: Record<string, number> = {};
+    const conditionColorMap: Record<string, string> = {};
+    this.conditions.forEach((condition: Condition, index: number) => {
+      conditionColorMap[condition.id] = ConditionOrderColors[index % ConditionOrderColors.length];
+    });
+
+    let currentMaxHeight = 0;
 
     for (let i: number = 1; i <= daysInMonth; i++) {
       const currentDate = new Date(year, month, i);
@@ -580,29 +591,25 @@ export class Homepage {
       const appointmentsForDay: Array<Appointment> = appointmentsByDate.get(dateKey) ?? [];
 
       const isToday: boolean =
-        currentDate.getTime() === today.getTime() &&
-        this.currentViewMonth === month &&
-        this.currentViewYear === year;
-      const isSelected: boolean = false;
+        i + 1 === today.getDay() &&
+        this.currentViewMonth === today.getMonth() &&
+        this.currentViewYear === today.getFullYear();
       const isPastDate: boolean = currentDate < today;
 
-      const conditionsForDate = this.getConditionsForDate(currentDate);
+      const conditionsForDate: Array<Condition> = this.getConditionsForDate(currentDate);
 
       currentMonthDays.push(
         <div
           role="button"
-          class={`px-3 py-2 flex flex-col gap-y-1 text-sm h-20 relative
-            ${isToday ? ' bg-[#9d83c6] ' : ''}
-            ${isSelected ? 'bg-[#7357be] text-white' : ''}
-            ${isPastDate ? 'text-gray-400' : 'hover:border-[#9d83c6] hover:border-2 bg-[#f0eafa]'
-              }
-          `}
+          class={`flex flex-col gap-y-1 text-sm relative w-full items-center justify-center
+          ${isPastDate ? 'text-gray-400' : 'hover:border-[#9d83c6] hover:border-2 bg-[#f0eafa]'}
+        `}
           onClick={(event: MouseEvent) => {
             event.stopPropagation();
             this.handleSelectDate(currentDate);
           }}
         >
-          <span class="w-full text-center">{i}</span>
+          <span class={`py-1 w-full text-center ${isToday && 'bg-[#7357be] text-white'}`}>{i}</span>
 
           <div class="relative w-full h-full flex flex-row flex-wrap gap-x-1 items-center justify-center">
             {appointmentsForDay.length > 0 && (
@@ -617,11 +624,11 @@ export class Homepage {
                 >
                   <div
                     class={`cursor-pointer circle rounded-full transition-all duration-200
-                  w-3 h-3 hover:w-4 hover:h-4
-                  sm:w-[0.875rem] sm:h-[0.875rem] sm:hover:w-5 sm:hover:h-5
-                  md:w-4 md:h-4 md:hover:w-6 md:hover:h-6
-                  lg:w-5 lg:h-5 lg:hover:w-7 lg:hover:h-7
-                `}
+                    w-3 h-3 hover:w-4 hover:h-4
+                    sm:w-[0.875rem] sm:h-[0.875rem] sm:hover:w-5 sm:hover:h-5
+                    md:w-4 md:h-4 md:hover:w-6 md:hover:h-6
+                    lg:w-5 lg:h-5 lg:hover:w-7 lg:hover:h-7
+                  `}
                     style={{
                       backgroundColor: AppointmentStatusColor[appointment.status].background,
                     }}
@@ -635,37 +642,73 @@ export class Homepage {
             )}
           </div>
 
-          {conditionsForDate.map((condition) => (
-            <div
-              key={condition.id}
-              class={`absolute bottom-0 left-0 right-0 cursor-pointer ${
-                this.hoveredConditionId === condition.id ? 'h-2' : 'h-1'
-              } bg-[#7357be] transition-all duration-200 group`}
-              onMouseEnter={() => this.hoveredConditionId = condition.id}
-              onMouseLeave={() => this.hoveredConditionId = null}
-              onClick={(event: MouseEvent) => {
-                event.stopPropagation();
-                this.handleSelectCondition(condition);
-              }}
-            >
+          {conditionsForDate.map((condition: Condition) => {
+            const isStartDate: boolean = currentDate.getTime() === condition.startDate.getTime();
+            const isEndDate: boolean = condition.endDate && currentDate.getTime() === condition.endDate.getTime();
+
+            if (!(condition.id in conditionHeightMap)) {
+              conditionHeightMap[condition.id] = currentMaxHeight;
+              currentMaxHeight += 0;
+            }
+
+            const conditionHeight = conditionHeightMap[condition.id] + 10;
+            const conditionColor = conditionColorMap[condition.id];
+
+            return (
               <div
-                class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 bg-black text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-10"
+                key={condition.id}
+                class="absolute left-0 right-0 cursor-pointer transition-all duration-200 group"
+                style={{
+                  bottom: "0px",
+                  height: this.hoveredConditionId === condition.id ? `${conditionHeight + 6}px` : `${conditionHeight}px`,
+                  zIndex: (100 - conditionHeight + 10 / 6).toString(),
+                  backgroundColor: conditionColor,
+                }}
+                onMouseEnter={() => (this.hoveredConditionId = condition.id)}
+                onMouseLeave={() => (this.hoveredConditionId = null)}
+                onClick={(event: MouseEvent) => {
+                  event.stopPropagation();
+                  this.handleSelectCondition(condition);
+                }}
               >
-                {condition.displayName}
+                <div class="relative">
+                  {isStartDate && (
+                    <div
+                      class="absolute left-0 top-0 transform -translate-y-3 w-5 h-5 rounded-tr-full"
+                      style={{
+                        backgroundColor: conditionColor,
+                      }}
+                    ></div>
+                  )}
+
+                  {isEndDate && (
+                    <div
+                      class="absolute right-0 top-0 transform -translate-y-3 w-5 h-5 rounded-tl-full"
+                      style={{
+                        backgroundColor: conditionColor,
+                      }}
+                    ></div>
+                  )}
+
+                  <div
+                    class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 bg-black text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-10"
+                  >
+                    {condition.displayName}
+                  </div>
+                </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       );
     }
-
 
     const totalCells = 42;
     const remainingCells =
       totalCells - (prevMonthDays.length + currentMonthDays.length);
     for (let i = 1; i <= remainingCells; i++) {
       nextMonthDays.push(
-        <div class="px-3 py-2 text-center text-sm text-gray-400 h-20">
+        <div class="px-3 py-2 text-center text-sm text-gray-400 bg-gray-100 w-full flex items-center justify-center">
           {i}
         </div>,
       );
@@ -673,6 +716,7 @@ export class Homepage {
 
     return [...prevMonthDays, ...currentMonthDays, ...nextMonthDays];
   };
+
 
   private getMonthName = () => {
     return MONTHS[this.currentViewMonth];
@@ -727,8 +771,6 @@ export class Homepage {
     this.selectedCondition = null;
     this.selectedDate = null;
     this.isDrawerOpen = true;
-
-    console.log("Selecting an appointment:", appointment);
   };
 
   private handleSelectCondition = (condition: Condition) => {
@@ -736,8 +778,6 @@ export class Homepage {
     this.selectedAppointment = null;
     this.selectedDate = null;
     this.isDrawerOpen = true;
-
-    console.log("Selecting a condition:", condition);
   };
 
   private handleSelectDate = (date: Date) => {
@@ -745,8 +785,6 @@ export class Homepage {
     this.selectedAppointment = null;
     this.selectedCondition = null;
     this.isDrawerOpen = true;
-
-    console.log("Selecting a date:", date);
   };
 
   private toggleConditionAppointments = (conditionId: string) => {
@@ -809,7 +847,7 @@ export class Homepage {
     }
 
     return (
-      <div class="flex h-screen flex-col w-full flex-1 overflow-x-hidden">
+      <div class="flex h-screen flex-col w-full overflow-hidden">
         <div class="bg-gray-800 flex items-center px-3 py-1 text-white">
           <span class="relative">
             <md-icon-button
@@ -896,7 +934,7 @@ export class Homepage {
           </md-icon-button>
         </div>
 
-        <div>
+        <div class="flex flex-1 flex-col overflow-x-hidden overflow-y-auto">
           <div class="grid grid-cols-7">
             {DAYS_OF_WEEK.map((day: { short: string, long: string }) => (
               <div class="px-4 py-3 text-center text-sm font-medium text-[#7357be]">
@@ -906,7 +944,8 @@ export class Homepage {
             ))}
           </div>
 
-          <div class="grid grid-cols-7 border-x border-t border-[#d8c7ed] divide-x divide-y divide-[#d8c7ed]">
+          <div
+            class="flex-1 grid grid-cols-7 grid-rows-6 border-x border-t border-[#d8c7ed] divide-x divide-y divide-[#d8c7ed]">
             {this.renderCalendar()}
           </div>
 
@@ -985,39 +1024,39 @@ export class Homepage {
                       {this.getAppointmentsForDate(this.selectedDate).length ?
                         this.getAppointmentsForDate(this.selectedDate)
                           .map((appointment: Appointment, index: number) => {
-                          return (
-                            <div
-                              key={appointment.id}
-                              class={`h-16 px-4 py-2 flex flex-col justify-center w-full border-2 border-transparent hover:border-[#9d83c6] cursor-pointer
+                              return (
+                                <div
+                                  key={appointment.id}
+                                  class={`h-16 px-4 py-2 flex flex-col justify-center w-full border-2 border-transparent hover:border-[#9d83c6] cursor-pointer
                                 ${index % 2 === 0 ? ' bg-gray-200 ' : ' bg-white '}
                                 ${index === 0 && ' rounded-t-lg '}
                               `}
-                              onClick={() => this.handleSelectAppointment(appointment)}
-                            >
-                              <div class="flex flex-row justify-between items-center">
-                                {getDateAndTimeTitle(
-                                  appointment.appointmentDate,
-                                  appointment.timeSlot.time,
-                                  'medium',
-                                )}
-                                <div class="text-sm font-medium text-gray-600">
-                                  {appointment.type.displayName}
+                                  onClick={() => this.handleSelectAppointment(appointment)}
+                                >
+                                  <div class="flex flex-row justify-between items-center">
+                                    {getDateAndTimeTitle(
+                                      appointment.appointmentDate,
+                                      appointment.timeSlot.time,
+                                      'medium',
+                                    )}
+                                    <div class="text-sm font-medium text-gray-600">
+                                      {appointment.type.displayName}
+                                    </div>
+                                  </div>
+                                  <div class="text-sm font-medium text-gray-600">
+                                    Dr. {appointment.doctor.firstName}{' '}
+                                    {appointment.doctor.lastName}
+                                  </div>
                                 </div>
-                              </div>
-                              <div class="text-sm font-medium text-gray-600">
-                                Dr. {appointment.doctor.firstName}{' '}
-                                {appointment.doctor.lastName}
-                              </div>
-                            </div>
-                          );
-                        },
-                      ) : (
-                        <div
-                          class={`h-16 px-4 py-2 flex flex-col justify-center w-full border-2 border-transparent text-center bg-gray-200 text-sm font-medium text-gray-600`}
-                        >
-                          No appointments for this date
-                        </div>
-                      )}
+                              );
+                            },
+                          ) : (
+                          <div
+                            class={`h-16 px-4 py-2 flex flex-col justify-center w-full border-2 border-transparent text-center bg-gray-200 text-sm font-medium text-gray-600`}
+                          >
+                            No appointments for this date
+                          </div>
+                        )}
 
                       <div class="w-full flex flex-row justify-between items-center h-12">
                         <md-icon-button
@@ -1064,71 +1103,71 @@ export class Homepage {
                       {this.getConditionsForDate(this.selectedDate).length ?
                         this.getConditionsForDate(this.selectedDate)
                           .map((condition: Condition, index: number) => {
-                        const isSelected: boolean =
-                          this.selectedCondition && condition.id === this.selectedCondition.id;
-                        const isExpanded: boolean =
-                          this.expandedConditionId && condition.id === this.expandedConditionId;
+                              const isSelected: boolean =
+                                this.selectedCondition && condition.id === this.selectedCondition.id;
+                              const isExpanded: boolean =
+                                this.expandedConditionId && condition.id === this.expandedConditionId;
 
-                        return (
-                          <div key={condition.id}>
-                            <div
-                              class={`px-4 py-2 flex flex-col justify-center w-full border-2 border-transparent hover:border-[#9d83c6] cursor-pointer
+                              return (
+                                <div key={condition.id}>
+                                  <div
+                                    class={`px-4 py-2 flex flex-col justify-center w-full border-2 border-transparent hover:border-[#9d83c6] cursor-pointer
                                 ${index % 2 === 0 ? ' bg-gray-200 ' : ' bg-white '}
                                 ${index === 0 && ' rounded-t-lg '}
                                 ${isExpanded ? 'h-auto' : 'h-16'}
                               `}
-                              onClick={() => this.handleSelectCondition(condition)}
-                              style={isSelected ? { borderColor: '#7357be' } : {}}
-                            >
-                              <div class="flex flex-row justify-between items-center">
-                                <div class="text-[#7357be] font-medium">
-                                  {condition.displayName}
-                                </div>
-                                <div class="flex items-center">
-                                  {condition.ended ? (
-                                    <span
-                                      class="material-symbols-outlined text-gray-500"
-                                      style={{ fontSize: '16px' }}
-                                    >
+                                    onClick={() => this.handleSelectCondition(condition)}
+                                    style={isSelected ? { borderColor: '#7357be' } : {}}
+                                  >
+                                    <div class="flex flex-row justify-between items-center">
+                                      <div class="text-[#7357be] font-medium">
+                                        {condition.displayName}
+                                      </div>
+                                      <div class="flex items-center">
+                                        {condition.ended ? (
+                                          <span
+                                            class="material-symbols-outlined text-gray-500"
+                                            style={{ fontSize: '16px' }}
+                                          >
                                       check_circle
                                     </span>
-                                  ) : (
-                                    <span
-                                      class="material-symbols-outlined text-gray-500"
-                                      style={{ fontSize: '16px' }}
-                                    >
+                                        ) : (
+                                          <span
+                                            class="material-symbols-outlined text-gray-500"
+                                            style={{ fontSize: '16px' }}
+                                          >
                                       pending
                                     </span>
-                                  )}
-                                </div>
-                              </div>
-                              <div class="flex flex-row justify-between items-center">
+                                        )}
+                                      </div>
+                                    </div>
+                                    <div class="flex flex-row justify-between items-center">
                                 <span class="text-sm text-gray-400">
                                   From:
                                   <span class="text-sm font-medium text-gray-600 ml-2">
                                     {formatDate(condition.startDate)}
                                   </span>
                                 </span>
-                                {condition.endDate && (
-                                  <span class="text-sm text-gray-400">
+                                      {condition.endDate && (
+                                        <span class="text-sm text-gray-400">
                                 To:
                                 <span class="text-sm font-medium text-gray-600 ml-2">
                                   {formatDate(condition.endDate)}
                                 </span>
                               </span>
-                                )}
-                              </div>
-                            </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                </div>
+                              );
+                            },
+                          ) : (
+                          <div
+                            class={`h-16 px-4 py-2 flex flex-col justify-center w-full border-2 border-transparent text-center bg-gray-200 text-sm font-medium text-gray-600`}
+                          >
+                            No conditions for this date
                           </div>
-                        );
-                        },
-                      ) : (
-                        <div
-                          class={`h-16 px-4 py-2 flex flex-col justify-center w-full border-2 border-transparent text-center bg-gray-200 text-sm font-medium text-gray-600`}
-                        >
-                          No conditions for this date
-                        </div>
-                      )}
+                        )}
 
                       <div class="w-full flex flex-row justify-between items-center h-12">
                         <md-icon-button

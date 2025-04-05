@@ -125,6 +125,14 @@ export const AppointmentStatusColor = {
   }
 };
 
+export const ConditionOrderColors: Array<string> = [
+  "#0D47A1",
+  "#1E88E5",
+  "#42A5F5",
+  "#90CAF9",
+  "#E3F2FD",
+];
+
 export const getAppointmentActions = (
   appointmentStatus: AppointmentStatusEnum,
   handleRescheduleAppointment: (appointment: Appointment) => void,

@@ -299,6 +299,24 @@ paths:
           $ref: '#/components/responses/DoctorTimeslots'
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
+  /resources/available:
+    get:
+      tags:
+        - Resources
+      summary: Get available resources for a time slot
+      operationId: getAvailableResources
+      parameters:
+        - $ref: '#/components/parameters/date'
+        - $ref: '#/components/parameters/time'
+      responses:
+        '200':
+          description: Successfully retrieved available resources for the specified time slot.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AvailableResources'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
 components:
   schemas:
     Registration:
@@ -713,6 +731,29 @@ components:
       required:
         - time
         - status
+    AvailableResources:
+      type: object
+      description: Lists of available resources (facilities, equipment, medicine) for a specific date and time slot.
+      properties:
+        facilities:
+          type: array
+          description: List of available facilities.
+          items:
+            $ref: '#/components/schemas/Facility'
+        equipment:
+          type: array
+          description: List of available equipment.
+          items:
+            $ref: '#/components/schemas/Equipment'
+        medicine:
+          type: array
+          description: List of available medicine (assuming medicine can be 'allocated' or has limited stock per slot).
+          items:
+            $ref: '#/components/schemas/Medicine'
+      required:
+        - facilities
+        - equipment
+        - medicine
   requestBodies:
     RegisterRequest:
       description: Doctor details for registration.
@@ -821,3 +862,12 @@ components:
         type: string
         format: date
       example: '2024-07-15'
+    time:
+      name: time
+      in: query
+      required: true
+      description: The time slot to check availability for (HH:MM format, 24-hour clock).
+      schema:
+        type: string
+        pattern: ^([01]\d|2[0-3]):([0-5]\d)$
+      example: '11:30'

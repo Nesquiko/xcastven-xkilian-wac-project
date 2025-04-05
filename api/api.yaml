@@ -34,16 +34,8 @@ paths:
     $ref: "./paths/doctors_doctorId_calendar.yaml"
   /doctors/{doctorId}/appointment/{appointmentId}:
     $ref: "./paths/doctors_doctorId_appointment_appointmentId.yaml"
-
   /doctors/{doctorId}/timeslots:
     $ref: "./paths/doctors_doctorId_timeslots.yaml"
-  # /appointments/{appointmentId}/cancel:
-  #   $ref: "./paths/appointments_appointmentId_cancel.yaml"
-  # /appointments/{appointmentId}/reschedule:
-  #   $ref: "./paths/appointments_appointmentId_reschedule.yaml"
-  # /appointments/{appointmentId}/resources:
-  #   $ref: "./paths/appointments_appointmentId_resources.yaml"
-  # /appointments/{appointmentId}/decision:
-  #   $ref: "./paths/appointments_appointmentId_decision.yaml"
-  # /resources/available:
-  #   $ref: "./paths/resources_available.yaml"
+
+  /resources/available:
+    $ref: "./paths/resources_available.yaml"

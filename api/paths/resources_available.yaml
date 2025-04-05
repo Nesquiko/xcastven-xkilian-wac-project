@@ -8,7 +8,11 @@ get:
     - $ref: "../components/parameters/query/time.yaml"
   responses:
     "200":
-      $ref: "../components/responses/AvailableResources.yaml"
+      description: Successfully retrieved available resources for the specified time slot.
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/resources/AvailableResources.yaml"
 
     "500":
       $ref: "../components/responses/InternalServerErrorResponse.yaml"

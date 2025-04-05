@@ -13,7 +13,7 @@ get:
       content:
         application/json:
           schema:
-            $ref: "../components/schemas/medicalRecords/MedicalHistoryFileList.yaml"
+            $ref: "../components/schemas/MedicalHistoryFileList.yaml"
           examples:
             fileListExample:
               summary: Example list of medical history filenames

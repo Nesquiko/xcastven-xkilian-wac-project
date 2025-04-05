@@ -17,8 +17,8 @@ properties:
   type:
     $ref: "./AppointmentType.yaml"
   doctor:
-    $ref: "../doctors/Doctor.yaml"
-  illness:
+    $ref: "../Doctor.yaml"
+  condition:
     type: string
     description: Associated illness diagnosis (if applicable).
     example: "Acute Bronchitis"

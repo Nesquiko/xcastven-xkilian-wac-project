@@ -9,7 +9,7 @@ properties:
       description: Filename of a medical record document.
       example: "lab_results_2024-01-15.pdf"
   pagination:
-    $ref: "../Pagination.yaml" # Reference the standard Pagination schema
+    $ref: "./Pagination.yaml"
 required:
   - files
   - pagination

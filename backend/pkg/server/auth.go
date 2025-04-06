@@ -76,5 +76,51 @@ func (s Server) RegisterUser(w http.ResponseWriter, r *http.Request) {
 
 // LoginUser implements api.ServerInterface.
 func (s Server) LoginUser(w http.ResponseWriter, r *http.Request) {
-	panic("unimplemented")
+	req, decodeErr := Decode[api.LoginUserJSONBody](w, r)
+	if decodeErr != nil {
+		encodeError(w, decodeErr)
+		return
+	}
+
+	if req.Role == api.UserRoleDoctor {
+		doc, err := s.app.DoctorByEmail(r.Context(), string(req.Email))
+		if errors.Is(err, app.ErrNotFound) {
+			apiErr := &ApiError{
+				ErrorDetail: api.ErrorDetail{
+					Code:   "doctor.not-found",
+					Title:  "Not Found",
+					Detail: fmt.Sprintf("Doctor with email %q not found.", req.Email),
+					Status: http.StatusNotFound,
+				},
+			}
+			encodeError(w, apiErr)
+			return
+		} else if err != nil {
+			slog.Error(UnexpectedError, "error", err.Error(), "where", "GetPatientById", "role", "doctor")
+			encodeError(w, internalServerError())
+			return
+		}
+
+		encode(w, http.StatusOK, doc)
+	}
+
+	patient, err := s.app.PatientByEmail(r.Context(), string(req.Email))
+	if errors.Is(err, app.ErrNotFound) {
+		apiErr := &ApiError{
+			ErrorDetail: api.ErrorDetail{
+				Code:   "patient.not-found",
+				Title:  "Not Found",
+				Detail: fmt.Sprintf("Patient with email %q not found.", req.Email),
+				Status: http.StatusNotFound,
+			},
+		}
+		encodeError(w, apiErr)
+		return
+	} else if err != nil {
+		slog.Error(UnexpectedError, "error", err.Error(), "where", "GetPatientById", "role", "patient")
+		encodeError(w, internalServerError())
+		return
+	}
+
+	encode(w, http.StatusOK, patient)
 }

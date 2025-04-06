@@ -19,53 +19,52 @@ import (
 	"github.com/Nesquiko/wac/pkg/server"
 )
 
-func TestCreatePatient(t *testing.T) {
-	require := require.New(t)
-	patient := newPatient("test@one.com")
-	req, err := json.Marshal(patient)
-	require.NoError(err)
+func TestGetPatientById_OK(t *testing.T) {
+	t.Parallel()
 
-	url := ServerUrl + "/auth/register"
-	res, err := http.Post(url, server.ApplicationJSON, bytes.NewBuffer(req))
-	require.NoError(err)
+	patientRequest := newPatient(fmt.Sprintf("test.patient.get.%s@example.com", uuid.NewString()))
+	createdPatient := mustCreatePatient(t, patientRequest)
+	require.NotEmpty(t, createdPatient.Id, "Setup failed: Created patient ID is empty")
 
-	require.Equal(http.StatusCreated, res.StatusCode, "response: %+v", res)
+	url := fmt.Sprintf("%s/patients/%s", ServerUrl, createdPatient.Id)
+	res, err := http.Get(url)
+	require.NoError(t, err, "http.Get failed for GetPatientById")
+	defer res.Body.Close()
+	require.Equal(t, http.StatusOK, res.StatusCode, "Expected OK status code")
 
-	var newPatient api.Patient
-	err = json.NewDecoder(res.Body).Decode(&newPatient)
-	res.Body.Close()
-	require.NoError(err, "response: %+v", res)
+	var retrievedPatient api.Patient
+	err = json.NewDecoder(res.Body).Decode(&retrievedPatient)
+	require.NoError(t, err, "Failed to decode response body for GetPatientById")
 
-	assert.Equal(t, patient.Email, newPatient.Email)
-	assert.Equal(t, patient.FirstName, newPatient.FirstName)
-	assert.Equal(t, patient.LastName, newPatient.LastName)
+	assert := assert.New(t)
+	assert.Equal(createdPatient.Id, retrievedPatient.Id)
+	assert.Equal(createdPatient.Email, retrievedPatient.Email)
+	assert.Equal(createdPatient.FirstName, retrievedPatient.FirstName)
+	assert.Equal(createdPatient.LastName, retrievedPatient.LastName)
 }
 
-func TestCreatePatient_Conflict(t *testing.T) {
-	require := require.New(t)
-	assert := assert.New(t)
+func TestGetPatientById_NotFound(t *testing.T) {
+	t.Parallel()
 
-	uniqueEmail := fmt.Sprintf("test.conflict.%s@example.com", uuid.NewString())
-	patient1 := newPatient(uniqueEmail)
-	_ = mustCreatePatient(t, patient1)
-
-	res2, err := createPatient(patient1) // Use the same patient data
-	require.NoError(err, "Second createPatient call failed")
-	defer res2.Body.Close()
-
-	require.Equal(http.StatusConflict, res2.StatusCode, "Expected conflict status code")
+	nonExistentID := uuid.New()
+	url := fmt.Sprintf("%s/patients/%s", ServerUrl, nonExistentID)
+	res, err := http.Get(url)
+	require.NoError(t, err, "http.Get failed for GetPatientById (NotFound)")
+	defer res.Body.Close()
+	require.Equal(t, http.StatusNotFound, res.StatusCode, "Expected Not Found status code")
 
 	var errorResponse api.ErrorDetail
-	err = json.NewDecoder(res2.Body).Decode(&errorResponse)
-	require.NoError(err, "Failed to decode error response body")
+	err = json.NewDecoder(res.Body).Decode(&errorResponse)
+	require.NoError(t, err, "Failed to decode error response body for GetPatientById (NotFound)")
 
-	assert.Equal(http.StatusConflict, errorResponse.Status)
-	assert.Equal("Conflict", errorResponse.Title)
-	assert.Equal("patient.email-exists", errorResponse.Code)
+	assert := assert.New(t)
+	assert.Equal(http.StatusNotFound, errorResponse.Status)
+	assert.Equal("Not Found", errorResponse.Title)
+	assert.Equal("patient.not-found", errorResponse.Code)
 	assert.Contains(
 		errorResponse.Detail,
-		string(patient1.Email),
-		"Error detail should mention the conflicting email",
+		nonExistentID.String(),
+		"Error detail should mention the missing ID",
 	)
 }
 

@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 )
 
@@ -32,6 +33,38 @@ func (m *MongoDb) CreateDoctor(ctx context.Context, doctor Doctor) (Doctor, erro
 			}
 		}
 		return Doctor{}, fmt.Errorf("CreateDoctor: failed to insert document: %w", err)
+	}
+
+	return doctor, nil
+}
+
+func (m *MongoDb) DoctorById(ctx context.Context, id uuid.UUID) (Doctor, error) {
+	collection := m.Database.Collection(doctorsCollection)
+	filter := bson.M{"_id": id}
+	var doctor Doctor
+
+	err := collection.FindOne(ctx, filter).Decode(&doctor)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return Doctor{}, ErrNotFound
+		}
+		return Doctor{}, fmt.Errorf("DoctorById: failed to find document: %w", err)
+	}
+
+	return doctor, nil
+}
+
+func (m *MongoDb) DoctorByEmail(ctx context.Context, email string) (Doctor, error) {
+	collection := m.Database.Collection(doctorsCollection)
+	filter := bson.M{"email": email}
+	var doctor Doctor
+
+	err := collection.FindOne(ctx, filter).Decode(&doctor)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return Doctor{}, ErrNotFound
+		}
+		return Doctor{}, fmt.Errorf("DoctorByEmail: failed to find document: %w", err)
 	}
 
 	return doctor, nil

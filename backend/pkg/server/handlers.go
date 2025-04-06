@@ -1,9 +1,13 @@
 package server
 
 import (
+	"errors"
+	"fmt"
+	"log/slog"
 	"net/http"
 
 	"github.com/Nesquiko/wac/pkg/api"
+	"github.com/Nesquiko/wac/pkg/app"
 )
 
 // CancelAppointment implements api.ServerInterface.
@@ -64,7 +68,26 @@ func (s Server) GetAvailableResources(
 
 // GetDoctorById implements api.ServerInterface.
 func (s Server) GetDoctorById(w http.ResponseWriter, r *http.Request, doctorId api.DoctorId) {
-	panic("unimplemented")
+	doctor, err := s.app.DoctorById(r.Context(), doctorId)
+	if err != nil {
+		if errors.Is(err, app.ErrNotFound) {
+			apiErr := &ApiError{
+				ErrorDetail: api.ErrorDetail{
+					Code:   "doctor.not-found",
+					Title:  "Not Found",
+					Detail: fmt.Sprintf("Doctor with ID %q not found.", doctorId),
+					Status: http.StatusNotFound,
+				},
+			}
+			encodeError(w, apiErr)
+			return
+		}
+		slog.Error(UnexpectedError, "error", err.Error(), "where", "GetDoctorById")
+		encodeError(w, internalServerError())
+		return
+	}
+
+	encode(w, http.StatusOK, doctor)
 }
 
 // GetDoctorsDoctorIdAppointmentAppointmentId implements api.ServerInterface.
@@ -79,7 +102,26 @@ func (s Server) GetDoctorsDoctorIdAppointmentAppointmentId(
 
 // GetPatientById implements api.ServerInterface.
 func (s Server) GetPatientById(w http.ResponseWriter, r *http.Request, patientId api.PatientId) {
-	panic("unimplemented")
+	patient, err := s.app.PatientById(r.Context(), patientId)
+	if err != nil {
+		if errors.Is(err, app.ErrNotFound) {
+			apiErr := &ApiError{
+				ErrorDetail: api.ErrorDetail{
+					Code:   "patient.not-found",
+					Title:  "Not Found",
+					Detail: fmt.Sprintf("Patient with ID %q not found.", patientId),
+					Status: http.StatusNotFound,
+				},
+			}
+			encodeError(w, apiErr)
+			return
+		}
+		slog.Error(UnexpectedError, "error", err.Error(), "where", "GetPatientById")
+		encodeError(w, internalServerError())
+		return
+	}
+
+	encode(w, http.StatusOK, patient)
 }
 
 // GetPatientsPatientIdAppointmentAppointmentId implements api.ServerInterface.

@@ -244,7 +244,7 @@ paths:
   /medicine:
     post:
       tags:
-        - Patient
+        - Patients
         - Medical History
       summary: Create a medicine record for a patient
       operationId: createPatientMedicine
@@ -449,6 +449,28 @@ paths:
           $ref: '#/components/responses/DoctorTimeslots'
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
+  /resources:
+    post:
+      tags:
+        - Resources
+      summary: Create resource
+      operationId: createResource
+      requestBody:
+        description: New resource to be created
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewResource'
+      responses:
+        '201':
+          description: Created resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewResource'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
   /resources/available:
     get:
       tags:
@@ -456,8 +478,7 @@ paths:
       summary: Get available resources for a time slot
       operationId: getAvailableResources
       parameters:
-        - $ref: '#/components/parameters/date'
-        - $ref: '#/components/parameters/time'
+        - $ref: '#/components/parameters/date-time'
       responses:
         '200':
           description: Successfully retrieved available resources for the specified time slot.
@@ -465,6 +486,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/AvailableResources'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /resources/{resourceId}:
+    post:
+      tags:
+        - Resources
+      summary: Creates a reservation for a resource at specific time
+      operationId: reserveResource
+      parameters:
+        - $ref: '#/components/parameters/resourceId'
+      requestBody:
+        description: Reservation details
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceReservation'
+      responses:
+        '204':
+          description: Successfully reserved a resource for an appointment.
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
 components:
@@ -957,6 +998,30 @@ components:
       required:
         - time
         - status
+    ResourceType:
+      type: string
+      enum:
+        - medicine
+        - facility
+        - equipment
+    NewResource:
+      type: object
+      description: Represents a resource.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          description: Name of the medicine.
+          example: Anaesthetic XYZ
+        type:
+          $ref: '#/components/schemas/ResourceType'
+      required:
+        - id
+        - name
+        - type
     AvailableResources:
       type: object
       description: Lists of available resources (facilities, equipment, medicine) for a specific date and time slot.
@@ -980,6 +1045,26 @@ components:
         - facilities
         - equipment
         - medicine
+    ResourceReservation:
+      type: object
+      required:
+        - appointmentId
+        - resourceId
+        - start
+        - end
+      properties:
+        appointmentId:
+          type: string
+          format: uuid
+        resourceId:
+          type: string
+          format: uuid
+        start:
+          type: string
+          format: date-time
+        end:
+          type: string
+          format: date-time
   responses:
     InternalServerErrorResponse:
       description: An error occurred. See specific status code for details.
@@ -1089,12 +1174,19 @@ components:
         type: string
         format: date
       example: '2024-07-15'
-    time:
-      name: time
+    date-time:
+      name: date-time
       in: query
       required: true
-      description: The time slot to check availability for (HH:MM format, 24-hour clock).
       schema:
         type: string
-        pattern: ^([01]\d|2[0-3]):([0-5]\d)$
-      example: '11:30'
+        format: date-time
+    resourceId:
+      name: resourceId
+      in: path
+      required: true
+      description: The unique identifier (UUID) of a resource.
+      schema:
+        type: string
+        format: uuid
+      example: b2c3d4e5-f6a7-8901-2345-67890abcdef1

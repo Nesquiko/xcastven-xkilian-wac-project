@@ -50,3 +50,18 @@ func (a monolithApp) PatientByEmail(ctx context.Context, email string) (api.Pati
 
 	return dataPatientToApiPatient(patient), nil
 }
+
+func (a monolithApp) PatientsCalendar(patientId api.PatientId, params api.PatientsCalendarParams) {
+	panic("unimplemented")
+}
+
+func (a monolithApp) CreatePatientCondition(
+	ctx context.Context,
+	c api.NewCondition,
+) (api.ConditionDisplay, error) {
+	cond, err := a.db.CreateCondition(ctx, newCondToDataCond(c))
+	if err != nil {
+		return api.ConditionDisplay{}, fmt.Errorf("CreatePatientCondition: %w", err)
+	}
+	return dataCondToCondDisplay(cond), nil
+}

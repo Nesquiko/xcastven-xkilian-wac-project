@@ -9,6 +9,7 @@ import (
 	"io"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/oapi-codegen/runtime/types"
@@ -18,6 +19,61 @@ import (
 	"github.com/Nesquiko/wac/pkg/api"
 	"github.com/Nesquiko/wac/pkg/server"
 )
+
+func TestCreatePatientCondition_Success(t *testing.T) {
+	t.Parallel()
+
+	patientEmail := fmt.Sprintf("test.patient.cond.ok.%s@example.com", uuid.NewString())
+	patientRequest := newPatient(patientEmail)
+	createdPatient := mustCreatePatient(t, patientRequest)
+	require.NotEmpty(t, createdPatient.Id, "Setup failed: Created patient ID is empty")
+
+	startTime := time.Now().Truncate(time.Second)
+	conditionName := "Acute Bronchitis"
+	newConditionRequest := api.NewCondition{
+		Name:      conditionName,
+		PatientId: createdPatient.Id,
+		Start:     startTime,
+	}
+
+	reqBodyBytes, err := json.Marshal(newConditionRequest)
+	require.NoError(t, err, "Failed to marshal NewCondition request")
+
+	url := fmt.Sprintf("%s/conditions", ServerUrl)
+	res, err := http.Post(url, server.ApplicationJSON, bytes.NewBuffer(reqBodyBytes))
+	require.NoError(t, err, "http.Post failed for CreatePatientCondition")
+	defer res.Body.Close()
+
+	bodyBytes, readErr := io.ReadAll(res.Body)
+	require.NoError(t, readErr, "Failed to read response body")
+	res.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+	require.Equal(
+		t,
+		http.StatusCreated,
+		res.StatusCode,
+		"Expected '201 Created' status code. Response body: %s",
+		string(bodyBytes),
+	)
+
+	var createdCondition api.ConditionDisplay
+	err = json.NewDecoder(res.Body).Decode(&createdCondition)
+	require.NoError(t, err, "Failed to decode successful response body into ConditionDisplay")
+
+	assert := assert.New(t)
+	assert.NotNil(createdCondition.Id, "Response condition ID should not be nil")
+	assert.NotEmpty(*createdCondition.Id, "Response condition ID should not be empty")
+	assert.Equal(conditionName, createdCondition.Name, "Response condition name mismatch")
+	assert.WithinDuration(
+		startTime,
+		createdCondition.Start,
+		time.Second,
+		"Response condition start time mismatch",
+	)
+	assert.Nil(
+		createdCondition.End,
+		"Response condition end time should be nil as it wasn't provided",
+	)
+}
 
 func TestGetPatientById_OK(t *testing.T) {
 	t.Parallel()

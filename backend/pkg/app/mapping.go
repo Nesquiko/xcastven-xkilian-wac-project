@@ -46,3 +46,21 @@ func dataDoctorToApiDoctor(d data.Doctor) api.Doctor {
 		Role:           api.UserRoleDoctor,
 	}
 }
+
+func newCondToDataCond(c api.NewCondition) data.Condition {
+	return data.Condition{
+		PatientId: c.PatientId,
+		Name:      c.Name,
+		Start:     c.Start,
+		End:       c.End,
+	}
+}
+
+func dataCondToCondDisplay(c data.Condition) api.ConditionDisplay {
+	return api.ConditionDisplay{
+		Id:    &c.Id,
+		Name:  c.Name,
+		Start: c.Start,
+		End:   c.End,
+	}
+}

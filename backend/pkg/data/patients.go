@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"log/slog"
 
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/bson"
@@ -67,4 +68,26 @@ func (m *MongoDb) PatientByEmail(ctx context.Context, email string) (Patient, er
 	}
 
 	return patient, nil
+}
+
+func (m *MongoDb) patientExists(ctx context.Context, patientId uuid.UUID) error {
+	patientsColl := m.Database.Collection(patientsCollection)
+	filter := bson.M{"_id": patientId}
+
+	count, err := patientsColl.CountDocuments(ctx, filter)
+	if err != nil {
+		slog.Error(
+			"Failed to count patient documents for existence check",
+			"patientId",
+			patientId,
+			"error",
+			err,
+		)
+		return fmt.Errorf("patientExists: failed patient count check: %w", err)
+	}
+	if count == 0 {
+		return ErrPatientNotFound
+	}
+
+	return nil
 }

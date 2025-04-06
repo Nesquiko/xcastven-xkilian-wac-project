@@ -17,11 +17,12 @@ type MongoDb struct {
 var _ Db = (*MongoDb)(nil)
 
 const (
-	patientsCollection = "patients"
-	doctorsCollection  = "doctors"
+	patientsCollection   = "patients"
+	doctorsCollection    = "doctors"
+	conditionsCollection = "conditions"
 )
 
-var Collections = []string{patientsCollection, doctorsCollection, "appointments"}
+var Collections = []string{patientsCollection, doctorsCollection, conditionsCollection}
 
 func ConnectMongo(ctx context.Context, uri string, db string) (*MongoDb, error) {
 	client, err := mongo.Connect(options.Client().ApplyURI(uri))
@@ -80,6 +81,9 @@ func initIndexes(ctx context.Context, mongoDb *mongo.Database) error {
 		doctorsCollection: {
 			Keys:    bson.M{"email": 1},
 			Options: options.Index().SetUnique(true),
+		},
+		conditionsCollection: {
+			Keys: bson.M{"patientId": 1},
 		},
 	}
 

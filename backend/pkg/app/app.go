@@ -19,10 +19,13 @@ type App interface {
 	CreatePatient(ctx context.Context, p api.PatientRegistration) (api.Patient, error)
 	PatientById(ctx context.Context, id uuid.UUID) (api.Patient, error)
 	PatientByEmail(ctx context.Context, email string) (api.Patient, error)
+	PatientsCalendar(patientId api.PatientId, params api.PatientsCalendarParams)
 
 	CreateDoctor(ctx context.Context, d api.DoctorRegistration) (api.Doctor, error)
 	DoctorById(ctx context.Context, id uuid.UUID) (api.Doctor, error)
 	DoctorByEmail(ctx context.Context, email string) (api.Doctor, error)
+
+	CreatePatientCondition(ctx context.Context, cond api.NewCondition) (api.ConditionDisplay, error)
 }
 
 func New(db data.Db) App {

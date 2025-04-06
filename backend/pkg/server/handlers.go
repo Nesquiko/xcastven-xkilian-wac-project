@@ -90,8 +90,8 @@ func (s Server) GetDoctorById(w http.ResponseWriter, r *http.Request, doctorId a
 	encode(w, http.StatusOK, doctor)
 }
 
-// GetDoctorsDoctorIdAppointmentAppointmentId implements api.ServerInterface.
-func (s Server) GetDoctorsDoctorIdAppointmentAppointmentId(
+// DoctorsAppointment implements api.ServerInterface.
+func (s Server) DoctorsAppointment(
 	w http.ResponseWriter,
 	r *http.Request,
 	doctorId api.DoctorId,
@@ -124,8 +124,8 @@ func (s Server) GetPatientById(w http.ResponseWriter, r *http.Request, patientId
 	encode(w, http.StatusOK, patient)
 }
 
-// GetPatientsPatientIdAppointmentAppointmentId implements api.ServerInterface.
-func (s Server) GetPatientsPatientIdAppointmentAppointmentId(
+// PatientsAppointment implements api.ServerInterface.
+func (s Server) PatientsAppointment(
 	w http.ResponseWriter,
 	r *http.Request,
 	patientId api.PatientId,
@@ -160,5 +160,33 @@ func (s Server) RescheduleAppointment(
 	r *http.Request,
 	appointmentId api.AppointmentId,
 ) {
+	panic("unimplemented")
+}
+
+// CreatePatientCondition implements api.ServerInterface.
+func (s Server) CreatePatientCondition(w http.ResponseWriter, r *http.Request) {
+	req, decodeErr := Decode[api.NewCondition](w, r)
+	if decodeErr != nil {
+		encodeError(w, decodeErr)
+		return
+	}
+
+	cond, err := s.app.CreatePatientCondition(r.Context(), req)
+	if err != nil {
+		slog.Error(UnexpectedError, "error", err.Error(), "where", "CreatePatientCondition")
+		encodeError(w, internalServerError())
+		return
+	}
+
+	encode(w, http.StatusCreated, cond)
+}
+
+// CreatePatientMedicine implements api.ServerInterface.
+func (s Server) CreatePatientMedicine(w http.ResponseWriter, r *http.Request) {
+	panic("unimplemented")
+}
+
+// RequestAppointment implements api.ServerInterface.
+func (s Server) RequestAppointment(w http.ResponseWriter, r *http.Request) {
 	panic("unimplemented")
 }

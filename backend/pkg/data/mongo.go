@@ -23,6 +23,7 @@ const (
 	medicinesCollection    = "medicine"
 	appointmentsCollection = "appointments"
 	resourcesCollection    = "resources"
+	reservationsCollection = "reservations"
 )
 
 var Collections = []string{
@@ -32,6 +33,7 @@ var Collections = []string{
 	medicinesCollection,
 	appointmentsCollection,
 	resourcesCollection,
+	reservationsCollection,
 }
 
 func ConnectMongo(ctx context.Context, uri string, db string) (*MongoDb, error) {
@@ -132,21 +134,38 @@ func initIndexes(ctx context.Context, mongoDb *mongo.Database) error {
 				Options: options.Index().SetName("idx_resource_type"),
 			},
 		},
+		reservationsCollection: {
+			{
+				Keys: bson.D{
+					{Key: "resourceId", Value: 1},
+					{Key: "startTime", Value: 1},
+				},
+				Options: options.Index().SetName("idx_reservation_resource_time"),
+			},
+			{
+				Keys:    bson.D{{Key: "appointmentId", Value: 1}},
+				Options: options.Index().SetName("idx_reservation_appointmentId"),
+			},
+		},
 	}
 
-	for collName, indexModel := range indexes {
+	for collName, indexModels := range indexes {
 		coll := mongoDb.Collection(collName)
-		indexName, err := coll.Indexes().CreateOne(ctx, indexModel)
+		indexNames, err := coll.Indexes().CreateMany(ctx, indexModels)
 		if err != nil {
 			slog.Warn(
-				"Could not create index (may already exist with different options or other issue)",
-				slog.String("collection", collName),
-				slog.Any("keys", indexModel.Keys),
-				slog.String("error", err.Error()),
-				slog.String("indexName", indexName),
+				"Could not create one or more indexes (may already exist or other issue)",
+				"collection", collName,
+				"indexModels", indexModels,
+				"error", err.Error(),
+				"createdIndexNames",
+				indexNames,
 			)
+		} else {
+			slog.Info("Successfully created/verified indexes", "collection", collName, "indexNames", indexNames)
 		}
 	}
+
 	return nil
 }
 

@@ -117,7 +117,6 @@ func (m *MongoDb) FindConditionsByPatientId(
 	}()
 
 	if err = cursor.All(ctx, &conditions); err != nil {
-		slog.Error("Failed to decode documents from cursor", "error", err)
 		return nil, PaginationResult{}, fmt.Errorf(
 			"FindConditionsByPatientId: decode failed: %w",
 			err,
@@ -125,7 +124,6 @@ func (m *MongoDb) FindConditionsByPatientId(
 	}
 
 	if err = cursor.Err(); err != nil {
-		slog.Error("Cursor iteration error", "error", err)
 		return nil, PaginationResult{}, fmt.Errorf(
 			"FindConditionsByPatientIdPaginated: cursor error: %w",
 			err,
@@ -134,4 +132,19 @@ func (m *MongoDb) FindConditionsByPatientId(
 
 	pagination.PageSize = len(conditions)
 	return conditions, pagination, nil
+}
+
+func (m *MongoDb) conditionExists(ctx context.Context, id uuid.UUID) error {
+	conditionsColl := m.Database.Collection(conditionsCollection)
+	filter := bson.M{"_id": id}
+
+	count, err := conditionsColl.CountDocuments(ctx, filter)
+	if err != nil {
+		return fmt.Errorf("conditionExists failed condition count check: %w", err)
+	}
+	if count == 0 {
+		return ErrNotFound
+	}
+
+	return nil
 }

@@ -9,13 +9,17 @@ import (
 )
 
 var (
-	ErrDuplicateEmail  = errors.New("email address already exists")
-	ErrNotFound        = errors.New("resource not found")
-	ErrPatientNotFound = errors.New("referenced patient not found")
+	ErrDuplicateEmail      = errors.New("email address already exists")
+	ErrNotFound            = errors.New("resource not found")
+	ErrDoctorUnavailable   = errors.New("doctor unavailable at the specified time")
+	ErrResourceUnavailable = errors.New("resource is unavailable during the requested time slot")
 )
 
 type Db interface {
 	Disconnect(ctx context.Context) error
+
+	CreateAppointment(ctx context.Context, appointment Appointment) (Appointment, error)
+	AppointmentById(ctx context.Context, id uuid.UUID) (Appointment, error)
 
 	CreatePatient(ctx context.Context, patient Patient) (Patient, error)
 	PatientById(ctx context.Context, id uuid.UUID) (Patient, error)
@@ -46,7 +50,25 @@ type Db interface {
 		page int,
 		pageSize int,
 	) ([]Medicine, PaginationResult, error)
+
 	CreateResource(ctx context.Context, name string, typ ResourceType) (Resource, error)
+	ResourceById(ctx context.Context, id uuid.UUID) (Resource, error)
+	FindAvailableResourcesAtTime(
+		ctx context.Context,
+		appointmentDate time.Time,
+	) (struct {
+		Medicines  []Resource
+		Facilities []Resource
+		Equipment  []Resource
+	}, error)
+	CreateReservation(
+		ctx context.Context,
+		appointmentId uuid.UUID,
+		resourceId uuid.UUID,
+		resourceType ResourceType,
+		startTime time.Time,
+		endTime time.Time,
+	) (Reservation, error)
 }
 
 type PaginationResult struct {

@@ -709,7 +709,6 @@ components:
         - id
         - appointmentDateTime
         - type
-        - condition
         - status
       properties:
         id:
@@ -1049,14 +1048,10 @@ components:
       type: object
       required:
         - appointmentId
-        - resourceId
         - start
         - end
       properties:
         appointmentId:
-          type: string
-          format: uuid
-        resourceId:
           type: string
           format: uuid
         start:

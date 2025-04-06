@@ -1,6 +1,8 @@
 package app
 
 import (
+	"time"
+
 	"github.com/oapi-codegen/runtime/types"
 
 	"github.com/Nesquiko/wac/pkg/api"
@@ -81,4 +83,55 @@ func dataMedToMedDisplay(m data.Medicine) api.MedicineDisplay {
 		Start: m.Start,
 		End:   m.End,
 	}
+}
+
+func resourceToEquipment(r data.Resource) api.Equipment {
+	return api.Equipment{Id: r.Id, Name: r.Name}
+}
+
+func resourceToFacility(r data.Resource) api.Facility {
+	return api.Facility{Id: r.Id, Name: r.Name}
+}
+
+func resourceToMedicine(r data.Resource) api.Medicine {
+	return api.Medicine{Id: r.Id, Name: r.Name}
+}
+
+func newApptToDataAppt(a api.NewAppointmentRequest) data.Appointment {
+	appt := data.Appointment{
+		PatientId:           a.PatientId,
+		DoctorId:            a.DoctorId,
+		AppointmentDateTime: a.AppointmentDateTime,
+		EndTime:             a.AppointmentDateTime.Add(time.Hour),
+		Status:              string(api.Requested),
+		Reason:              a.Reason,
+		ConditionId:         a.ConditionId,
+	}
+
+	if a.Type != nil {
+		appt.Type = string(*a.Type)
+	}
+	return appt
+}
+
+func dataApptToPatientAppt(
+	a data.Appointment,
+	d data.Doctor,
+	c *data.Condition,
+) api.PatientAppointment {
+	appt := api.PatientAppointment{
+		Id:                  &a.Id,
+		AppointmentDateTime: a.AppointmentDateTime,
+		Doctor:              dataDoctorToApiDoctor(d),
+		Reason:              new(string),
+		Status:              api.AppointmentStatus(a.Status),
+		Type:                api.AppointmentType(a.Type),
+	}
+
+	if c != nil {
+		cond := dataCondToCondDisplay(*c)
+		appt.Condition = &cond
+	}
+
+	return appt
 }

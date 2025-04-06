@@ -22,7 +22,7 @@ import (
 func TestGetDoctorById_OK(t *testing.T) {
 	t.Parallel()
 
-	docRequest := newDoctorRequest(fmt.Sprintf("test.doctor.get.%s@example.com", uuid.NewString()))
+	docRequest := newDoctor(fmt.Sprintf("test.doctor.get.%s@example.com", uuid.NewString()))
 	createdDoctor := mustCreateDoctor(t, docRequest)
 	require.NotEmpty(t, createdDoctor.Id, "Setup failed: Created doctor ID is empty")
 
@@ -99,7 +99,7 @@ func mustCreateDoctor(t *testing.T, request *api.DoctorRegistration) api.Doctor 
 
 func createDoctor(request *api.DoctorRegistration) (*http.Response, error) {
 	if request == nil {
-		request = newDoctorRequest("")
+		request = newDoctor("")
 	}
 	reqBytes, err := json.Marshal(request)
 	if err != nil {
@@ -114,7 +114,7 @@ func createDoctor(request *api.DoctorRegistration) (*http.Response, error) {
 	return res, nil
 }
 
-func newDoctorRequest(email string) *api.DoctorRegistration {
+func newDoctor(email string) *api.DoctorRegistration {
 	d := &api.DoctorRegistration{
 		Email:          "dr.default@example.com",
 		FirstName:      "Gregory",

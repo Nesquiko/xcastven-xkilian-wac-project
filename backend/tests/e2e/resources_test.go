@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	netUrl "net/url"
 	"testing"
 	"time"
 
@@ -19,6 +20,102 @@ import (
 	"github.com/Nesquiko/wac/pkg/data"
 	"github.com/Nesquiko/wac/pkg/server"
 )
+
+func TestGetAvailableResources(t *testing.T) {
+	t.Parallel()
+
+	resourceNames := []string{
+		fmt.Sprintf("Equipment-%s", uuid.NewString()),
+		fmt.Sprintf("Facility-%s", uuid.NewString()),
+		fmt.Sprintf("Medicine-%s", uuid.NewString()),
+	}
+	resourceTypes := []api.ResourceType{
+		api.ResourceTypeEquipment,
+		api.ResourceTypeFacility,
+		api.ResourceTypeMedicine,
+	}
+
+	var createdResources []api.NewResource
+	for i, name := range resourceNames {
+		newRes := api.NewResource{
+			Name: name,
+			Type: resourceTypes[i],
+		}
+		created := mustCreateResource(t, newRes)
+		createdResources = append(createdResources, created)
+	}
+
+	patientEmail := fmt.Sprintf("test.getavail.%s@patient.com", uuid.NewString())
+	patient := mustCreatePatient(t, newPatient(patientEmail))
+
+	doctorEmail := fmt.Sprintf("test.getavail.%s@doctor.com", uuid.NewString())
+	doctor := mustCreateDoctor(t, newDoctor(doctorEmail))
+
+	apptTime := time.Now().Add(48 * time.Hour).Truncate(time.Hour)
+	apptReq := api.NewAppointmentRequest{
+		PatientId:           patient.Id,
+		DoctorId:            doctor.Id,
+		AppointmentDateTime: apptTime,
+	}
+	appt := mustCreateAppointment(t, apptReq)
+	apptId := *appt.Id
+
+	// Reserve the first resource for this appointment (should be unavailable)
+	reservedResource := createdResources[0]
+	reservation := api.ResourceReservation{
+		AppointmentId: apptId,
+		Start:         apptTime,
+		End:           apptTime.Add(time.Hour),
+	}
+	body, err := json.Marshal(reservation)
+	require.NoError(t, err)
+
+	url := fmt.Sprintf("%s/resources/%s", ServerUrl, *reservedResource.Id)
+	res, err := http.Post(url, server.ApplicationJSON, bytes.NewReader(body))
+	require.NoError(t, err)
+	defer res.Body.Close()
+	require.Equal(t, http.StatusNoContent, res.StatusCode)
+
+	queryTime := apptTime.Add(30 * time.Minute)
+	availableURL := fmt.Sprintf(
+		"%s/resources/available?date-time=%s",
+		ServerUrl,
+		netUrl.QueryEscape(queryTime.Format(time.RFC3339)),
+	)
+	resp, err := http.Get(availableURL)
+	require.NoError(t, err)
+	defer resp.Body.Close()
+
+	require.Equal(t, http.StatusOK, resp.StatusCode)
+
+	var available api.AvailableResources
+	err = json.NewDecoder(resp.Body).Decode(&available)
+	require.NoError(t, err)
+
+	for _, eq := range available.Equipment {
+		require.NotEqual(
+			t,
+			*reservedResource.Id,
+			eq.Id,
+			"Reserved equipment should not be available",
+		)
+	}
+
+	var foundFacility, foundMedicine bool
+	for _, f := range available.Facilities {
+		if f.Id == *createdResources[1].Id {
+			foundFacility = true
+		}
+	}
+	for _, m := range available.Medicine {
+		if m.Id == *createdResources[2].Id {
+			foundMedicine = true
+		}
+	}
+
+	assert.True(t, foundFacility, "Facility resource should be available")
+	assert.True(t, foundMedicine, "Medicine resource should be available")
+}
 
 func TestReserveResource(t *testing.T) {
 	t.Parallel()

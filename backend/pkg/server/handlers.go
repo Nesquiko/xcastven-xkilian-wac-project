@@ -25,7 +25,14 @@ func (s Server) ConditionDetail(
 	r *http.Request,
 	conditionId api.ConditionId,
 ) {
-	panic("unimplemented")
+	cond, err := s.app.ConditionById(r.Context(), conditionId)
+	if err != nil {
+		slog.Error(UnexpectedError, "error", err.Error(), "where", "GetAvailableResources")
+		encodeError(w, internalServerError())
+		return
+	}
+
+	encode(w, http.StatusOK, cond)
 }
 
 // DecideAppointment implements api.ServerInterface.

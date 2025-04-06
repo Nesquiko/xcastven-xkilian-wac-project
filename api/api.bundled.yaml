@@ -190,15 +190,8 @@ paths:
         required: true
         content:
           application/json:
-            allOf:
-              - $ref: ./ConditionDisplay.yaml
-              - type: object
-                properties:
-                  patientId:
-                    type: string
-                    format: uuid
-                required:
-                  - patientId
+            schema:
+              $ref: '#/components/schemas/NewCondition'
       responses:
         '201':
           description: Condition record created successfully. Returns the created condition details.
@@ -742,6 +735,16 @@ components:
           properties:
             doctor:
               $ref: '#/components/schemas/Doctor'
+    NewCondition:
+      allOf:
+        - $ref: '#/components/schemas/ConditionDisplay'
+        - type: object
+          properties:
+            patientId:
+              type: string
+              format: uuid
+          required:
+            - patientId
     AppointmentDisplay:
       type: object
       description: Represents an appointment view.

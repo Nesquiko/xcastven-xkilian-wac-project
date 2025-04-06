@@ -1,7 +1,7 @@
 get:
   tags:
     - Appointments
-  summary: Appointment scheduled by patient
+  summary: Get appointment scheduled by patient
   operationId: patientsAppointment
   parameters:
     - $ref: "../components/parameters/path/patientId.yaml"

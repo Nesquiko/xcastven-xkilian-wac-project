@@ -11,4 +11,4 @@ properties:
   medicine:
     type: array
     items:
-      $ref: "./MedicineDisplay.yaml"
+      $ref: "./medicine/MedicineDisplay.yaml"

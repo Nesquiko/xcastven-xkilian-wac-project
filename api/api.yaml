@@ -12,6 +12,7 @@ tags:
   - name: Doctors
   - name: Patients
   - name: Resources
+  - name: Medical History
 
 paths:
   /auth/register:
@@ -26,6 +27,9 @@ paths:
     $ref: "./paths/conditions.yaml"
   /conditions/{conditionId}:
     $ref: "./paths/conditions_conditionId.yaml"
+
+  /medicine:
+    $ref: "./paths/medicine.yaml"
 
   /patients/{patientId}:
     $ref: "./paths/patients_patientId.yaml"

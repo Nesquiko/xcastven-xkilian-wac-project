@@ -10,71 +10,7 @@ import (
 	"github.com/Nesquiko/wac/pkg/app"
 )
 
-func (s Server) RegisterPatient(w http.ResponseWriter, r *http.Request) {
-	request, decodeErr := Decode[api.Patient](w, r)
-	if decodeErr != nil {
-		encodeError(w, decodeErr)
-		return
-	}
-
-	p, err := s.app.CreatePatient(r.Context(), request)
-	if errors.Is(err, app.ErrDuplicateEmail) {
-		apiErr := &ApiError{
-			ErrorDetail: api.ErrorDetail{
-				Code:   "patient.email-exists",
-				Title:  "Conflict",
-				Detail: fmt.Sprintf("A patient with email %q already exists.", request.Email),
-				Status: http.StatusConflict,
-			},
-		}
-		encodeError(w, apiErr)
-		return
-	} else if err != nil {
-		slog.Error(UnexpectedError, slog.String("error", err.Error()), slog.String("where", "RegisterPatient"))
-		encodeError(w, internalServerError())
-		return
-	}
-
-	encode(w, http.StatusCreated, p)
-}
-
-func (s Server) RegisterDoctor(w http.ResponseWriter, r *http.Request) {
-	request, decodeErr := Decode[api.Doctor](w, r)
-	if decodeErr != nil {
-		encodeError(w, decodeErr)
-		return
-	}
-	slog.Info("doctor email", "email", request.Email)
-
-	doc, err := s.app.CreateDoctor(r.Context(), request)
-	if errors.Is(err, app.ErrDuplicateEmail) {
-		apiErr := &ApiError{
-			ErrorDetail: api.ErrorDetail{
-				Code:   "doctor.email-exists",
-				Title:  "Conflict",
-				Detail: fmt.Sprintf("A doctor with email %q already exists.", request.Email),
-				Status: http.StatusConflict,
-			},
-		}
-		encodeError(w, apiErr)
-		return
-	} else if err != nil {
-		slog.Error(UnexpectedError, slog.String("error", err.Error()), slog.String("where", "RegisterDoctor"))
-		encodeError(w, internalServerError())
-		return
-	}
-
-	encode(w, http.StatusCreated, doc)
-}
-
-func (s Server) AssignAppointmentResources(
-	w http.ResponseWriter,
-	r *http.Request,
-	appointmentId api.AppointmentId,
-) {
-	panic("unimplemented")
-}
-
+// CancelAppointment implements api.ServerInterface.
 func (s Server) CancelAppointment(
 	w http.ResponseWriter,
 	r *http.Request,
@@ -83,7 +19,17 @@ func (s Server) CancelAppointment(
 	panic("unimplemented")
 }
 
-func (s Server) DecideAppointmentRequest(
+// ConditionDetail implements api.ServerInterface.
+func (s Server) ConditionDetail(
+	w http.ResponseWriter,
+	r *http.Request,
+	conditionId api.ConditionId,
+) {
+	panic("unimplemented")
+}
+
+// DecideAppointment implements api.ServerInterface.
+func (s Server) DecideAppointment(
 	w http.ResponseWriter,
 	r *http.Request,
 	appointmentId api.AppointmentId,
@@ -91,6 +37,27 @@ func (s Server) DecideAppointmentRequest(
 	panic("unimplemented")
 }
 
+// DoctorsCalendar implements api.ServerInterface.
+func (s Server) DoctorsCalendar(
+	w http.ResponseWriter,
+	r *http.Request,
+	doctorId api.DoctorId,
+	params api.DoctorsCalendarParams,
+) {
+	panic("unimplemented")
+}
+
+// DoctorsTimeslots implements api.ServerInterface.
+func (s Server) DoctorsTimeslots(
+	w http.ResponseWriter,
+	r *http.Request,
+	doctorId api.DoctorId,
+	params api.DoctorsTimeslotsParams,
+) {
+	panic("unimplemented")
+}
+
+// GetAvailableResources implements api.ServerInterface.
 func (s Server) GetAvailableResources(
 	w http.ResponseWriter,
 	r *http.Request,
@@ -99,19 +66,85 @@ func (s Server) GetAvailableResources(
 	panic("unimplemented")
 }
 
-func (s Server) GetDoctorTimeslots(
+// GetDoctorById implements api.ServerInterface.
+func (s Server) GetDoctorById(w http.ResponseWriter, r *http.Request, doctorId api.DoctorId) {
+	doctor, err := s.app.DoctorById(r.Context(), doctorId)
+	if err != nil {
+		if errors.Is(err, app.ErrNotFound) {
+			apiErr := &ApiError{
+				ErrorDetail: api.ErrorDetail{
+					Code:   "doctor.not-found",
+					Title:  "Not Found",
+					Detail: fmt.Sprintf("Doctor with ID %q not found.", doctorId),
+					Status: http.StatusNotFound,
+				},
+			}
+			encodeError(w, apiErr)
+			return
+		}
+		slog.Error(UnexpectedError, "error", err.Error(), "where", "GetDoctorById")
+		encodeError(w, internalServerError())
+		return
+	}
+
+	encode(w, http.StatusOK, doctor)
+}
+
+// DoctorsAppointment implements api.ServerInterface.
+func (s Server) DoctorsAppointment(
 	w http.ResponseWriter,
 	r *http.Request,
 	doctorId api.DoctorId,
-	params api.GetDoctorTimeslotsParams,
+	appointmentId api.AppointmentId,
 ) {
 	panic("unimplemented")
 }
 
-func (s Server) ListDoctors(w http.ResponseWriter, r *http.Request, params api.ListDoctorsParams) {
+// GetPatientById implements api.ServerInterface.
+func (s Server) GetPatientById(w http.ResponseWriter, r *http.Request, patientId api.PatientId) {
+	patient, err := s.app.PatientById(r.Context(), patientId)
+	if err != nil {
+		if errors.Is(err, app.ErrNotFound) {
+			apiErr := &ApiError{
+				ErrorDetail: api.ErrorDetail{
+					Code:   "patient.not-found",
+					Title:  "Not Found",
+					Detail: fmt.Sprintf("Patient with ID %q not found.", patientId),
+					Status: http.StatusNotFound,
+				},
+			}
+			encodeError(w, apiErr)
+			return
+		}
+		slog.Error(UnexpectedError, "error", err.Error(), "where", "GetPatientById")
+		encodeError(w, internalServerError())
+		return
+	}
+
+	encode(w, http.StatusOK, patient)
+}
+
+// PatientsAppointment implements api.ServerInterface.
+func (s Server) PatientsAppointment(
+	w http.ResponseWriter,
+	r *http.Request,
+	patientId api.PatientId,
+	appointmentId api.AppointmentId,
+) {
 	panic("unimplemented")
 }
 
+// PatientsCalendar implements api.ServerInterface.
+func (s Server) PatientsCalendar(
+	w http.ResponseWriter,
+	r *http.Request,
+	patientId api.PatientId,
+	params api.PatientsCalendarParams,
+) {
+	panic("unimplemented")
+}
+
+// PatientsMedicalHistoryFiles implements api.ServerInterface.
 func (s Server) PatientsMedicalHistoryFiles(
 	w http.ResponseWriter,
 	r *http.Request,
@@ -121,14 +154,52 @@ func (s Server) PatientsMedicalHistoryFiles(
 	panic("unimplemented")
 }
 
-func (s Server) RequestAppointment(w http.ResponseWriter, r *http.Request) {
-	panic("unimplemented")
-}
-
-func (s Server) RescheduleMyAppointment(
+// RescheduleAppointment implements api.ServerInterface.
+func (s Server) RescheduleAppointment(
 	w http.ResponseWriter,
 	r *http.Request,
 	appointmentId api.AppointmentId,
 ) {
+	panic("unimplemented")
+}
+
+// CreatePatientCondition implements api.ServerInterface.
+func (s Server) CreatePatientCondition(w http.ResponseWriter, r *http.Request) {
+	req, decodeErr := Decode[api.NewCondition](w, r)
+	if decodeErr != nil {
+		encodeError(w, decodeErr)
+		return
+	}
+
+	cond, err := s.app.CreatePatientCondition(r.Context(), req)
+	if err != nil {
+		slog.Error(UnexpectedError, "error", err.Error(), "where", "CreatePatientCondition")
+		encodeError(w, internalServerError())
+		return
+	}
+
+	encode(w, http.StatusCreated, cond)
+}
+
+// CreatePatientMedicine implements api.ServerInterface.
+func (s Server) CreatePatientMedicine(w http.ResponseWriter, r *http.Request) {
+	req, decodeErr := Decode[api.NewMedicine](w, r)
+	if decodeErr != nil {
+		encodeError(w, decodeErr)
+		return
+	}
+
+	med, err := s.app.CreatePatientMedicine(r.Context(), req)
+	if err != nil {
+		slog.Error(UnexpectedError, "error", err.Error(), "where", "CreatePatientMedicine")
+		encodeError(w, internalServerError())
+		return
+	}
+
+	encode(w, http.StatusCreated, med)
+}
+
+// RequestAppointment implements api.ServerInterface.
+func (s Server) RequestAppointment(w http.ResponseWriter, r *http.Request) {
 	panic("unimplemented")
 }

@@ -12,7 +12,7 @@ get:
       content:
         application/json:
           schema:
-            $ref: "../components/schemas/Doctor.yaml"
+            $ref: "../components/schemas/auth/Doctor.yaml"
 
     "404":
       description: Not Found - The specified doctor ID does not exist.

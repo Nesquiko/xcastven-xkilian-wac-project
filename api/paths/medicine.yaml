@@ -1,0 +1,24 @@
+post:
+  tags:
+    - Patient
+    - Medical History
+  summary: Create a medicine record for a patient
+  operationId: createPatientMedicine
+  requestBody:
+    description: Details of the medicine to be created.
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../components/schemas/medicine/NewMedicine.yaml"
+
+  responses:
+    "201":
+      description: Medicine record created successfully. Returns the created medicine details.
+      content:
+        application/json:
+          schema:
+            $ref: "../components/schemas/medicine/MedicineDisplay.yaml"
+
+    "500":
+      $ref: "../components/responses/InternalServerErrorResponse.yaml"

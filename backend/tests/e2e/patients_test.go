@@ -9,6 +9,7 @@ import (
 	"io"
 	"net/http"
 	"testing"
+	"time"
 
 	"github.com/google/uuid"
 	"github.com/oapi-codegen/runtime/types"
@@ -19,57 +20,166 @@ import (
 	"github.com/Nesquiko/wac/pkg/server"
 )
 
-func TestCreatePatient(t *testing.T) {
-	require := require.New(t)
-	patient := newPatient("test@one.com")
-	req, err := json.Marshal(patient)
-	require.NoError(err)
+func TestCreatePatientMedicine(t *testing.T) {
+	t.Parallel()
 
-	url := ServerUrl + "/patients"
-	res, err := http.Post(url, server.ApplicationJSON, bytes.NewBuffer(req))
-	require.NoError(err)
+	patientEmail := fmt.Sprintf("test.patient.med.ok.%s@example.com", uuid.NewString())
+	patientRequest := newPatient(patientEmail)
+	createdPatient := mustCreatePatient(t, patientRequest)
+	require.NotEmpty(t, createdPatient.Id, "Setup failed: Created patient ID is empty")
 
-	require.Equal(http.StatusCreated, res.StatusCode, "response: %+v", res)
+	startTime := time.Now().Truncate(time.Second)
+	medicineName := "Atorvastatin 20mg"
+	newMedicineRequest := api.NewMedicine{
+		Name:      medicineName,
+		PatientId: createdPatient.Id,
+		Start:     startTime,
+	}
 
-	var newPatient api.Patient
-	err = json.NewDecoder(res.Body).Decode(&newPatient)
-	res.Body.Close()
-	require.NoError(err, "response: %+v", res)
+	reqBodyBytes, err := json.Marshal(newMedicineRequest)
+	require.NoError(t, err, "Failed to marshal NewMedicine request")
 
-	assert.Equal(t, patient.Email, newPatient.Email)
-	assert.Equal(t, patient.FirstName, newPatient.FirstName)
-	assert.Equal(t, patient.LastName, newPatient.LastName)
-}
+	url := fmt.Sprintf("%s/medicine", ServerUrl)
+	res, err := http.Post(url, server.ApplicationJSON, bytes.NewBuffer(reqBodyBytes))
+	require.NoError(t, err, "http.Post failed for CreatePatientMedicine")
+	defer res.Body.Close()
 
-func TestCreatePatient_Conflict(t *testing.T) {
-	require := require.New(t)
+	bodyBytes, readErr := io.ReadAll(res.Body)
+	require.NoError(t, readErr, "Failed to read response body")
+	res.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+	require.Equal(
+		t,
+		http.StatusCreated,
+		res.StatusCode,
+		"Expected '201 Created' status code. Response body: %s",
+		string(bodyBytes),
+	)
+
+	var createdMedicine api.MedicineDisplay
+	err = json.NewDecoder(res.Body).Decode(&createdMedicine)
+	require.NoError(t, err, "Failed to decode successful response body into MedicineDisplay")
+
 	assert := assert.New(t)
-
-	uniqueEmail := fmt.Sprintf("test.conflict.%s@example.com", uuid.NewString())
-	patient1 := newPatient(uniqueEmail)
-	_ = mustCreatePatient(t, patient1)
-
-	res2, err := createPatient(patient1) // Use the same patient data
-	require.NoError(err, "Second createPatient call failed")
-	defer res2.Body.Close()
-
-	require.Equal(http.StatusConflict, res2.StatusCode, "Expected conflict status code")
-
-	var errorResponse api.ErrorDetail
-	err = json.NewDecoder(res2.Body).Decode(&errorResponse)
-	require.NoError(err, "Failed to decode error response body")
-
-	assert.Equal(http.StatusConflict, errorResponse.Status)
-	assert.Equal("Conflict", errorResponse.Title)
-	assert.Equal("patient.email-exists", errorResponse.Code)
-	assert.Contains(
-		errorResponse.Detail,
-		string(patient1.Email),
-		"Error detail should mention the conflicting email",
+	assert.NotNil(createdMedicine.Id, "Response medicine ID should not be nil")
+	assert.NotEmpty(createdMedicine.Id, "Response medicine ID should not be empty or nil UUID")
+	assert.Equal(medicineName, createdMedicine.Name, "Response medicine name mismatch")
+	assert.WithinDuration(
+		startTime,
+		createdMedicine.Start,
+		time.Second,
+		"Response medicine start time mismatch",
+	)
+	assert.Nil(
+		createdMedicine.End,
+		"Response medicine end time should be nil as it wasn't provided",
 	)
 }
 
-func mustCreatePatient(t *testing.T, request *api.Patient) api.Patient {
+func TestCreatePatientCondition(t *testing.T) {
+	t.Parallel()
+
+	patientEmail := fmt.Sprintf("test.patient.cond.ok.%s@example.com", uuid.NewString())
+	patientRequest := newPatient(patientEmail)
+	createdPatient := mustCreatePatient(t, patientRequest)
+	require.NotEmpty(t, createdPatient.Id, "Setup failed: Created patient ID is empty")
+
+	startTime := time.Now().Truncate(time.Second)
+	conditionName := "Acute Bronchitis"
+	newConditionRequest := api.NewCondition{
+		Name:      conditionName,
+		PatientId: createdPatient.Id,
+		Start:     startTime,
+	}
+
+	reqBodyBytes, err := json.Marshal(newConditionRequest)
+	require.NoError(t, err, "Failed to marshal NewCondition request")
+
+	url := fmt.Sprintf("%s/conditions", ServerUrl)
+	res, err := http.Post(url, server.ApplicationJSON, bytes.NewBuffer(reqBodyBytes))
+	require.NoError(t, err, "http.Post failed for CreatePatientCondition")
+	defer res.Body.Close()
+
+	bodyBytes, readErr := io.ReadAll(res.Body)
+	require.NoError(t, readErr, "Failed to read response body")
+	res.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+	require.Equal(
+		t,
+		http.StatusCreated,
+		res.StatusCode,
+		"Expected '201 Created' status code. Response body: %s",
+		string(bodyBytes),
+	)
+
+	var createdCondition api.ConditionDisplay
+	err = json.NewDecoder(res.Body).Decode(&createdCondition)
+	require.NoError(t, err, "Failed to decode successful response body into ConditionDisplay")
+
+	assert := assert.New(t)
+	assert.NotNil(createdCondition.Id, "Response condition ID should not be nil")
+	assert.NotEmpty(*createdCondition.Id, "Response condition ID should not be empty")
+	assert.Equal(conditionName, createdCondition.Name, "Response condition name mismatch")
+	assert.WithinDuration(
+		startTime,
+		createdCondition.Start,
+		time.Second,
+		"Response condition start time mismatch",
+	)
+	assert.Nil(
+		createdCondition.End,
+		"Response condition end time should be nil as it wasn't provided",
+	)
+}
+
+func TestGetPatientById(t *testing.T) {
+	t.Parallel()
+
+	patientRequest := newPatient(fmt.Sprintf("test.patient.get.%s@example.com", uuid.NewString()))
+	createdPatient := mustCreatePatient(t, patientRequest)
+	require.NotEmpty(t, createdPatient.Id, "Setup failed: Created patient ID is empty")
+
+	url := fmt.Sprintf("%s/patients/%s", ServerUrl, createdPatient.Id)
+	res, err := http.Get(url)
+	require.NoError(t, err, "http.Get failed for GetPatientById")
+	defer res.Body.Close()
+	require.Equal(t, http.StatusOK, res.StatusCode, "Expected OK status code")
+
+	var retrievedPatient api.Patient
+	err = json.NewDecoder(res.Body).Decode(&retrievedPatient)
+	require.NoError(t, err, "Failed to decode response body for GetPatientById")
+
+	assert := assert.New(t)
+	assert.Equal(createdPatient.Id, retrievedPatient.Id)
+	assert.Equal(createdPatient.Email, retrievedPatient.Email)
+	assert.Equal(createdPatient.FirstName, retrievedPatient.FirstName)
+	assert.Equal(createdPatient.LastName, retrievedPatient.LastName)
+}
+
+func TestGetPatientById_NotFound(t *testing.T) {
+	t.Parallel()
+
+	nonExistentID := uuid.New()
+	url := fmt.Sprintf("%s/patients/%s", ServerUrl, nonExistentID)
+	res, err := http.Get(url)
+	require.NoError(t, err, "http.Get failed for GetPatientById (NotFound)")
+	defer res.Body.Close()
+	require.Equal(t, http.StatusNotFound, res.StatusCode, "Expected Not Found status code")
+
+	var errorResponse api.ErrorDetail
+	err = json.NewDecoder(res.Body).Decode(&errorResponse)
+	require.NoError(t, err, "Failed to decode error response body for GetPatientById (NotFound)")
+
+	assert := assert.New(t)
+	assert.Equal(http.StatusNotFound, errorResponse.Status)
+	assert.Equal("Not Found", errorResponse.Title)
+	assert.Equal("patient.not-found", errorResponse.Code)
+	assert.Contains(
+		errorResponse.Detail,
+		nonExistentID.String(),
+		"Error detail should mention the missing ID",
+	)
+}
+
+func mustCreatePatient(t *testing.T, request *api.PatientRegistration) api.Patient {
 	t.Helper()
 	require := require.New(t)
 
@@ -94,7 +204,7 @@ func mustCreatePatient(t *testing.T, request *api.Patient) api.Patient {
 	return createdPatient
 }
 
-func createPatient(request *api.Patient) (*http.Response, error) {
+func createPatient(request *api.PatientRegistration) (*http.Response, error) {
 	if request == nil {
 		request = newPatient("")
 	}
@@ -103,7 +213,7 @@ func createPatient(request *api.Patient) (*http.Response, error) {
 		return nil, fmt.Errorf("createPatient marshal: %w", err)
 	}
 
-	url := ServerUrl + "/patients"
+	url := ServerUrl + "/auth/register"
 	res, err := http.Post(url, server.ApplicationJSON, bytes.NewBuffer(req))
 	if err != nil {
 		return nil, fmt.Errorf("createPatient post: %w", err)
@@ -111,11 +221,12 @@ func createPatient(request *api.Patient) (*http.Response, error) {
 	return res, nil
 }
 
-func newPatient(email string) *api.Patient {
-	p := &api.Patient{
+func newPatient(email string) *api.PatientRegistration {
+	p := &api.PatientRegistration{
 		Email:     "email@email.com",
 		FirstName: "John",
 		LastName:  "Doe",
+		Role:      api.UserRolePatient,
 	}
 	if email != "" {
 		p.Email = types.Email(email)

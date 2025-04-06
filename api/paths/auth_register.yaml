@@ -4,14 +4,19 @@ post:
   summary: Register a new user
   operationId: registerUser
   requestBody:
-    $ref: "../components/requestBodies/RegisterRequest.yaml"
+    description: Doctor details for registration.
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: "../components/schemas/auth/Registration.yaml"
   responses:
     "201":
       description: User registered successfully. Returns the created user object.
       content:
         application/json:
           schema:
-            $ref: "../components/schemas/User.yaml"
+            $ref: "../components/schemas/auth/User.yaml"
 
     "409":
       description: Conflict - A user with the provided email already exists.

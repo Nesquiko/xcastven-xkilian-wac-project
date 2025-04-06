@@ -18,12 +18,7 @@ post:
               description: User's email address.
               example: "john.doe@example.com"
             role:
-              type: string
-              description: The role the user is logging in as.
-              enum:
-                - patient
-                - doctor
-              example: "patient"
+              $ref: "../components/schemas/auth/UserRole.yaml"
           required:
             - email
             - role
@@ -50,7 +45,7 @@ post:
       content:
         application/json:
           schema:
-            $ref: "../components/schemas/User.yaml"
+            $ref: "../components/schemas/auth/User.yaml"
 
     "401":
       description: Unauthorized - Invalid email or role combination (user not found).

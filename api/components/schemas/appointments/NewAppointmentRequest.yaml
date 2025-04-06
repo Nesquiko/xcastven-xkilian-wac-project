@@ -1,25 +1,23 @@
 type: object
-description: Contains basic information about an appointment.
 required:
-  - id
+  - patientId
+  - doctorId
   - appointmentDateTime
-  - type
-  - condition
-  - status
 properties:
-  id:
+  patientId:
     type: string
     format: uuid
-    readOnly: true
+  doctorId:
+    type: string
+    format: uuid
   appointmentDateTime:
     type: string
     format: date-time
   type:
     $ref: "./AppointmentType.yaml"
-  condition:
-    $ref: "../conditions/ConditionDisplay.yaml"
-  status:
-    $ref: "./AppointmentStatus.yaml"
+  conditionId:
+    type: string
+    format: uuid
   reason:
     type: string
     description: Reason for the appointment provided by the patient.

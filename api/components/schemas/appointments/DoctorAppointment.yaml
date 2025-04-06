@@ -5,7 +5,7 @@ allOf:
       - patient
     properties:
       patient:
-        $ref: "../Doctor.yaml"
+        $ref: "../auth/Patient.yaml"
       facilities:
         type: array
         description: List of required facilities for the appointment.

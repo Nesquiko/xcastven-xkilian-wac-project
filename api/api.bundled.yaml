@@ -8,9 +8,11 @@ info:
 tags:
   - name: Auth
   - name: Appointments
+  - name: Conditions
   - name: Doctors
   - name: Patients
   - name: Resources
+  - name: Medical History
 paths:
   /auth/register:
     post:
@@ -19,7 +21,12 @@ paths:
       summary: Register a new user
       operationId: registerUser
       requestBody:
-        $ref: '#/components/requestBodies/RegisterRequest'
+        description: Doctor details for registration.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Registration'
       responses:
         '201':
           description: User registered successfully. Returns the created user object.
@@ -64,12 +71,7 @@ paths:
                   description: User's email address.
                   example: john.doe@example.com
                 role:
-                  type: string
-                  description: The role the user is logging in as.
-                  enum:
-                    - patient
-                    - doctor
-                  example: patient
+                  $ref: '#/components/schemas/UserRole'
               required:
                 - email
                 - role
@@ -113,7 +115,74 @@ paths:
                     detail: No user found with the provided email and role.
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
+  /appointments:
+    post:
+      tags:
+        - Appointments
+      summary: Patient creates an appointment request
+      operationId: requestAppointment
+      requestBody:
+        description: Basic info about the appointment request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewAppointmentRequest'
+      responses:
+        '201':
+          description: Appointment successfully requested.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientAppointment'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
   /appointments/{appointmentId}:
+    post:
+      tags:
+        - Appointments
+      description: Doctor either accepts or denies patients appointment request.
+      summary: Decide appointment's status
+      operationId: decideAppointment
+      parameters:
+        - $ref: '#/components/parameters/appointmentId'
+      requestBody:
+        description: Whether doctor accepts or denies patients appointment request.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppointmentDecision'
+      responses:
+        '200':
+          description: Appointment successfully cancelled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DoctorAppointment'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+    patch:
+      tags:
+        - Appointments
+      description: Reschedules patients appointment, also changes state of the appointment to request.
+      summary: Reschedule an appointment
+      operationId: rescheduleAppointment
+      parameters:
+        - $ref: '#/components/parameters/appointmentId'
+      requestBody:
+        description: Reason for cancelling the appointment.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppointmentReschedule'
+      responses:
+        '200':
+          description: Appointment successfully cancelled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientAppointment'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
     delete:
       tags:
         - Appointments
@@ -130,6 +199,69 @@ paths:
       responses:
         '204':
           description: Appointment successfully cancelled.
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /conditions:
+    post:
+      tags:
+        - Conditions
+        - Patients
+      summary: Create a condition record for a patient
+      operationId: createPatientCondition
+      requestBody:
+        description: Details of the condition to be created.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewCondition'
+      responses:
+        '201':
+          description: Condition record created successfully. Returns the created condition details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConditionDisplay'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /conditions/{conditionId}:
+    get:
+      tags:
+        - Conditions
+      summary: Condition detail
+      operationId: conditionDetail
+      parameters:
+        - $ref: '#/components/parameters/conditionId'
+      responses:
+        '200':
+          description: Condition details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Condition'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /medicine:
+    post:
+      tags:
+        - Patient
+        - Medical History
+      summary: Create a medicine record for a patient
+      operationId: createPatientMedicine
+      requestBody:
+        description: Details of the medicine to be created.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewMedicine'
+      responses:
+        '201':
+          description: Medicine record created successfully. Returns the created medicine details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MedicineDisplay'
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
   /patients/{patientId}:
@@ -219,8 +351,8 @@ paths:
     get:
       tags:
         - Appointments
-      summary: Appointment scheduled to a doctor
-      operationId: null
+      summary: Get appointment scheduled by patient
+      operationId: patientsAppointment
       parameters:
         - $ref: '#/components/parameters/patientId'
         - $ref: '#/components/parameters/appointmentId'
@@ -288,8 +420,8 @@ paths:
     get:
       tags:
         - Appointments
-      summary: Appointment scheduled by patient
-      operationId: null
+      summary: Get appointment scheduled to a doctor
+      operationId: doctorsAppointment
       parameters:
         - $ref: '#/components/parameters/doctorId'
         - $ref: '#/components/parameters/appointmentId'
@@ -337,7 +469,12 @@ paths:
           $ref: '#/components/responses/InternalServerErrorResponse'
 components:
   schemas:
-    Registration:
+    UserRole:
+      type: string
+      enum:
+        - patient
+        - doctor
+    PatientRegistration:
       type: object
       required:
         - email
@@ -358,22 +495,7 @@ components:
           minLength: 1
           example: Doe
         role:
-          type: string
-          enum:
-            - patient
-            - doctor
-          example: patient
-      oneOf:
-        - $ref: '#/components/schemas/PatientRegistration'
-        - $ref: '#/components/schemas/DoctorRegistration'
-      discriminator:
-        propertyName: role
-        mapping:
-          patient: '#/components/schemas/PatientRegistration'
-          doctor: '#/components/schemas/DoctorRegistration'
-    PatientRegistration:
-      allOf:
-        - $ref: '#/components/schemas/Registration'
+          $ref: '#/components/schemas/UserRole'
     SpecializationEnum:
       type: string
       description: Medical specialization of a doctor.
@@ -396,14 +518,26 @@ components:
       example: DIAGNOSTICIAN
     DoctorRegistration:
       allOf:
-        - $ref: '#/components/schemas/Registration'
+        - $ref: '#/components/schemas/PatientRegistration'
         - type: object
           properties:
+            role:
+              $ref: '#/components/schemas/UserRole'
             specialization:
               $ref: '#/components/schemas/SpecializationEnum'
           required:
+            - role
             - specialization
-    User:
+    Registration:
+      oneOf:
+        - $ref: '#/components/schemas/PatientRegistration'
+        - $ref: '#/components/schemas/DoctorRegistration'
+      discriminator:
+        propertyName: role
+        mapping:
+          patient: '#/components/schemas/PatientRegistration'
+          doctor: '#/components/schemas/DoctorRegistration'
+    Patient:
       type: object
       required:
         - id
@@ -423,10 +557,17 @@ components:
           type: string
           format: email
         role:
-          type: string
-          enum:
-            - patient
-            - doctor
+          $ref: '#/components/schemas/UserRole'
+    Doctor:
+      allOf:
+        - $ref: '#/components/schemas/Patient'
+        - type: object
+          required:
+            - specialization
+          properties:
+            specialization:
+              $ref: '#/components/schemas/SpecializationEnum'
+    User:
       oneOf:
         - $ref: '#/components/schemas/Patient'
         - $ref: '#/components/schemas/Doctor'
@@ -435,36 +576,6 @@ components:
         mapping:
           patient: '#/components/schemas/Patient'
           doctor: '#/components/schemas/Doctor'
-      examples:
-        patient:
-          summary: Example created patient response
-          value:
-            id: a1b2c3d4-e5f6-7890-1234-567890abcdef
-            email: new.patient@example.com
-            firstName: Pat
-            lastName: Ient
-            role: patient
-        doctor:
-          summary: Example created doctor response
-          value:
-            id: b2c3d4e5-f6a7-8901-2345-67890abcde1
-            email: new.doctor@example.com
-            firstName: Doc
-            lastName: Tor
-            role: doctor
-            specialization: CARDIOLOGIST
-    Patient:
-      allOf:
-        - $ref: '#/components/schemas/User'
-    Doctor:
-      allOf:
-        - $ref: '#/components/schemas/User'
-        - type: object
-          required:
-            - specialization
-          properties:
-            specialization:
-              $ref: '#/components/schemas/SpecializationEnum'
     ErrorDetail:
       type: object
       description: Standardized error details (RFC 9457).
@@ -490,14 +601,56 @@ components:
         - code
         - status
         - detail
-    AppointmentCancellation:
+    AppointmentType:
+      type: string
+      description: The type of the appointment.
+      enum:
+        - regular_check
+    NewAppointmentRequest:
       type: object
-      description: Data required to cancel an appointment.
+      required:
+        - patientId
+        - doctorId
+        - appointmentDateTime
       properties:
+        patientId:
+          type: string
+          format: uuid
+        doctorId:
+          type: string
+          format: uuid
+        appointmentDateTime:
+          type: string
+          format: date-time
+        type:
+          $ref: '#/components/schemas/AppointmentType'
+        conditionId:
+          type: string
+          format: uuid
         reason:
           type: string
-          description: Optional reason provided for the cancellation.
-          example: Feeling better, no longer need the consultation.
+          description: Reason for the appointment provided by the patient.
+          example: Feeling unwell, general check-up needed.
+    ConditionDisplay:
+      type: object
+      description: Basic info about a patient's condition.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+        start:
+          type: string
+          format: date-time
+        end:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - start
     AppointmentStatus:
       type: string
       description: The current status of the appointment.
@@ -508,125 +661,9 @@ components:
         - completed
         - denied
       example: scheduled
-    AppointmentDisplay:
-      type: object
-      description: Represents an appointment view.
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: Unique identifier for the appointment.
-          example: d4e5f6a7-b8c9-0123-4567-890abcdef123
-        appointmentDateTime:
-          type: string
-          format: date-time
-          description: The date time of the appointment.
-        status:
-          $ref: '#/components/schemas/AppointmentStatus'
-      required:
-        - id
-        - appointmentDateTime
-        - status
-    ConditionDisplay:
-      type: object
-      description: Basic info about a patient's condition.
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-        start:
-          type: string
-          format: date-time
-        end:
-          type: string
-          format: date-time
-      required:
-        - id
-        - name
-        - start
-    MedicineDisplay:
-      type: object
-      description: Basic info about a patient's condition.
-      properties:
-        id:
-          type: string
-          format: uuid
-        name:
-          type: string
-        start:
-          type: string
-          format: date-time
-        end:
-          type: string
-          format: date-time
-      required:
-        - id
-        - name
-        - start
-    PatientsCalendar:
-      type: object
-      properties:
-        appointments:
-          type: array
-          items:
-            $ref: '#/components/schemas/AppointmentDisplay'
-        conditions:
-          type: array
-          items:
-            $ref: '#/components/schemas/ConditionDisplay'
-        medicine:
-          type: array
-          items:
-            $ref: '#/components/schemas/MedicineDisplay'
-    Pagination:
-      type: object
-      description: Structure for paginated list responses.
-      properties:
-        page:
-          type: integer
-          format: int
-          description: Current page number (0-indexed).
-          example: 0
-        pageSize:
-          type: integer
-          format: int
-          description: Number of items per page.
-          example: 20
-        total:
-          type: integer
-          format: int
-          description: Total number of items available.
-          example: 153
-      required:
-        - page
-        - pageSize
-        - total
-    MedicalHistoryFileList:
-      type: object
-      description: A paginated list of medical history filenames for the authenticated patient.
-      properties:
-        files:
-          type: array
-          description: List of filenames for the medical history records on the current page.
-          items:
-            type: string
-            description: Filename of a medical record document.
-            example: lab_results_2024-01-15.pdf
-        pagination:
-          $ref: '#/components/schemas/Pagination'
-      required:
-        - files
-        - pagination
-    AppointmentType:
-      type: string
-      description: The type of the appointment.
-      enum:
-        - regular_check
     AppointmentBase:
       type: object
-      description: Represents a detailed appointment view for doctors.
+      description: Contains basic information about an appointment.
       required:
         - id
         - appointmentDateTime
@@ -637,6 +674,7 @@ components:
         id:
           type: string
           format: uuid
+          readOnly: true
         appointmentDateTime:
           type: string
           format: date-time
@@ -659,13 +697,23 @@ components:
           properties:
             doctor:
               $ref: '#/components/schemas/Doctor'
-    DoctorsCalendar:
+    AppointmentDecision:
       type: object
+      description: Data required for staff to accept or reject an appointment request.
       properties:
-        appointments:
-          type: array
-          items:
-            $ref: '#/components/schemas/AppointmentDisplay'
+        action:
+          type: string
+          description: The decision action to take on the appointment request.
+          enum:
+            - accept
+            - reject
+          example: accept
+        reason:
+          type: string
+          description: Required reason if the action is 'reject'. Optional otherwise.
+          example: Doctor schedule conflict. Please choose another time.
+      required:
+        - action
     Facility:
       type: object
       description: Represents a required facility resource.
@@ -722,7 +770,7 @@ components:
             - patient
           properties:
             patient:
-              $ref: '#/components/schemas/Doctor'
+              $ref: '#/components/schemas/Patient'
             facilities:
               type: array
               description: List of required facilities for the appointment.
@@ -738,6 +786,158 @@ components:
               description: List of required medicine for the appointment.
               items:
                 $ref: '#/components/schemas/Medicine'
+    AppointmentCancellation:
+      type: object
+      description: Data required to cancel an appointment.
+      properties:
+        reason:
+          type: string
+          description: Optional reason provided for the cancellation.
+          example: Feeling better, no longer need the consultation.
+    AppointmentReschedule:
+      type: object
+      description: Data required for a patient to reschedule their appointment.
+      properties:
+        newAppointmentDateTime:
+          type: string
+          format: date-time
+        reason:
+          type: string
+          description: Optional reason for rescheduling provided by the patient.
+          example: Work conflict arose.
+      required:
+        - newAppointmentDateTime
+    NewCondition:
+      allOf:
+        - $ref: '#/components/schemas/ConditionDisplay'
+        - type: object
+          properties:
+            patientId:
+              type: string
+              format: uuid
+          required:
+            - patientId
+    AppointmentDisplay:
+      type: object
+      description: Represents an appointment view.
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the appointment.
+          example: d4e5f6a7-b8c9-0123-4567-890abcdef123
+        appointmentDateTime:
+          type: string
+          format: date-time
+          description: The date time of the appointment.
+        status:
+          $ref: '#/components/schemas/AppointmentStatus'
+      required:
+        - id
+        - appointmentDateTime
+        - status
+    Condition:
+      allOf:
+        - $ref: '#/components/schemas/ConditionDisplay'
+        - type: object
+          properties:
+            appointments:
+              type: array
+              items:
+                $ref: '#/components/schemas/AppointmentDisplay'
+          required:
+            - appointments
+    MedicineDisplay:
+      type: object
+      description: Basic info about a patient's condition.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+        start:
+          type: string
+          format: date-time
+        end:
+          type: string
+          format: date-time
+      required:
+        - id
+        - name
+        - start
+    NewMedicine:
+      allOf:
+        - $ref: '#/components/schemas/MedicineDisplay'
+        - type: object
+          properties:
+            patientId:
+              type: string
+              format: uuid
+          required:
+            - patientId
+    PatientsCalendar:
+      type: object
+      properties:
+        appointments:
+          type: array
+          items:
+            $ref: '#/components/schemas/AppointmentDisplay'
+        conditions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConditionDisplay'
+        medicine:
+          type: array
+          items:
+            $ref: '#/components/schemas/MedicineDisplay'
+    Pagination:
+      type: object
+      description: Structure for paginated list responses.
+      properties:
+        page:
+          type: integer
+          format: int
+          description: Current page number (0-indexed).
+          example: 0
+        pageSize:
+          type: integer
+          format: int
+          description: Number of items per page.
+          example: 20
+        total:
+          type: integer
+          format: int
+          description: Total number of items available.
+          example: 153
+      required:
+        - page
+        - pageSize
+        - total
+    MedicalHistoryFileList:
+      type: object
+      description: A paginated list of medical history filenames for the authenticated patient.
+      properties:
+        files:
+          type: array
+          description: List of filenames for the medical history records on the current page.
+          items:
+            type: string
+            description: Filename of a medical record document.
+            example: lab_results_2024-01-15.pdf
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+      required:
+        - files
+        - pagination
+    DoctorsCalendar:
+      type: object
+      properties:
+        appointments:
+          type: array
+          items:
+            $ref: '#/components/schemas/AppointmentDisplay'
     TimeSlot:
       type: object
       description: Represents a single time slot for a doctor on a specific day.
@@ -780,14 +980,6 @@ components:
         - facilities
         - equipment
         - medicine
-  requestBodies:
-    RegisterRequest:
-      description: Doctor details for registration.
-      required: true
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Registration'
   responses:
     InternalServerErrorResponse:
       description: An error occurred. See specific status code for details.
@@ -819,6 +1011,15 @@ components:
       in: path
       required: true
       description: The unique identifier (UUID) of the appointment.
+      schema:
+        type: string
+        format: uuid
+      example: d4e5f6a7-b8c9-0123-4567-890abcdef123
+    conditionId:
+      name: conditionId
+      in: path
+      required: true
+      description: The unique identifier (UUID) of a condition.
       schema:
         type: string
         format: uuid

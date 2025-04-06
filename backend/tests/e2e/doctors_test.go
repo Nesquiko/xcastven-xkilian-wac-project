@@ -19,47 +19,59 @@ import (
 	"github.com/Nesquiko/wac/pkg/server"
 )
 
-func TestCreateDoctor(t *testing.T) {
-	uniqueEmail := fmt.Sprintf("test.doctor.create.%s@example.com", uuid.NewString())
-	docRequest := newDoctorRequest(uniqueEmail)
+func TestGetDoctorById_OK(t *testing.T) {
+	t.Parallel()
 
+	docRequest := newDoctorRequest(fmt.Sprintf("test.doctor.get.%s@example.com", uuid.NewString()))
 	createdDoctor := mustCreateDoctor(t, docRequest)
+	require.NotEmpty(t, createdDoctor.Id, "Setup failed: Created doctor ID is empty")
+
+	url := fmt.Sprintf("%s/doctors/%s", ServerUrl, createdDoctor.Id)
+	res, err := http.Get(url)
+	require.NoError(t, err, "http.Get failed for GetDoctorById")
+	defer res.Body.Close()
+
+	require.Equal(t, http.StatusOK, res.StatusCode, "Expected OK status code")
+
+	var retrievedDoctor api.Doctor
+	err = json.NewDecoder(res.Body).Decode(&retrievedDoctor)
+	require.NoError(t, err, "Failed to decode response body for GetDoctorById")
 
 	assert := assert.New(t)
-	assert.Equal(docRequest.Email, createdDoctor.Email)
-	assert.Equal(docRequest.FirstName, createdDoctor.FirstName)
-	assert.Equal(docRequest.LastName, createdDoctor.LastName)
-	assert.Equal(docRequest.Specialization, createdDoctor.Specialization)
-	assert.NotEmpty(createdDoctor.Id, "Created doctor ID should not be empty")
+	assert.Equal(createdDoctor.Id, retrievedDoctor.Id)
+	assert.Equal(createdDoctor.Email, retrievedDoctor.Email)
+	assert.Equal(createdDoctor.FirstName, retrievedDoctor.FirstName)
+	assert.Equal(createdDoctor.LastName, retrievedDoctor.LastName)
+	assert.Equal(createdDoctor.Specialization, retrievedDoctor.Specialization)
 }
 
-func TestCreateDoctor_Conflict(t *testing.T) {
-	uniqueEmail := fmt.Sprintf("test.doctor.conflict.%s@example.com", uuid.NewString())
-	docRequest1 := newDoctorRequest(uniqueEmail)
-	_ = mustCreateDoctor(t, docRequest1)
+func TestGetDoctorById_NotFound(t *testing.T) {
+	t.Parallel()
 
-	res2, err := createDoctor(docRequest1)
-	require.NoError(t, err, "Second createDoctor call failed")
-	defer res2.Body.Close()
+	nonExistentID := uuid.New()
+	url := fmt.Sprintf("%s/doctors/%s", ServerUrl, nonExistentID)
+	res, err := http.Get(url)
+	require.NoError(t, err, "http.Get failed for GetDoctorById (NotFound)")
+	defer res.Body.Close()
 
-	require.Equal(t, http.StatusConflict, res2.StatusCode, "Expected conflict status code")
+	require.Equal(t, http.StatusNotFound, res.StatusCode, "Expected Not Found status code")
 
 	var errorResponse api.ErrorDetail
-	err = json.NewDecoder(res2.Body).Decode(&errorResponse)
-	require.NoError(t, err, "Failed to decode error response body")
+	err = json.NewDecoder(res.Body).Decode(&errorResponse)
+	require.NoError(t, err, "Failed to decode error response body for GetDoctorById (NotFound)")
 
 	assert := assert.New(t)
-	assert.Equal(http.StatusConflict, errorResponse.Status)
-	assert.Equal("Conflict", errorResponse.Title)
-	assert.Equal("doctor.email-exists", errorResponse.Code)
+	assert.Equal(http.StatusNotFound, errorResponse.Status)
+	assert.Equal("Not Found", errorResponse.Title)
+	assert.Equal("doctor.not-found", errorResponse.Code)
 	assert.Contains(
 		errorResponse.Detail,
-		string(docRequest1.Email),
-		"Error detail should mention the conflicting email",
+		nonExistentID.String(),
+		"Error detail should mention the missing ID",
 	)
 }
 
-func mustCreateDoctor(t *testing.T, request *api.Doctor) api.Doctor {
+func mustCreateDoctor(t *testing.T, request *api.DoctorRegistration) api.Doctor {
 	t.Helper()
 	require := require.New(t)
 
@@ -85,7 +97,7 @@ func mustCreateDoctor(t *testing.T, request *api.Doctor) api.Doctor {
 	return createdDoctor
 }
 
-func createDoctor(request *api.Doctor) (*http.Response, error) {
+func createDoctor(request *api.DoctorRegistration) (*http.Response, error) {
 	if request == nil {
 		request = newDoctorRequest("")
 	}
@@ -94,7 +106,7 @@ func createDoctor(request *api.Doctor) (*http.Response, error) {
 		return nil, fmt.Errorf("createDoctor marshal: %w", err)
 	}
 
-	url := ServerUrl + "/doctors"
+	url := ServerUrl + "/auth/register"
 	res, err := http.Post(url, server.ApplicationJSON, bytes.NewBuffer(reqBytes))
 	if err != nil {
 		return nil, fmt.Errorf("createDoctor post: %w", err)
@@ -102,12 +114,13 @@ func createDoctor(request *api.Doctor) (*http.Response, error) {
 	return res, nil
 }
 
-func newDoctorRequest(email string) *api.Doctor {
-	d := &api.Doctor{
+func newDoctorRequest(email string) *api.DoctorRegistration {
+	d := &api.DoctorRegistration{
 		Email:          "dr.default@example.com",
 		FirstName:      "Gregory",
 		LastName:       "House",
-		Specialization: api.Urologist,
+		Specialization: api.UROLOGIST,
+		Role:           api.UserRoleDoctor,
 	}
 	if email != "" {
 		d.Email = types.Email(email)

@@ -7,30 +7,25 @@ import (
 	"github.com/Nesquiko/wac/pkg/data"
 )
 
-func apiPatientToDataPatient(p api.Patient) data.Patient {
-	patient := data.Patient{
+func patientRegToDataPatient(p api.PatientRegistration) data.Patient {
+	return data.Patient{
 		Email:     string(p.Email),
 		FirstName: p.FirstName,
 		LastName:  p.LastName,
 	}
-
-	if p.Id != nil {
-		patient.Id = *p.Id
-	}
-
-	return patient
 }
 
 func dataPatientToApiPatient(p data.Patient) api.Patient {
 	return api.Patient{
-		Id:        &p.Id,
+		Id:        p.Id,
 		Email:     types.Email(p.Email),
 		FirstName: p.FirstName,
 		LastName:  p.LastName,
+		Role:      api.UserRolePatient,
 	}
 }
 
-func apiDoctorToDataDoctor(d api.Doctor) data.Doctor {
+func doctorRegToDataDoctor(d api.DoctorRegistration) data.Doctor {
 	doctor := data.Doctor{
 		Email:          string(d.Email),
 		FirstName:      d.FirstName,
@@ -38,19 +33,52 @@ func apiDoctorToDataDoctor(d api.Doctor) data.Doctor {
 		Specialization: string(d.Specialization),
 	}
 
-	if d.Id != nil {
-		doctor.Id = *d.Id
-	}
-
 	return doctor
 }
 
 func dataDoctorToApiDoctor(d data.Doctor) api.Doctor {
 	return api.Doctor{
-		Id:             &d.Id,
+		Id:             d.Id,
 		Email:          types.Email(d.Email),
 		FirstName:      d.FirstName,
 		LastName:       d.LastName,
-		Specialization: api.DoctorSpecialization(d.Specialization),
+		Specialization: api.SpecializationEnum(d.Specialization),
+		Role:           api.UserRoleDoctor,
+	}
+}
+
+func newCondToDataCond(c api.NewCondition) data.Condition {
+	return data.Condition{
+		PatientId: c.PatientId,
+		Name:      c.Name,
+		Start:     c.Start,
+		End:       c.End,
+	}
+}
+
+func dataCondToCondDisplay(c data.Condition) api.ConditionDisplay {
+	return api.ConditionDisplay{
+		Id:    &c.Id,
+		Name:  c.Name,
+		Start: c.Start,
+		End:   c.End,
+	}
+}
+
+func newMedToDataMed(m api.NewMedicine) data.Medicine {
+	return data.Medicine{
+		PatientId: m.PatientId,
+		Name:      m.Name,
+		Start:     m.Start,
+		End:       m.End,
+	}
+}
+
+func dataMedToMedDisplay(m data.Medicine) api.MedicineDisplay {
+	return api.MedicineDisplay{
+		Id:    &m.Id,
+		Name:  m.Name,
+		Start: m.Start,
+		End:   m.End,
 	}
 }

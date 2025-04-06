@@ -183,7 +183,20 @@ func (s Server) CreatePatientCondition(w http.ResponseWriter, r *http.Request) {
 
 // CreatePatientMedicine implements api.ServerInterface.
 func (s Server) CreatePatientMedicine(w http.ResponseWriter, r *http.Request) {
-	panic("unimplemented")
+	req, decodeErr := Decode[api.NewMedicine](w, r)
+	if decodeErr != nil {
+		encodeError(w, decodeErr)
+		return
+	}
+
+	med, err := s.app.CreatePatientMedicine(r.Context(), req)
+	if err != nil {
+		slog.Error(UnexpectedError, "error", err.Error(), "where", "CreatePatientMedicine")
+		encodeError(w, internalServerError())
+		return
+	}
+
+	encode(w, http.StatusCreated, med)
 }
 
 // RequestAppointment implements api.ServerInterface.

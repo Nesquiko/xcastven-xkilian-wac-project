@@ -65,3 +65,14 @@ func (a monolithApp) CreatePatientCondition(
 	}
 	return dataCondToCondDisplay(cond), nil
 }
+
+func (a monolithApp) CreatePatientMedicine(
+	ctx context.Context,
+	m api.NewMedicine,
+) (api.MedicineDisplay, error) {
+	med, err := a.db.CreateMedicine(ctx, newMedToDataMed(m))
+	if err != nil {
+		return api.MedicineDisplay{}, fmt.Errorf("CreatePatientMedicine: %w", err)
+	}
+	return dataMedToMedDisplay(med), nil
+}

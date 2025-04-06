@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log/slog"
 
-	"go.mongodb.org/mongo-driver/bson"
+	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
@@ -20,9 +20,15 @@ const (
 	patientsCollection   = "patients"
 	doctorsCollection    = "doctors"
 	conditionsCollection = "conditions"
+	medicinesCollection  = "medicine"
 )
 
-var Collections = []string{patientsCollection, doctorsCollection, conditionsCollection}
+var Collections = []string{
+	patientsCollection,
+	doctorsCollection,
+	conditionsCollection,
+	medicinesCollection,
+}
 
 func ConnectMongo(ctx context.Context, uri string, db string) (*MongoDb, error) {
 	client, err := mongo.Connect(options.Client().ApplyURI(uri))
@@ -83,6 +89,9 @@ func initIndexes(ctx context.Context, mongoDb *mongo.Database) error {
 			Options: options.Index().SetUnique(true),
 		},
 		conditionsCollection: {
+			Keys: bson.M{"patientId": 1},
+		},
+		medicinesCollection: {
 			Keys: bson.M{"patientId": 1},
 		},
 	}

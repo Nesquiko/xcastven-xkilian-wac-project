@@ -64,3 +64,21 @@ func dataCondToCondDisplay(c data.Condition) api.ConditionDisplay {
 		End:   c.End,
 	}
 }
+
+func newMedToDataMed(m api.NewMedicine) data.Medicine {
+	return data.Medicine{
+		PatientId: m.PatientId,
+		Name:      m.Name,
+		Start:     m.Start,
+		End:       m.End,
+	}
+}
+
+func dataMedToMedDisplay(m data.Medicine) api.MedicineDisplay {
+	return api.MedicineDisplay{
+		Id:    &m.Id,
+		Name:  m.Name,
+		Start: m.Start,
+		End:   m.End,
+	}
+}

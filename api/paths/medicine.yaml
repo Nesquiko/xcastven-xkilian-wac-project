@@ -1,4 +1,4 @@
-get:
+post:
   tags:
     - Patient
     - Medical History

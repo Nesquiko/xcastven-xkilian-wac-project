@@ -242,7 +242,7 @@ paths:
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
   /medicine:
-    get:
+    post:
       tags:
         - Patient
         - Medical History
@@ -854,6 +854,7 @@ components:
         id:
           type: string
           format: uuid
+          readOnly: true
         name:
           type: string
         start:

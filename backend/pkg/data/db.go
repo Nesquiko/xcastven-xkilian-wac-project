@@ -35,6 +35,17 @@ type Db interface {
 		page int,
 		pageSize int,
 	) ([]Condition, PaginationResult, error)
+
+	CreateMedicine(ctx context.Context, medicine Medicine) (Medicine, error)
+	MedicineById(ctx context.Context, id uuid.UUID) (Medicine, error)
+	FindMedicinesByPatientId(
+		ctx context.Context,
+		patientId uuid.UUID,
+		from time.Time,
+		to *time.Time,
+		page int,
+		pageSize int,
+	) ([]Medicine, PaginationResult, error)
 }
 
 type PaginationResult struct {

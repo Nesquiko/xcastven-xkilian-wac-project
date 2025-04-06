@@ -20,7 +20,62 @@ import (
 	"github.com/Nesquiko/wac/pkg/server"
 )
 
-func TestCreatePatientCondition_Success(t *testing.T) {
+func TestCreatePatientMedicine(t *testing.T) {
+	t.Parallel()
+
+	patientEmail := fmt.Sprintf("test.patient.med.ok.%s@example.com", uuid.NewString())
+	patientRequest := newPatient(patientEmail)
+	createdPatient := mustCreatePatient(t, patientRequest)
+	require.NotEmpty(t, createdPatient.Id, "Setup failed: Created patient ID is empty")
+
+	startTime := time.Now().Truncate(time.Second)
+	medicineName := "Atorvastatin 20mg"
+	newMedicineRequest := api.NewMedicine{
+		Name:      medicineName,
+		PatientId: createdPatient.Id,
+		Start:     startTime,
+	}
+
+	reqBodyBytes, err := json.Marshal(newMedicineRequest)
+	require.NoError(t, err, "Failed to marshal NewMedicine request")
+
+	url := fmt.Sprintf("%s/medicine", ServerUrl)
+	res, err := http.Post(url, server.ApplicationJSON, bytes.NewBuffer(reqBodyBytes))
+	require.NoError(t, err, "http.Post failed for CreatePatientMedicine")
+	defer res.Body.Close()
+
+	bodyBytes, readErr := io.ReadAll(res.Body)
+	require.NoError(t, readErr, "Failed to read response body")
+	res.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+	require.Equal(
+		t,
+		http.StatusCreated,
+		res.StatusCode,
+		"Expected '201 Created' status code. Response body: %s",
+		string(bodyBytes),
+	)
+
+	var createdMedicine api.MedicineDisplay
+	err = json.NewDecoder(res.Body).Decode(&createdMedicine)
+	require.NoError(t, err, "Failed to decode successful response body into MedicineDisplay")
+
+	assert := assert.New(t)
+	assert.NotNil(createdMedicine.Id, "Response medicine ID should not be nil")
+	assert.NotEmpty(createdMedicine.Id, "Response medicine ID should not be empty or nil UUID")
+	assert.Equal(medicineName, createdMedicine.Name, "Response medicine name mismatch")
+	assert.WithinDuration(
+		startTime,
+		createdMedicine.Start,
+		time.Second,
+		"Response medicine start time mismatch",
+	)
+	assert.Nil(
+		createdMedicine.End,
+		"Response medicine end time should be nil as it wasn't provided",
+	)
+}
+
+func TestCreatePatientCondition(t *testing.T) {
 	t.Parallel()
 
 	patientEmail := fmt.Sprintf("test.patient.cond.ok.%s@example.com", uuid.NewString())
@@ -75,7 +130,7 @@ func TestCreatePatientCondition_Success(t *testing.T) {
 	)
 }
 
-func TestGetPatientById_OK(t *testing.T) {
+func TestGetPatientById(t *testing.T) {
 	t.Parallel()
 
 	patientRequest := newPatient(fmt.Sprintf("test.patient.get.%s@example.com", uuid.NewString()))

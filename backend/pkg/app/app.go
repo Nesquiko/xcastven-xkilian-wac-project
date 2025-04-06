@@ -26,6 +26,8 @@ type App interface {
 	DoctorByEmail(ctx context.Context, email string) (api.Doctor, error)
 
 	CreatePatientCondition(ctx context.Context, cond api.NewCondition) (api.ConditionDisplay, error)
+
+	CreatePatientMedicine(ctx context.Context, cond api.NewMedicine) (api.MedicineDisplay, error)
 }
 
 func New(db data.Db) App {

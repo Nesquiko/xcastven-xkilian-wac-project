@@ -17,10 +17,12 @@ type MongoDb struct {
 var _ Db = (*MongoDb)(nil)
 
 const (
-	patientsCollection   = "patients"
-	doctorsCollection    = "doctors"
-	conditionsCollection = "conditions"
-	medicinesCollection  = "medicine"
+	patientsCollection     = "patients"
+	doctorsCollection      = "doctors"
+	conditionsCollection   = "conditions"
+	medicinesCollection    = "medicine"
+	appointmentsCollection = "appointments"
+	resourcesCollection    = "resources"
 )
 
 var Collections = []string{
@@ -28,6 +30,8 @@ var Collections = []string{
 	doctorsCollection,
 	conditionsCollection,
 	medicinesCollection,
+	appointmentsCollection,
+	resourcesCollection,
 }
 
 func ConnectMongo(ctx context.Context, uri string, db string) (*MongoDb, error) {
@@ -79,20 +83,54 @@ func initCollections(ctx context.Context, mongoDb *mongo.Database, cols []string
 }
 
 func initIndexes(ctx context.Context, mongoDb *mongo.Database) error {
-	indexes := map[string]mongo.IndexModel{
+	indexes := map[string][]mongo.IndexModel{
 		patientsCollection: {
-			Keys:    bson.M{"email": 1},
-			Options: options.Index().SetUnique(true),
+			{
+				Keys:    bson.D{{Key: "email", Value: 1}},
+				Options: options.Index().SetUnique(true).SetName("idx_patient_email_unique"),
+			},
 		},
 		doctorsCollection: {
-			Keys:    bson.M{"email": 1},
-			Options: options.Index().SetUnique(true),
+			{
+				Keys:    bson.D{{Key: "email", Value: 1}},
+				Options: options.Index().SetUnique(true).SetName("idx_doctor_email_unique"),
+			},
 		},
 		conditionsCollection: {
-			Keys: bson.M{"patientId": 1},
+			{
+				Keys:    bson.D{{Key: "patientId", Value: 1}},
+				Options: options.Index().SetName("idx_condition_patientId"),
+			},
+			{
+				Keys:    bson.D{{Key: "patientId", Value: 1}, {Key: "start", Value: 1}},
+				Options: options.Index().SetName("idx_condition_patientId_start"),
+			},
 		},
 		medicinesCollection: {
-			Keys: bson.M{"patientId": 1},
+			{
+				Keys:    bson.D{{Key: "patientId", Value: 1}},
+				Options: options.Index().SetName("idx_medicine_patientId"),
+			},
+			{
+				Keys:    bson.D{{Key: "patientId", Value: 1}, {Key: "start", Value: 1}},
+				Options: options.Index().SetName("idx_medicine_patientId_start"),
+			},
+		},
+		appointmentsCollection: {
+			{
+				Keys:    bson.D{{Key: "status", Value: 1}},
+				Options: options.Index().SetName("idx_appointment_status"),
+			},
+			{
+				Keys:    bson.D{{Key: "appointmentDateTime", Value: 1}},
+				Options: options.Index().SetName("idx_appointment_datetime"),
+			},
+		},
+		resourcesCollection: {
+			{
+				Keys:    bson.D{{Key: "type", Value: 1}},
+				Options: options.Index().SetName("idx_resource_type"),
+			},
 		},
 	}
 

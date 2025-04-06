@@ -46,6 +46,7 @@ type Db interface {
 		page int,
 		pageSize int,
 	) ([]Medicine, PaginationResult, error)
+	CreateResource(ctx context.Context, name string, typ ResourceType) (Resource, error)
 }
 
 type PaginationResult struct {

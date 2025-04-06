@@ -28,6 +28,7 @@ type App interface {
 	CreatePatientCondition(ctx context.Context, cond api.NewCondition) (api.ConditionDisplay, error)
 
 	CreatePatientMedicine(ctx context.Context, cond api.NewMedicine) (api.MedicineDisplay, error)
+	CreateResource(ctx context.Context, resource api.NewResource) (api.NewResource, error)
 }
 
 func New(db data.Db) App {

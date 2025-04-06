@@ -203,3 +203,21 @@ func (s Server) CreatePatientMedicine(w http.ResponseWriter, r *http.Request) {
 func (s Server) RequestAppointment(w http.ResponseWriter, r *http.Request) {
 	panic("unimplemented")
 }
+// CreateResource implements api.ServerInterface.
+func (s Server) CreateResource(w http.ResponseWriter, r *http.Request) {
+	req, decodeErr := Decode[api.NewResource](w, r)
+	if decodeErr != nil {
+		encodeError(w, decodeErr)
+		return
+	}
+
+	resource, err := s.app.CreateResource(r.Context(), req)
+	if err != nil {
+		slog.Error(UnexpectedError, "error", err.Error(), "where", "CreateResource")
+		encodeError(w, internalServerError())
+		return
+	}
+
+	encode(w, http.StatusCreated, resource)
+}
+

@@ -1,515 +1,25 @@
 import { Component, h, State } from '@stencil/core';
 import { MdMenu } from '@material/web/all';
-import { Appointment, AppointmentStatusEnum, TimeSlot } from '../../api/generated';
+import { Appointment, AppointmentStatusEnum } from '../../api/generated';
 import {
-  AppointmentStatusColor,
+  AppointmentStatusColor, Condition,
   ConditionOrderColors,
   DAYS_OF_WEEK,
   formatDate,
   formatDateDelta,
   getAppointmentActions,
-  getDateAndTimeTitle,
+  getDateAndTimeTitle, HomepagePatientDataExample,
   MONTHS,
   TODAY,
 } from '../../utils/utils';
-
-type Condition = {
-  id: string;
-  displayName: string;
-  startDate: Date;
-  endDate?: Date;
-  ended: boolean;
-  appointments: Array<Appointment>;
-};
-
-const data = {
-  appointments: [
-    {
-      id: 'appt-1',
-      timeSlot: {
-        time: '7:00',
-        status: 'unavailable',
-      } satisfies TimeSlot,
-      appointmentDate: new Date(2025, 3, 4),
-      type: {
-        id: '1',
-        displayName: 'Check-Up',
-      },
-      doctor: {
-        id: '1',
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'email@email.sk',
-        specialization: 'gastroenterologist',
-      },
-      illness: 'Flu',
-      status: 'scheduled',
-      reason: 'Feeling unwell Feeling unwell Feeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell ',
-      facilities: [],
-      equipment: [],
-      medicine: [],
-      patient: {
-        id: '100',
-        email: 'email@email.sk',
-        firstName: 'Jozef',
-        lastName: 'Jozkovic',
-      },
-    } satisfies Appointment,
-    {
-      id: 'appt-2',
-      timeSlot: {
-        time: '8:00',
-        status: 'unavailable',
-      } satisfies TimeSlot,
-      appointmentDate: new Date(2025, 3, 5),
-      type: {
-        id: '100',
-        displayName: 'Consultation',
-      },
-      doctor: {
-        id: '1542523124',
-        firstName: 'Jane',
-        lastName: 'Smith',
-        email: 'email@smith.sk',
-        specialization: 'general_practitioner',
-      },
-      illness: 'Flu',
-      status: 'requested',
-      reason: 'Feeling unwell Feeling unwell Feeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell ',
-      facilities: [],
-      equipment: [],
-      medicine: [],
-      patient: {
-        id: '100',
-        email: 'email@email.sk',
-        firstName: 'Jozef',
-        lastName: 'Jozkovic',
-      },
-    } satisfies Appointment,
-    {
-      id: 'appt-3',
-      timeSlot: {
-        time: '11:00',
-        status: 'unavailable',
-      } satisfies TimeSlot,
-      appointmentDate: new Date(2025, 3, 10),
-      type: {
-        id: '1',
-        displayName: 'Check-Up',
-      },
-      doctor: {
-        id: '1',
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'email@email.sk',
-        specialization: 'gastroenterologist',
-      },
-      illness: 'Flu',
-      status: 'completed',
-      reason: 'Feeling unwell Feeling unwell Feeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell ',
-      facilities: [],
-      equipment: [],
-      medicine: [],
-      patient: {
-        id: '100',
-        email: 'email@email.sk',
-        firstName: 'Jozef',
-        lastName: 'Jozkovic',
-      },
-    } satisfies Appointment,
-    {
-      id: 'appt-4',
-      timeSlot: {
-        time: '13:00',
-        status: 'unavailable',
-      } satisfies TimeSlot,
-      appointmentDate: new Date(2025, 3, 14),
-      type: {
-        id: '1',
-        displayName: 'Check-Up',
-      },
-      doctor: {
-        id: '1',
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'email@email.sk',
-        specialization: 'gastroenterologist',
-      },
-      illness: 'Flu',
-      status: 'denied',
-      reason: 'Feeling unwell Feeling unwell Feeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell ',
-      facilities: [],
-      equipment: [],
-      medicine: [],
-      patient: {
-        id: '100',
-        email: 'email@email.sk',
-        firstName: 'Jozef',
-        lastName: 'Jozkovic',
-      },
-    } satisfies Appointment,
-    {
-      id: 'appt-5',
-      timeSlot: {
-        time: '10:00',
-        status: 'unavailable',
-      } satisfies TimeSlot,
-      appointmentDate: new Date(2025, 3, 19),
-      type: {
-        id: '1',
-        displayName: 'Check-Up',
-      },
-      doctor: {
-        id: '1',
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'email@email.sk',
-        specialization: 'gastroenterologist',
-      },
-      illness: 'Flu',
-      status: 'canceled',
-      reason: 'Feeling unwell Feeling unwell Feeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell ',
-      facilities: [],
-      equipment: [],
-      medicine: [],
-      patient: {
-        id: '100',
-        email: 'email@email.sk',
-        firstName: 'Jozef',
-        lastName: 'Jozkovic',
-      },
-    } satisfies Appointment,
-    {
-      id: 'appt-6',
-      timeSlot: {
-        time: '10:00',
-        status: 'unavailable',
-      } satisfies TimeSlot,
-      appointmentDate: new Date(2025, 3, 19),
-      type: {
-        id: '1',
-        displayName: 'Check-Up',
-      },
-      doctor: {
-        id: '1',
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'email@email.sk',
-        specialization: 'gastroenterologist',
-      },
-      illness: 'Flu',
-      status: 'canceled',
-      reason: 'Feeling unwell Feeling unwell Feeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell ',
-      facilities: [],
-      equipment: [],
-      medicine: [],
-      patient: {
-        id: '100',
-        email: 'email@email.sk',
-        firstName: 'Jozef',
-        lastName: 'Jozkovic',
-      },
-    } satisfies Appointment,
-    {
-      id: 'appt-7',
-      timeSlot: {
-        time: '10:00',
-        status: 'unavailable',
-      } satisfies TimeSlot,
-      appointmentDate: new Date(2025, 3, 19),
-      type: {
-        id: '1',
-        displayName: 'Check-Up',
-      },
-      doctor: {
-        id: '1',
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'email@email.sk',
-        specialization: 'gastroenterologist',
-      },
-      illness: 'Flu',
-      status: 'canceled',
-      reason: 'Feeling unwell Feeling unwell Feeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell ',
-      facilities: [],
-      equipment: [],
-      medicine: [],
-      patient: {
-        id: '100',
-        email: 'email@email.sk',
-        firstName: 'Jozef',
-        lastName: 'Jozkovic',
-      },
-    } satisfies Appointment,
-    {
-      id: 'appt-8',
-      timeSlot: {
-        time: '10:00',
-        status: 'unavailable',
-      } satisfies TimeSlot,
-      appointmentDate: new Date(2025, 3, 19),
-      type: {
-        id: '1',
-        displayName: 'Check-Up',
-      },
-      doctor: {
-        id: '1',
-        firstName: 'John',
-        lastName: 'Doe',
-        email: 'email@email.sk',
-        specialization: 'gastroenterologist',
-      },
-      illness: 'Flu',
-      status: 'canceled',
-      reason: 'Feeling unwell Feeling unwell Feeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell ',
-      facilities: [],
-      equipment: [],
-      medicine: [],
-      patient: {
-        id: '100',
-        email: 'email@email.sk',
-        firstName: 'Jozef',
-        lastName: 'Jozkovic',
-      },
-    } satisfies Appointment,
-  ] satisfies Array<Appointment>,
-  conditions: [
-    {
-      id: 'cond-1',
-      displayName: 'Flu',
-      startDate: new Date(2023, 8, 15),
-      endDate: new Date(2023, 9, 5),
-      ended: true,
-      appointments: [
-        {
-          id: 'appt-1',
-          timeSlot: {
-            time: '7:00',
-            status: 'unavailable',
-          } satisfies TimeSlot,
-          appointmentDate: new Date(),
-          type: {
-            id: '1',
-            displayName: 'Check-Up',
-          },
-          doctor: {
-            id: '1',
-            firstName: 'John',
-            lastName: 'Doe',
-            email: 'doctor@doctor.sk',
-            specialization: 'orthopedist',
-          },
-          illness: 'Flu',
-          status: 'scheduled',
-          reason: 'Feeling unwell Feeling unwell Feeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell ',
-          facilities: [],
-          equipment: [],
-          medicine: [],
-          patient: {
-            id: 'gsdnga armsd',
-            firstName: 'Jozef',
-            lastName: 'Jozovic',
-            email: 'jozef@jozovic.sk',
-          },
-        } satisfies Appointment,
-        {
-          id: 'appt-1',
-          timeSlot: {
-            time: '9:00',
-            status: 'unavailable',
-          } satisfies TimeSlot,
-          appointmentDate: new Date(),
-          type: {
-            id: '1',
-            displayName: 'Check-Up',
-          },
-          doctor: {
-            id: '9',
-            firstName: 'John',
-            lastName: 'Doe',
-            email: 'doctor@doctor.sk',
-            specialization: 'orthopedist',
-          },
-          illness: 'Flu',
-          status: 'scheduled',
-          reason: 'Feeling unwell Feeling unwell Feeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell ',
-          facilities: [],
-          equipment: [],
-          medicine: [],
-          patient: {
-            id: 'gsdnga armsd',
-            firstName: 'Jozef',
-            lastName: 'Jozovic',
-            email: 'jozef@jozovic.sk',
-          },
-        } satisfies Appointment,
-        {
-          id: 'appt-1',
-          timeSlot: {
-            time: '11:00',
-            status: 'unavailable',
-          } satisfies TimeSlot,
-          appointmentDate: new Date(),
-          type: {
-            id: '1',
-            displayName: 'Check-Up',
-          },
-          doctor: {
-            id: '1',
-            firstName: 'John',
-            lastName: 'Doe',
-            email: 'doctor@doctor.sk',
-            specialization: 'orthopedist',
-          },
-          illness: 'Flu',
-          status: 'scheduled',
-          reason: 'Feeling unwell Feeling unwell Feeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell ',
-          facilities: [],
-          equipment: [],
-          medicine: [],
-          patient: {
-            id: 'gsdnga armsd',
-            firstName: 'Jozef',
-            lastName: 'Jozovic',
-            email: 'jozef@jozovic.sk',
-          },
-        } satisfies Appointment,
-        {
-          id: 'appt-1',
-          timeSlot: {
-            time: '11:00',
-            status: 'unavailable',
-          } satisfies TimeSlot,
-          appointmentDate: new Date(),
-          type: {
-            id: '1',
-            displayName: 'Check-Up',
-          },
-          doctor: {
-            id: '1',
-            firstName: 'John',
-            lastName: 'Doe',
-            email: 'doctor@doctor.sk',
-            specialization: 'orthopedist',
-          },
-          illness: 'Flu',
-          status: 'scheduled',
-          reason: 'Feeling unwell Feeling unwell Feeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell ',
-          facilities: [],
-          equipment: [],
-          medicine: [],
-          patient: {
-            id: 'gsdnga armsd',
-            firstName: 'Jozef',
-            lastName: 'Jozovic',
-            email: 'jozef@jozovic.sk',
-          },
-        } satisfies Appointment,
-        {
-          id: 'appt-1',
-          timeSlot: {
-            time: '11:00',
-            status: 'unavailable',
-          } satisfies TimeSlot,
-          appointmentDate: new Date(),
-          type: {
-            id: '1',
-            displayName: 'Check-Up',
-          },
-          doctor: {
-            id: '1',
-            firstName: 'John',
-            lastName: 'Doe',
-            email: 'doctor@doctor.sk',
-            specialization: 'orthopedist',
-          },
-          illness: 'Flu',
-          status: 'scheduled',
-          reason: 'Feeling unwell Feeling unwell Feeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell ',
-          facilities: [],
-          equipment: [],
-          medicine: [],
-          patient: {
-            id: 'gsdnga armsd',
-            firstName: 'Jozef',
-            lastName: 'Jozovic',
-            email: 'jozef@jozovic.sk',
-          },
-        } satisfies Appointment,
-        {
-          id: 'appt-1',
-          timeSlot: {
-            time: '11:00',
-            status: 'unavailable',
-          } satisfies TimeSlot,
-          appointmentDate: new Date(),
-          type: {
-            id: '1',
-            displayName: 'Check-Up',
-          },
-          doctor: {
-            id: '1',
-            firstName: 'John',
-            lastName: 'Doe',
-            email: 'doctor@doctor.sk',
-            specialization: 'orthopedist',
-          },
-          illness: 'Flu',
-          status: 'scheduled',
-          reason: 'Feeling unwell Feeling unwell Feeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell ',
-          facilities: [],
-          equipment: [],
-          medicine: [],
-          patient: {
-            id: 'gsdnga armsd',
-            firstName: 'Jozef',
-            lastName: 'Jozovic',
-            email: 'jozef@jozovic.sk',
-          },
-        } satisfies Appointment,
-      ] satisfies Array<Appointment>,
-    },
-    {
-      id: 'cond-2',
-      displayName: 'Broken leg',
-      startDate: new Date(2025, 3, 23),
-      endDate: new Date(2025, 3, 25),
-      ended: true,
-      appointments: [],
-    },
-    {
-      id: 'cond-3',
-      displayName: 'ACL tear',
-      startDate: new Date(2025, 3, 20),
-      endDate: new Date(2025, 3, 21),
-      ended: true,
-      appointments: [],
-    },
-    {
-      id: 'cond-4',
-      displayName: 'Migraine',
-      startDate: new Date(2025, 3, 24),
-      endDate: new Date(2025, 3, 30),
-      ended: true,
-      appointments: [],
-    },
-    {
-      id: 'cond-5',
-      displayName: 'Headache',
-      startDate: new Date(2025, 4, 4),
-      ended: false,
-      appointments: [],
-    },
-  ] satisfies Array<Condition>,
-};
 
 @Component({
   tag: 'xcastven-xkilian-project-home-page',
   shadow: false,
 })
 export class Homepage {
-  @State() appointments: Array<Appointment> = data.appointments;
-  @State() conditions: Array<Condition> = data.conditions;
+  @State() appointments: Array<Appointment> = HomepagePatientDataExample.appointments;
+  @State() conditions: Array<Condition> = HomepagePatientDataExample.conditions;
   @State() selectedAppointment: Appointment = null;
   @State() selectedCondition: Condition = null;
   @State() selectedDate: Date = null;
@@ -537,7 +47,84 @@ export class Homepage {
 
   private getAppointmentTooltipContent = (appointment: Appointment) => {
     const displayStatus: string = appointment.status[0].toUpperCase() + appointment.status.slice(1);
-    return displayStatus + " " + appointment.type.displayName + " at " + appointment.timeSlot.time;
+
+    return (
+      <div
+        class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 bg-black text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-10"
+      >
+        <div class="flex flex-col gap-y-1 w-full">
+          <span class="w-full text-center">{appointment.type.displayName}</span>
+
+          <div class="flex flex-col gap-y-1 items-center justify-center">
+            <div class="space-x-1 flex items-center text-gray-400">
+              <span
+                class="material-symbols-outlined"
+                style={{ fontSize: '16px' }}
+              >
+                event
+              </span>
+              <div>{formatDate(appointment.appointmentDate)}</div>
+            </div>
+
+            <div class="space-x-1 flex items-center text-gray-400">
+              <span
+                class="material-symbols-outlined"
+                style={{ fontSize: '16px' }}
+              >
+                timer
+              </span>
+              <div>{appointment.timeSlot.time}</div>
+            </div>
+
+            <div class="space-x-1 flex items-center text-gray-400">
+                <span
+                  class="material-symbols-outlined"
+                  style={{ fontSize: '16px' }}
+                >
+                  format_list_bulleted
+                </span>
+              <div>{displayStatus}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  private getConditionTooltipContent = (condition: Condition) => {
+    return (
+      <div
+        class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 bg-black text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-10"
+      >
+        <div class="flex flex-col gap-y-1 w-full">
+          <span class="w-full text-center">{condition.displayName}</span>
+
+          <div class="flex flex-col gap-y-1 items-center justify-center">
+            <div class="space-x-1 flex items-center text-gray-400">
+              <span
+                class="material-symbols-outlined"
+                style={{ fontSize: '16px' }}
+              >
+                line_start_circle
+              </span>
+              <div>{formatDate(condition.startDate)}</div>
+            </div>
+
+            {condition.endDate && (
+              <div class="space-x-1 flex items-center text-gray-400">
+                <span
+                  class="material-symbols-outlined"
+                  style={{ fontSize: '16px' }}
+                >
+                  line_end_circle
+                </span>
+                <div>{formatDate(condition.endDate)}</div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
   };
 
   private renderCalendar = () => {
@@ -557,7 +144,7 @@ export class Homepage {
 
     this.appointments.forEach((appointment: Appointment) => {
       const date: Date = appointment.appointmentDate;
-      const dateKey: string = date.getFullYear() + "-" + date.getMonth() + "-" + date.getDate();
+      const dateKey: string = date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate();
 
       if (!appointmentsByDate.has(dateKey)) {
         appointmentsByDate.set(dateKey, []);
@@ -575,16 +162,82 @@ export class Homepage {
       );
     }
 
-    const conditionHeightMap: Record<string, number> = {};
     const conditionColorMap: Record<string, string> = {};
     this.conditions.forEach((condition: Condition, index: number) => {
       conditionColorMap[condition.id] = ConditionOrderColors[index % ConditionOrderColors.length];
     });
 
-    let currentMaxHeight = 0;
+    const calculateConditionHeights = () => {
+      const sortedConditions: Array<Condition> = [...this.conditions]
+        .sort((a: Condition, b: Condition): number =>
+          a.startDate.getTime() - b.startDate.getTime()
+        );
+
+      const timeline: Map<number, Set<string>> = new Map();
+
+      sortedConditions.forEach((condition: Condition) => {
+        const startTime: number = condition.startDate.getTime();
+        const endTime: number = condition.endDate ? condition.endDate.getTime() : startTime;
+
+        let currentDate: Date = new Date(startTime);
+        currentDate.setHours(0, 0, 0, 0);
+
+        while (currentDate.getTime() <= endTime) {
+          const timeKey: number = currentDate.getTime();
+
+          if (!timeline.has(timeKey)) {
+            timeline.set(timeKey, new Set());
+          }
+
+          timeline.get(timeKey).add(condition.id);
+
+          currentDate.setDate(currentDate.getDate() + 1);
+        }
+      });
+
+      const overlaps: Map<string, Set<string>> = new Map();
+
+      sortedConditions.forEach((condition: Condition) => {
+        overlaps.set(condition.id, new Set());
+      });
+
+      Array.from(timeline.values()).forEach(activeConditions => {
+        if (activeConditions.size > 1) {
+          const activeArray: Array<string> = Array.from(activeConditions);
+          for (let i = 0; i < activeArray.length; i++) {
+            for (let j = i + 1; j < activeArray.length; j++) {
+              overlaps.get(activeArray[i]).add(activeArray[j]);
+              overlaps.get(activeArray[j]).add(activeArray[i]);
+            }
+          }
+        }
+      });
+
+      const conditionHeightMap: Record<string, number> = {};
+
+      sortedConditions.forEach(condition => {
+        const usedHeights = new Set<number>();
+        overlaps.get(condition.id).forEach(overlapId => {
+          if (conditionHeightMap[overlapId] !== undefined) {
+            usedHeights.add(conditionHeightMap[overlapId]);
+          }
+        });
+
+        let heightLevel: number = 0;
+        while (usedHeights.has(10 + heightLevel * 6)) {
+          heightLevel++;
+        }
+
+        conditionHeightMap[condition.id] = 10 + heightLevel * 6;
+      });
+
+      return conditionHeightMap;
+    };
+
+    const conditionHeightMap: Record<string, number> = calculateConditionHeights();
 
     for (let i: number = 1; i <= daysInMonth; i++) {
-      const currentDate = new Date(year, month, i);
+      const currentDate: Date = new Date(year, month, i);
       currentDate.setHours(0, 0, 0, 0);
 
       const dateKey: string = year + "-" + month + "-" + i;
@@ -633,10 +286,7 @@ export class Homepage {
                       backgroundColor: AppointmentStatusColor[appointment.status].background,
                     }}
                   ></div>
-                  <div
-                    class="absolute bottom-full left-1/2 transform -translate-x-1/2 bg-black text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-10">
-                    {this.getAppointmentTooltipContent(appointment)}
-                  </div>
+                  {this.getAppointmentTooltipContent(appointment)}
                 </button>
               ))
             )}
@@ -646,13 +296,8 @@ export class Homepage {
             const isStartDate: boolean = currentDate.getTime() === condition.startDate.getTime();
             const isEndDate: boolean = condition.endDate && currentDate.getTime() === condition.endDate.getTime();
 
-            if (!(condition.id in conditionHeightMap)) {
-              conditionHeightMap[condition.id] = currentMaxHeight;
-              currentMaxHeight += 0;
-            }
-
-            const conditionHeight = conditionHeightMap[condition.id] + 10;
-            const conditionColor = conditionColorMap[condition.id];
+            const conditionHeight: number = conditionHeightMap[condition.id];
+            const conditionColor: string = conditionColorMap[condition.id];
 
             return (
               <div
@@ -661,7 +306,7 @@ export class Homepage {
                 style={{
                   bottom: "0px",
                   height: this.hoveredConditionId === condition.id ? `${conditionHeight + 6}px` : `${conditionHeight}px`,
-                  zIndex: (100 - conditionHeight + 10 / 6).toString(),
+                  zIndex: (50 - conditionHeight).toString(),
                   backgroundColor: conditionColor,
                 }}
                 onMouseEnter={() => (this.hoveredConditionId = condition.id)}
@@ -690,11 +335,7 @@ export class Homepage {
                     ></div>
                   )}
 
-                  <div
-                    class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 bg-black text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-10"
-                  >
-                    {condition.displayName}
-                  </div>
+                  {this.getConditionTooltipContent(condition)}
                 </div>
               </div>
             );
@@ -978,13 +619,13 @@ export class Homepage {
 
         {this.isDrawerOpen && (
           <div
-            class="fixed inset-0 bg-black/50 z-40"
+            class="fixed inset-0 bg-black/50 z-99"
             onClick={() => this.resetSelection()}
           />
         )}
 
         <div
-          class={`fixed top-0 right-0 h-full min-w-md max-w-md bg-white shadow-lg transform transition-transform duration-300 z-50 ${
+          class={`fixed top-0 right-0 h-full min-w-md max-w-md bg-white shadow-lg transform transition-transform duration-300 z-100 ${
             this.isDrawerOpen ? 'translate-x-0' : 'translate-x-full'
           }`}
           onClick={(e) => e.stopPropagation()}
@@ -1028,9 +669,9 @@ export class Homepage {
                                 <div
                                   key={appointment.id}
                                   class={`h-16 px-4 py-2 flex flex-col justify-center w-full border-2 border-transparent hover:border-[#9d83c6] cursor-pointer
-                                ${index % 2 === 0 ? ' bg-gray-200 ' : ' bg-white '}
-                                ${index === 0 && ' rounded-t-lg '}
-                              `}
+                                    ${index % 2 === 0 ? ' bg-gray-200 ' : ' bg-white '}
+                                    ${index === 0 && ' rounded-t-lg '}
+                                  `}
                                   onClick={() => this.handleSelectAppointment(appointment)}
                                 >
                                   <div class="flex flex-row justify-between items-center">
@@ -1112,10 +753,10 @@ export class Homepage {
                                 <div key={condition.id}>
                                   <div
                                     class={`px-4 py-2 flex flex-col justify-center w-full border-2 border-transparent hover:border-[#9d83c6] cursor-pointer
-                                ${index % 2 === 0 ? ' bg-gray-200 ' : ' bg-white '}
-                                ${index === 0 && ' rounded-t-lg '}
-                                ${isExpanded ? 'h-auto' : 'h-16'}
-                              `}
+                                      ${index % 2 === 0 ? ' bg-gray-200 ' : ' bg-white '}
+                                      ${index === 0 && ' rounded-t-lg '}
+                                      ${isExpanded ? 'h-auto' : 'h-16'}
+                                    `}
                                     onClick={() => this.handleSelectCondition(condition)}
                                     style={isSelected ? { borderColor: '#7357be' } : {}}
                                   >

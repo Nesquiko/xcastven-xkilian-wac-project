@@ -1,5 +1,5 @@
 import { h } from "@stencil/core";
-import { Appointment, AppointmentStatusEnum } from '../api/generated';
+import { Appointment, AppointmentStatusEnum, TimeSlot } from '../api/generated';
 
 export const DAYS_OF_WEEK: Array<{ short: string; long: string }> = [
   { short: "Mo", long: "Monday" },
@@ -126,11 +126,16 @@ export const AppointmentStatusColor = {
 };
 
 export const ConditionOrderColors: Array<string> = [
-  "#0D47A1",
-  "#1E88E5",
-  "#42A5F5",
-  "#90CAF9",
-  "#E3F2FD",
+  "#1976D2",
+  "#7B1FA2",
+  "#388E3C",
+  "#D32F2F",
+  "#F57C00",
+  "#512DA8",
+  "#00796B",
+  "#795548",
+  "#0097A7",
+  "#FBC02D",
 ];
 
 export const getAppointmentActions = (
@@ -183,4 +188,655 @@ export const getAppointmentActions = (
     default:
       return null;
   }
+};
+
+export type Condition = {
+  id: string;
+  displayName: string;
+  startDate: Date;
+  endDate?: Date;
+  ended: boolean;
+  appointments: Array<Appointment>;
+};
+
+export const HomepagePatientDataExample = {
+  appointments: [
+    {
+      id: 'appt-1',
+      timeSlot: {
+        time: '7:00',
+        status: 'unavailable',
+      } satisfies TimeSlot,
+      appointmentDate: new Date(2025, 3, 4),
+      type: {
+        id: '1',
+        displayName: 'Check-Up',
+      },
+      doctor: {
+        id: '1',
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'email@email.sk',
+        specialization: 'gastroenterologist',
+      },
+      illness: 'Flu',
+      status: 'scheduled',
+      reason: 'Feeling unwell Feeling unwell Feeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell ',
+      facilities: [],
+      equipment: [],
+      medicine: [],
+      patient: {
+        id: '100',
+        email: 'email@email.sk',
+        firstName: 'Jozef',
+        lastName: 'Jozkovic',
+      },
+    } satisfies Appointment,
+    {
+      id: 'appt-2',
+      timeSlot: {
+        time: '8:00',
+        status: 'unavailable',
+      } satisfies TimeSlot,
+      appointmentDate: new Date(2025, 3, 5),
+      type: {
+        id: '100',
+        displayName: 'Consultation',
+      },
+      doctor: {
+        id: '1542523124',
+        firstName: 'Jane',
+        lastName: 'Smith',
+        email: 'email@smith.sk',
+        specialization: 'general_practitioner',
+      },
+      illness: 'Flu',
+      status: 'requested',
+      reason: 'Feeling unwell Feeling unwell Feeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell ',
+      facilities: [],
+      equipment: [],
+      medicine: [],
+      patient: {
+        id: '100',
+        email: 'email@email.sk',
+        firstName: 'Jozef',
+        lastName: 'Jozkovic',
+      },
+    } satisfies Appointment,
+    {
+      id: 'appt-3',
+      timeSlot: {
+        time: '11:00',
+        status: 'unavailable',
+      } satisfies TimeSlot,
+      appointmentDate: new Date(2025, 3, 10),
+      type: {
+        id: '1',
+        displayName: 'Check-Up',
+      },
+      doctor: {
+        id: '1',
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'email@email.sk',
+        specialization: 'gastroenterologist',
+      },
+      illness: 'Flu',
+      status: 'completed',
+      reason: 'Feeling unwell Feeling unwell Feeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell ',
+      facilities: [],
+      equipment: [],
+      medicine: [],
+      patient: {
+        id: '100',
+        email: 'email@email.sk',
+        firstName: 'Jozef',
+        lastName: 'Jozkovic',
+      },
+    } satisfies Appointment,
+    {
+      id: 'appt-4',
+      timeSlot: {
+        time: '13:00',
+        status: 'unavailable',
+      } satisfies TimeSlot,
+      appointmentDate: new Date(2025, 3, 14),
+      type: {
+        id: '1',
+        displayName: 'Check-Up',
+      },
+      doctor: {
+        id: '1',
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'email@email.sk',
+        specialization: 'gastroenterologist',
+      },
+      illness: 'Flu',
+      status: 'denied',
+      reason: 'Feeling unwell Feeling unwell Feeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell ',
+      facilities: [],
+      equipment: [],
+      medicine: [],
+      patient: {
+        id: '100',
+        email: 'email@email.sk',
+        firstName: 'Jozef',
+        lastName: 'Jozkovic',
+      },
+    } satisfies Appointment,
+    {
+      id: 'appt-5',
+      timeSlot: {
+        time: '10:00',
+        status: 'unavailable',
+      } satisfies TimeSlot,
+      appointmentDate: new Date(2025, 3, 19),
+      type: {
+        id: '1',
+        displayName: 'Check-Up',
+      },
+      doctor: {
+        id: '1',
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'email@email.sk',
+        specialization: 'gastroenterologist',
+      },
+      illness: 'Flu',
+      status: 'canceled',
+      reason: 'Feeling unwell Feeling unwell Feeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell ',
+      facilities: [],
+      equipment: [],
+      medicine: [],
+      patient: {
+        id: '100',
+        email: 'email@email.sk',
+        firstName: 'Jozef',
+        lastName: 'Jozkovic',
+      },
+    } satisfies Appointment,
+    {
+      id: 'appt-6',
+      timeSlot: {
+        time: '10:00',
+        status: 'unavailable',
+      } satisfies TimeSlot,
+      appointmentDate: new Date(2025, 3, 19),
+      type: {
+        id: '1',
+        displayName: 'Check-Up',
+      },
+      doctor: {
+        id: '1',
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'email@email.sk',
+        specialization: 'gastroenterologist',
+      },
+      illness: 'Flu',
+      status: 'canceled',
+      reason: 'Feeling unwell Feeling unwell Feeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell ',
+      facilities: [],
+      equipment: [],
+      medicine: [],
+      patient: {
+        id: '100',
+        email: 'email@email.sk',
+        firstName: 'Jozef',
+        lastName: 'Jozkovic',
+      },
+    } satisfies Appointment,
+    {
+      id: 'appt-7',
+      timeSlot: {
+        time: '10:00',
+        status: 'unavailable',
+      } satisfies TimeSlot,
+      appointmentDate: new Date(2025, 3, 19),
+      type: {
+        id: '1',
+        displayName: 'Check-Up',
+      },
+      doctor: {
+        id: '1',
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'email@email.sk',
+        specialization: 'gastroenterologist',
+      },
+      illness: 'Flu',
+      status: 'canceled',
+      reason: 'Feeling unwell Feeling unwell Feeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell ',
+      facilities: [],
+      equipment: [],
+      medicine: [],
+      patient: {
+        id: '100',
+        email: 'email@email.sk',
+        firstName: 'Jozef',
+        lastName: 'Jozkovic',
+      },
+    } satisfies Appointment,
+    {
+      id: 'appt-8',
+      timeSlot: {
+        time: '10:00',
+        status: 'unavailable',
+      } satisfies TimeSlot,
+      appointmentDate: new Date(2025, 3, 19),
+      type: {
+        id: '1',
+        displayName: 'Check-Up',
+      },
+      doctor: {
+        id: '1',
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'email@email.sk',
+        specialization: 'gastroenterologist',
+      },
+      illness: 'Flu',
+      status: 'canceled',
+      reason: 'Feeling unwell Feeling unwell Feeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell ',
+      facilities: [],
+      equipment: [],
+      medicine: [],
+      patient: {
+        id: '100',
+        email: 'email@email.sk',
+        firstName: 'Jozef',
+        lastName: 'Jozkovic',
+      },
+    } satisfies Appointment,
+  ] satisfies Array<Appointment>,
+  conditions: [
+    {
+      id: 'cond-1',
+      displayName: 'Flu',
+      startDate: new Date(2025, 3, 17),
+      endDate: new Date(2025, 3, 17),
+      ended: true,
+      appointments: [
+        {
+          id: 'appt-1',
+          timeSlot: {
+            time: '7:00',
+            status: 'unavailable',
+          } satisfies TimeSlot,
+          appointmentDate: new Date(),
+          type: {
+            id: '1',
+            displayName: 'Check-Up',
+          },
+          doctor: {
+            id: '1',
+            firstName: 'John',
+            lastName: 'Doe',
+            email: 'doctor@doctor.sk',
+            specialization: 'orthopedist',
+          },
+          illness: 'Flu',
+          status: 'scheduled',
+          reason: 'Feeling unwell Feeling unwell Feeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell ',
+          facilities: [],
+          equipment: [],
+          medicine: [],
+          patient: {
+            id: 'gsdnga armsd',
+            firstName: 'Jozef',
+            lastName: 'Jozovic',
+            email: 'jozef@jozovic.sk',
+          },
+        } satisfies Appointment,
+        {
+          id: 'appt-1',
+          timeSlot: {
+            time: '9:00',
+            status: 'unavailable',
+          } satisfies TimeSlot,
+          appointmentDate: new Date(),
+          type: {
+            id: '1',
+            displayName: 'Check-Up',
+          },
+          doctor: {
+            id: '9',
+            firstName: 'John',
+            lastName: 'Doe',
+            email: 'doctor@doctor.sk',
+            specialization: 'orthopedist',
+          },
+          illness: 'Flu',
+          status: 'scheduled',
+          reason: 'Feeling unwell Feeling unwell Feeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell ',
+          facilities: [],
+          equipment: [],
+          medicine: [],
+          patient: {
+            id: 'gsdnga armsd',
+            firstName: 'Jozef',
+            lastName: 'Jozovic',
+            email: 'jozef@jozovic.sk',
+          },
+        } satisfies Appointment,
+        {
+          id: 'appt-1',
+          timeSlot: {
+            time: '11:00',
+            status: 'unavailable',
+          } satisfies TimeSlot,
+          appointmentDate: new Date(),
+          type: {
+            id: '1',
+            displayName: 'Check-Up',
+          },
+          doctor: {
+            id: '1',
+            firstName: 'John',
+            lastName: 'Doe',
+            email: 'doctor@doctor.sk',
+            specialization: 'orthopedist',
+          },
+          illness: 'Flu',
+          status: 'scheduled',
+          reason: 'Feeling unwell Feeling unwell Feeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell ',
+          facilities: [],
+          equipment: [],
+          medicine: [],
+          patient: {
+            id: 'gsdnga armsd',
+            firstName: 'Jozef',
+            lastName: 'Jozovic',
+            email: 'jozef@jozovic.sk',
+          },
+        } satisfies Appointment,
+        {
+          id: 'appt-1',
+          timeSlot: {
+            time: '11:00',
+            status: 'unavailable',
+          } satisfies TimeSlot,
+          appointmentDate: new Date(),
+          type: {
+            id: '1',
+            displayName: 'Check-Up',
+          },
+          doctor: {
+            id: '1',
+            firstName: 'John',
+            lastName: 'Doe',
+            email: 'doctor@doctor.sk',
+            specialization: 'orthopedist',
+          },
+          illness: 'Flu',
+          status: 'scheduled',
+          reason: 'Feeling unwell Feeling unwell Feeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell ',
+          facilities: [],
+          equipment: [],
+          medicine: [],
+          patient: {
+            id: 'gsdnga armsd',
+            firstName: 'Jozef',
+            lastName: 'Jozovic',
+            email: 'jozef@jozovic.sk',
+          },
+        } satisfies Appointment,
+        {
+          id: 'appt-1',
+          timeSlot: {
+            time: '11:00',
+            status: 'unavailable',
+          } satisfies TimeSlot,
+          appointmentDate: new Date(),
+          type: {
+            id: '1',
+            displayName: 'Check-Up',
+          },
+          doctor: {
+            id: '1',
+            firstName: 'John',
+            lastName: 'Doe',
+            email: 'doctor@doctor.sk',
+            specialization: 'orthopedist',
+          },
+          illness: 'Flu',
+          status: 'scheduled',
+          reason: 'Feeling unwell Feeling unwell Feeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell ',
+          facilities: [],
+          equipment: [],
+          medicine: [],
+          patient: {
+            id: 'gsdnga armsd',
+            firstName: 'Jozef',
+            lastName: 'Jozovic',
+            email: 'jozef@jozovic.sk',
+          },
+        } satisfies Appointment,
+        {
+          id: 'appt-1',
+          timeSlot: {
+            time: '11:00',
+            status: 'unavailable',
+          } satisfies TimeSlot,
+          appointmentDate: new Date(),
+          type: {
+            id: '1',
+            displayName: 'Check-Up',
+          },
+          doctor: {
+            id: '1',
+            firstName: 'John',
+            lastName: 'Doe',
+            email: 'doctor@doctor.sk',
+            specialization: 'orthopedist',
+          },
+          illness: 'Flu',
+          status: 'scheduled',
+          reason: 'Feeling unwell Feeling unwell Feeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell ',
+          facilities: [],
+          equipment: [],
+          medicine: [],
+          patient: {
+            id: 'gsdnga armsd',
+            firstName: 'Jozef',
+            lastName: 'Jozovic',
+            email: 'jozef@jozovic.sk',
+          },
+        } satisfies Appointment,
+      ] satisfies Array<Appointment>,
+    },
+    {
+      id: 'cond-2',
+      displayName: 'Broken leg',
+      startDate: new Date(2025, 3, 23),
+      endDate: new Date(2025, 3, 25),
+      ended: true,
+      appointments: [],
+    },
+    {
+      id: 'cond-3',
+      displayName: 'ACL tear',
+      startDate: new Date(2025, 3, 25),
+      endDate: new Date(2025, 3, 26),
+      ended: true,
+      appointments: [],
+    },
+    {
+      id: 'cond-4',
+      displayName: 'Migraine',
+      startDate: new Date(2025, 3, 24),
+      endDate: new Date(2025, 3, 30),
+      ended: true,
+      appointments: [],
+    },
+    {
+      id: 'cond-5',
+      displayName: 'Headache',
+      startDate: new Date(2025, 3, 22),
+      endDate: new Date(2025, 3, 23),
+      ended: true,
+      appointments: [],
+    },
+  ] satisfies Array<Condition>,
+};
+
+export const HomepageDoctorDataExample = {
+  appointments: [
+    {
+      id: 'appt-1',
+      timeSlot: {
+        time: '7:00',
+        status: 'unavailable',
+      } satisfies TimeSlot,
+      appointmentDate: new Date(2025, 3, 9),
+      type: {
+        id: '1',
+        displayName: 'Check-Up',
+      },
+      doctor: {
+        id: '1',
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'email@email.sk',
+        specialization: 'gastroenterologist',
+      },
+      illness: 'Flu',
+      status: 'requested',
+      reason: 'Feeling unwell Feeling unwell Feeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell ',
+      facilities: [],
+      equipment: [],
+      medicine: [],
+      patient: {
+        id: '100',
+        email: 'email@email.sk',
+        firstName: 'Jozef',
+        lastName: 'Jozkovic',
+      },
+    } satisfies Appointment,
+    {
+      id: 'appt-2',
+      timeSlot: {
+        time: '7:00',
+        status: 'unavailable',
+      } satisfies TimeSlot,
+      appointmentDate: new Date(2025, 3, 9),
+      type: {
+        id: '1',
+        displayName: 'Check-Up',
+      },
+      doctor: {
+        id: '1',
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'email@email.sk',
+        specialization: 'gastroenterologist',
+      },
+      illness: 'Flu',
+      status: 'requested',
+      reason: 'Feeling unwell Feeling unwell Feeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell ',
+      facilities: [],
+      equipment: [],
+      medicine: [],
+      patient: {
+        id: '100',
+        email: 'email@email.sk',
+        firstName: 'Jozef',
+        lastName: 'Jozkovic',
+      },
+    } satisfies Appointment,
+    {
+      id: 'appt-3',
+      timeSlot: {
+        time: '7:00',
+        status: 'unavailable',
+      } satisfies TimeSlot,
+      appointmentDate: new Date(2025, 3, 9),
+      type: {
+        id: '1',
+        displayName: 'Check-Up',
+      },
+      doctor: {
+        id: '1',
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'email@email.sk',
+        specialization: 'gastroenterologist',
+      },
+      illness: 'Flu',
+      status: 'scheduled',
+      reason: 'Feeling unwell Feeling unwell Feeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell ',
+      facilities: [],
+      equipment: [],
+      medicine: [],
+      patient: {
+        id: '100',
+        email: 'email@email.sk',
+        firstName: 'Jozef',
+        lastName: 'Jozkovic',
+      },
+    } satisfies Appointment,
+    {
+      id: 'appt-4',
+      timeSlot: {
+        time: '7:00',
+        status: 'unavailable',
+      } satisfies TimeSlot,
+      appointmentDate: new Date(2025, 3, 9),
+      type: {
+        id: '1',
+        displayName: 'Check-Up',
+      },
+      doctor: {
+        id: '1',
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'email@email.sk',
+        specialization: 'gastroenterologist',
+      },
+      illness: 'Flu',
+      status: 'scheduled',
+      reason: 'Feeling unwell Feeling unwell Feeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell ',
+      facilities: [],
+      equipment: [],
+      medicine: [],
+      patient: {
+        id: '100',
+        email: 'email@email.sk',
+        firstName: 'Jozef',
+        lastName: 'Jozkovic',
+      },
+    } satisfies Appointment,
+    {
+      id: 'appt-5',
+      timeSlot: {
+        time: '7:00',
+        status: 'unavailable',
+      } satisfies TimeSlot,
+      appointmentDate: new Date(2025, 3, 9),
+      type: {
+        id: '1',
+        displayName: 'Check-Up',
+      },
+      doctor: {
+        id: '1',
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'email@email.sk',
+        specialization: 'gastroenterologist',
+      },
+      illness: 'Flu',
+      status: 'scheduled',
+      reason: 'Feeling unwell Feeling unwell Feeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell ',
+      facilities: [],
+      equipment: [],
+      medicine: [],
+      patient: {
+        id: '100',
+        email: 'email@email.sk',
+        firstName: 'Jozef',
+        lastName: 'Jozkovic',
+      },
+    } satisfies Appointment,
+  ] satisfies Array<Appointment>,
 };

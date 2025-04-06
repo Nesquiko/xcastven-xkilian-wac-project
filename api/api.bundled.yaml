@@ -12,6 +12,7 @@ tags:
   - name: Doctors
   - name: Patients
   - name: Resources
+  - name: Medical History
 paths:
   /auth/register:
     post:
@@ -114,6 +115,27 @@ paths:
                     detail: No user found with the provided email and role.
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
+  /appointments:
+    post:
+      tags:
+        - Appointments
+      summary: Patient creates an appointment request
+      operationId: requestAppointment
+      requestBody:
+        description: Basic info about the appointment request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewAppointmentRequest'
+      responses:
+        '201':
+          description: Appointment successfully requested.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientAppointment'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
   /appointments/{appointmentId}:
     post:
       tags:
@@ -183,6 +205,7 @@ paths:
     get:
       tags:
         - Conditions
+        - Patients
       summary: Create a condition record for a patient
       operationId: createPatientCondition
       requestBody:
@@ -216,6 +239,29 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/Condition'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /medicine:
+    get:
+      tags:
+        - Patient
+        - Medical History
+      summary: Create a medicine record for a patient
+      operationId: createPatientMedicine
+      requestBody:
+        description: Details of the medicine to be created.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewMedicine'
+      responses:
+        '201':
+          description: Medicine record created successfully. Returns the created medicine details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MedicineDisplay'
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
   /patients/{patientId}:
@@ -305,7 +351,7 @@ paths:
     get:
       tags:
         - Appointments
-      summary: Appointment scheduled by patient
+      summary: Get appointment scheduled by patient
       operationId: patientsAppointment
       parameters:
         - $ref: '#/components/parameters/patientId'
@@ -374,7 +420,7 @@ paths:
     get:
       tags:
         - Appointments
-      summary: Appointment scheduled to a doctor
+      summary: Get appointment scheduled to a doctor
       operationId: doctorsAppointment
       parameters:
         - $ref: '#/components/parameters/doctorId'
@@ -555,28 +601,36 @@ components:
         - code
         - status
         - detail
-    AppointmentDecision:
-      type: object
-      description: Data required for staff to accept or reject an appointment request.
-      properties:
-        action:
-          type: string
-          description: The decision action to take on the appointment request.
-          enum:
-            - accept
-            - reject
-          example: accept
-        reason:
-          type: string
-          description: Required reason if the action is 'reject'. Optional otherwise.
-          example: Doctor schedule conflict. Please choose another time.
-      required:
-        - action
     AppointmentType:
       type: string
       description: The type of the appointment.
       enum:
         - regular_check
+    NewAppointmentRequest:
+      type: object
+      required:
+        - patientId
+        - doctorId
+        - appointmentDateTime
+      properties:
+        patientId:
+          type: string
+          format: uuid
+        doctorId:
+          type: string
+          format: uuid
+        appointmentDateTime:
+          type: string
+          format: date-time
+        type:
+          $ref: '#/components/schemas/AppointmentType'
+        conditionId:
+          type: string
+          format: uuid
+        reason:
+          type: string
+          description: Reason for the appointment provided by the patient.
+          example: Feeling unwell, general check-up needed.
     ConditionDisplay:
       type: object
       description: Basic info about a patient's condition.
@@ -609,7 +663,7 @@ components:
       example: scheduled
     AppointmentBase:
       type: object
-      description: Represents a detailed appointment view for doctors.
+      description: Contains basic information about an appointment.
       required:
         - id
         - appointmentDateTime
@@ -620,6 +674,7 @@ components:
         id:
           type: string
           format: uuid
+          readOnly: true
         appointmentDateTime:
           type: string
           format: date-time
@@ -633,6 +688,32 @@ components:
           type: string
           description: Reason for the appointment provided by the patient.
           example: Feeling unwell, general check-up needed.
+    PatientAppointment:
+      allOf:
+        - $ref: '#/components/schemas/AppointmentBase'
+        - type: object
+          required:
+            - doctor
+          properties:
+            doctor:
+              $ref: '#/components/schemas/Doctor'
+    AppointmentDecision:
+      type: object
+      description: Data required for staff to accept or reject an appointment request.
+      properties:
+        action:
+          type: string
+          description: The decision action to take on the appointment request.
+          enum:
+            - accept
+            - reject
+          example: accept
+        reason:
+          type: string
+          description: Required reason if the action is 'reject'. Optional otherwise.
+          example: Doctor schedule conflict. Please choose another time.
+      required:
+        - action
     Facility:
       type: object
       description: Represents a required facility resource.
@@ -726,15 +807,6 @@ components:
           example: Work conflict arose.
       required:
         - newAppointmentDateTime
-    PatientAppointment:
-      allOf:
-        - $ref: '#/components/schemas/AppointmentBase'
-        - type: object
-          required:
-            - doctor
-          properties:
-            doctor:
-              $ref: '#/components/schemas/Doctor'
     NewCondition:
       allOf:
         - $ref: '#/components/schemas/ConditionDisplay'
@@ -794,6 +866,16 @@ components:
         - id
         - name
         - start
+    NewMedicine:
+      allOf:
+        - $ref: '#/components/schemas/MedicineDisplay'
+        - type: object
+          properties:
+            patientId:
+              type: string
+              format: uuid
+          required:
+            - patientId
     PatientsCalendar:
       type: object
       properties:

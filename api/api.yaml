@@ -20,6 +20,8 @@ paths:
   /auth/login:
     $ref: "./paths/auth_login.yaml"
 
+  /appointments:
+    $ref: "./paths/appointments.yaml"
   /appointments/{appointmentId}:
     $ref: "./paths/appointments_appointmentId.yaml"
 

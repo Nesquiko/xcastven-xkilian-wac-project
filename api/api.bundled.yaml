@@ -179,6 +179,35 @@ paths:
           description: Appointment successfully cancelled.
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
+  /conditions:
+    get:
+      tags:
+        - Conditions
+      summary: Create a condition record for a patient
+      operationId: createPatientCondition
+      requestBody:
+        description: Details of the condition to be created.
+        required: true
+        content:
+          application/json:
+            allOf:
+              - $ref: ./ConditionDisplay.yaml
+              - type: object
+                properties:
+                  patientId:
+                    type: string
+                    format: uuid
+                required:
+                  - patientId
+      responses:
+        '201':
+          description: Condition record created successfully. Returns the created condition details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConditionDisplay'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
   /conditions/{conditionId}:
     get:
       tags:
@@ -283,8 +312,8 @@ paths:
     get:
       tags:
         - Appointments
-      summary: Appointment scheduled to a doctor
-      operationId: null
+      summary: Appointment scheduled by patient
+      operationId: patientsAppointment
       parameters:
         - $ref: '#/components/parameters/patientId'
         - $ref: '#/components/parameters/appointmentId'
@@ -352,8 +381,8 @@ paths:
     get:
       tags:
         - Appointments
-      summary: Appointment scheduled by patient
-      operationId: null
+      summary: Appointment scheduled to a doctor
+      operationId: doctorsAppointment
       parameters:
         - $ref: '#/components/parameters/doctorId'
         - $ref: '#/components/parameters/appointmentId'
@@ -562,6 +591,7 @@ components:
         id:
           type: string
           format: uuid
+          readOnly: true
         name:
           type: string
         start:

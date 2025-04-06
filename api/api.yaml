@@ -22,6 +22,8 @@ paths:
   /appointments/{appointmentId}:
     $ref: "./paths/appointments_appointmentId.yaml"
 
+  /conditions:
+    $ref: "./paths/conditions.yaml"
   /conditions/{conditionId}:
     $ref: "./paths/conditions_conditionId.yaml"
 

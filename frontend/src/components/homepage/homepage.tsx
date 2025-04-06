@@ -385,8 +385,15 @@ export class Homepage {
     this.currentViewYear = parseInt((event.target as HTMLSelectElement).value);
   };
 
-  private handleToggleMenu = () => {
-    const menu: MdMenu = document.querySelector('md-menu');
+  private handleToggleHeaderMenu = () => {
+    const menu: MdMenu = document.getElementById('header-md-menu') as MdMenu;
+    if (menu) {
+      menu.open = !menu.open;
+    }
+  };
+
+  private handleToggleLegendMenu = () => {
+    const menu: MdMenu = document.getElementById('legend-md-menu') as MdMenu;
     if (menu) {
       menu.open = !menu.open;
     }
@@ -494,16 +501,16 @@ export class Homepage {
             <md-icon-button
               id="menu-button"
               class="mr-2"
-              onClick={this.handleToggleMenu}
+              onClick={this.handleToggleHeaderMenu}
             >
               <span class="material-symbols-outlined text-white">menu</span>
             </md-icon-button>
 
-            <md-menu anchor="menu-button">
+            <md-menu id="header-md-menu" anchor="menu-button" class="z-98">
               <md-menu-item>
                 <div
                   slot="headline"
-                  class="text-sm w-48 flex flex-row items-center gap-x-2"
+                  class="text-sm w-48 flex flex-row items-center gap-x-2 z-98"
                 >
                   <span
                     class="material-symbols-outlined"
@@ -517,7 +524,7 @@ export class Homepage {
               <md-menu-item>
                 <div
                   slot="headline"
-                  class="text-sm w-48 flex flex-row items-center gap-x-2"
+                  class="text-sm w-48 flex flex-row items-center gap-x-2 z-98"
                 >
                   <span
                     class="material-symbols-outlined"
@@ -590,30 +597,156 @@ export class Homepage {
             {this.renderCalendar()}
           </div>
 
-          <div class="w-full px-3 py-1 bg-[#d8c7ed] flex flex-row justify-center items-center gap-x-3">
-            <md-text-button
-              class="text-sm w-56 relative pr-3"
-            >
-              <span
-                class="material-symbols-outlined absolute top-[10px] left-4"
-                style={{ fontSize: '20px' }}
-              >
-                event
-              </span>
-              <span class="pl-8 text-center">Schedule an appointment</span>
-            </md-text-button>
+          <div class="w-full px-3 py-1 bg-[#d8c7ed] flex flex-row justify-between">
+            <div class="w-10"></div>
 
-            <md-text-button
-              class="text-sm w-56 relative pr-3"
-            >
-              <span
-                class="material-symbols-outlined absolute top-[10px] left-8"
-                style={{ fontSize: '20px' }}
+            <div class="w-full flex flex-row justify-center items-center gap-x-3">
+              <md-text-button
+                class="text-sm sm:w-56 w-18 relative pr-3 text-[#7357be]"
+                onClick={() => console.log("Schedule an appointment")}
+                title="Schedule an appointment"
               >
-                coronavirus
-              </span>
-              <span class="pl-8 text-center">Register a condition</span>
-            </md-text-button>
+                <span
+                  class="material-symbols-outlined absolute top-[10px] left-4"
+                  style={{ fontSize: '20px' }}
+                >
+                  event
+                </span>
+                <span
+                  class="sm:text-transparent material-symbols-outlined absolute top-[10px] left-10"
+                  style={{ fontSize: '20px' }}
+                >
+                  add
+                </span>
+                <span class="pl-8 text-center sm:inline hidden">Schedule an appointment</span>
+              </md-text-button>
+
+              <md-text-button
+                class="text-sm sm:w-48 w-18 relative pr-3 text-[#7357be]"
+                onClick={() => console.log("Register a condition")}
+                title="Register a condition"
+              >
+                <span
+                  class="material-symbols-outlined absolute top-[10px] left-4"
+                  style={{ fontSize: '20px' }}
+                >
+                  coronavirus
+                </span>
+                <span
+                  class="sm:text-transparent material-symbols-outlined absolute top-[10px] left-10"
+                  style={{ fontSize: '20px' }}
+                >
+                  add
+                </span>
+                <span class="pl-8 text-center sm:inline hidden">Register a condition</span>
+              </md-text-button>
+            </div>
+
+            <div class="w-10 relative z-98">
+              <md-icon-button
+                id="legend-button"
+                class="mr-2 text-[#7357be]"
+                onClick={this.handleToggleLegendMenu}
+                title="Legend"
+              >
+                <span class="material-symbols-outlined text-[#7357be]">more_horiz</span>
+              </md-icon-button>
+
+              <md-menu id="legend-md-menu" anchor="legend-button" style={{ position: 'absolute', zIndex: 98 }}>
+                <md-menu-item>
+                  <div
+                    slot="headline"
+                    class="text-sm w-48 flex flex-row items-center justify-between gap-x-2 z-98"
+                  >
+                    <span>Schedule-able day</span>
+                    <div class="bg-[#d8c7ed] h-6 w-6 rounded-full border-2 border-white" />
+                  </div>
+                </md-menu-item>
+                <md-menu-item>
+                  <div
+                    slot="headline"
+                    class="text-sm w-48 flex flex-row items-center justify-between gap-x-2 z-98"
+                  >
+                    <span>Non-schedule-able day</span>
+                    <div class="bg-white h-6 w-6 rounded-full border-2 border-white" />
+                  </div>
+                </md-menu-item>
+                <md-menu-item>
+                  <div
+                    slot="headline"
+                    class="text-sm w-48 flex flex-row items-center justify-between gap-x-2 z-98"
+                  >
+                    <span>Other month's day</span>
+                    <div class="bg-gray-200 h-6 w-6 rounded-full border-2 border-white" />
+                  </div>
+                </md-menu-item>
+                <md-menu-item>
+                  <div
+                    slot="headline"
+                    class="text-sm w-48 flex flex-row items-center justify-between gap-x-2 z-98"
+                  >
+                    <span>Scheduled appointment</span>
+                    <div class="bg-[#7357be] h-6 w-6 rounded-full border-2 border-white" />
+                  </div>
+                </md-menu-item>
+                <md-menu-item>
+                  <div
+                    slot="headline"
+                    class="text-sm w-48 flex flex-row items-center justify-between gap-x-2 z-98"
+                  >
+                    <span>Requested appointment</span>
+                    <div class="bg-[#9d83c6] h-6 w-6 rounded-full border-2 border-white" />
+                  </div>
+                </md-menu-item>
+                <md-menu-item>
+                  <div
+                    slot="headline"
+                    class="text-sm w-48 flex flex-row items-center justify-between gap-x-2 z-98"
+                  >
+                    <span>Completed appointment</span>
+                    <div class="bg-[#2E8B57] h-6 w-6 rounded-full border-2 border-white" />
+                  </div>
+                </md-menu-item>
+                <md-menu-item>
+                  <div
+                    slot="headline"
+                    class="text-sm w-48 flex flex-row items-center justify-between gap-x-2 z-98"
+                  >
+                    <span>Canceled appointment</span>
+                    <div class="bg-[#F08080] h-6 w-6 rounded-full border-2 border-white" />
+                  </div>
+                </md-menu-item>
+                <md-menu-item>
+                  <div
+                    slot="headline"
+                    class="text-sm w-48 flex flex-row items-center justify-between gap-x-2 z-98"
+                  >
+                    <span>Denied appointment</span>
+                    <div class="bg-[#4f4f4f] h-6 w-6 rounded-full border-2 border-white" />
+                  </div>
+                </md-menu-item>
+                <md-menu-item>
+                  <div
+                    slot="headline"
+                    class="text-sm w-48 flex flex-col items-center justify-between gap-y-2 z-98"
+                  >
+                    <span>Conditions</span>
+                    <div
+                      class="flex w-full h-8 rounded-full overflow-hidden border-2 border-white"
+                    >
+                      {ConditionOrderColors.map((color: string) => (
+                        <div
+                          class="flex-grow"
+                          style={{
+                            backgroundColor: color,
+                          }}
+                        ></div>
+                      ))}
+                    </div>
+                  </div>
+                </md-menu-item>
+              </md-menu>
+            </div>
           </div>
         </div>
 

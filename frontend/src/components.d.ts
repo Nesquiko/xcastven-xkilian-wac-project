@@ -5,8 +5,8 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { AppointmentDisplay, Condition, ConditionDisplay, DoctorAppointment, PatientAppointment } from "./api/generated";
-export { AppointmentDisplay, Condition, ConditionDisplay, DoctorAppointment, PatientAppointment } from "./api/generated";
+import { AppointmentDisplay, Condition, ConditionDisplay, DoctorAppointment, PatientAppointment, PrescriptionDisplay } from "./api/generated";
+export { AppointmentDisplay, Condition, ConditionDisplay, DoctorAppointment, PatientAppointment, PrescriptionDisplay } from "./api/generated";
 export namespace Components {
     interface AmbulanceApp {
     }
@@ -28,10 +28,15 @@ export namespace Components {
         "currentViewMonth": number;
         "currentViewYear": number;
         "getConditionsForDate": (date: Date) => Array<ConditionDisplay>;
+        "getPrescriptionsForDate": (date: Date) => Array<PrescriptionDisplay>;
+        "handleNextMonth": () => void;
+        "handlePreviousMonth": () => void;
         "handleSelectAppointment": (appointment: AppointmentDisplay) => void;
         "handleSelectCondition": (condition: ConditionDisplay) => void;
         "handleSelectDate": (date: Date) => void;
+        "handleSelectPrescription": (prescription: PrescriptionDisplay) => void;
         "hoveredConditionId": string;
+        "prescriptions": Array<PrescriptionDisplay>;
         "setHoveredConditionId": (value: string | null) => void;
     }
     interface XcastvenXkilianProjectConditionDetail {
@@ -48,17 +53,21 @@ export namespace Components {
     interface XcastvenXkilianProjectDrawer {
         "getAppointmentsForDate": (date: Date) => Array<AppointmentDisplay>;
         "getConditionsForDate": (date: Date) => Array<ConditionDisplay>;
+        "getPrescriptionsForDate": (date: Date) => Array<PrescriptionDisplay>;
         "handleCancelAppointment": (appointment: PatientAppointment | DoctorAppointment) => void;
         "handleRescheduleAppointment": (appointment: PatientAppointment | DoctorAppointment) => void;
         "handleResetSelection": () => void;
         "handleScheduleAppointmentFromCondition": (condition: Condition) => void;
         "handleSelectAppointment": (appointment: AppointmentDisplay) => void;
         "handleSelectCondition": (condition: ConditionDisplay) => void;
+        "handleSelectPrescription": (prescription: PrescriptionDisplay) => void;
         "handleToggleConditionStatus": () => void;
         "isDrawerOpen": boolean;
         "selectedAppointment": AppointmentDisplay;
         "selectedCondition": ConditionDisplay;
         "selectedDate": Date;
+        "selectedPrescription": PrescriptionDisplay;
+        "showLegend": boolean;
     }
     interface XcastvenXkilianProjectFooter {
         "handleRegisterCondition": () => void;
@@ -76,6 +85,14 @@ export namespace Components {
     }
     interface XcastvenXkilianProjectLegend {
         "handleResetSelection": () => void;
+    }
+    interface XcastvenXkilianProjectPrescriptionDetail {
+        "handleResetSelection": () => void;
+        "prescriptionId": string;
+    }
+    interface XcastvenXkilianProjectPrescriptionsList {
+        "handleSelectPrescription": (prescription: PrescriptionDisplay) => void;
+        "prescriptions": Array<PrescriptionDisplay>;
     }
 }
 declare global {
@@ -151,6 +168,18 @@ declare global {
         prototype: HTMLXcastvenXkilianProjectLegendElement;
         new (): HTMLXcastvenXkilianProjectLegendElement;
     };
+    interface HTMLXcastvenXkilianProjectPrescriptionDetailElement extends Components.XcastvenXkilianProjectPrescriptionDetail, HTMLStencilElement {
+    }
+    var HTMLXcastvenXkilianProjectPrescriptionDetailElement: {
+        prototype: HTMLXcastvenXkilianProjectPrescriptionDetailElement;
+        new (): HTMLXcastvenXkilianProjectPrescriptionDetailElement;
+    };
+    interface HTMLXcastvenXkilianProjectPrescriptionsListElement extends Components.XcastvenXkilianProjectPrescriptionsList, HTMLStencilElement {
+    }
+    var HTMLXcastvenXkilianProjectPrescriptionsListElement: {
+        prototype: HTMLXcastvenXkilianProjectPrescriptionsListElement;
+        new (): HTMLXcastvenXkilianProjectPrescriptionsListElement;
+    };
     interface HTMLElementTagNameMap {
         "ambulance-app": HTMLAmbulanceAppElement;
         "xcastven-xkilian-appointment-scheduler": HTMLXcastvenXkilianAppointmentSchedulerElement;
@@ -164,6 +193,8 @@ declare global {
         "xcastven-xkilian-project-header": HTMLXcastvenXkilianProjectHeaderElement;
         "xcastven-xkilian-project-home-page": HTMLXcastvenXkilianProjectHomePageElement;
         "xcastven-xkilian-project-legend": HTMLXcastvenXkilianProjectLegendElement;
+        "xcastven-xkilian-project-prescription-detail": HTMLXcastvenXkilianProjectPrescriptionDetailElement;
+        "xcastven-xkilian-project-prescriptions-list": HTMLXcastvenXkilianProjectPrescriptionsListElement;
     }
 }
 declare namespace LocalJSX {
@@ -187,10 +218,15 @@ declare namespace LocalJSX {
         "currentViewMonth"?: number;
         "currentViewYear"?: number;
         "getConditionsForDate"?: (date: Date) => Array<ConditionDisplay>;
+        "getPrescriptionsForDate"?: (date: Date) => Array<PrescriptionDisplay>;
+        "handleNextMonth"?: () => void;
+        "handlePreviousMonth"?: () => void;
         "handleSelectAppointment"?: (appointment: AppointmentDisplay) => void;
         "handleSelectCondition"?: (condition: ConditionDisplay) => void;
         "handleSelectDate"?: (date: Date) => void;
+        "handleSelectPrescription"?: (prescription: PrescriptionDisplay) => void;
         "hoveredConditionId"?: string;
+        "prescriptions"?: Array<PrescriptionDisplay>;
         "setHoveredConditionId"?: (value: string | null) => void;
     }
     interface XcastvenXkilianProjectConditionDetail {
@@ -207,17 +243,21 @@ declare namespace LocalJSX {
     interface XcastvenXkilianProjectDrawer {
         "getAppointmentsForDate"?: (date: Date) => Array<AppointmentDisplay>;
         "getConditionsForDate"?: (date: Date) => Array<ConditionDisplay>;
+        "getPrescriptionsForDate"?: (date: Date) => Array<PrescriptionDisplay>;
         "handleCancelAppointment"?: (appointment: PatientAppointment | DoctorAppointment) => void;
         "handleRescheduleAppointment"?: (appointment: PatientAppointment | DoctorAppointment) => void;
         "handleResetSelection"?: () => void;
         "handleScheduleAppointmentFromCondition"?: (condition: Condition) => void;
         "handleSelectAppointment"?: (appointment: AppointmentDisplay) => void;
         "handleSelectCondition"?: (condition: ConditionDisplay) => void;
+        "handleSelectPrescription"?: (prescription: PrescriptionDisplay) => void;
         "handleToggleConditionStatus"?: () => void;
         "isDrawerOpen"?: boolean;
         "selectedAppointment"?: AppointmentDisplay;
         "selectedCondition"?: ConditionDisplay;
         "selectedDate"?: Date;
+        "selectedPrescription"?: PrescriptionDisplay;
+        "showLegend"?: boolean;
     }
     interface XcastvenXkilianProjectFooter {
         "handleRegisterCondition"?: () => void;
@@ -236,6 +276,14 @@ declare namespace LocalJSX {
     interface XcastvenXkilianProjectLegend {
         "handleResetSelection"?: () => void;
     }
+    interface XcastvenXkilianProjectPrescriptionDetail {
+        "handleResetSelection"?: () => void;
+        "prescriptionId"?: string;
+    }
+    interface XcastvenXkilianProjectPrescriptionsList {
+        "handleSelectPrescription"?: (prescription: PrescriptionDisplay) => void;
+        "prescriptions"?: Array<PrescriptionDisplay>;
+    }
     interface IntrinsicElements {
         "ambulance-app": AmbulanceApp;
         "xcastven-xkilian-appointment-scheduler": XcastvenXkilianAppointmentScheduler;
@@ -249,6 +297,8 @@ declare namespace LocalJSX {
         "xcastven-xkilian-project-header": XcastvenXkilianProjectHeader;
         "xcastven-xkilian-project-home-page": XcastvenXkilianProjectHomePage;
         "xcastven-xkilian-project-legend": XcastvenXkilianProjectLegend;
+        "xcastven-xkilian-project-prescription-detail": XcastvenXkilianProjectPrescriptionDetail;
+        "xcastven-xkilian-project-prescriptions-list": XcastvenXkilianProjectPrescriptionsList;
     }
 }
 export { LocalJSX as JSX };
@@ -267,6 +317,8 @@ declare module "@stencil/core" {
             "xcastven-xkilian-project-header": LocalJSX.XcastvenXkilianProjectHeader & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectHeaderElement>;
             "xcastven-xkilian-project-home-page": LocalJSX.XcastvenXkilianProjectHomePage & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectHomePageElement>;
             "xcastven-xkilian-project-legend": LocalJSX.XcastvenXkilianProjectLegend & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectLegendElement>;
+            "xcastven-xkilian-project-prescription-detail": LocalJSX.XcastvenXkilianProjectPrescriptionDetail & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectPrescriptionDetailElement>;
+            "xcastven-xkilian-project-prescriptions-list": LocalJSX.XcastvenXkilianProjectPrescriptionsList & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectPrescriptionsListElement>;
         }
     }
 }

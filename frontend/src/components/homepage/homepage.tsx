@@ -2,7 +2,7 @@ import { Component, h, State } from '@stencil/core';
 import {
   TODAY,
 } from '../../utils/utils';
-import { AppointmentDisplay, ConditionDisplay, PatientsCalendar } from '../../api/generated';
+import { AppointmentDisplay, ConditionDisplay, PrescriptionDisplay } from '../../api/generated';
 import { PatientsCalendarExample } from '../../data-examples/patients-calendar';
 import { StyledHost } from '../StyledHost';
 
@@ -11,14 +11,16 @@ import { StyledHost } from '../StyledHost';
   shadow: false,
 })
 export class Homepage {
-  private DATA: PatientsCalendar = PatientsCalendarExample;
+  @State() appointments: Array<AppointmentDisplay> = PatientsCalendarExample.appointments;
+  @State() conditions: Array<ConditionDisplay> = PatientsCalendarExample.conditions;
+  @State() prescriptions: Array<PrescriptionDisplay> = PatientsCalendarExample.prescriptions;
 
-  @State() appointments: Array<AppointmentDisplay> = this.DATA.appointments;
-  @State() conditions: Array<ConditionDisplay> = this.DATA.conditions;
+  @State() selectedDate: Date = null;
   @State() selectedAppointment: AppointmentDisplay = null;
   @State() selectedCondition: ConditionDisplay = null;
-  @State() selectedDate: Date = null;
+  @State() selectedPrescription: PrescriptionDisplay = null;
   @State() isDrawerOpen: boolean = false;
+  @State() showLegend: boolean = false;
   @State() hoveredConditionId: string = null;
 
   @State() currentViewMonth: number = TODAY.getMonth();
@@ -50,6 +52,7 @@ export class Homepage {
     this.selectedDate = null;
     this.selectedAppointment = null;
     this.selectedCondition = null;
+    this.showLegend = true;
     this.isDrawerOpen = true;
   };
 
@@ -74,26 +77,43 @@ export class Homepage {
     this.selectedAppointment = null;
     this.selectedCondition = null;
     this.selectedDate = null;
+    this.selectedPrescription = null;
+    this.showLegend = false;
   };
 
   private handleSelectDate = (date: Date) => {
+    this.showLegend = false;
     this.selectedDate = date;
     this.selectedAppointment = null;
     this.selectedCondition = null;
+    this.selectedPrescription = null;
     this.isDrawerOpen = true;
   };
 
   private handleSelectAppointment = (appointment: AppointmentDisplay) => {
+    this.showLegend = false;
     this.selectedAppointment = appointment;
     this.selectedCondition = null;
     this.selectedDate = null;
+    this.selectedPrescription = null;
     this.isDrawerOpen = true;
   };
 
   private handleSelectCondition = (condition: ConditionDisplay) => {
+    this.showLegend = false;
     this.selectedCondition = condition;
     this.selectedAppointment = null;
     this.selectedDate = null;
+    this.selectedPrescription = null;
+    this.isDrawerOpen = true;
+  };
+
+  private handleSelectPrescription = (prescription: PrescriptionDisplay) => {
+    this.showLegend = false;
+    this.selectedPrescription = prescription;
+    this.selectedDate = null;
+    this.selectedAppointment = null;
+    this.selectedCondition = null;
     this.isDrawerOpen = true;
   };
 
@@ -109,7 +129,7 @@ export class Homepage {
   };
 
   private getAppointmentsForDate = (date: Date): Array<AppointmentDisplay> => {
-    return this.appointments.filter((appointment: AppointmentDisplay) => {
+    return this.appointments.filter((appointment: AppointmentDisplay): boolean => {
       const appointmentDate: Date = new Date(appointment.appointmentDateTime);
       return (
         appointmentDate.getFullYear() === date.getFullYear() &&
@@ -122,10 +142,19 @@ export class Homepage {
   private getConditionsForDate = (date: Date): Array<ConditionDisplay> => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    return this.conditions.filter((condition: ConditionDisplay) => {
+    return this.conditions.filter((condition: ConditionDisplay): boolean => {
       const { start, end } = condition;
       const effectiveEndDate: Date = end ? end : today;
       return date >= start && date <= effectiveEndDate;
+    });
+  };
+
+  private getPrescriptionsForDate = (date: Date): Array<PrescriptionDisplay> => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    return this.prescriptions.filter((prescription: PrescriptionDisplay): boolean => {
+      const { start, end } = prescription;
+      return date >= start && date <= end;
     });
   };
 
@@ -143,14 +172,19 @@ export class Homepage {
         <xcastven-xkilian-project-calendar
           appointments={this.appointments}
           conditions={this.conditions}
+          prescriptions={this.prescriptions}
           getConditionsForDate={this.getConditionsForDate}
+          getPrescriptionsForDate={this.getPrescriptionsForDate}
           handleSelectDate={this.handleSelectDate}
           handleSelectAppointment={this.handleSelectAppointment}
           handleSelectCondition={this.handleSelectCondition}
+          handleSelectPrescription={this.handleSelectPrescription}
           hoveredConditionId={this.hoveredConditionId}
           setHoveredConditionId={(value: string | null) => this.hoveredConditionId = value}
           currentViewMonth={this.currentViewMonth}
           currentViewYear={this.currentViewYear}
+          handlePreviousMonth={this.handlePreviousMonth}
+          handleNextMonth={this.handleNextMonth}
         />
 
         <xcastven-xkilian-project-footer
@@ -171,11 +205,17 @@ export class Homepage {
           selectedDate={this.selectedDate}
           selectedAppointment={this.selectedAppointment}
           selectedCondition={this.selectedCondition}
+          selectedPrescription={this.selectedPrescription}
+          showLegend={this.showLegend}
+
           handleResetSelection={this.handleResetSelection}
           getAppointmentsForDate={this.getAppointmentsForDate}
           getConditionsForDate={this.getConditionsForDate}
+          getPrescriptionsForDate={this.getPrescriptionsForDate}
           handleSelectAppointment={this.handleSelectAppointment}
           handleSelectCondition={this.handleSelectCondition}
+          handleSelectPrescription={this.handleSelectPrescription}
+
           handleRescheduleAppointment={this.handleRescheduleAppointment}
           handleCancelAppointment={this.handleCancelAppointment}
           handleScheduleAppointmentFromCondition={this.handleScheduleAppointmentFromCondition}

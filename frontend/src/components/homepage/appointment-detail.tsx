@@ -1,5 +1,5 @@
 import { Component, h, Prop, State } from '@stencil/core';
-import { formatDate, getAppointmentActions } from '../../utils/utils';
+import { formatDate, formatTime, getAppointmentActions } from '../../utils/utils';
 import {
   AppointmentStatus,
   DoctorAppointment,
@@ -83,8 +83,7 @@ export class AppointmentDetail {
               Time
             </div>
             <span class="font-medium text-gray-600">
-              {this.appointment.appointmentDateTime.getHours()}:
-              {this.appointment.appointmentDateTime.getMinutes()}
+              {formatTime(this.appointment.appointmentDateTime)}
             </span>
           </div>
 

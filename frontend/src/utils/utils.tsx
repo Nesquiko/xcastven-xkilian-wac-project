@@ -36,6 +36,15 @@ export const formatDate = (date: Date) => {
   return `${MONTHS[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
 };
 
+export const formatTime = (date: Date): string => {
+  if (!date) return "";
+
+  const hours: string = date.getHours().toString();
+  const minutes: string = date.getMinutes().toString().padStart(2, '0');
+
+  return `${hours}:${minutes}`;
+};
+
 export const getDateAndTimeTitle = (
   dateTime: Date,
   fontWeight: string,
@@ -46,9 +55,9 @@ export const getDateAndTimeTitle = (
       {dateTime && (
         <span class={"text-[#7357be] font-" + fontWeight}>{formatDate(dateTime)}</span>
       )}
-      {dateTime.getHours() && (
+      {dateTime.getHours() !== null && (
         <span class="text-gray-600"> at <span class={"text-[#7357be] font-" + fontWeight}>
-          {dateTime.getHours()}:{dateTime.getMinutes()}
+          {formatTime(dateTime)}
         </span></span>
       )}
     </h2>

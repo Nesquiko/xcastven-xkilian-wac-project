@@ -20,3 +20,4 @@ required:
   - id
   - name
   - start
+  - end

@@ -1,6 +1,7 @@
 import { formatDate, formatDateDelta, getDateAndTimeTitle } from '../../utils/utils';
 import { Component, h, Prop, State } from '@stencil/core';
 import { AppointmentDisplay, Condition } from '../../api/generated';
+import { ConditionDetailExample } from '../../data-examples/condition-detail';
 
 @Component({
   tag: 'xcastven-xkilian-project-condition-detail',
@@ -13,7 +14,7 @@ export class ConditionDetail {
   @Prop() handleScheduleAppointmentFromCondition: (condition: Condition) => void;
   @Prop() handleToggleConditionStatus: () => void;
 
-  @State() condition: Condition;
+  @State() condition: Condition = ConditionDetailExample;
   @State() expandedConditionId: string;
 
   private toggleConditionAppointments = (conditionId: string) => {

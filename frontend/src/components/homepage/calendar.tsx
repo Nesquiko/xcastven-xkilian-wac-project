@@ -1,6 +1,6 @@
-import { AppointmentStatusColor, ConditionOrderColors, DAYS_OF_WEEK, formatDate } from '../../utils/utils';
+import { AppointmentStatusColor, ConditionOrderColors, DAYS_OF_WEEK, formatDate, formatTime } from '../../utils/utils';
 import { Component, h, Prop } from '@stencil/core';
-import { AppointmentDisplay, ConditionDisplay } from '../../api/generated';
+import { AppointmentDisplay, ConditionDisplay, PrescriptionDisplay } from '../../api/generated';
 
 @Component({
   tag: 'xcastven-xkilian-project-calendar',
@@ -9,14 +9,19 @@ import { AppointmentDisplay, ConditionDisplay } from '../../api/generated';
 export class Calendar {
   @Prop() appointments: Array<AppointmentDisplay>;
   @Prop() conditions: Array<ConditionDisplay>;
+  @Prop() prescriptions: Array<PrescriptionDisplay>;
   @Prop() getConditionsForDate: (date: Date) => Array<ConditionDisplay>;
+  @Prop() getPrescriptionsForDate: (date: Date) => Array<PrescriptionDisplay>;
   @Prop() handleSelectDate: (date: Date) => void;
   @Prop() handleSelectAppointment: (appointment: AppointmentDisplay) => void;
   @Prop() handleSelectCondition: (condition: ConditionDisplay) => void;
+  @Prop() handleSelectPrescription: (prescription: PrescriptionDisplay) => void;
   @Prop() hoveredConditionId: string;
   @Prop() setHoveredConditionId: (value: string | null) => void;
   @Prop() currentViewMonth: number;
   @Prop() currentViewYear: number;
+  @Prop() handlePreviousMonth: () => void;
+  @Prop() handleNextMonth: () => void;
 
   private getDaysInMonth = (year: number, month: number) => {
     return new Date(year, month + 1, 0).getDate();
@@ -56,8 +61,7 @@ export class Calendar {
                 timer
               </span>
               <div>
-                {appointment.appointmentDateTime.getHours()}:
-                {appointment.appointmentDateTime.getMinutes()}
+                {formatTime(appointment.appointmentDateTime)}
               </div>
             </div>
 
@@ -112,6 +116,10 @@ export class Calendar {
     );
   };
 
+  private getPrescriptionTooltipContent = () => {
+    // TODO: prescription tooltip
+  };
+
   private renderCalendar = () => {
     const year: number = this.currentViewYear;
     const month: number = this.currentViewMonth;
@@ -141,7 +149,10 @@ export class Calendar {
     const daysInPrevMonth: number = this.getDaysInMonth(year, month - 1);
     for (let i: number = firstDayOfMonth - 1; i >= 0; i--) {
       prevMonthDays.push(
-        <div class="px-3 py-2 text-center text-sm text-gray-400 bg-gray-200 w-full flex items-center justify-center">
+        <div
+          class="px-3 py-2 text-center text-sm text-gray-400 bg-gray-200 w-full flex items-center justify-center"
+          onClick={this.handlePreviousMonth}
+        >
           {daysInPrevMonth - i}
         </div>
       );
@@ -236,6 +247,8 @@ export class Calendar {
 
       const conditionsForDate: Array<ConditionDisplay> = this.getConditionsForDate(currentDate);
 
+      const prescriptionsForDate: Array<PrescriptionDisplay> = this.getPrescriptionsForDate(currentDate);
+
       currentMonthDays.push(
         <div
           role="button"
@@ -247,7 +260,12 @@ export class Calendar {
             this.handleSelectDate(currentDate);
           }}
         >
-          <span class={`py-1 w-full text-center ${isToday && 'bg-[#7357be] text-white'}`}>{i}</span>
+          <div class={`py-1 w-full text-center flex flex-row justify-between items-center ${isToday && 'bg-[#7357be] text-white'}`}>
+            <div class="w-10" />
+            <div>{i}</div>
+            {/* TODO: display icon for prescriptions */}
+            <div class="w-10" />
+          </div>
 
           <div class="relative w-full h-full flex flex-row flex-wrap gap-1 items-start justify-center">
             {appointmentsForDay.length > 0 && (
@@ -294,8 +312,8 @@ export class Calendar {
                   zIndex: (50 - conditionHeight).toString(),
                   backgroundColor: conditionColor,
                 }}
-                onMouseEnter={() => (this.hoveredConditionId = condition.id)}
-                onMouseLeave={() => (this.hoveredConditionId = null)}
+                onMouseEnter={() => (this.setHoveredConditionId(condition.id))}
+                onMouseLeave={() => (this.setHoveredConditionId(null))}
                 onClick={(event: MouseEvent) => {
                   event.stopPropagation();
                   this.handleSelectCondition(condition);
@@ -334,7 +352,10 @@ export class Calendar {
       totalCells - (prevMonthDays.length + currentMonthDays.length);
     for (let i = 1; i <= remainingCells; i++) {
       nextMonthDays.push(
-        <div class="px-3 py-2 text-center text-sm text-gray-400 bg-gray-200 w-full flex items-center justify-center">
+        <div
+          class="px-3 py-2 text-center text-sm text-gray-400 bg-gray-200 w-full flex items-center justify-center"
+          onClick={this.handleNextMonth}
+        >
           {i}
         </div>,
       );

@@ -11,6 +11,7 @@ on:
     branches: ["main"]
     paths:
       - "frontend/**"
+      - ".github/workflows/fe-ci.yaml"
 
 jobs:
   build:

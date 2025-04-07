@@ -13,6 +13,6 @@ get:
       content:
         application/json:
           schema:
-            $ref: "../components/schemas/DoctorsCalendar.yaml"
+            $ref: "../components/schemas/DoctorCalendar.yaml"
     "500":
       $ref: "../components/responses/InternalServerErrorResponse.yaml"

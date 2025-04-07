@@ -13,6 +13,11 @@ properties:
   end:
     type: string
     format: date-time
+  apointmentsIds:
+    type: array
+    items:
+      type: string
+      format: uuid
 required:
   - id
   - name

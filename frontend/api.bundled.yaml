@@ -2,37 +2,40 @@ openapi: 3.0.4
 info:
   title: MediCal API
   version: 1.0.0
-  description: |
-    API for the MediCal application, managing patient appointment scheduling with doctors and access to patient medical history.
   license:
     name: MIT
     url: https://opensource.org/licenses/MIT
 tags:
+  - name: Auth
   - name: Appointments
-    description: Manage appointment lifecycle (request, view, confirm, cancel, reschedule).
+  - name: Conditions
   - name: Doctors
-    description: Retrieve doctor details and available timeslots.
   - name: Patients
-    description: Manage patient information and access patient-specific data.
-  - name: Medical History
-    description: Retrieve patient medical history (diagnoses, appointments, prescriptions).
   - name: Resources
-    description: Manage and view resources (facilities, equipment, medicine) for appointments.
+  - name: Medical History
 paths:
-  /patients:
+  /auth/register:
     post:
       tags:
-        - Patients
-      summary: Register a new patient
-      description: Creates a new patient record using email, first name, and last name.
-      operationId: registerPatient
+        - Auth
+      summary: Register a new user
+      operationId: registerUser
       requestBody:
-        $ref: '#/components/requestBodies/PatientRegistration'
+        description: Doctor details for registration.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Registration'
       responses:
         '201':
-          $ref: '#/components/responses/PatientCreated'
+          description: User registered successfully. Returns the created user object.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
         '409':
-          description: Conflict - Patient email already exists.
+          description: Conflict - A user with the provided email already exists.
           content:
             application/problem+json:
               schema:
@@ -43,8 +46,273 @@ paths:
                   value:
                     title: Conflict
                     status: 409
-                    code: patient.email-exists
-                    detail: A patient with email john.doe@example.com already exists.
+                    code: user.email-exists
+                    detail: A user with email new.patient@example.com already exists.
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: User Login
+      operationId: loginUser
+      requestBody:
+        description: User credentials for login.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              title: LoginRequest
+              properties:
+                email:
+                  type: string
+                  format: email
+                  description: User's email address.
+                  example: john.doe@example.com
+                role:
+                  $ref: '#/components/schemas/UserRole'
+              required:
+                - email
+                - role
+            examples:
+              patientLogin:
+                summary: Example patient login request
+                value:
+                  email: jane.roe@example.com
+                  role: patient
+              doctorLogin:
+                summary: Example doctor login request
+                value:
+                  email: dr.house@example.com
+                  role: doctor
+      responses:
+        '200':
+          description: Login successful. Sets session cookie and returns user details.
+          headers:
+            Set-Cookie:
+              schema:
+                type: string
+                example: session_id=abcde12345; Path=/; HttpOnly; Secure; SameSite=Lax
+              description: Session cookie set upon successful login. Contains session identifier.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '401':
+          description: Unauthorized - Invalid email or role combination (user not found).
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetail'
+              examples:
+                invalidCredentials:
+                  summary: Example invalid credentials (401)
+                  value:
+                    title: Unauthorized
+                    status: 401
+                    code: auth.invalid-credentials
+                    detail: No user found with the provided email and role.
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /appointments:
+    post:
+      tags:
+        - Appointments
+      summary: Patient creates an appointment request
+      operationId: requestAppointment
+      requestBody:
+        description: Basic info about the appointment request
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewAppointmentRequest'
+      responses:
+        '201':
+          description: Appointment successfully requested.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientAppointment'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /appointments/{appointmentId}:
+    post:
+      tags:
+        - Appointments
+      description: Doctor either accepts or denies patients appointment request.
+      summary: Decide appointment's status
+      operationId: decideAppointment
+      parameters:
+        - $ref: '#/components/parameters/appointmentId'
+      requestBody:
+        description: Whether doctor accepts or denies patients appointment request.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppointmentDecision'
+      responses:
+        '200':
+          description: Appointment successfully cancelled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DoctorAppointment'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+    patch:
+      tags:
+        - Appointments
+      description: Reschedules patients appointment, also changes state of the appointment to request.
+      summary: Reschedule an appointment
+      operationId: rescheduleAppointment
+      parameters:
+        - $ref: '#/components/parameters/appointmentId'
+      requestBody:
+        description: Reason for cancelling the appointment.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppointmentReschedule'
+      responses:
+        '200':
+          description: Appointment successfully cancelled.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientAppointment'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+    delete:
+      tags:
+        - Appointments
+      summary: Cancel an appointment
+      operationId: cancelAppointment
+      parameters:
+        - $ref: '#/components/parameters/appointmentId'
+      requestBody:
+        description: Reason for cancelling the appointment.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AppointmentCancellation'
+      responses:
+        '204':
+          description: Appointment successfully cancelled.
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /conditions:
+    post:
+      tags:
+        - Conditions
+        - Patients
+      summary: Create a condition record for a patient
+      operationId: createPatientCondition
+      requestBody:
+        description: Details of the condition to be created.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewCondition'
+      responses:
+        '201':
+          description: Condition record created successfully. Returns the created condition details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConditionDisplay'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /conditions/{conditionId}:
+    get:
+      tags:
+        - Conditions
+      summary: Condition detail
+      operationId: conditionDetail
+      parameters:
+        - $ref: '#/components/parameters/conditionId'
+      responses:
+        '200':
+          description: Condition details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Condition'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /medicine:
+    post:
+      tags:
+        - Patients
+        - Medical History
+      summary: Create a medicine record for a patient
+      operationId: createPatientMedicine
+      requestBody:
+        description: Details of the medicine to be created.
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewMedicine'
+      responses:
+        '201':
+          description: Medicine record created successfully. Returns the created medicine details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MedicineDisplay'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /patients/{patientId}:
+    get:
+      tags:
+        - Patients
+      summary: Get patient by ID
+      description: Retrieves the details of a specific patient by their unique identifier.
+      operationId: getPatientById
+      parameters:
+        - $ref: '#/components/parameters/patientId'
+      responses:
+        '200':
+          description: Successfully retrieved patient details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Patient'
+        '404':
+          description: Not Found - The specified patient ID does not exist.
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/ErrorDetail'
+              examples:
+                patientNotFound:
+                  summary: Example patient not found (404)
+                  value:
+                    title: Resource Not Found
+                    status: 404
+                    code: patient.not-found
+                    detail: Patient with ID f47ac10b-58cc-4372-a567-0e02b2c3d479 not found.
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /patients/{patientId}/calendar:
+    get:
+      tags:
+        - Patients
+      summary: Get patient's calendar
+      operationId: patientsCalendar
+      parameters:
+        - $ref: '#/components/parameters/patientId'
+        - $ref: '#/components/parameters/from'
+        - $ref: '#/components/parameters/to'
+      responses:
+        '200':
+          description: Returned patient's calendar for a given time period
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientsCalendar'
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
   /patients/{patientId}/medical-history/files:
@@ -59,390 +327,148 @@ paths:
         - $ref: '#/components/parameters/pageSize'
       responses:
         '200':
-          $ref: '#/components/responses/MedicalRecordFileList'
-        '400':
-          description: Bad Request - Invalid pagination parameters.
+          description: Successfully retrieved the paginated list of medical history filenames.
           content:
-            application/problem+json:
+            application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDetail'
+                $ref: '#/components/schemas/MedicalHistoryFileList'
               examples:
-                invalidPageParam:
-                  summary: Example invalid page parameter (400)
+                fileListExample:
+                  summary: Example list of medical history filenames
                   value:
-                    title: Validation Error
-                    status: 400
-                    code: validation.invalid-parameter
-                    detail: page must be a non-negative integer.
-        '401':
-          $ref: '#/components/responses/UnauthorizedErrorResponse'
+                    files:
+                      - consultation_notes_2023-11-20.docx
+                      - xray_report_2024-02-01.pdf
+                      - prescription_history_2024-05-01.txt
+                      - lab_results_2024-05-10.pdf
+                    pagination:
+                      page: 0
+                      pageSize: 10
+                      total: 4
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
-  /doctors:
+  /patients/{patientId}/appointment/{appointmentId}:
+    get:
+      tags:
+        - Appointments
+      summary: Get appointment scheduled by patient
+      operationId: patientsAppointment
+      parameters:
+        - $ref: '#/components/parameters/patientId'
+        - $ref: '#/components/parameters/appointmentId'
+      responses:
+        '200':
+          description: Appointment details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PatientAppointment'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /doctors/{doctorId}:
     get:
       tags:
         - Doctors
-      summary: List all doctors
-      description: Retrieves a paginated list of all registered doctors.
-      operationId: listDoctors
+      summary: Get doctor by ID
+      description: Retrieves the details of a specific doctor by their unique identifier.
+      operationId: getDoctorById
       parameters:
-        - $ref: '#/components/parameters/page'
-        - $ref: '#/components/parameters/pageSize'
+        - $ref: '#/components/parameters/doctorId'
       responses:
         '200':
-          $ref: '#/components/responses/DoctorList'
-        '400':
-          description: Bad Request - Invalid pagination parameters.
+          description: Successfully retrieved doctor details.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Doctor'
+        '404':
+          description: Not Found - The specified doctor ID does not exist.
           content:
             application/problem+json:
               schema:
                 $ref: '#/components/schemas/ErrorDetail'
               examples:
-                invalidPageSize:
-                  summary: Example invalid page size (400)
+                doctorNotFound:
+                  summary: Example doctor not found (404)
                   value:
-                    title: Validation Error
-                    status: 400
-                    code: validation.invalid-parameter
-                    detail: pageSize must be an integer between 1 and 100.
+                    title: Resource Not Found
+                    status: 404
+                    code: doctor.not-found
+                    detail: Doctor with ID b2c3d4e5-f6a7-8901-2345-67890abcdef1 not found.
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
-    post:
+  /doctors/{doctorId}/calendar:
+    get:
       tags:
         - Doctors
-      summary: Register a new doctor
-      description: Creates a new doctor record in the system.
-      operationId: registerDoctor
-      requestBody:
-        $ref: '#/components/requestBodies/DoctorRegistrationRequest'
+      summary: Get doctors's calendar
+      operationId: doctorsCalendar
+      parameters:
+        - $ref: '#/components/parameters/doctorId'
+        - $ref: '#/components/parameters/from'
+        - $ref: '#/components/parameters/to'
       responses:
-        '201':
-          $ref: '#/components/responses/DoctorCreated'
-        '400':
-          description: Bad Request - Invalid input data (e.g., missing fields, invalid email).
+        '200':
+          description: Returned doctor's calendar for a given time period
           content:
-            application/problem+json:
+            application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDetail'
-              examples:
-                validationError:
-                  summary: Example validation error (400)
-                  value:
-                    title: Validation Error
-                    status: 400
-                    code: validation.missing-field
-                    detail: Required field "specialization" is missing.
-        '409':
-          description: Conflict - A doctor with the provided email already exists.
+                $ref: '#/components/schemas/DoctorsCalendar'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /doctors/{doctorId}/appointment/{appointmentId}:
+    get:
+      tags:
+        - Appointments
+      summary: Get appointment scheduled to a doctor
+      operationId: doctorsAppointment
+      parameters:
+        - $ref: '#/components/parameters/doctorId'
+        - $ref: '#/components/parameters/appointmentId'
+      responses:
+        '200':
+          description: Appointment details.
           content:
-            application/problem+json:
+            application/json:
               schema:
-                $ref: '#/components/schemas/ErrorDetail'
-              examples:
-                duplicateEmail:
-                  summary: Example duplicate email error (409)
-                  value:
-                    title: Conflict
-                    status: 409
-                    code: doctor.email-exists
-                    detail: A doctor with email dr.house@example.com already exists.
+                $ref: '#/components/schemas/DoctorAppointment'
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
   /doctors/{doctorId}/timeslots:
     get:
       tags:
         - Doctors
-      summary: Get doctor's timeslots for a specific day
+      summary: Get doctor's timeslots for a specific date
       description: Retrieves a list of available and unavailable time slots for a given doctor ID and date.
-      operationId: getDoctorTimeslots
+      operationId: doctorsTimeslots
       parameters:
         - $ref: '#/components/parameters/doctorId'
         - $ref: '#/components/parameters/date'
       responses:
         '200':
           $ref: '#/components/responses/DoctorTimeslots'
-        '400':
-          description: Bad Request - Invalid date format.
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetail'
-              examples:
-                invalidDateFormat:
-                  summary: Example invalid date format (400)
-                  value:
-                    title: Validation Error
-                    status: 400
-                    code: validation.invalid-date-format
-                    detail: Date parameter must be in YYYY-MM-DD format.
-                    invalid-parameter: date
-        '404':
-          description: Not Found - The specified doctor ID does not exist.
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetail'
-              examples:
-                doctorNotFound:
-                  summary: Example doctor not found (404)
-                  value:
-                    title: Resource Not Found
-                    status: 404
-                    code: doctor.not-found
-                    detail: Doctor with ID b2c3d4e5-f6a7-8901-2345-67890abcdef1 not found.
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
-  /appointments:
+  /resources:
     post:
-      tags:
-        - Appointments
-      summary: Request a new appointment
-      description: Allows an authenticated patient to request an appointment with a specific doctor at a given date and time slot.
-      operationId: requestAppointment
-      requestBody:
-        $ref: '#/components/requestBodies/AppointmentRequest'
-      responses:
-        '201':
-          $ref: '#/components/responses/AppointmentCreated'
-        '400':
-          description: Bad Request - Invalid input data (e.g., missing fields, invalid format, date in past).
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetail'
-              examples:
-                invalidTimeFormat:
-                  summary: Example invalid time format (400)
-                  value:
-                    title: Validation Error
-                    status: 400
-                    code: validation.invalid-time-format
-                    detail: appointmentTime must be in HH:MM format.
-                    invalid-field: appointmentTime
-                dateInPast:
-                  summary: Example date in past (400)
-                  value:
-                    title: Validation Error
-                    status: 400
-                    code: validation.date-in-past
-                    detail: Appointment date cannot be in the past.
-                    invalid-field: appointmentDate
-        '401':
-          $ref: '#/components/responses/UnauthorizedErrorResponse'
-        '404':
-          description: Not Found - The specified doctor ID does not exist.
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetail'
-              examples:
-                doctorNotFound:
-                  summary: Example doctor not found (404)
-                  value:
-                    title: Resource Not Found
-                    status: 404
-                    code: doctor.not-found
-                    detail: Doctor with ID b2c3d4e5-f6a7-8901-2345-67890abcdef1 not found.
-                    missing-resource-id: b2c3d4e5-f6a7-8901-2345-67890abcdef1
-        '409':
-          description: Conflict - The requested time slot is not available or already booked by the patient.
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetail'
-              examples:
-                slotUnavailable:
-                  summary: Example timeslot unavailable (409)
-                  value:
-                    title: Conflict
-                    status: 409
-                    code: appointment.slot-unavailable
-                    detail: The requested time slot 10:00 on 2024-07-15 is no longer available.
-                duplicateRequest:
-                  summary: Example duplicate patient booking (409)
-                  value:
-                    title: Conflict
-                    status: 409
-                    code: appointment.duplicate-request
-                    detail: You already have an appointment requested or scheduled at this time.
-        '500':
-          $ref: '#/components/responses/InternalServerErrorResponse'
-  /appointments/{appointmentId}/cancel:
-    post:
-      tags:
-        - Appointments
-      summary: Cancel an appointment
-      description: Marks an existing appointment as 'canceled'. Can be initiated by the patient who booked it, or by authorized staff (doctor/nurse). Authentication is required. An optional reason can be provided in the request body.
-      operationId: cancelAppointment
-      parameters:
-        - $ref: '#/components/parameters/appointmentId'
-      requestBody:
-        $ref: '#/components/requestBodies/AppointmentCancellationRequest'
-      responses:
-        '204':
-          description: Appointment successfully cancelled.
-        '401':
-          $ref: '#/components/responses/UnauthorizedErrorResponse'
-        '403':
-          description: Forbidden - User does not have permission to cancel this appointment.
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetail'
-              examples:
-                permissionDenied:
-                  summary: Example permission denied (403)
-                  value:
-                    title: Forbidden
-                    status: 403
-                    code: auth.forbidden
-                    detail: You do not have permission to cancel this appointment.
-        '404':
-          description: Not Found - The specified appointment ID does not exist.
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetail'
-              examples:
-                appointmentNotFound:
-                  summary: Example appointment not found (404)
-                  value:
-                    title: Resource Not Found
-                    status: 404
-                    code: appointment.not-found
-                    detail: Appointment with ID d4e5f6a7-b8c9-0123-4567-890abcdef123 not found.
-        '409':
-          description: Conflict - The appointment cannot be cancelled (e.g., already completed or cancelled).
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetail'
-              examples:
-                alreadyCompleted:
-                  summary: Example already completed (409)
-                  value:
-                    title: Conflict
-                    status: 409
-                    code: appointment.invalid-state-for-cancel
-                    detail: Cannot cancel an appointment that is already completed.
-        '500':
-          $ref: '#/components/responses/InternalServerErrorResponse'
-  /appointments/{appointmentId}/reschedule:
-    post:
-      tags:
-        - Appointments
-      summary: Reschedule my appointment
-      description: Allows an authenticated patient to request rescheduling their own existing appointment to a new date and time. This may require re-confirmation by staff. Authentication is required.
-      operationId: rescheduleMyAppointment
-      parameters:
-        - $ref: '#/components/parameters/appointmentId'
-      requestBody:
-        $ref: '#/components/requestBodies/AppointmentRescheduleRequest'
-      responses:
-        '200':
-          $ref: '#/components/responses/AppointmentRescheduled'
-        '400':
-          description: Bad Request - Invalid input data (e.g., invalid format, date in past, same time).
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetail'
-              examples:
-                invalidDateFormat:
-                  summary: Example invalid date format (400)
-                  value:
-                    title: Validation Error
-                    status: 400
-                    code: validation.invalid-date-format
-                    detail: newAppointmentDate must be in YYYY-MM-DD format.
-                rescheduleToSameTime:
-                  summary: Example rescheduling to the same time (400)
-                  value:
-                    title: Validation Error
-                    status: 400
-                    code: validation.no-change
-                    detail: The requested reschedule time is the same as the current appointment time.
-        '401':
-          $ref: '#/components/responses/UnauthorizedErrorResponse'
-        '403':
-          description: Forbidden - Patient does not own this appointment.
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetail'
-              examples:
-                permissionDenied:
-                  summary: Example permission denied (403)
-                  value:
-                    title: Forbidden
-                    status: 403
-                    code: auth.forbidden
-                    detail: You can only reschedule your own appointments.
-        '404':
-          description: Not Found - The specified appointment ID does not exist.
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetail'
-              examples:
-                appointmentNotFound:
-                  summary: Example appointment not found (404)
-                  value:
-                    title: Resource Not Found
-                    status: 404
-                    code: appointment.not-found
-                    detail: Appointment with ID d4e5f6a7-b8c9-0123-4567-890abcdef123 not found.
-        '409':
-          description: Conflict - Cannot reschedule (e.g., appointment completed/cancelled, new slot unavailable).
-          content:
-            application/problem+json:
-              schema:
-                $ref: '#/components/schemas/ErrorDetail'
-              examples:
-                alreadyCompleted:
-                  summary: Example already completed (409)
-                  value:
-                    title: Conflict
-                    status: 409
-                    code: appointment.invalid-state-for-reschedule
-                    detail: Cannot reschedule an appointment that is already completed or cancelled.
-                newSlotUnavailable:
-                  summary: Example new slot unavailable (409)
-                  value:
-                    title: Conflict
-                    status: 409
-                    code: appointment.slot-unavailable
-                    detail: The requested new time slot 14:00 on 2024-07-22 is not available.
-        '500':
-          $ref: '#/components/responses/InternalServerErrorResponse'
-  /appointments/{appointmentId}/resources:
-    put:
       tags:
         - Resources
-      summary: Assign/Update resources for an appointment
-      operationId: assignAppointmentResources
-      parameters:
-        - $ref: '#/components/parameters/appointmentId'
+      summary: Create resource
+      operationId: createResource
       requestBody:
-        $ref: '#/components/requestBodies/AppointmentResourceAssignmentRequest'
+        description: New resource to be created
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NewResource'
       responses:
-        '200':
-          $ref: '#/components/responses/AppointmentResourcesUpdated'
-        '500':
-          $ref: '#/components/responses/InternalServerErrorResponse'
-  /appointments/{appointmentId}/decision:
-    post:
-      tags:
-        - Appointments
-      summary: Accept or reject an appointment request
-      operationId: decideAppointmentRequest
-      parameters:
-        - $ref: '#/components/parameters/appointmentId'
-      requestBody:
-        $ref: '#/components/requestBodies/AppointmentDecisionRequest'
-      responses:
-        '200':
-          $ref: '#/components/responses/AppointmentDecisionResponse'
+        '201':
+          description: Created resource
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NewResource'
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
   /resources/available:
@@ -452,42 +478,145 @@ paths:
       summary: Get available resources for a time slot
       operationId: getAvailableResources
       parameters:
-        - $ref: '#/components/parameters/date'
-        - $ref: '#/components/parameters/time'
+        - $ref: '#/components/parameters/date-time'
       responses:
         '200':
-          $ref: '#/components/responses/AvailableResources'
+          description: Successfully retrieved available resources for the specified time slot.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AvailableResources'
+        '500':
+          $ref: '#/components/responses/InternalServerErrorResponse'
+  /resources/{resourceId}:
+    post:
+      tags:
+        - Resources
+      summary: Creates a reservation for a resource at specific time
+      operationId: reserveResource
+      parameters:
+        - $ref: '#/components/parameters/resourceId'
+      requestBody:
+        description: Reservation details
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResourceReservation'
+      responses:
+        '204':
+          description: Successfully reserved a resource for an appointment.
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
 components:
   schemas:
+    UserRole:
+      type: string
+      enum:
+        - patient
+        - doctor
+    PatientRegistration:
+      type: object
+      required:
+        - email
+        - firstName
+        - lastName
+        - role
+      properties:
+        email:
+          type: string
+          format: email
+          example: new.user@example.com
+        firstName:
+          type: string
+          minLength: 1
+          example: John
+        lastName:
+          type: string
+          minLength: 1
+          example: Doe
+        role:
+          $ref: '#/components/schemas/UserRole'
+    SpecializationEnum:
+      type: string
+      description: Medical specialization of a doctor.
+      enum:
+        - SURGEON
+        - GASTROENTEROLOGIST
+        - PEDIATRICIAN
+        - DIAGNOSTICIAN
+        - ENDOCRINOLOGIST
+        - GENERAL_PRACTITIONER
+        - CARDIOLOGIST
+        - DERMATOLOGIST
+        - NEUROLOGIST
+        - ONCOLOGIST
+        - ORTHOPEDIST
+        - PSYCHIATRIST
+        - RADIOLOGIST
+        - UROLOGIST
+        - OTHER
+      example: DIAGNOSTICIAN
+    DoctorRegistration:
+      allOf:
+        - $ref: '#/components/schemas/PatientRegistration'
+        - type: object
+          properties:
+            role:
+              $ref: '#/components/schemas/UserRole'
+            specialization:
+              $ref: '#/components/schemas/SpecializationEnum'
+          required:
+            - role
+            - specialization
+    Registration:
+      oneOf:
+        - $ref: '#/components/schemas/PatientRegistration'
+        - $ref: '#/components/schemas/DoctorRegistration'
+      discriminator:
+        propertyName: role
+        mapping:
+          patient: '#/components/schemas/PatientRegistration'
+          doctor: '#/components/schemas/DoctorRegistration'
     Patient:
       type: object
-      description: Represents a patient resource.
+      required:
+        - id
+        - firstName
+        - lastName
+        - email
+        - role
       properties:
         id:
           type: string
           format: uuid
-          readOnly: true
-          example: f47ac10b-58cc-4372-a567-0e02b2c3d479
+        firstName:
+          type: string
+        lastName:
+          type: string
         email:
           type: string
           format: email
-          description: Patient's unique email address.
-          example: jane.roe@example.com
-        firstName:
-          type: string
-          description: Patient's first name.
-          example: Jane
-        lastName:
-          type: string
-          description: Patient's last name.
-          example: Roe
-      required:
-        - id
-        - email
-        - firstName
-        - lastName
+        role:
+          $ref: '#/components/schemas/UserRole'
+    Doctor:
+      allOf:
+        - $ref: '#/components/schemas/Patient'
+        - type: object
+          required:
+            - specialization
+          properties:
+            specialization:
+              $ref: '#/components/schemas/SpecializationEnum'
+    User:
+      oneOf:
+        - $ref: '#/components/schemas/Patient'
+        - $ref: '#/components/schemas/Doctor'
+      discriminator:
+        propertyName: role
+        mapping:
+          patient: '#/components/schemas/Patient'
+          doctor: '#/components/schemas/Doctor'
     ErrorDetail:
       type: object
       description: Standardized error details (RFC 9457).
@@ -513,262 +642,120 @@ components:
         - code
         - status
         - detail
-    Pagination:
+    AppointmentType:
+      type: string
+      description: The type of the appointment.
+      enum:
+        - regular_check
+    NewAppointmentRequest:
       type: object
-      description: Structure for paginated list responses.
-      properties:
-        page:
-          type: integer
-          format: int
-          description: Current page number (0-indexed).
-          example: 0
-        pageSize:
-          type: integer
-          format: int
-          description: Number of items per page.
-          example: 20
-        total:
-          type: integer
-          format: int
-          description: Total number of items available.
-          example: 153
       required:
-        - page
-        - pageSize
-        - total
-    MedicalHistoryFileList:
-      type: object
-      description: A paginated list of medical history filenames for the authenticated patient.
+        - patientId
+        - doctorId
+        - appointmentDateTime
       properties:
-        files:
-          type: array
-          description: List of filenames for the medical history records on the current page.
-          items:
-            type: string
-            description: Filename of a medical record document.
-            example: lab_results_2024-01-15.pdf
-        pagination:
-          $ref: '#/components/schemas/Pagination'
-      required:
-        - files
-        - pagination
-    Doctor:
-      type: object
-      description: Data required to register a new doctor.
-      properties:
-        id:
+        patientId:
           type: string
           format: uuid
-          readOnly: true
-          example: f47ac10b-58cc-4372-a567-0e02b2c3d479
-        email:
-          type: string
-          format: email
-          description: Doctor's unique email address.
-          example: dr.gregory.house@example.com
-        firstName:
-          type: string
-          description: Doctor's first name.
-          minLength: 1
-          example: Gregory
-        lastName:
-          type: string
-          description: Doctor's last name.
-          minLength: 1
-          example: House
-        specialization:
-          type: string
-          description: Medical specialization of the doctor.
-          enum:
-            - surgeon
-            - gastroenterologist
-            - pediatrician
-            - diagnostician
-            - endocrinologist
-            - general_practitioner
-            - cardiologist
-            - dermatologist
-            - neurologist
-            - oncologist
-            - orthopedist
-            - psychiatrist
-            - radiologist
-            - urologist
-            - other
-          example: diagnostician
-      required:
-        - id
-        - email
-        - firstName
-        - lastName
-        - specialization
-    TimeSlot:
-      type: object
-      description: Represents a single time slot for a doctor on a specific day.
-      properties:
-        time:
-          type: string
-          description: The time of the slot (HH:MM format, 24-hour clock).
-          pattern: ^([01]\d|2[0-3]):([0-5]\d)$
-          example: '09:30'
-        status:
-          type: string
-          description: Indicates whether the time slot is available or not.
-          enum:
-            - available
-            - unavailable
-          example: available
-      required:
-        - time
-        - status
-    NewAppointment:
-      type: object
-      description: Data sent by a patient to request an appointment time slot.
-      properties:
         doctorId:
           type: string
           format: uuid
-          description: The unique identifier of the desired doctor.
-          example: b2c3d4e5-f6a7-8901-2345-67890abcdef1
-        appointmentDate:
+        appointmentDateTime:
           type: string
-          format: date
-          description: The requested date for the appointment (YYYY-MM-DD).
-          example: '2024-07-16'
-        appointmentTime:
-          type: string
-          description: The requested time slot (HH:MM format, 24-hour clock).
-          pattern: ^([01]\d|2[0-3]):([0-5]\d)$
-          example: '11:30'
-        reason:
-          type: string
-          description: Optional reason for the appointment provided by the patient.
-          example: Feeling unwell, general check-up needed.
-      required:
-        - doctorId
-        - appointmentDate
-        - appointmentTime
-    AppointmentType:
-      type: object
-      description: Represents the type or category of an appointment.
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: Unique identifier for the appointment type.
-          readOnly: true
-          example: e5f6a7b8-c9d0-1234-5678-90abcdef1234
-        displayName:
-          type: string
-          description: Human-readable name of the appointment type.
-          example: Consultation
-      required:
-        - id
-        - displayName
-    PatientAppointment:
-      type: object
-      description: Represents an appointment from the patient's perspective.
-      properties:
-        id:
-          type: string
-          format: uuid
-          description: Unique identifier for the appointment.
-          readOnly: true
-          example: d4e5f6a7-b8c9-0123-4567-890abcdef123
-        appointmentDate:
-          type: string
-          format: date
-          description: The date of the appointment.
-          example: '2024-07-16'
-        timeSlot:
-          $ref: '#/components/schemas/TimeSlot'
+          format: date-time
         type:
           $ref: '#/components/schemas/AppointmentType'
-        doctor:
-          $ref: '#/components/schemas/Doctor'
-        illness:
+        conditionId:
           type: string
-          description: Associated illness diagnosis (if applicable).
-          example: Acute Bronchitis
-        status:
-          type: string
-          description: The current status of the appointment.
-          enum:
-            - requested
-            - canceled
-            - scheduled
-            - completed
-            - denied
-          readOnly: true
-          example: scheduled
+          format: uuid
         reason:
           type: string
           description: Reason for the appointment provided by the patient.
           example: Feeling unwell, general check-up needed.
+    ConditionDisplay:
+      type: object
+      description: Basic info about a patient's condition.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+        start:
+          type: string
+          format: date-time
+        end:
+          type: string
+          format: date-time
       required:
         - id
-        - appointmentDate
-        - timeSlot
-        - type
-        - doctor
-        - status
-    AppointmentCancellation:
+        - name
+        - start
+    AppointmentStatus:
+      type: string
+      description: The current status of the appointment.
+      enum:
+        - requested
+        - cancelled
+        - scheduled
+        - completed
+        - denied
+      example: scheduled
+    AppointmentBase:
       type: object
-      description: Data required to cancel an appointment.
-      properties:
-        cancellationReason:
-          type: string
-          description: Optional reason provided for the cancellation.
-          example: Feeling better, no longer need the consultation.
+      description: Contains basic information about an appointment.
       required:
-        - cancellationReason
-    AppointmentReschedule:
-      type: object
-      description: Data required for a patient to reschedule their appointment.
+        - id
+        - appointmentDateTime
+        - type
+        - status
       properties:
-        newAppointmentDate:
+        id:
           type: string
-          format: date
-          description: The desired new date for the appointment (YYYY-MM-DD).
-          example: '2024-07-22'
-        newAppointmentTime:
+          format: uuid
+          readOnly: true
+        appointmentDateTime:
           type: string
-          description: The desired new time slot (HH:MM format, 24-hour clock).
-          pattern: ^([01]\d|2[0-3]):([0-5]\d)$
-          example: '14:00'
+          format: date-time
+        type:
+          $ref: '#/components/schemas/AppointmentType'
+        condition:
+          $ref: '#/components/schemas/ConditionDisplay'
+        status:
+          $ref: '#/components/schemas/AppointmentStatus'
         reason:
           type: string
-          description: Optional reason for rescheduling provided by the patient.
-          example: Work conflict arose.
-      required:
-        - newAppointmentDate
-        - newAppointmentTime
-    AppointmentResourceAssignment:
+          description: Reason for the appointment provided by the patient.
+          example: Feeling unwell, general check-up needed.
+        cancellationReason:
+          type: string
+    PatientAppointment:
+      allOf:
+        - $ref: '#/components/schemas/AppointmentBase'
+        - type: object
+          required:
+            - doctor
+          properties:
+            doctor:
+              $ref: '#/components/schemas/Doctor'
+    AppointmentDecision:
       type: object
+      description: Data required for staff to accept or reject an appointment request.
       properties:
-        facilityIds:
-          type: array
-          description: List of unique identifiers (UUIDs) for required facilities.
-          items:
-            type: string
-            format: uuid
-          example:
-            - fac-001-a2b3-c4d5-e6f7
-        equipmentIds:
-          type: array
-          description: List of unique identifiers (UUIDs) for required equipment.
-          items:
-            type: string
-            format: uuid
-          example:
-            - eqp-002-f7e6-d5c4-b3a2
-            - eqp-005-1a2b-3c4d-5e6f
-        medicineIds:
-          type: array
-          description: List of unique identifiers (UUIDs) for required medicine.
-          items:
-            type: string
-            format: uuid
+        action:
+          type: string
+          description: The decision action to take on the appointment request.
+          enum:
+            - accept
+            - reject
+          example: accept
+        reason:
+          type: string
+          description: Required reason if the action is 'reject'. Optional otherwise.
+          example: Doctor schedule conflict. Please choose another time.
+      required:
+        - action
     Facility:
       type: object
       description: Represents a required facility resource.
@@ -817,96 +804,225 @@ components:
       required:
         - id
         - name
-    Appointment:
+    DoctorAppointment:
+      allOf:
+        - $ref: '#/components/schemas/AppointmentBase'
+        - type: object
+          required:
+            - patient
+          properties:
+            patient:
+              $ref: '#/components/schemas/Patient'
+            facilities:
+              type: array
+              description: List of required facilities for the appointment.
+              items:
+                $ref: '#/components/schemas/Facility'
+            equipment:
+              type: array
+              description: List of required equipment for the appointment.
+              items:
+                $ref: '#/components/schemas/Equipment'
+            medicine:
+              type: array
+              description: List of required medicine for the appointment.
+              items:
+                $ref: '#/components/schemas/Medicine'
+    AppointmentCancellation:
       type: object
-      description: Represents a detailed appointment view for staff (doctors, nurses).
+      description: Data required to cancel an appointment.
+      properties:
+        reason:
+          type: string
+          description: Optional reason provided for the cancellation.
+          example: Feeling better, no longer need the consultation.
+    AppointmentReschedule:
+      type: object
+      description: Data required for a patient to reschedule their appointment.
+      properties:
+        newAppointmentDateTime:
+          type: string
+          format: date-time
+        reason:
+          type: string
+          description: Optional reason for rescheduling provided by the patient.
+          example: Work conflict arose.
+      required:
+        - newAppointmentDateTime
+    NewCondition:
+      allOf:
+        - $ref: '#/components/schemas/ConditionDisplay'
+        - type: object
+          properties:
+            patientId:
+              type: string
+              format: uuid
+          required:
+            - patientId
+    AppointmentDisplay:
+      type: object
+      description: Represents an appointment view.
       properties:
         id:
           type: string
           format: uuid
           description: Unique identifier for the appointment.
-          readOnly: true
           example: d4e5f6a7-b8c9-0123-4567-890abcdef123
-        appointmentDate:
+        appointmentDateTime:
           type: string
-          format: date
-          description: The date of the appointment.
-          example: '2024-07-16'
-        timeSlot:
-          $ref: '#/components/schemas/TimeSlot'
-        type:
-          $ref: '#/components/schemas/AppointmentType'
-        patient:
-          $ref: '#/components/schemas/Patient'
-        doctor:
-          $ref: '#/components/schemas/Doctor'
-        illness:
-          type: string
-          description: Associated illness diagnosis (if applicable).
-          example: Acute Bronchitis
+          format: date-time
+          description: The date time of the appointment.
         status:
-          type: string
-          description: The current status of the appointment.
-          enum:
-            - requested
-            - canceled
-            - scheduled
-            - completed
-            - denied
-          example: scheduled
-        reason:
-          type: string
-          description: Reason for the appointment provided by the patient.
-          example: Feeling unwell, general check-up needed.
-        facilities:
-          type: array
-          description: List of required facilities for the appointment.
-          items:
-            $ref: '#/components/schemas/Facility'
-          example:
-            - id: fac-001-a2b3-c4d5-e6f7
-              name: MRI Suite B
-        equipment:
-          type: array
-          description: List of required equipment for the appointment.
-          items:
-            $ref: '#/components/schemas/Equipment'
-          example:
-            - id: eqp-002-f7e6-d5c4-b3a2
-              name: Ultrasound Machine XG-5
-        medicine:
-          type: array
-          description: List of required medicine for the appointment.
-          items:
-            $ref: '#/components/schemas/Medicine'
-          example:
-            - id: med-003-9a8b-7c6d-5e4f
-              name: Anaesthetic XYZ
+          $ref: '#/components/schemas/AppointmentStatus'
       required:
         - id
-        - appointmentDate
-        - timeSlot
-        - type
-        - patient
-        - doctor
+        - appointmentDateTime
         - status
-    AppointmentDecision:
+    Condition:
+      allOf:
+        - $ref: '#/components/schemas/ConditionDisplay'
+        - type: object
+          properties:
+            appointments:
+              type: array
+              items:
+                $ref: '#/components/schemas/AppointmentDisplay'
+          required:
+            - appointments
+    MedicineDisplay:
       type: object
-      description: Data required for staff to accept or reject an appointment request.
+      description: Basic info about a patient's condition.
       properties:
-        action:
+        id:
           type: string
-          description: The decision action to take on the appointment request.
-          enum:
-            - accept
-            - reject
-          example: accept
-        reason:
+          format: uuid
+          readOnly: true
+        name:
           type: string
-          description: Required reason if the action is 'reject'. Optional otherwise.
-          example: Doctor schedule conflict. Please choose another time.
+        start:
+          type: string
+          format: date-time
+        end:
+          type: string
+          format: date-time
       required:
-        - action
+        - id
+        - name
+        - start
+    NewMedicine:
+      allOf:
+        - $ref: '#/components/schemas/MedicineDisplay'
+        - type: object
+          properties:
+            patientId:
+              type: string
+              format: uuid
+          required:
+            - patientId
+    PatientsCalendar:
+      type: object
+      properties:
+        appointments:
+          type: array
+          items:
+            $ref: '#/components/schemas/AppointmentDisplay'
+        conditions:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConditionDisplay'
+        medicine:
+          type: array
+          items:
+            $ref: '#/components/schemas/MedicineDisplay'
+    Pagination:
+      type: object
+      description: Structure for paginated list responses.
+      properties:
+        page:
+          type: integer
+          format: int
+          description: Current page number (0-indexed).
+          example: 0
+        pageSize:
+          type: integer
+          format: int
+          description: Number of items per page.
+          example: 20
+        total:
+          type: integer
+          format: int
+          description: Total number of items available.
+          example: 153
+      required:
+        - page
+        - pageSize
+        - total
+    MedicalHistoryFileList:
+      type: object
+      description: A paginated list of medical history filenames for the authenticated patient.
+      properties:
+        files:
+          type: array
+          description: List of filenames for the medical history records on the current page.
+          items:
+            type: string
+            description: Filename of a medical record document.
+            example: lab_results_2024-01-15.pdf
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+      required:
+        - files
+        - pagination
+    DoctorsCalendar:
+      type: object
+      properties:
+        appointments:
+          type: array
+          items:
+            $ref: '#/components/schemas/AppointmentDisplay'
+    TimeSlot:
+      type: object
+      description: Represents a single time slot for a doctor on a specific day.
+      properties:
+        time:
+          type: string
+          description: The time of the slot (HH:MM format, 24-hour clock).
+          pattern: ^([01]\d|2[0-3]):([0-5]\d)$
+          example: '09:30'
+        status:
+          type: string
+          description: Indicates whether the time slot is available or not.
+          enum:
+            - available
+            - unavailable
+          example: available
+      required:
+        - time
+        - status
+    ResourceType:
+      type: string
+      enum:
+        - medicine
+        - facility
+        - equipment
+    NewResource:
+      type: object
+      description: Represents a resource.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+          description: Name of the medicine.
+          example: Anaesthetic XYZ
+        type:
+          $ref: '#/components/schemas/ResourceType'
+      required:
+        - id
+        - name
+        - type
     AvailableResources:
       type: object
       description: Lists of available resources (facilities, equipment, medicine) for a specific date and time slot.
@@ -930,114 +1046,23 @@ components:
         - facilities
         - equipment
         - medicine
-  requestBodies:
-    PatientRegistration:
-      description: Patient details for registration.
-      required: true
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Patient'
-    DoctorRegistrationRequest:
-      description: Doctor details for registration.
-      required: true
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Doctor'
-          examples:
-            newDoctor:
-              summary: Example new doctor registration
-              value:
-                email: dr.lisa.cuddy@example.com
-                firstName: Lisa
-                lastName: Cuddy
-                specialization: Endocrinology
-    AppointmentRequest:
-      description: Details for requesting a new appointment.
-      required: true
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/NewAppointment'
-          examples:
-            newAppointmentRequest:
-              summary: Example appointment request
-              value:
-                doctorId: b2c3d4e5-f6a7-8901-2345-67890abcdef1
-                appointmentDate: '2024-07-15'
-                appointmentTime: '10:00'
-                reason: Annual physical exam.
-    AppointmentCancellationRequest:
-      description: Reason for cancelling the appointment.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/AppointmentCancellation'
-          examples:
-            patientCancellation:
-              summary: Example cancellation by patient
-              value:
-                cancellationReason: Scheduling conflict.
-            staffCancellation:
-              summary: Example cancellation by staff
-              value:
-                cancellationReason: Doctor unavailable due to emergency.
-    AppointmentRescheduleRequest:
-      description: New date and time for the appointment reschedule request.
-      required: true
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/AppointmentReschedule'
-          examples:
-            rescheduleExample:
-              summary: Example reschedule request
-              value:
-                newAppointmentDate: '2024-07-22'
-                newAppointmentTime: '14:00'
-                reason: Previous date no longer works.
-    AppointmentResourceAssignmentRequest:
-      description: Complete list of required resource IDs for the appointment.
-      required: true
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/AppointmentResourceAssignment'
-          examples:
-            assignResourcesExample:
-              summary: Example assigning various resources
-              value:
-                facilityIds:
-                  - fac-001-a2b3-c4d5-e6f7
-                equipmentIds:
-                  - eqp-002-f7e6-d5c4-b3a2
-                medicineIds:
-                  - med-003-9a8b-7c6d-5e4f
-    AppointmentDecisionRequest:
-      description: Decision (accept/reject) and optional reason for an appointment request.
-      required: true
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/AppointmentDecision'
-          examples:
-            acceptAppointment:
-              summary: Example accepting an appointment
-              value:
-                action: accept
-            rejectAppointment:
-              summary: Example rejecting an appointment with reason
-              value:
-                action: reject
-                reason: Requires specialist referral first.
+    ResourceReservation:
+      type: object
+      required:
+        - appointmentId
+        - start
+        - end
+      properties:
+        appointmentId:
+          type: string
+          format: uuid
+        start:
+          type: string
+          format: date-time
+        end:
+          type: string
+          format: date-time
   responses:
-    PatientCreated:
-      description: Patient registered successfully. Returns the created patient object.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Patient'
     InternalServerErrorResponse:
       description: An error occurred. See specific status code for details.
       content:
@@ -1049,163 +1074,38 @@ components:
             status: 500
             code: internal.server.error
             detail: An unknwon server error occured
-    MedicalRecordFileList:
-      description: Successfully retrieved the paginated list of medical history filenames.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/MedicalHistoryFileList'
-          examples:
-            fileListExample:
-              summary: Example list of medical history filenames
-              value:
-                files:
-                  - consultation_notes_2023-11-20.docx
-                  - xray_report_2024-02-01.pdf
-                  - prescription_history_2024-05-01.txt
-                  - lab_results_2024-05-10.pdf
-                pagination:
-                  page: 0
-                  pageSize: 10
-                  total: 4
-    UnauthorizedErrorResponse:
-      description: Example unauthorized access (401)
-      content:
-        application/problem+json:
-          schema:
-            $ref: '#/components/schemas/ErrorDetail'
-          example:
-            title: Unauthorized
-            status: 401
-            code: auth.unauthorized
-            detail: Authentication is required
-    DoctorList:
-      description: Successfully retrieved a paginated list of doctors.
-      content:
-        application/json:
-          schema:
-            type: object
-            description: A paginated list of doctors.
-            properties:
-              doctors:
-                type: array
-                description: The list of doctor objects for the current page.
-                items:
-                  $ref: '#/components/schemas/Doctor'
-              pagination:
-                $ref: '#/components/schemas/Pagination'
-            required:
-              - data
-              - pagination
-          examples:
-            doctorListExample:
-              summary: Example list of doctors with pagination
-              value:
-                doctors:
-                  - id: b2c3d4e5-f6a7-8901-2345-67890abcdef1
-                    email: dr.gregory.house@example.com
-                    firstName: Gregory
-                    lastName: House
-                    specialization: DIAGNOSTICIAN
-                  - id: c3d4e5f6-a7b8-9012-3456-7890abcdef12
-                    email: dr.lisa.cuddy@example.com
-                    firstName: Lisa
-                    lastName: Cuddy
-                    specialization: ENDOCRINOLOGIST
-                pagination:
-                  page: 0
-                  pageSize: 20
-                  total: 2
-    DoctorCreated:
-      description: Doctor registered successfully. Returns the created doctor object.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Doctor'
-          examples:
-            createdDoctor:
-              summary: Example created doctor response
-              value:
-                id: c3d4e5f6-a7b8-9012-3456-7890abcdef12
-                email: dr.lisa.cuddy@example.com
-                firstName: Lisa
-                lastName: Cuddy
-                specialization: Endocrinology
     DoctorTimeslots:
       description: Successfully retrieved the list of time slots.
       content:
         application/json:
           schema:
             type: object
+            required:
+              - slots
             properties:
               slots:
                 type: array
                 items:
                   $ref: '#/components/schemas/TimeSlot'
-          examples:
-            timeslotsExample:
-              summary: Example timeslots for a doctor on a specific day
-              value:
-                slots:
-                  - time: '09:00'
-                    status: available
-                  - time: '09:30'
-                    status: unavailable
-                  - time: '10:00'
-                    status: available
-                  - time: '10:30'
-                    status: available
-                  - time: '11:00'
-                    status: unavailable
-                  - time: '14:00'
-                    status: available
-    AppointmentCreated:
-      description: Appointment requested successfully. Returns the created appointment object with 'requested' status.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/PatientAppointment'
-    AppointmentRescheduled:
-      description: Appointment reschedule request submitted successfully. Returns the updated appointment details (potentially with status 'requested' again).
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/PatientAppointment'
-          examples:
-            rescheduledAppointment:
-              summary: Example rescheduled appointment response
-              value:
-                id: d4e5f6a7-b8c9-0123-4567-890abcdef123
-                appointmentDate: '2024-07-22'
-                appointmentTime: '14:00'
-                type:
-                  id: e5f6a7b8-c9d0-1234-5678-90abcdef1234
-                  displayName: Consultation
-                doctor:
-                  id: b2c3d4e5-f6a7-8901-2345-67890abcdef1
-                  displayName: Dr. Gregory House
-                  specialization: DIAGNOSTICIAN
-                status: requested
-                reason: Previous date no longer works.
-    AppointmentResourcesUpdated:
-      description: Resources successfully assigned/updated for the appointment. Returns the full updated appointment details.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Appointment'
-    AppointmentDecisionResponse:
-      description: Appointment successfully accepted (scheduled) or rejected (denied). Returns the full updated appointment details.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/Appointment'
-    AvailableResources:
-      description: Successfully retrieved available resources for the specified time slot.
-      content:
-        application/json:
-          schema:
-            $ref: '#/components/schemas/AvailableResources'
   parameters:
+    appointmentId:
+      name: appointmentId
+      in: path
+      required: true
+      description: The unique identifier (UUID) of the appointment.
+      schema:
+        type: string
+        format: uuid
+      example: d4e5f6a7-b8c9-0123-4567-890abcdef123
+    conditionId:
+      name: conditionId
+      in: path
+      required: true
+      description: The unique identifier (UUID) of a condition.
+      schema:
+        type: string
+        format: uuid
+      example: d4e5f6a7-b8c9-0123-4567-890abcdef123
     patientId:
       name: patientId
       in: path
@@ -1215,6 +1115,23 @@ components:
         type: string
         format: uuid
       example: b2c3d4e5-f6a7-8901-2345-67890abcdef1
+    from:
+      name: from
+      in: query
+      required: true
+      description: The specific day form which to retrieve resources.
+      schema:
+        type: string
+        format: date
+      example: '2024-07-15'
+    to:
+      name: to
+      in: query
+      description: The specific day to which to retrieve resources.
+      schema:
+        type: string
+        format: date
+      example: '2024-07-15'
     page:
       name: page
       in: query
@@ -1254,21 +1171,19 @@ components:
         type: string
         format: date
       example: '2024-07-15'
-    appointmentId:
-      name: appointmentId
+    date-time:
+      name: date-time
+      in: query
+      required: true
+      schema:
+        type: string
+        format: date-time
+    resourceId:
+      name: resourceId
       in: path
       required: true
-      description: The unique identifier (UUID) of the appointment to cancel.
+      description: The unique identifier (UUID) of a resource.
       schema:
         type: string
         format: uuid
-      example: d4e5f6a7-b8c9-0123-4567-890abcdef123
-    time:
-      name: time
-      in: query
-      required: true
-      description: The time slot to check availability for (HH:MM format, 24-hour clock).
-      schema:
-        type: string
-        pattern: ^([01]\d|2[0-3]):([0-5]\d)$
-      example: '11:30'
+      example: b2c3d4e5-f6a7-8901-2345-67890abcdef1

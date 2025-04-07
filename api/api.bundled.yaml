@@ -241,27 +241,27 @@ paths:
                 $ref: '#/components/schemas/Condition'
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
-  /medicine:
+  /prescriptions:
     post:
       tags:
         - Patients
         - Medical History
-      summary: Create a medicine record for a patient
-      operationId: createPatientMedicine
+      summary: Create a prescriptions record for a patient
+      operationId: createPrescription
       requestBody:
-        description: Details of the medicine to be created.
+        description: Details of the prescription to be created.
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/NewMedicine'
+              $ref: '#/components/schemas/NewPrescription'
       responses:
         '201':
-          description: Medicine record created successfully. Returns the created medicine details.
+          description: Prescription record created successfully.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/MedicineDisplay'
+                $ref: '#/components/schemas/PrescriptionDisplay'
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
   /patients/{patientId}:
@@ -413,7 +413,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/DoctorsCalendar'
+                $ref: '#/components/schemas/DoctorCalendar'
         '500':
           $ref: '#/components/responses/InternalServerErrorResponse'
   /doctors/{doctorId}/appointment/{appointmentId}:
@@ -541,22 +541,22 @@ components:
       type: string
       description: Medical specialization of a doctor.
       enum:
-        - SURGEON
-        - GASTROENTEROLOGIST
-        - PEDIATRICIAN
-        - DIAGNOSTICIAN
-        - ENDOCRINOLOGIST
-        - GENERAL_PRACTITIONER
-        - CARDIOLOGIST
-        - DERMATOLOGIST
-        - NEUROLOGIST
-        - ONCOLOGIST
-        - ORTHOPEDIST
-        - PSYCHIATRIST
-        - RADIOLOGIST
-        - UROLOGIST
-        - OTHER
-      example: DIAGNOSTICIAN
+        - surgeon
+        - gastroenterologist
+        - pediatrician
+        - diagnostician
+        - endocrinologist
+        - general_practitioner
+        - cardiologist
+        - dermatologist
+        - neurologist
+        - oncologist
+        - orthopedist
+        - psychiatrist
+        - radiologist
+        - urologist
+        - other
+      example: diagnostician
     DoctorRegistration:
       allOf:
         - $ref: '#/components/schemas/PatientRegistration'
@@ -688,6 +688,11 @@ components:
         end:
           type: string
           format: date-time
+        apointmentsIds:
+          type: array
+          items:
+            type: string
+            format: uuid
       required:
         - id
         - name
@@ -702,6 +707,29 @@ components:
         - completed
         - denied
       example: scheduled
+    PrescriptionDisplay:
+      type: object
+      description: Basic info about a patient's condition.
+      properties:
+        id:
+          type: string
+          format: uuid
+          readOnly: true
+        name:
+          type: string
+        start:
+          type: string
+          format: date-time
+        end:
+          type: string
+          format: date-time
+        appointmentId:
+          type: string
+          format: uuid
+      required:
+        - id
+        - name
+        - start
     AppointmentBase:
       type: object
       description: Contains basic information about an appointment.
@@ -730,6 +758,10 @@ components:
           example: Feeling unwell, general check-up needed.
         cancellationReason:
           type: string
+        prescriptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/PrescriptionDisplay'
     PatientAppointment:
       allOf:
         - $ref: '#/components/schemas/AppointmentBase'
@@ -872,12 +904,21 @@ components:
           type: string
           format: date-time
           description: The date time of the appointment.
+        doctorName:
+          type: string
+        patientName:
+          type: string
         status:
           $ref: '#/components/schemas/AppointmentStatus'
+        type:
+          $ref: '#/components/schemas/AppointmentType'
       required:
         - id
         - appointmentDateTime
+        - doctorName
+        - patientName
         - status
+        - type
     Condition:
       allOf:
         - $ref: '#/components/schemas/ConditionDisplay'
@@ -889,34 +930,16 @@ components:
                 $ref: '#/components/schemas/AppointmentDisplay'
           required:
             - appointments
-    MedicineDisplay:
-      type: object
-      description: Basic info about a patient's condition.
-      properties:
-        id:
-          type: string
-          format: uuid
-          readOnly: true
-        name:
-          type: string
-        start:
-          type: string
-          format: date-time
-        end:
-          type: string
-          format: date-time
-      required:
-        - id
-        - name
-        - start
-    NewMedicine:
+    NewPrescription:
       allOf:
-        - $ref: '#/components/schemas/MedicineDisplay'
+        - $ref: '#/components/schemas/PrescriptionDisplay'
         - type: object
           properties:
             patientId:
               type: string
               format: uuid
+            doctorsNote:
+              type: string
           required:
             - patientId
     PatientsCalendar:
@@ -930,10 +953,10 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/ConditionDisplay'
-        medicine:
+        prescriptions:
           type: array
           items:
-            $ref: '#/components/schemas/MedicineDisplay'
+            $ref: '#/components/schemas/PrescriptionDisplay'
     Pagination:
       type: object
       description: Structure for paginated list responses.
@@ -973,7 +996,7 @@ components:
       required:
         - files
         - pagination
-    DoctorsCalendar:
+    DoctorCalendar:
       type: object
       properties:
         appointments:

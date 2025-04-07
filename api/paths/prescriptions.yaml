@@ -17,7 +17,7 @@ post:
       content:
         application/json:
           schema:
-            $ref: "../components/schemas/prescription/PrescriptionDisplay.yaml"
+            $ref: "../components/schemas/prescription/Prescription.yaml"
 
     "500":
       $ref: "../components/responses/InternalServerErrorResponse.yaml"

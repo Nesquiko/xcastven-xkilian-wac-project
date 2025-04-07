@@ -6,7 +6,3 @@ spec:
   frontendClass: md-shell # default obsiahnutý v základe polyfea md-shell
   service: http://xcastven-xkilian-project.wac-hospital # referencia na službu odkiaľ sa má načítať modul
   modulePath: /build/xcastven-xkilian-project.esm.js
-  staticPaths:
-    - kind: stylesheet
-      path: /build/xcastven-xkilian-project.css
-      waitOnLoad: true

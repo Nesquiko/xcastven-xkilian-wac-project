@@ -4,6 +4,7 @@ import {
 } from '../../utils/utils';
 import { AppointmentDisplay, ConditionDisplay, PatientsCalendar } from '../../api/generated';
 import { PatientsCalendarExample } from '../../data-examples/patients-calendar';
+import { StyledHost } from '../StyledHost';
 
 @Component({
   tag: 'xcastven-xkilian-project-home-page',
@@ -130,7 +131,7 @@ export class Homepage {
 
   render() {
     return (
-      <div class="flex h-screen flex-col w-full overflow-hidden">
+      <StyledHost class="flex h-screen flex-col w-full overflow-hidden">
         <xcastven-xkilian-project-header
           currentViewMonth={this.currentViewMonth}
           currentViewYear={this.currentViewYear}
@@ -180,7 +181,7 @@ export class Homepage {
           handleScheduleAppointmentFromCondition={this.handleScheduleAppointmentFromCondition}
           handleToggleConditionStatus={this.handleToggleConditionStatus}
         />
-      </div>
+      </StyledHost>
     );
   };
 }

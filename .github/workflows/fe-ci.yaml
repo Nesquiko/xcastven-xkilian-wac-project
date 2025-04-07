@@ -31,6 +31,10 @@ jobs:
         working-directory: frontend
         run: bun install --frozen-lockfile
 
+      - name: Install Dependencies in API
+        working-directory: api
+        run: bun install --frozen-lockfile
+
       - name: Build
         working-directory: frontend
         run: bun run openapi
@@ -78,7 +82,7 @@ jobs:
         with:
           context: frontend
           platforms: linux/amd64
-          file: frontend/Dockerfile
+          file: Dockerfile
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}

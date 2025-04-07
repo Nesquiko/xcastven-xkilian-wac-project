@@ -38,7 +38,7 @@
     "test.watch": "stencil test --spec --e2e --watchAll",
     "generate": "stencil generate",
     "format": "prettier --write './**/*.{ts,tsx,js,jsx,json}'",
-    "openapi": "openapi-generator-cli generate -g typescript-fetch -i api.bundled.yaml -o src/api/generated"
+    "openapi": "bun run --cwd ../api bundle && openapi-generator-cli generate -g typescript-fetch -i ../api/api.bundled.yaml -o src/api/generated"
   },
   "devDependencies": {
     "@stencil/core": "^4.27.1",

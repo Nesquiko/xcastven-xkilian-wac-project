@@ -5,12 +5,14 @@ on:
     branches: ["main"]
     paths:
       - "frontend/**"
+      - ".github/workflows/fe-ci.yaml"
     tags:
       - "v1*"
   pull_request:
     branches: ["main"]
     paths:
       - "frontend/**"
+      - ".github/workflows/fe-ci.yaml"
 
 jobs:
   build:
@@ -80,7 +82,6 @@ jobs:
 
       - uses: docker/build-push-action@v6
         with:
-          context: frontend
           platforms: linux/amd64
           file: Dockerfile
           push: true

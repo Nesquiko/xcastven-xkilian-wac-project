@@ -5,6 +5,7 @@ on:
     branches: ["main"]
     paths:
       - "frontend/**"
+      - ".github/workflows/fe-ci.yaml"
     tags:
       - "v1*"
   pull_request:

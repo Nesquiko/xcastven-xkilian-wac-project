@@ -688,7 +688,7 @@ components:
         end:
           type: string
           format: date-time
-        apointmentsIds:
+        appointmentsIds:
           type: array
           items:
             type: string

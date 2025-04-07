@@ -247,3 +247,31 @@ func mustCreateResource(t *testing.T, request api.NewResource) api.NewResource {
 
 	return createdResource
 }
+
+func mustCreateReservation(
+	t *testing.T,
+	request api.ResourceReservation,
+	resourceId api.ResourceId,
+) {
+	t.Helper()
+	require := require.New(t)
+
+	reqBodyBytes, err := json.Marshal(request)
+	require.NoError(err, "mustCreateReservation: Failed to marshal request")
+
+	url := fmt.Sprintf("%s/resources/%s", ServerUrl, resourceId)
+	res, err := http.Post(url, server.ApplicationJSON, bytes.NewBuffer(reqBodyBytes))
+	require.NoError(err, "mustCreateReservation: http.Post failed")
+	defer res.Body.Close()
+
+	bodyBytes, readErr := io.ReadAll(res.Body)
+	require.NoError(readErr, "mustCreateReservation: Failed to read response body")
+	res.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+
+	require.Equal(
+		http.StatusNoContent,
+		res.StatusCode,
+		"mustCreateReservation: Expected '204 Created'. Body: %s",
+		string(bodyBytes),
+	)
+}

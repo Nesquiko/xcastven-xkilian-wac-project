@@ -40,6 +40,7 @@ func (a monolithApp) ReserveResource(
 		ctx,
 		res.AppointmentId,
 		resourceId,
+		resource.Name,
 		resource.Type,
 		res.Start,
 		res.End,

@@ -23,3 +23,5 @@ properties:
     type: string
     description: Reason for the appointment provided by the patient.
     example: "Feeling unwell, general check-up needed."
+  cancellationReason:
+    type: string

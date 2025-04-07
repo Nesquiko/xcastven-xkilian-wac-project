@@ -697,7 +697,7 @@ components:
       description: The current status of the appointment.
       enum:
         - requested
-        - canceled
+        - cancelled
         - scheduled
         - completed
         - denied
@@ -728,6 +728,8 @@ components:
           type: string
           description: Reason for the appointment provided by the patient.
           example: Feeling unwell, general check-up needed.
+        cancellationReason:
+          type: string
     PatientAppointment:
       allOf:
         - $ref: '#/components/schemas/AppointmentBase'

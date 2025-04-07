@@ -20,6 +20,11 @@ type Db interface {
 
 	CreateAppointment(ctx context.Context, appointment Appointment) (Appointment, error)
 	AppointmentById(ctx context.Context, id uuid.UUID) (Appointment, error)
+	CancelAppointment(
+		ctx context.Context,
+		appointmentId uuid.UUID,
+		cancellationReason *string,
+	) error
 
 	CreatePatient(ctx context.Context, patient Patient) (Patient, error)
 	PatientById(ctx context.Context, id uuid.UUID) (Patient, error)
@@ -65,10 +70,12 @@ type Db interface {
 		ctx context.Context,
 		appointmentId uuid.UUID,
 		resourceId uuid.UUID,
+		resourceName string,
 		resourceType ResourceType,
 		startTime time.Time,
 		endTime time.Time,
 	) (Reservation, error)
+	ResourcesByAppointmentId(ctx context.Context, appointmentId uuid.UUID) ([]Resource, error)
 }
 
 type PaginationResult struct {

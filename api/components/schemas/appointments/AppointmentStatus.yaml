@@ -2,7 +2,7 @@ type: string
 description: The current status of the appointment.
 enum:
   - requested
-  - canceled
+  - cancelled
   - scheduled
   - completed
   - denied

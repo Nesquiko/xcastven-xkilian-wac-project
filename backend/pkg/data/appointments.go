@@ -109,6 +109,36 @@ func (m *MongoDb) AppointmentById(ctx context.Context, id uuid.UUID) (Appointmen
 	return appt, nil
 }
 
+func (m *MongoDb) CancelAppointment(
+	ctx context.Context,
+	appointmentId uuid.UUID,
+	cancellationReason *string,
+) error {
+	if err := m.appointmentExists(ctx, appointmentId); err != nil {
+		return fmt.Errorf("CancelAppointment appointment check failed: %w", err)
+	}
+
+	appointmentsColl := m.Database.Collection(appointmentsCollection)
+	update := bson.M{
+		"$set": bson.M{
+			"status":             "cancelled",
+			"cancellationReason": cancellationReason,
+		},
+	}
+	filter := bson.M{"_id": appointmentId}
+
+	_, err := appointmentsColl.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return fmt.Errorf("CancelAppointment failed to update appointment status: %w", err)
+	}
+
+	if err := m.DeleteReservationsByAppointmentId(ctx, appointmentId); err != nil {
+		return fmt.Errorf("CancelAppointment failed to delete reservations: %w", err)
+	}
+
+	return nil
+}
+
 func (m *MongoDb) appointmentExists(ctx context.Context, id uuid.UUID) error {
 	appointmentsColl := m.Database.Collection(appointmentsCollection)
 	filter := bson.M{"_id": id}

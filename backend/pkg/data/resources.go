@@ -30,6 +30,7 @@ type Reservation struct {
 	Id            uuid.UUID    `bson:"_id"           json:"id"`
 	AppointmentId uuid.UUID    `bson:"appointmentId" json:"appointmentId"` // Link to the Appointment document
 	ResourceId    uuid.UUID    `bson:"resourceId"    json:"resourceId"`    // Link to the specific Resource document (Facility, Equipment, etc.)
+	ResourceName  string       `bson:"name"          json:"name"`
 	ResourceType  ResourceType `bson:"resourceType"  json:"resourceType"`
 	StartTime     time.Time    `bson:"startTime"     json:"startTime"`
 	EndTime       time.Time    `bson:"endTime"       json:"endTime"`
@@ -80,6 +81,7 @@ func (m *MongoDb) CreateReservation(
 	ctx context.Context,
 	appointmentId uuid.UUID,
 	resourceId uuid.UUID,
+	resourceName string,
 	resourceType ResourceType,
 	startTime time.Time,
 	endTime time.Time,
@@ -123,6 +125,7 @@ func (m *MongoDb) CreateReservation(
 		Id:            uuid.New(),
 		AppointmentId: appointmentId,
 		ResourceId:    resourceId,
+		ResourceName:  resourceName,
 		ResourceType:  resourceType,
 		StartTime:     startTime,
 		EndTime:       endTime,
@@ -248,6 +251,77 @@ func (m *MongoDb) FindAvailableResourcesAtTime(
 	}
 
 	return result, nil
+}
+
+func (m *MongoDb) DeleteReservationsByAppointmentId(
+	ctx context.Context,
+	appointmentId uuid.UUID,
+) error {
+	collection := m.Database.Collection(reservationsCollection)
+	filter := bson.M{"appointmentId": appointmentId}
+
+	_, err := collection.DeleteMany(ctx, filter)
+	if err != nil {
+		return fmt.Errorf("DeleteReservationsByAppointmentId failed: %w", err)
+	}
+
+	return nil
+}
+
+func (m *MongoDb) ResourcesByAppointmentId(
+	ctx context.Context,
+	appointmentId uuid.UUID,
+) ([]Resource, error) {
+	reservations, err := m.ReservationsByAppointmentId(ctx, appointmentId)
+	if err != nil {
+		return nil, fmt.Errorf("ResourcesByAppointmentIdFromReservations: %w", err)
+	}
+
+	resourceMap := make(map[uuid.UUID]Resource)
+	for _, reservation := range reservations {
+		resource := Resource{
+			Id:   reservation.ResourceId,
+			Name: reservation.ResourceName,
+			Type: reservation.ResourceType,
+		}
+		resourceMap[reservation.ResourceId] = resource
+	}
+
+	resources := make([]Resource, 0, len(resourceMap))
+	for _, resource := range resourceMap {
+		resources = append(resources, resource)
+	}
+
+	return resources, nil
+}
+
+func (m *MongoDb) ReservationsByAppointmentId(
+	ctx context.Context,
+	appointmentId uuid.UUID,
+) ([]Reservation, error) {
+	collection := m.Database.Collection(reservationsCollection)
+	filter := bson.M{"appointmentId": appointmentId}
+
+	var reservations []Reservation
+	cursor, err := collection.Find(ctx, filter)
+	if err != nil {
+		return nil, fmt.Errorf("ReservationsByAppointmentId: %w", err)
+	}
+	defer func() {
+		if cerr := cursor.Close(ctx); cerr != nil {
+			slog.Warn("Failed to close reservations cursor", "error", cerr.Error())
+		}
+	}()
+
+	if err = cursor.All(ctx, &reservations); err != nil {
+		return nil, fmt.Errorf("ReservationsByAppointmentId decode failed: %w", err)
+	}
+
+	if err = cursor.Err(); err != nil {
+		return nil, fmt.Errorf("ReservationsByAppointmentId cursor error: %w", err)
+	}
+
+	return reservations, nil
 }
 
 func (m *MongoDb) resourceExists(ctx context.Context, id uuid.UUID) error {

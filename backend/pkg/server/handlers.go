@@ -16,7 +16,20 @@ func (s Server) CancelAppointment(
 	r *http.Request,
 	appointmentId api.AppointmentId,
 ) {
-	panic("unimplemented")
+	req, decodeErr := Decode[api.AppointmentCancellation](w, r)
+	if decodeErr != nil {
+		encodeError(w, decodeErr)
+		return
+	}
+
+	err := s.app.CancelAppointment(r.Context(), appointmentId, req.Reason)
+	if err != nil {
+		slog.Error(UnexpectedError, "error", err.Error(), "where", "CancelAppointment")
+		encodeError(w, internalServerError())
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
 
 // ConditionDetail implements api.ServerInterface.
@@ -111,7 +124,13 @@ func (s Server) DoctorsAppointment(
 	doctorId api.DoctorId,
 	appointmentId api.AppointmentId,
 ) {
-	panic("unimplemented")
+	appt, err := s.app.DoctorsAppointmentById(r.Context(), doctorId, appointmentId)
+	if err != nil {
+		slog.Error(UnexpectedError, "error", err.Error(), "where", "DoctorsAppointment")
+		encodeError(w, internalServerError())
+		return
+	}
+	encode(w, http.StatusOK, appt)
 }
 
 // GetPatientById implements api.ServerInterface.
@@ -145,7 +164,13 @@ func (s Server) PatientsAppointment(
 	patientId api.PatientId,
 	appointmentId api.AppointmentId,
 ) {
-	panic("unimplemented")
+	appt, err := s.app.PatientsAppointmentById(r.Context(), patientId, appointmentId)
+	if err != nil {
+		slog.Error(UnexpectedError, "error", err.Error(), "where", "PatientsAppointment")
+		encodeError(w, internalServerError())
+		return
+	}
+	encode(w, http.StatusOK, appt)
 }
 
 // PatientsCalendar implements api.ServerInterface.

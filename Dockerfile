@@ -1,19 +1,30 @@
 FROM oven/bun:latest AS installer
 
-
 WORKDIR /app
 
-COPY package.json bun.lock /app
+COPY ./frontend/package.json ./frontend/bun.lock /app
 
 RUN bun install --frozen-lockfile
+
+WORKDIR /api
+
+COPY ./api/package.json ./api/bun.lock /api
+
+RUN bun install --frozen-lockfile
+
+COPY ./api/api.yaml /api
+COPY ./api/components /api/components
+COPY ./api/paths /api/paths
+
+RUN bun run bundle
 
 FROM openapitools/openapi-generator-cli:v7.12.0 AS api-gen
 
 COPY --from=installer /app /app
 
-WORKDIR /app
+COPY --from=installer /api/api.bundled.yaml /app
 
-COPY api.bundled.yaml /app
+WORKDIR /app
 
 RUN mkdir -p src/api/generated
 
@@ -25,7 +36,7 @@ WORKDIR /build
 
 COPY --from=api-gen /app /build
 
-COPY . .
+COPY ./frontend .
 
 RUN bun run build
 

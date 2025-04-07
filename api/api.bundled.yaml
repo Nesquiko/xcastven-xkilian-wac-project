@@ -205,7 +205,6 @@ paths:
     post:
       tags:
         - Conditions
-        - Patients
       summary: Create a condition record for a patient
       operationId: createPatientCondition
       requestBody:
@@ -244,7 +243,6 @@ paths:
   /prescriptions:
     post:
       tags:
-        - Patients
         - Medical History
       summary: Create a prescriptions record for a patient
       operationId: createPrescription

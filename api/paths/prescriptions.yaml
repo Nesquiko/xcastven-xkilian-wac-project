@@ -1,6 +1,5 @@
 post:
   tags:
-    - Patients
     - Medical History
   summary: Create a prescriptions record for a patient
   operationId: createPrescription

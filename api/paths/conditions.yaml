@@ -1,7 +1,6 @@
 post:
   tags:
     - Conditions
-    - Patients
   summary: Create a condition record for a patient
   operationId: createPatientCondition
   requestBody:

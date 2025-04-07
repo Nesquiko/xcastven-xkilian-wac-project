@@ -16,7 +16,20 @@ func (s Server) CancelAppointment(
 	r *http.Request,
 	appointmentId api.AppointmentId,
 ) {
-	panic("unimplemented")
+	req, decodeErr := Decode[api.AppointmentCancellation](w, r)
+	if decodeErr != nil {
+		encodeError(w, decodeErr)
+		return
+	}
+
+	err := s.app.CancelAppointment(r.Context(), appointmentId, req.Reason)
+	if err != nil {
+		slog.Error(UnexpectedError, "error", err.Error(), "where", "CancelAppointment")
+		encodeError(w, internalServerError())
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
 
 // ConditionDetail implements api.ServerInterface.
@@ -25,7 +38,14 @@ func (s Server) ConditionDetail(
 	r *http.Request,
 	conditionId api.ConditionId,
 ) {
-	panic("unimplemented")
+	cond, err := s.app.ConditionById(r.Context(), conditionId)
+	if err != nil {
+		slog.Error(UnexpectedError, "error", err.Error(), "where", "GetAvailableResources")
+		encodeError(w, internalServerError())
+		return
+	}
+
+	encode(w, http.StatusOK, cond)
 }
 
 // DecideAppointment implements api.ServerInterface.
@@ -63,7 +83,14 @@ func (s Server) GetAvailableResources(
 	r *http.Request,
 	params api.GetAvailableResourcesParams,
 ) {
-	panic("unimplemented")
+	resources, err := s.app.AvailableResources(r.Context(), params.DateTime)
+	if err != nil {
+		slog.Error(UnexpectedError, "error", err.Error(), "where", "GetAvailableResources")
+		encodeError(w, internalServerError())
+		return
+	}
+
+	encode(w, http.StatusOK, resources)
 }
 
 // GetDoctorById implements api.ServerInterface.
@@ -97,7 +124,13 @@ func (s Server) DoctorsAppointment(
 	doctorId api.DoctorId,
 	appointmentId api.AppointmentId,
 ) {
-	panic("unimplemented")
+	appt, err := s.app.DoctorsAppointmentById(r.Context(), doctorId, appointmentId)
+	if err != nil {
+		slog.Error(UnexpectedError, "error", err.Error(), "where", "DoctorsAppointment")
+		encodeError(w, internalServerError())
+		return
+	}
+	encode(w, http.StatusOK, appt)
 }
 
 // GetPatientById implements api.ServerInterface.
@@ -131,7 +164,13 @@ func (s Server) PatientsAppointment(
 	patientId api.PatientId,
 	appointmentId api.AppointmentId,
 ) {
-	panic("unimplemented")
+	appt, err := s.app.PatientsAppointmentById(r.Context(), patientId, appointmentId)
+	if err != nil {
+		slog.Error(UnexpectedError, "error", err.Error(), "where", "PatientsAppointment")
+		encodeError(w, internalServerError())
+		return
+	}
+	encode(w, http.StatusOK, appt)
 }
 
 // PatientsCalendar implements api.ServerInterface.
@@ -201,5 +240,54 @@ func (s Server) CreatePatientMedicine(w http.ResponseWriter, r *http.Request) {
 
 // RequestAppointment implements api.ServerInterface.
 func (s Server) RequestAppointment(w http.ResponseWriter, r *http.Request) {
-	panic("unimplemented")
+	req, decodeErr := Decode[api.NewAppointmentRequest](w, r)
+	if decodeErr != nil {
+		encodeError(w, decodeErr)
+		return
+	}
+
+	appt, err := s.app.CreateAppointment(r.Context(), req)
+	if err != nil {
+		slog.Error(UnexpectedError, "error", err.Error(), "where", "RequestAppointment")
+		encodeError(w, internalServerError())
+		return
+	}
+
+	encode(w, http.StatusCreated, appt)
+}
+
+// CreateResource implements api.ServerInterface.
+func (s Server) CreateResource(w http.ResponseWriter, r *http.Request) {
+	req, decodeErr := Decode[api.NewResource](w, r)
+	if decodeErr != nil {
+		encodeError(w, decodeErr)
+		return
+	}
+
+	resource, err := s.app.CreateResource(r.Context(), req)
+	if err != nil {
+		slog.Error(UnexpectedError, "error", err.Error(), "where", "CreateResource")
+		encodeError(w, internalServerError())
+		return
+	}
+
+	encode(w, http.StatusCreated, resource)
+}
+
+// ReserveResource implements api.ServerInterface.
+func (s Server) ReserveResource(w http.ResponseWriter, r *http.Request, resourceId api.ResourceId) {
+	req, decodeErr := Decode[api.ResourceReservation](w, r)
+	if decodeErr != nil {
+		encodeError(w, decodeErr)
+		return
+	}
+
+	err := s.app.ReserveResource(r.Context(), resourceId, req)
+	if err != nil {
+		slog.Error(UnexpectedError, "error", err.Error(), "where", "ReserveResource")
+		encodeError(w, internalServerError())
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }

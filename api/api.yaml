@@ -51,5 +51,9 @@ paths:
   /doctors/{doctorId}/timeslots:
     $ref: "./paths/doctors_doctorId_timeslots.yaml"
 
+  /resources:
+    $ref: "./paths/resources.yaml"
   /resources/available:
     $ref: "./paths/resources_available.yaml"
+  /resources/{resourceId}:
+    $ref: "./paths/resources_resourceId.yaml"

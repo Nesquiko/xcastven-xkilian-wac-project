@@ -69,3 +69,18 @@ func (m *MongoDb) DoctorByEmail(ctx context.Context, email string) (Doctor, erro
 
 	return doctor, nil
 }
+
+func (m *MongoDb) doctorExists(ctx context.Context, id uuid.UUID) error {
+	doctorsColl := m.Database.Collection(doctorsCollection)
+	filter := bson.M{"_id": id}
+
+	count, err := doctorsColl.CountDocuments(ctx, filter)
+	if err != nil {
+		return fmt.Errorf("doctorExists failed doctor count check: %w", err)
+	}
+	if count == 0 {
+		return ErrNotFound
+	}
+
+	return nil
+}

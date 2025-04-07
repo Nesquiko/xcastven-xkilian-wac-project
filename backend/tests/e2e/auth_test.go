@@ -141,7 +141,7 @@ func TestLoginUser_Doctor_OK(t *testing.T) {
 	t.Parallel()
 
 	uniqueEmail := fmt.Sprintf("test.login.doctor.%s@example.com", uuid.NewString())
-	docRequest := newDoctorRequest(uniqueEmail)
+	docRequest := newDoctor(uniqueEmail)
 	createdDoctor := mustCreateDoctor(t, docRequest)
 	require.NotEmpty(t, createdDoctor.Id, "Setup failed: Created doctor ID is empty")
 
@@ -205,7 +205,7 @@ func TestCreatePatient(t *testing.T) {
 func TestCreateDoctor(t *testing.T) {
 	t.Parallel()
 	uniqueEmail := fmt.Sprintf("test.doctor.create.%s@example.com", uuid.NewString())
-	docRequest := newDoctorRequest(uniqueEmail)
+	docRequest := newDoctor(uniqueEmail)
 
 	createdDoctor := mustCreateDoctor(t, docRequest)
 
@@ -249,7 +249,7 @@ func TestCreatePatient_Conflict(t *testing.T) {
 func TestCreateDoctor_Conflict(t *testing.T) {
 	t.Parallel()
 	uniqueEmail := fmt.Sprintf("test.doctor.conflict.%s@example.com", uuid.NewString())
-	docRequest1 := newDoctorRequest(uniqueEmail)
+	docRequest1 := newDoctor(uniqueEmail)
 	_ = mustCreateDoctor(t, docRequest1)
 
 	res2, err := createDoctor(docRequest1)
@@ -272,4 +272,3 @@ func TestCreateDoctor_Conflict(t *testing.T) {
 		"Error detail should mention the conflicting email",
 	)
 }
-

@@ -4,8 +4,7 @@ get:
   summary: Get available resources for a time slot
   operationId: getAvailableResources
   parameters:
-    - $ref: "../components/parameters/query/date.yaml"
-    - $ref: "../components/parameters/query/time.yaml"
+    - $ref: "../components/parameters/query/date-time.yaml"
   responses:
     "200":
       description: Successfully retrieved available resources for the specified time slot.

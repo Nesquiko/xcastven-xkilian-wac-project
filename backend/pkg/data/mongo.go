@@ -17,10 +17,13 @@ type MongoDb struct {
 var _ Db = (*MongoDb)(nil)
 
 const (
-	patientsCollection   = "patients"
-	doctorsCollection    = "doctors"
-	conditionsCollection = "conditions"
-	medicinesCollection  = "medicine"
+	patientsCollection     = "patients"
+	doctorsCollection      = "doctors"
+	conditionsCollection   = "conditions"
+	medicinesCollection    = "medicine"
+	appointmentsCollection = "appointments"
+	resourcesCollection    = "resources"
+	reservationsCollection = "reservations"
 )
 
 var Collections = []string{
@@ -28,6 +31,9 @@ var Collections = []string{
 	doctorsCollection,
 	conditionsCollection,
 	medicinesCollection,
+	appointmentsCollection,
+	resourcesCollection,
+	reservationsCollection,
 }
 
 func ConnectMongo(ctx context.Context, uri string, db string) (*MongoDb, error) {
@@ -79,36 +85,87 @@ func initCollections(ctx context.Context, mongoDb *mongo.Database, cols []string
 }
 
 func initIndexes(ctx context.Context, mongoDb *mongo.Database) error {
-	indexes := map[string]mongo.IndexModel{
+	indexes := map[string][]mongo.IndexModel{
 		patientsCollection: {
-			Keys:    bson.M{"email": 1},
-			Options: options.Index().SetUnique(true),
+			{
+				Keys:    bson.D{{Key: "email", Value: 1}},
+				Options: options.Index().SetUnique(true).SetName("idx_patient_email_unique"),
+			},
 		},
 		doctorsCollection: {
-			Keys:    bson.M{"email": 1},
-			Options: options.Index().SetUnique(true),
+			{
+				Keys:    bson.D{{Key: "email", Value: 1}},
+				Options: options.Index().SetUnique(true).SetName("idx_doctor_email_unique"),
+			},
 		},
 		conditionsCollection: {
-			Keys: bson.M{"patientId": 1},
+			{
+				Keys:    bson.D{{Key: "patientId", Value: 1}},
+				Options: options.Index().SetName("idx_condition_patientId"),
+			},
+			{
+				Keys:    bson.D{{Key: "patientId", Value: 1}, {Key: "start", Value: 1}},
+				Options: options.Index().SetName("idx_condition_patientId_start"),
+			},
 		},
 		medicinesCollection: {
-			Keys: bson.M{"patientId": 1},
+			{
+				Keys:    bson.D{{Key: "patientId", Value: 1}},
+				Options: options.Index().SetName("idx_medicine_patientId"),
+			},
+			{
+				Keys:    bson.D{{Key: "patientId", Value: 1}, {Key: "start", Value: 1}},
+				Options: options.Index().SetName("idx_medicine_patientId_start"),
+			},
+		},
+		appointmentsCollection: {
+			{
+				Keys:    bson.D{{Key: "status", Value: 1}},
+				Options: options.Index().SetName("idx_appointment_status"),
+			},
+			{
+				Keys:    bson.D{{Key: "appointmentDateTime", Value: 1}},
+				Options: options.Index().SetName("idx_appointment_datetime"),
+			},
+		},
+		resourcesCollection: {
+			{
+				Keys:    bson.D{{Key: "type", Value: 1}},
+				Options: options.Index().SetName("idx_resource_type"),
+			},
+		},
+		reservationsCollection: {
+			{
+				Keys: bson.D{
+					{Key: "resourceId", Value: 1},
+					{Key: "startTime", Value: 1},
+				},
+				Options: options.Index().SetName("idx_reservation_resource_time"),
+			},
+			{
+				Keys:    bson.D{{Key: "appointmentId", Value: 1}},
+				Options: options.Index().SetName("idx_reservation_appointmentId"),
+			},
 		},
 	}
 
-	for collName, indexModel := range indexes {
+	for collName, indexModels := range indexes {
 		coll := mongoDb.Collection(collName)
-		indexName, err := coll.Indexes().CreateOne(ctx, indexModel)
+		indexNames, err := coll.Indexes().CreateMany(ctx, indexModels)
 		if err != nil {
 			slog.Warn(
-				"Could not create index (may already exist with different options or other issue)",
-				slog.String("collection", collName),
-				slog.Any("keys", indexModel.Keys),
-				slog.String("error", err.Error()),
-				slog.String("indexName", indexName),
+				"Could not create one or more indexes (may already exist or other issue)",
+				"collection", collName,
+				"indexModels", indexModels,
+				"error", err.Error(),
+				"createdIndexNames",
+				indexNames,
 			)
+		} else {
+			slog.Info("Successfully created/verified indexes", "collection", collName, "indexNames", indexNames)
 		}
 	}
+
 	return nil
 }
 

@@ -4,7 +4,7 @@
     "": {
       "name": "xcastven-xkilian-project",
       "dependencies": {
-        "@material/web": "^2.2.0",
+        "@material/web": "^2.3.0",
         "@openapitools/openapi-generator-cli": "2.4.19",
         "date-fns": "^4.1.0",
         "tailwindcss": "^4.0.14",
@@ -143,7 +143,7 @@
 
     "@lit/reactive-element": ["@lit/reactive-element@2.0.4", "", { "dependencies": { "@lit-labs/ssr-dom-shim": "^1.2.0" } }, "sha512-GFn91inaUa2oHLak8awSIigYz0cU0Payr1rcFsrkf5OJ5eSPxElyZfKh0f2p9FsTiZWXQdWGJeXZICEfXXYSXQ=="],
 
-    "@material/web": ["@material/web@2.2.0", "", { "dependencies": { "lit": "^2.7.4 || ^3.0.0", "tslib": "^2.4.0" } }, "sha512-k1Pi7f04qDRkHfIEdcnL++udN+x5Oq34R47n0Fk7Xo49uz9aKb6ZkO42jC6uvMH0ahOiFDktX9txHgYMDvNa+A=="],
+    "@material/web": ["@material/web@2.3.0", "", { "dependencies": { "lit": "^2.8.0 || ^3.0.0", "tslib": "^2.4.0" } }, "sha512-r7ccZHthMk5tM05goPJ965hQ99ptMyZt7i8Xi8+RmEqK3ZXaMtjx+s4p+9OVX+vgOS3zpop+g1yGYXtOOlrwUg=="],
 
     "@nestjs/common": ["@nestjs/common@8.2.4", "", { "dependencies": { "axios": "0.24.0", "iterare": "1.2.1", "tslib": "2.3.1", "uuid": "8.3.2" }, "peerDependencies": { "cache-manager": "*", "class-transformer": "*", "class-validator": "*", "reflect-metadata": "^0.1.12", "rxjs": "^7.1.0" }, "optionalPeers": ["cache-manager", "class-transformer", "class-validator"] }, "sha512-zb6Y//Rd7tRsMsY2qDvX7qk/msr6sBid7V9YNvdePzGNYfMOvtwgNoqtHgbq2F6V4kCtMO7slmmM4/zptSghiQ=="],
 

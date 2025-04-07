@@ -5,14 +5,64 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
+import { Appointment } from "./api/generated";
+import { Condition } from "./utils/utils";
+export { Appointment } from "./api/generated";
+export { Condition } from "./utils/utils";
 export namespace Components {
     interface AmbulanceApp {
     }
     interface AppointmentScheduler {
     }
+    interface XcastvenXkilianProjectAppointmentDetail {
+        "appointment": Appointment;
+        "handleCancelAppointment": (appointment: Appointment) => void;
+        "handleRescheduleAppointment": (appointment: Appointment) => void;
+        "handleResetSelection": () => void;
+    }
     interface XcastvenXkilianProjectAppointmentsIllnesses {
     }
+    interface XcastvenXkilianProjectAppointmentsList {
+        "appointments": Array<Appointment>;
+        "handleSelectAppointment": (appointment: Appointment) => void;
+    }
+    interface XcastvenXkilianProjectConditionDetail {
+        "condition": Condition;
+        "handleResetSelection": () => void;
+        "handleScheduleAppointmentFromCondition": (condition: Condition) => void;
+        "handleSelectAppointment": (appointment: Appointment) => void;
+        "handleToggleConditionStatus": () => void;
+    }
+    interface XcastvenXkilianProjectConditionsList {
+        "conditions": Array<Condition>;
+        "handleSelectCondition": (condition: Condition) => void;
+    }
+    interface XcastvenXkilianProjectDrawer {
+        "getAppointmentsForDate": (date: Date) => Array<Appointment>;
+        "getConditionsForDate": (date: Date) => Array<Condition>;
+        "handleCancelAppointment": (appointment: Appointment) => void;
+        "handleRescheduleAppointment": (appointment: Appointment) => void;
+        "handleResetSelection": () => void;
+        "handleScheduleAppointmentFromCondition": (condition: Condition) => void;
+        "handleSelectAppointment": (appointment: Appointment) => void;
+        "handleSelectCondition": (condition: Condition) => void;
+        "handleToggleConditionStatus": () => void;
+        "isDrawerOpen": boolean;
+        "selectedAppointment": Appointment;
+        "selectedCondition": Condition;
+        "selectedDate": Date;
+    }
+    interface XcastvenXkilianProjectHeader {
+        "currentViewMonth": number;
+        "currentViewYear": number;
+        "handleNextMonth": () => void;
+        "handlePreviousMonth": () => void;
+        "handleYearChange": (event: Event) => void;
+    }
     interface XcastvenXkilianProjectHomePage {
+    }
+    interface XcastvenXkilianProjectLegend {
+        "handleResetSelection": () => void;
     }
 }
 declare global {
@@ -28,11 +78,47 @@ declare global {
         prototype: HTMLAppointmentSchedulerElement;
         new (): HTMLAppointmentSchedulerElement;
     };
+    interface HTMLXcastvenXkilianProjectAppointmentDetailElement extends Components.XcastvenXkilianProjectAppointmentDetail, HTMLStencilElement {
+    }
+    var HTMLXcastvenXkilianProjectAppointmentDetailElement: {
+        prototype: HTMLXcastvenXkilianProjectAppointmentDetailElement;
+        new (): HTMLXcastvenXkilianProjectAppointmentDetailElement;
+    };
     interface HTMLXcastvenXkilianProjectAppointmentsIllnessesElement extends Components.XcastvenXkilianProjectAppointmentsIllnesses, HTMLStencilElement {
     }
     var HTMLXcastvenXkilianProjectAppointmentsIllnessesElement: {
         prototype: HTMLXcastvenXkilianProjectAppointmentsIllnessesElement;
         new (): HTMLXcastvenXkilianProjectAppointmentsIllnessesElement;
+    };
+    interface HTMLXcastvenXkilianProjectAppointmentsListElement extends Components.XcastvenXkilianProjectAppointmentsList, HTMLStencilElement {
+    }
+    var HTMLXcastvenXkilianProjectAppointmentsListElement: {
+        prototype: HTMLXcastvenXkilianProjectAppointmentsListElement;
+        new (): HTMLXcastvenXkilianProjectAppointmentsListElement;
+    };
+    interface HTMLXcastvenXkilianProjectConditionDetailElement extends Components.XcastvenXkilianProjectConditionDetail, HTMLStencilElement {
+    }
+    var HTMLXcastvenXkilianProjectConditionDetailElement: {
+        prototype: HTMLXcastvenXkilianProjectConditionDetailElement;
+        new (): HTMLXcastvenXkilianProjectConditionDetailElement;
+    };
+    interface HTMLXcastvenXkilianProjectConditionsListElement extends Components.XcastvenXkilianProjectConditionsList, HTMLStencilElement {
+    }
+    var HTMLXcastvenXkilianProjectConditionsListElement: {
+        prototype: HTMLXcastvenXkilianProjectConditionsListElement;
+        new (): HTMLXcastvenXkilianProjectConditionsListElement;
+    };
+    interface HTMLXcastvenXkilianProjectDrawerElement extends Components.XcastvenXkilianProjectDrawer, HTMLStencilElement {
+    }
+    var HTMLXcastvenXkilianProjectDrawerElement: {
+        prototype: HTMLXcastvenXkilianProjectDrawerElement;
+        new (): HTMLXcastvenXkilianProjectDrawerElement;
+    };
+    interface HTMLXcastvenXkilianProjectHeaderElement extends Components.XcastvenXkilianProjectHeader, HTMLStencilElement {
+    }
+    var HTMLXcastvenXkilianProjectHeaderElement: {
+        prototype: HTMLXcastvenXkilianProjectHeaderElement;
+        new (): HTMLXcastvenXkilianProjectHeaderElement;
     };
     interface HTMLXcastvenXkilianProjectHomePageElement extends Components.XcastvenXkilianProjectHomePage, HTMLStencilElement {
     }
@@ -40,11 +126,24 @@ declare global {
         prototype: HTMLXcastvenXkilianProjectHomePageElement;
         new (): HTMLXcastvenXkilianProjectHomePageElement;
     };
+    interface HTMLXcastvenXkilianProjectLegendElement extends Components.XcastvenXkilianProjectLegend, HTMLStencilElement {
+    }
+    var HTMLXcastvenXkilianProjectLegendElement: {
+        prototype: HTMLXcastvenXkilianProjectLegendElement;
+        new (): HTMLXcastvenXkilianProjectLegendElement;
+    };
     interface HTMLElementTagNameMap {
         "ambulance-app": HTMLAmbulanceAppElement;
         "appointment-scheduler": HTMLAppointmentSchedulerElement;
+        "xcastven-xkilian-project-appointment-detail": HTMLXcastvenXkilianProjectAppointmentDetailElement;
         "xcastven-xkilian-project-appointments-illnesses": HTMLXcastvenXkilianProjectAppointmentsIllnessesElement;
+        "xcastven-xkilian-project-appointments-list": HTMLXcastvenXkilianProjectAppointmentsListElement;
+        "xcastven-xkilian-project-condition-detail": HTMLXcastvenXkilianProjectConditionDetailElement;
+        "xcastven-xkilian-project-conditions-list": HTMLXcastvenXkilianProjectConditionsListElement;
+        "xcastven-xkilian-project-drawer": HTMLXcastvenXkilianProjectDrawerElement;
+        "xcastven-xkilian-project-header": HTMLXcastvenXkilianProjectHeaderElement;
         "xcastven-xkilian-project-home-page": HTMLXcastvenXkilianProjectHomePageElement;
+        "xcastven-xkilian-project-legend": HTMLXcastvenXkilianProjectLegendElement;
     }
 }
 declare namespace LocalJSX {
@@ -52,15 +151,68 @@ declare namespace LocalJSX {
     }
     interface AppointmentScheduler {
     }
+    interface XcastvenXkilianProjectAppointmentDetail {
+        "appointment"?: Appointment;
+        "handleCancelAppointment"?: (appointment: Appointment) => void;
+        "handleRescheduleAppointment"?: (appointment: Appointment) => void;
+        "handleResetSelection"?: () => void;
+    }
     interface XcastvenXkilianProjectAppointmentsIllnesses {
     }
+    interface XcastvenXkilianProjectAppointmentsList {
+        "appointments"?: Array<Appointment>;
+        "handleSelectAppointment"?: (appointment: Appointment) => void;
+    }
+    interface XcastvenXkilianProjectConditionDetail {
+        "condition"?: Condition;
+        "handleResetSelection"?: () => void;
+        "handleScheduleAppointmentFromCondition"?: (condition: Condition) => void;
+        "handleSelectAppointment"?: (appointment: Appointment) => void;
+        "handleToggleConditionStatus"?: () => void;
+    }
+    interface XcastvenXkilianProjectConditionsList {
+        "conditions"?: Array<Condition>;
+        "handleSelectCondition"?: (condition: Condition) => void;
+    }
+    interface XcastvenXkilianProjectDrawer {
+        "getAppointmentsForDate"?: (date: Date) => Array<Appointment>;
+        "getConditionsForDate"?: (date: Date) => Array<Condition>;
+        "handleCancelAppointment"?: (appointment: Appointment) => void;
+        "handleRescheduleAppointment"?: (appointment: Appointment) => void;
+        "handleResetSelection"?: () => void;
+        "handleScheduleAppointmentFromCondition"?: (condition: Condition) => void;
+        "handleSelectAppointment"?: (appointment: Appointment) => void;
+        "handleSelectCondition"?: (condition: Condition) => void;
+        "handleToggleConditionStatus"?: () => void;
+        "isDrawerOpen"?: boolean;
+        "selectedAppointment"?: Appointment;
+        "selectedCondition"?: Condition;
+        "selectedDate"?: Date;
+    }
+    interface XcastvenXkilianProjectHeader {
+        "currentViewMonth"?: number;
+        "currentViewYear"?: number;
+        "handleNextMonth"?: () => void;
+        "handlePreviousMonth"?: () => void;
+        "handleYearChange"?: (event: Event) => void;
+    }
     interface XcastvenXkilianProjectHomePage {
+    }
+    interface XcastvenXkilianProjectLegend {
+        "handleResetSelection"?: () => void;
     }
     interface IntrinsicElements {
         "ambulance-app": AmbulanceApp;
         "appointment-scheduler": AppointmentScheduler;
+        "xcastven-xkilian-project-appointment-detail": XcastvenXkilianProjectAppointmentDetail;
         "xcastven-xkilian-project-appointments-illnesses": XcastvenXkilianProjectAppointmentsIllnesses;
+        "xcastven-xkilian-project-appointments-list": XcastvenXkilianProjectAppointmentsList;
+        "xcastven-xkilian-project-condition-detail": XcastvenXkilianProjectConditionDetail;
+        "xcastven-xkilian-project-conditions-list": XcastvenXkilianProjectConditionsList;
+        "xcastven-xkilian-project-drawer": XcastvenXkilianProjectDrawer;
+        "xcastven-xkilian-project-header": XcastvenXkilianProjectHeader;
         "xcastven-xkilian-project-home-page": XcastvenXkilianProjectHomePage;
+        "xcastven-xkilian-project-legend": XcastvenXkilianProjectLegend;
     }
 }
 export { LocalJSX as JSX };
@@ -69,8 +221,15 @@ declare module "@stencil/core" {
         interface IntrinsicElements {
             "ambulance-app": LocalJSX.AmbulanceApp & JSXBase.HTMLAttributes<HTMLAmbulanceAppElement>;
             "appointment-scheduler": LocalJSX.AppointmentScheduler & JSXBase.HTMLAttributes<HTMLAppointmentSchedulerElement>;
+            "xcastven-xkilian-project-appointment-detail": LocalJSX.XcastvenXkilianProjectAppointmentDetail & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectAppointmentDetailElement>;
             "xcastven-xkilian-project-appointments-illnesses": LocalJSX.XcastvenXkilianProjectAppointmentsIllnesses & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectAppointmentsIllnessesElement>;
+            "xcastven-xkilian-project-appointments-list": LocalJSX.XcastvenXkilianProjectAppointmentsList & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectAppointmentsListElement>;
+            "xcastven-xkilian-project-condition-detail": LocalJSX.XcastvenXkilianProjectConditionDetail & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectConditionDetailElement>;
+            "xcastven-xkilian-project-conditions-list": LocalJSX.XcastvenXkilianProjectConditionsList & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectConditionsListElement>;
+            "xcastven-xkilian-project-drawer": LocalJSX.XcastvenXkilianProjectDrawer & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectDrawerElement>;
+            "xcastven-xkilian-project-header": LocalJSX.XcastvenXkilianProjectHeader & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectHeaderElement>;
             "xcastven-xkilian-project-home-page": LocalJSX.XcastvenXkilianProjectHomePage & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectHomePageElement>;
+            "xcastven-xkilian-project-legend": LocalJSX.XcastvenXkilianProjectLegend & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectLegendElement>;
         }
     }
 }

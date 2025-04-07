@@ -1,0 +1,213 @@
+import { Condition, formatDate, formatDateDelta, getDateAndTimeTitle } from '../../utils/utils';
+import { Appointment } from '../../api/generated';
+import { Component, h, Prop, State } from '@stencil/core';
+
+@Component({
+  tag: 'xcastven-xkilian-project-condition-detail',
+  shadow: false,
+})
+export class AppointmentDetail {
+  @Prop() condition: Condition;
+  @Prop() handleResetSelection: () => void;
+  @Prop() handleSelectAppointment: (appointment: Appointment) => void;
+  @Prop() handleScheduleAppointmentFromCondition: (condition: Condition) => void;
+  @Prop() handleToggleConditionStatus: () => void;
+
+  @State() expandedConditionId: string;
+
+  private toggleConditionAppointments = (conditionId: string) => {
+    this.expandedConditionId = this.expandedConditionId === conditionId ? null : conditionId;
+  };
+
+  render() {
+    if (!this.condition) return null;
+
+    return (
+      <div class="w-full max-w-md">
+        <div class="relative w-full max-w-md">
+          <div class="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-0">
+            <md-icon-button onClick={this.handleResetSelection}>
+              <span class="material-symbols-outlined text-gray-600">
+                arrow_forward
+              </span>
+            </md-icon-button>
+          </div>
+
+          <h2 class="w-full text-center text-[#7357be] text-xl font-medium mb-6">
+            Condition details
+          </h2>
+        </div>
+
+        <div class="w-full max-w-md px-4 py-3 rounded-md bg-gray-200 mb-6">
+          <div class="w-full flex flex-row justify-between items-center mb-1">
+            <div class="text-gray-500 flex flex-row items-center gap-x-2">
+              <span
+                class="material-symbols-outlined"
+                style={{ fontSize: '16px' }}
+              >
+                edit
+              </span>
+              Name
+            </div>
+            <span class="font-medium text-gray-600">
+              {this.condition.displayName}
+            </span>
+          </div>
+
+          <div class="w-full flex flex-row justify-between items-center mb-1">
+            <div class="text-gray-500 flex flex-row items-center gap-x-2">
+              <span
+                class="material-symbols-outlined"
+                style={{ fontSize: '16px' }}
+              >
+                line_start_circle
+              </span>
+              From
+            </div>
+            <span class="font-medium text-gray-600">
+              {formatDate(this.condition.startDate)}
+            </span>
+          </div>
+
+          {this.condition.ended &&
+            this.condition.endDate && (
+              <>
+                <div class="w-full flex flex-row justify-between items-center mb-1">
+                  <div class="text-gray-500 flex flex-row items-center gap-x-2">
+                    <span
+                      class="material-symbols-outlined"
+                      style={{ fontSize: '16px' }}
+                    >
+                      line_end_circle
+                    </span>
+                    To
+                  </div>
+                  <span class="font-medium text-gray-600">
+                    {formatDate(this.condition.endDate)}
+                  </span>
+                </div>
+
+                <div class="w-full flex flex-row justify-between items-center mb-1">
+                  <div class="text-gray-500 flex flex-row items-center gap-x-2">
+                    <span
+                      class="material-symbols-outlined"
+                      style={{ fontSize: '16px' }}
+                    >
+                      timer
+                    </span>
+                    Duration
+                  </div>
+                  <span class="font-medium text-gray-600">
+                    {formatDateDelta(
+                      this.condition.startDate,
+                      this.condition.endDate,
+                    )}
+                  </span>
+                </div>
+              </>
+            )}
+
+          <div class="w-full flex flex-row justify-between items-center">
+            <div class="text-gray-500 flex flex-row items-center gap-x-2">
+              <span
+                class="material-symbols-outlined"
+                style={{ fontSize: '16px' }}
+              >
+                {this.condition.ended
+                  ? 'check_circle'
+                  : 'pending'}
+              </span>
+              Status
+            </div>
+            <span class="font-medium text-gray-600">
+              {this.condition.ended ? 'Gone' : 'Ongoing'}
+            </span>
+          </div>
+        </div>
+
+        <div class="w-full max-w-md px-4 py-3 rounded-md bg-gray-200 mb-6">
+          <div class="flex flex-row justify-between items-center mb-2">
+            <div class="text-gray-500 flex flex-row items-center gap-x-2">
+              <span
+                class="material-symbols-outlined"
+                style={{ fontSize: '16px' }}
+              >
+                calendar_month
+              </span>
+              Appointments
+            </div>
+            {this.condition.appointments.length > 0 && (
+              <md-icon-button
+                onClick={() =>
+                  this.toggleConditionAppointments(this.condition.id)
+                }
+                style={{ width: '24px', height: '24px' }}
+              >
+                <span class="material-symbols-outlined">
+                  {this.expandedConditionId === this.condition.id
+                    ? 'expand_less'
+                    : 'expand_more'}
+                </span>
+              </md-icon-button>
+            )}
+          </div>
+
+          {this.condition.appointments.length <= 0 ? (
+            <div class="text-sm font-medium text-gray-600">
+              No appointments for this condition
+            </div>
+          ) : this.expandedConditionId === this.condition.id ? (
+            <div class="w-full rounded-md bg-gray-200 overflow-y-auto max-h-28">
+              {this.condition.appointments.map(
+                (appointment: Appointment) => (
+                  <div
+                    key={appointment.id}
+                    class="flex justify-between items-center py-1 px-2 hover:bg-gray-300 rounded cursor-pointer mb-1"
+                    onClick={() =>
+                      this.handleSelectAppointment(appointment)
+                    }
+                  >
+                    <div class="flex items-center">
+                      <span
+                        class="material-symbols-outlined text-gray-500 mr-2"
+                        style={{ fontSize: '14px' }}
+                      >
+                        calendar_month
+                      </span>
+                      {getDateAndTimeTitle(appointment.appointmentDate, appointment.timeSlot.time, "medium", "text-sm")}
+                    </div>
+                    <div class="text-xs text-gray-600 font-medium">
+                      {appointment.type.displayName}
+                    </div>
+                  </div>
+                ),
+              )}
+            </div>
+          ) : (
+            <div class="text-sm font-medium text-gray-600 ml-2">
+              {this.condition.appointments.length} appointment
+              {this.condition.appointments.length !== 1 &&
+                's'}
+            </div>
+          )}
+        </div>
+
+        <div class="w-full max-w-md flex flex-row justify-between items-center gap-x-3">
+          <md-filled-button
+            class="w-1/2 rounded-full bg-[#7357be]"
+            onClick={this.handleScheduleAppointmentFromCondition}
+          >
+            Schedule
+          </md-filled-button>
+
+          <md-filled-button
+            class="w-1/2 rounded-full bg-[#7357be]"
+            onClick={this.handleToggleConditionStatus}
+          >
+            {this.condition.ended ? 'Reset as ongoing' : 'Set as gone'}
+          </md-filled-button>
+        </div>
+      </div>
+    );
+  };
+}

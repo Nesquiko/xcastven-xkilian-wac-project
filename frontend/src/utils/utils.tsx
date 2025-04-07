@@ -202,6 +202,37 @@ export type Condition = {
 export const HomepagePatientDataExample = {
   appointments: [
     {
+      id: 'appt-0',
+      timeSlot: {
+        time: '7:00',
+        status: 'unavailable',
+      } satisfies TimeSlot,
+      appointmentDate: new Date(2025, 3, 4),
+      type: {
+        id: '1',
+        displayName: 'Check-Up',
+      },
+      doctor: {
+        id: '1',
+        firstName: 'John',
+        lastName: 'Doe',
+        email: 'email@email.sk',
+        specialization: 'gastroenterologist',
+      },
+      illness: 'Flu',
+      status: 'scheduled',
+      reason: 'Feeling unwell Feeling unwell Feeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwellFeeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell Feeling unwell ',
+      facilities: [],
+      equipment: [],
+      medicine: [],
+      patient: {
+        id: '100',
+        email: 'email@email.sk',
+        firstName: 'Jozef',
+        lastName: 'Jozkovic',
+      },
+    } satisfies Appointment,
+    {
       id: 'appt-1',
       timeSlot: {
         time: '7:00',
@@ -454,8 +485,8 @@ export const HomepagePatientDataExample = {
     {
       id: 'cond-1',
       displayName: 'Flu',
-      startDate: new Date(2025, 3, 17),
-      endDate: new Date(2025, 3, 17),
+      startDate: new Date(2025, 3, 19),
+      endDate: new Date(2025, 3, 19),
       ended: true,
       appointments: [
         {

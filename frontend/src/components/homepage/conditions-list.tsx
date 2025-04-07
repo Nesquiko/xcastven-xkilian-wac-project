@@ -1,13 +1,14 @@
-import { Condition, formatDate } from '../../utils/utils';
+import { formatDate } from '../../utils/utils';
 import { Component, h, Prop, State } from '@stencil/core';
+import { ConditionDisplay } from '../../api/generated';
 
 @Component({
   tag: 'xcastven-xkilian-project-conditions-list',
   shadow: false,
 })
 export class AppointmentsList {
-  @Prop() conditions: Array<Condition>;
-  @Prop() handleSelectCondition: (condition: Condition) => void;
+  @Prop() conditions: Array<ConditionDisplay>;
+  @Prop() handleSelectCondition: (condition: ConditionDisplay) => void;
 
   @State() expandedConditionId: string = null;
 
@@ -15,7 +16,7 @@ export class AppointmentsList {
     return (
       <div class="w-full bg-white rounded-lg overflow-hidden shadow-sm">
         {this.conditions.length ?
-          this.conditions.map((condition: Condition, index: number) => {
+          this.conditions.map((condition: ConditionDisplay, index: number) => {
             const isExpanded: boolean =
               this.expandedConditionId && condition.id === this.expandedConditionId;
 
@@ -31,10 +32,10 @@ export class AppointmentsList {
                 >
                   <div class="flex flex-row justify-between items-center">
                     <div class="text-[#7357be] font-medium">
-                      {condition.displayName}
+                      {condition.name}
                     </div>
                     <div class="flex items-center">
-                      {condition.ended ? (
+                      {condition.end ? (
                         <span
                           class="material-symbols-outlined text-gray-500"
                           style={{ fontSize: '16px' }}
@@ -55,14 +56,14 @@ export class AppointmentsList {
                     <span class="text-sm text-gray-400">
                       From:
                       <span class="text-sm font-medium text-gray-600 ml-2">
-                        {formatDate(condition.startDate)}
+                        {formatDate(condition.start)}
                       </span>
                     </span>
-                    {condition.endDate && (
+                    {condition.end && (
                       <span class="text-sm text-gray-400">
                         To:
                         <span class="text-sm font-medium text-gray-600 ml-2">
-                          {formatDate(condition.endDate)}
+                          {formatDate(condition.end)}
                         </span>
                       </span>
                     )}

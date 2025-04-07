@@ -1,18 +1,19 @@
-import { Condition, formatDate, formatDateDelta, getDateAndTimeTitle } from '../../utils/utils';
-import { Appointment } from '../../api/generated';
+import { formatDate, formatDateDelta, getDateAndTimeTitle } from '../../utils/utils';
 import { Component, h, Prop, State } from '@stencil/core';
+import { AppointmentDisplay, Condition } from '../../api/generated';
 
 @Component({
   tag: 'xcastven-xkilian-project-condition-detail',
   shadow: false,
 })
-export class AppointmentDetail {
-  @Prop() condition: Condition;
+export class ConditionDetail {
+  @Prop() conditionId: string;
   @Prop() handleResetSelection: () => void;
-  @Prop() handleSelectAppointment: (appointment: Appointment) => void;
+  @Prop() handleSelectAppointment: (appointment: AppointmentDisplay) => void;
   @Prop() handleScheduleAppointmentFromCondition: (condition: Condition) => void;
   @Prop() handleToggleConditionStatus: () => void;
 
+  @State() condition: Condition;
   @State() expandedConditionId: string;
 
   private toggleConditionAppointments = (conditionId: string) => {
@@ -50,7 +51,7 @@ export class AppointmentDetail {
               Name
             </div>
             <span class="font-medium text-gray-600">
-              {this.condition.displayName}
+              {this.condition.name}
             </span>
           </div>
 
@@ -65,47 +66,46 @@ export class AppointmentDetail {
               From
             </div>
             <span class="font-medium text-gray-600">
-              {formatDate(this.condition.startDate)}
+              {formatDate(this.condition.start)}
             </span>
           </div>
 
-          {this.condition.ended &&
-            this.condition.endDate && (
-              <>
-                <div class="w-full flex flex-row justify-between items-center mb-1">
-                  <div class="text-gray-500 flex flex-row items-center gap-x-2">
-                    <span
-                      class="material-symbols-outlined"
-                      style={{ fontSize: '16px' }}
-                    >
-                      line_end_circle
-                    </span>
-                    To
-                  </div>
-                  <span class="font-medium text-gray-600">
-                    {formatDate(this.condition.endDate)}
+          {this.condition.end && (
+            <>
+              <div class="w-full flex flex-row justify-between items-center mb-1">
+                <div class="text-gray-500 flex flex-row items-center gap-x-2">
+                  <span
+                    class="material-symbols-outlined"
+                    style={{ fontSize: '16px' }}
+                  >
+                    line_end_circle
                   </span>
+                  To
                 </div>
+                <span class="font-medium text-gray-600">
+                  {formatDate(this.condition.end)}
+                </span>
+              </div>
 
-                <div class="w-full flex flex-row justify-between items-center mb-1">
-                  <div class="text-gray-500 flex flex-row items-center gap-x-2">
-                    <span
-                      class="material-symbols-outlined"
-                      style={{ fontSize: '16px' }}
-                    >
-                      timer
-                    </span>
-                    Duration
-                  </div>
-                  <span class="font-medium text-gray-600">
-                    {formatDateDelta(
-                      this.condition.startDate,
-                      this.condition.endDate,
-                    )}
+              <div class="w-full flex flex-row justify-between items-center mb-1">
+                <div class="text-gray-500 flex flex-row items-center gap-x-2">
+                  <span
+                    class="material-symbols-outlined"
+                    style={{ fontSize: '16px' }}
+                  >
+                    timer
                   </span>
+                  Duration
                 </div>
-              </>
-            )}
+                <span class="font-medium text-gray-600">
+                  {formatDateDelta(
+                    this.condition.start,
+                    this.condition.end,
+                  )}
+                </span>
+              </div>
+            </>
+          )}
 
           <div class="w-full flex flex-row justify-between items-center">
             <div class="text-gray-500 flex flex-row items-center gap-x-2">
@@ -113,14 +113,14 @@ export class AppointmentDetail {
                 class="material-symbols-outlined"
                 style={{ fontSize: '16px' }}
               >
-                {this.condition.ended
+                {this.condition.end
                   ? 'check_circle'
                   : 'pending'}
               </span>
               Status
             </div>
             <span class="font-medium text-gray-600">
-              {this.condition.ended ? 'Gone' : 'Ongoing'}
+              {this.condition.end ? 'Gone' : 'Ongoing'}
             </span>
           </div>
         </div>
@@ -159,7 +159,7 @@ export class AppointmentDetail {
           ) : this.expandedConditionId === this.condition.id ? (
             <div class="w-full rounded-md bg-gray-200 overflow-y-auto max-h-28">
               {this.condition.appointments.map(
-                (appointment: Appointment) => (
+                (appointment: AppointmentDisplay) => (
                   <div
                     key={appointment.id}
                     class="flex justify-between items-center py-1 px-2 hover:bg-gray-300 rounded cursor-pointer mb-1"
@@ -174,10 +174,10 @@ export class AppointmentDetail {
                       >
                         calendar_month
                       </span>
-                      {getDateAndTimeTitle(appointment.appointmentDate, appointment.timeSlot.time, "medium", "text-sm")}
+                      {getDateAndTimeTitle(appointment.appointmentDateTime, "medium", "text-sm")}
                     </div>
                     <div class="text-xs text-gray-600 font-medium">
-                      {appointment.type.displayName}
+                      {appointment.type}
                     </div>
                   </div>
                 ),
@@ -204,7 +204,7 @@ export class AppointmentDetail {
             class="w-1/2 rounded-full bg-[#7357be]"
             onClick={this.handleToggleConditionStatus}
           >
-            {this.condition.ended ? 'Reset as ongoing' : 'Set as gone'}
+            {this.condition.end ? 'Reset as ongoing' : 'Set as gone'}
           </md-filled-button>
         </div>
       </div>

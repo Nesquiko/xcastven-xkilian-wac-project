@@ -1,18 +1,26 @@
-import { Component, h, Prop } from '@stencil/core';
+import { Component, h, Prop, State } from '@stencil/core';
 import { formatDate, getAppointmentActions } from '../../utils/utils';
-import { Appointment, AppointmentStatusEnum } from '../../api/generated';
+import {
+  AppointmentStatus,
+  DoctorAppointment,
+  instanceOfDoctorAppointment,
+  PatientAppointment,
+} from '../../api/generated';
+import { PatientAppointmentDetailExample } from '../../data-examples/patient-appointment-detail';
 
 @Component({
   tag: 'xcastven-xkilian-project-appointment-detail',
   shadow: false,
 })
 export class AppointmentDetail {
-  @Prop() appointment: Appointment;
+  @Prop() appointmentId: string;
   @Prop() handleResetSelection: () => void;
-  @Prop() handleRescheduleAppointment: (appointment: Appointment) => void;
-  @Prop() handleCancelAppointment: (appointment: Appointment) => void;
+  @Prop() handleRescheduleAppointment: (appointment: PatientAppointment | DoctorAppointment) => void;
+  @Prop() handleCancelAppointment: (appointment: PatientAppointment | DoctorAppointment) => void;
 
-  private getAppointmentStatusMessage = (appointmentStatus: AppointmentStatusEnum) => {
+  @State() appointment: PatientAppointment | DoctorAppointment = PatientAppointmentDetailExample;
+
+  private getAppointmentStatusMessage = (appointmentStatus: AppointmentStatus) => {
     switch (appointmentStatus) {
       case 'requested':
         return 'This appointment is waiting for a reaction from the Doctor\'s office.';
@@ -22,7 +30,7 @@ export class AppointmentDetail {
         return 'This appointment has already been completed.';
       case 'denied':
         return 'This appointment has been denied by the Doctor\'s office.';
-      case 'canceled':
+      case 'cancelled':
         return 'This appointment has been canceled by you.';
       default:
         return '';
@@ -60,7 +68,7 @@ export class AppointmentDetail {
               Date
             </div>
             <span class="font-medium text-gray-600">
-              {formatDate(this.appointment.appointmentDate)}
+              {formatDate(this.appointment.appointmentDateTime)}
             </span>
           </div>
 
@@ -75,7 +83,8 @@ export class AppointmentDetail {
               Time
             </div>
             <span class="font-medium text-gray-600">
-              {this.appointment.timeSlot.time}
+              {this.appointment.appointmentDateTime.getHours()}:
+              {this.appointment.appointmentDateTime.getMinutes()}
             </span>
           </div>
 
@@ -90,25 +99,43 @@ export class AppointmentDetail {
               Type
             </div>
             <span class="font-medium text-gray-600">
-              {this.appointment.type.displayName}
+              {this.appointment.type}
             </span>
           </div>
 
-          <div class="w-full flex flex-row justify-between items-center">
-            <div class="text-gray-500 flex flex-row items-center gap-x-2">
+          {instanceOfDoctorAppointment(this.appointment) ? (
+            <div class="w-full flex flex-row justify-between items-center">
+              <div class="text-gray-500 flex flex-row items-center gap-x-2">
               <span
                 class="material-symbols-outlined"
                 style={{ fontSize: '16px' }}
               >
                 person
               </span>
-              Doctor
+                Patient
+              </div>
+              <span class="font-medium text-gray-600">
+                Dr. {this.appointment.patient.firstName}{' '}
+                {this.appointment.patient.lastName}
+              </span>
             </div>
-            <span class="font-medium text-gray-600">
-              Dr. {this.appointment.doctor.firstName}{' '}
-              {this.appointment.doctor.lastName}
-            </span>
-          </div>
+          ) : (
+            <div class="w-full flex flex-row justify-between items-center">
+              <div class="text-gray-500 flex flex-row items-center gap-x-2">
+              <span
+                class="material-symbols-outlined"
+                style={{ fontSize: '16px' }}
+              >
+                person
+              </span>
+                Doctor
+              </div>
+              <span class="font-medium text-gray-600">
+                Dr. {this.appointment.doctor.firstName}{' '}
+                {this.appointment.doctor.lastName}
+              </span>
+            </div>
+          )}
 
           <div class="w-full flex flex-row justify-between items-center">
             <div class="text-gray-500 flex flex-row items-center gap-x-2">

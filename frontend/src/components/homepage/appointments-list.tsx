@@ -1,20 +1,22 @@
-import { Appointment } from '../../api/generated';
 import { getDateAndTimeTitle } from '../../utils/utils';
 import { Component, h, Prop } from '@stencil/core';
+import { AppointmentDisplay } from '../../api/generated';
 
 @Component({
   tag: 'xcastven-xkilian-project-appointments-list',
   shadow: false,
 })
 export class AppointmentsList {
-  @Prop() appointments: Array<Appointment>;
-  @Prop() handleSelectAppointment: (appointment: Appointment) => void;
+  private isDoctor: boolean = false /* sessionStorage.getItem("role") */;
+
+  @Prop() appointments: Array<AppointmentDisplay>;
+  @Prop() handleSelectAppointment: (appointment: AppointmentDisplay) => void;
 
   render() {
     return (
       <div class="w-full bg-white rounded-lg overflow-hidden shadow-sm">
         {this.appointments.length ?
-          this.appointments.map((appointment: Appointment, index: number) => {
+          this.appointments.map((appointment: AppointmentDisplay, index: number) => {
             return (
               <div
                 key={appointment.id}
@@ -26,21 +28,26 @@ export class AppointmentsList {
               >
                 <div class="flex flex-row justify-between items-center">
                   {getDateAndTimeTitle(
-                    appointment.appointmentDate,
-                    appointment.timeSlot.time,
+                    appointment.appointmentDateTime,
                     'medium',
                   )}
                   <div class="text-sm font-medium text-gray-600">
-                    {appointment.type.displayName}
+                    {appointment.type}
                   </div>
                 </div>
-                <div class="text-sm font-medium text-gray-600">
-                  Dr. {appointment.doctor.firstName}{' '}
-                  {appointment.doctor.lastName}
-                </div>
+                {this.isDoctor ? (
+                  <div class="text-sm font-medium text-gray-600">
+                    {appointment.patientName}
+                  </div>
+                ) : (
+                  <div class="text-sm font-medium text-gray-600">
+                    Dr. {appointment.doctorName}
+                  </div>
+                )}
               </div>
-            )},
-            ) : (
+            )
+            },
+          ) : (
             <div
               class={`h-16 px-4 py-2 flex flex-col justify-center w-full border-2 border-transparent text-center bg-gray-200 text-sm font-medium text-gray-600`}
             >

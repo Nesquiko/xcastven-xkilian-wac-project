@@ -14,19 +14,17 @@ const data = {
     { time: "14:00", status: "unavailable" },
   ] satisfies Array<TimeSlot>,
   appointmentTypes: [
-    { id: "1", displayName: "Check-Up" },
-    { id: "2", displayName: "Follow-Up" },
-    { id: "3", displayName: "Consultation" },
+    "regular_check"
   ] satisfies Array<AppointmentType>,
   doctors: [
-    { id: "1", firstName: "John", lastName: "Doe", email: "email@email.sk", specialization: "cardiologist" },
-    { id: "2", firstName: "Jane", lastName: "Smith", email: "email@gmail.com", specialization: "endocrinologist" },
-    { id: "3", firstName: "Samuel", lastName: "Johnson", email: "g@g.sk", specialization: "dermatologist" },
+    { id: "1", firstName: "John", lastName: "Doe", email: "email@email.sk", specialization: "cardiologist", role: "doctor" },
+    { id: "2", firstName: "Jane", lastName: "Smith", email: "email@gmail.com", specialization: "endocrinologist", role: "doctor" },
+    { id: "3", firstName: "Samuel", lastName: "Johnson", email: "g@g.sk", specialization: "dermatologist", role: "doctor" },
   ] satisfies Array<Doctor>,
 };
 
 @Component({
-  tag: 'appointment-scheduler',
+  tag: 'xcastven-xkilian-appointment-scheduler',
   shadow: false,
 })
 export class AppointmentScheduler {
@@ -312,8 +310,8 @@ export class AppointmentScheduler {
                     onInput={(e: Event) => this.handleAppointmentTypeChange(e)}
                   >
                     {this.appointmentTypes.map((appointmentType: AppointmentType) => (
-                      <md-select-option value={appointmentType.id}>
-                        <div slot="headline">{appointmentType.displayName}</div>
+                      <md-select-option value={appointmentType}>
+                        <div slot="headline">{appointmentType}</div>
                       </md-select-option>
                     ))}
                   </md-filled-select>

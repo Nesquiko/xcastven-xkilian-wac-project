@@ -32,8 +32,8 @@ export class Header {
     }
 
     return (
-      <div class="bg-gray-800 flex items-center px-3 py-1 text-white relative z-0">
-          <span class="relative z-0">
+      <div class="bg-gray-800 flex items-center px-3 py-1 text-white h-[48px]">
+          <span class="relative">
             <md-icon-button
               id="menu-button"
               class="mr-2"

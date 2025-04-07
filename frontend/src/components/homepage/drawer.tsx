@@ -1,6 +1,12 @@
-import { Condition, formatDate } from '../../utils/utils';
+import { formatDate } from '../../utils/utils';
 import { Component, h, Prop, State } from '@stencil/core';
-import { Appointment } from '../../api/generated';
+import {
+  AppointmentDisplay,
+  Condition,
+  ConditionDisplay,
+  DoctorAppointment,
+  PatientAppointment,
+} from '../../api/generated';
 
 @Component({
   tag: 'xcastven-xkilian-project-drawer',
@@ -9,17 +15,17 @@ import { Appointment } from '../../api/generated';
 export class Drawer {
   @Prop() isDrawerOpen: boolean;
   @Prop() selectedDate: Date;
-  @Prop() selectedAppointment: Appointment;
-  @Prop() selectedCondition: Condition;
+  @Prop() selectedAppointment: AppointmentDisplay;
+  @Prop() selectedCondition: ConditionDisplay;
 
   @Prop() handleResetSelection: () => void;
-  @Prop() getAppointmentsForDate: (date: Date) => Array<Appointment>;
-  @Prop() getConditionsForDate: (date: Date) => Array<Condition>;
-  @Prop() handleSelectAppointment: (appointment: Appointment) => void;
-  @Prop() handleSelectCondition: (condition: Condition) => void;
+  @Prop() getAppointmentsForDate: (date: Date) => Array<AppointmentDisplay>;
+  @Prop() getConditionsForDate: (date: Date) => Array<ConditionDisplay>;
+  @Prop() handleSelectAppointment: (appointment: AppointmentDisplay) => void;
+  @Prop() handleSelectCondition: (condition: ConditionDisplay) => void;
 
-  @Prop() handleRescheduleAppointment: (appointment: Appointment) => void;
-  @Prop() handleCancelAppointment: (appointment: Appointment) => void;
+  @Prop() handleRescheduleAppointment: (appointment: PatientAppointment | DoctorAppointment) => void;
+  @Prop() handleCancelAppointment: (appointment: PatientAppointment | DoctorAppointment) => void;
   @Prop() handleScheduleAppointmentFromCondition: (condition: Condition) => void;
   @Prop() handleToggleConditionStatus: () => void;
 
@@ -85,7 +91,7 @@ export class Drawer {
           {/* Appointment detail */}
           {this.selectedAppointment && (
             <xcastven-xkilian-project-appointment-detail
-              appointment={this.selectedAppointment}
+              appointmentId={this.selectedAppointment.id}
               handleResetSelection={this.handleResetSelection}
               handleRescheduleAppointment={this.handleRescheduleAppointment}
               handleCancelAppointment={this.handleCancelAppointment}
@@ -95,7 +101,7 @@ export class Drawer {
           {/* Condition detail */}
           {this.selectedCondition && (
             <xcastven-xkilian-project-condition-detail
-              condition={this.selectedCondition}
+              conditionId={this.selectedCondition.id}
               handleResetSelection={this.handleResetSelection}
               handleSelectAppointment={this.handleSelectAppointment}
               handleScheduleAppointmentFromCondition={this.handleScheduleAppointmentFromCondition}

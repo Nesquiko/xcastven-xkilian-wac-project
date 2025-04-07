@@ -33,6 +33,10 @@ jobs:
 
       - name: Build
         working-directory: frontend
+        run: bun run openapi
+
+      - name: Build
+        working-directory: frontend
         run: bun run build
 
   docker:

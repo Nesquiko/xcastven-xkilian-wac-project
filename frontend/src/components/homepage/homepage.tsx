@@ -52,6 +52,7 @@ export class Homepage {
       <div
         class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 bg-black text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-10"
       >
+        <link href="./build/xcastven-xkilian-project.css" rel="stylesheet" />
         <div class="flex flex-col gap-y-1 w-full">
           <span class="w-full text-center">{appointment.type.displayName}</span>
 

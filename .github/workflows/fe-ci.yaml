@@ -80,7 +80,6 @@ jobs:
 
       - uses: docker/build-push-action@v6
         with:
-          context: frontend
           platforms: linux/amd64
           file: Dockerfile
           push: true

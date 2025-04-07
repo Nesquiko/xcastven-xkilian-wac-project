@@ -25,3 +25,7 @@ properties:
     example: "Feeling unwell, general check-up needed."
   cancellationReason:
     type: string
+  prescriptions:
+    type: array
+    items:
+      $ref: "../prescription/PrescriptionDisplay.yaml"

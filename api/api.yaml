@@ -30,8 +30,8 @@ paths:
   /conditions/{conditionId}:
     $ref: "./paths/conditions_conditionId.yaml"
 
-  /medicine:
-    $ref: "./paths/medicine.yaml"
+  /prescriptions:
+    $ref: "./paths/prescriptions.yaml"
 
   /patients/{patientId}:
     $ref: "./paths/patients_patientId.yaml"

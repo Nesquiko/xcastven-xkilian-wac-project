@@ -8,7 +8,7 @@ properties:
     type: array
     items:
       $ref: "./conditions/ConditionDisplay.yaml"
-  medicine:
+  prescriptions:
     type: array
     items:
-      $ref: "./medicine/MedicineDisplay.yaml"
+      $ref: "./prescription/PrescriptionDisplay.yaml"

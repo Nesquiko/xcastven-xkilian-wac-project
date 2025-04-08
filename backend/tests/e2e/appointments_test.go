@@ -19,6 +19,115 @@ import (
 	"github.com/Nesquiko/wac/pkg/server"
 )
 
+func TestDecideAppointmentApprove(t *testing.T) {
+	t.Parallel()
+
+	patientEmail := fmt.Sprintf("test.decide.appt.approve.%s@patient.com", uuid.NewString())
+	patient := mustCreatePatient(t, newPatient(patientEmail))
+
+	doctorEmail := fmt.Sprintf("test.decide.appt.approve.%s@doctor.com", uuid.NewString())
+	doctor := mustCreateDoctor(t, newDoctor(doctorEmail))
+
+	appointmentTime := time.Now().Add(24 * time.Hour).Truncate(time.Hour)
+	newAppointmentReq := api.NewAppointmentRequest{
+		PatientId:           patient.Id,
+		DoctorId:            doctor.Id,
+		AppointmentDateTime: appointmentTime,
+		Type:                asPtr(api.RegularCheck),
+	}
+	createdAppointment := mustCreateAppointment(t, newAppointmentReq)
+	appointmentId := *createdAppointment.Id
+
+	resourceName := "Test Resource"
+	resourceType := api.ResourceTypeEquipment
+	resource := mustCreateResource(t, api.NewResource{Name: resourceName, Type: resourceType})
+
+	decision := api.AppointmentDecision{
+		Action: api.Accept,
+		Equipment: &[]api.Equipment{
+			{
+				Id:   *resource.Id,
+				Name: resource.Name,
+			},
+		},
+	}
+	decisionReqBody, err := json.Marshal(decision)
+	require.NoError(t, err, "Failed to marshal decision request body")
+
+	url := fmt.Sprintf("%s/appointments/%s", ServerUrl, appointmentId)
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(decisionReqBody))
+	require.NoError(t, err, "Failed to create HTTP POST request")
+	req.Header.Set("Content-Type", server.ApplicationJSON)
+
+	res, err := http.DefaultClient.Do(req)
+	require.NoError(t, err, "http.Post failed for DecideAppointment")
+	defer res.Body.Close()
+
+	require.Equal(t, http.StatusOK, res.StatusCode, "Expected '200 OK' status code")
+
+	var fetchedAppointment api.DoctorAppointment
+	err = json.NewDecoder(res.Body).Decode(&fetchedAppointment)
+	require.NoError(t, err, "Failed to decode fetched appointment")
+
+	assert := assert.New(t)
+	assert.Equal(
+		api.Scheduled,
+		fetchedAppointment.Status,
+		"Appointment status should be 'scheduled'",
+	)
+	assert.NotNil(fetchedAppointment.Equipment)
+	assert.Len(*fetchedAppointment.Equipment, 1)
+	assert.Equal(*resource.Id, (*fetchedAppointment.Equipment)[0].Id)
+	assert.Equal(resource.Name, (*fetchedAppointment.Equipment)[0].Name)
+}
+
+func TestDecideAppointmentReject(t *testing.T) {
+	t.Parallel()
+
+	patientEmail := fmt.Sprintf("test.decide.appt.reject.%s@patient.com", uuid.NewString())
+	patient := mustCreatePatient(t, newPatient(patientEmail))
+
+	doctorEmail := fmt.Sprintf("test.decide.appt.reject.%s@doctor.com", uuid.NewString())
+	doctor := mustCreateDoctor(t, newDoctor(doctorEmail))
+
+	appointmentTime := time.Now().Add(24 * time.Hour).Truncate(time.Hour)
+	newAppointmentReq := api.NewAppointmentRequest{
+		PatientId:           patient.Id,
+		DoctorId:            doctor.Id,
+		AppointmentDateTime: appointmentTime,
+		Type:                asPtr(api.RegularCheck),
+	}
+	createdAppointment := mustCreateAppointment(t, newAppointmentReq)
+	appointmentId := *createdAppointment.Id
+
+	rejectionReason := "Test rejection reason"
+	decision := api.AppointmentDecision{
+		Action: api.Reject,
+		Reason: &rejectionReason,
+	}
+	decisionReqBody, err := json.Marshal(decision)
+	require.NoError(t, err, "Failed to marshal decision request body")
+
+	url := fmt.Sprintf("%s/appointments/%s", ServerUrl, appointmentId)
+	req, err := http.NewRequest(http.MethodPost, url, bytes.NewBuffer(decisionReqBody))
+	require.NoError(t, err, "Failed to create HTTP POST request")
+	req.Header.Set("Content-Type", server.ApplicationJSON)
+
+	res, err := http.DefaultClient.Do(req)
+	require.NoError(t, err, "http.Post failed for DecideAppointment")
+	defer res.Body.Close()
+
+	require.Equal(t, http.StatusOK, res.StatusCode, "Expected '200 OK' status code")
+
+	var fetchedAppointment api.DoctorAppointment
+	err = json.NewDecoder(res.Body).Decode(&fetchedAppointment)
+	require.NoError(t, err, "Failed to decode fetched appointment")
+
+	assert := assert.New(t)
+	assert.Equal(api.Denied, fetchedAppointment.Status, "Appointment status should be 'denied'")
+	assert.Equal(rejectionReason, *fetchedAppointment.Reason, "Rejection reason mismatch")
+}
+
 func TestDoctorsAppointmentById(t *testing.T) {
 	t.Parallel()
 

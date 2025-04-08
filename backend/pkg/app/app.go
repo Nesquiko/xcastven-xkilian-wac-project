@@ -32,6 +32,11 @@ type App interface {
 		doctorId uuid.UUID,
 		appointmentId uuid.UUID,
 	) (api.DoctorAppointment, error)
+	DecideAppointment(
+		ctx context.Context,
+		appointmentId uuid.UUID,
+		decision api.AppointmentDecision,
+	) (api.DoctorAppointment, error)
 
 	CreatePatient(ctx context.Context, p api.PatientRegistration) (api.Patient, error)
 	PatientById(ctx context.Context, id uuid.UUID) (api.Patient, error)

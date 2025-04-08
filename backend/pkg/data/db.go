@@ -25,6 +25,13 @@ type Db interface {
 		appointmentId uuid.UUID,
 		cancellationReason *string,
 	) error
+	DecideAppointment(
+		ctx context.Context,
+		appointmentId uuid.UUID,
+		decision string,
+		denyReason *string,
+		resources []Resource,
+	) (Appointment, error)
 
 	CreatePatient(ctx context.Context, patient Patient) (Patient, error)
 	PatientById(ctx context.Context, id uuid.UUID) (Patient, error)

@@ -128,3 +128,86 @@ func (a monolithApp) DoctorsAppointmentById(
 
 	return dataApptToDoctorAppt(appointment, patient, cond, facilities, equipment, medicine), nil
 }
+
+func (a monolithApp) DecideAppointment(
+	ctx context.Context,
+	appointmentId uuid.UUID,
+	decision api.AppointmentDecision,
+) (api.DoctorAppointment, error) {
+	var resources []data.Resource
+	if decision.Facilities != nil {
+		for _, facility := range *decision.Facilities {
+			resources = append(resources, data.Resource{
+				Id:   facility.Id,
+				Name: facility.Name,
+				Type: data.ResourceTypeFacility,
+			})
+		}
+	}
+	if decision.Equipment != nil {
+		for _, equipment := range *decision.Equipment {
+			resources = append(resources, data.Resource{
+				Id:   equipment.Id,
+				Name: equipment.Name,
+				Type: data.ResourceTypeEquipment,
+			})
+		}
+	}
+	if decision.Medicine != nil {
+		for _, medicine := range *decision.Medicine {
+			resources = append(resources, data.Resource{
+				Id:   medicine.Id,
+				Name: medicine.Name,
+				Type: data.ResourceTypeMedicine,
+			})
+		}
+	}
+
+	appointment, err := a.db.DecideAppointment(
+		ctx,
+		appointmentId,
+		string(decision.Action),
+		decision.Reason,
+		resources,
+	)
+	if err != nil {
+		return api.DoctorAppointment{}, fmt.Errorf("DecideAppointment: %w", err)
+	}
+
+	patient, err := a.db.PatientById(ctx, appointment.PatientId)
+	if err != nil {
+		return api.DoctorAppointment{}, fmt.Errorf("DecideAppointment fetch patient: %w", err)
+	}
+
+	var cond *data.Condition
+	if appointment.ConditionId != nil {
+		c, err := a.db.ConditionById(ctx, *appointment.ConditionId)
+		if err != nil {
+			return api.DoctorAppointment{}, fmt.Errorf("DecideAppointment fetch condition: %w", err)
+		}
+		cond = &c
+	}
+
+	var facilities, equipment, medicine []data.Resource
+	for _, resource := range resources {
+		switch resource.Type {
+		case data.ResourceTypeFacility:
+			facilities = append(facilities, resource)
+		case data.ResourceTypeEquipment:
+			equipment = append(equipment, resource)
+		case data.ResourceTypeMedicine:
+			medicine = append(medicine, resource)
+		}
+	}
+
+	doctorAppointment := dataApptToDoctorAppt(
+		appointment,
+		patient,
+		cond,
+		facilities,
+		equipment,
+		medicine,
+	)
+
+	return doctorAppointment, nil
+}

@@ -54,7 +54,20 @@ func (s Server) DecideAppointment(
 	r *http.Request,
 	appointmentId api.AppointmentId,
 ) {
-	panic("unimplemented")
+	req, decodeErr := Decode[api.AppointmentDecision](w, r)
+	if decodeErr != nil {
+		encodeError(w, decodeErr)
+		return
+	}
+
+	doctorAppt, err := s.app.DecideAppointment(r.Context(), appointmentId, req)
+	if err != nil {
+		slog.Error(UnexpectedError, "error", err.Error(), "where", "DecideAppointment")
+		encodeError(w, internalServerError())
+		return
+	}
+
+	encode(w, http.StatusOK, doctorAppt)
 }
 
 // DoctorsCalendar implements api.ServerInterface.

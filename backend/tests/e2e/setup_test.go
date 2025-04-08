@@ -11,25 +11,28 @@ import (
 	"time"
 
 	"github.com/docker/go-connections/nat"
+	"github.com/test-go/testify/require"
 	"github.com/testcontainers/testcontainers-go/modules/mongodb"
 
 	"github.com/Nesquiko/wac/pkg/server"
 )
 
-var ServerUrl string
+var (
+	ServerUrl    string
+	serverCtx    context.Context
+	serverCancel context.CancelFunc
+)
 
 func TestMain(m *testing.M) {
-	ctx := context.Background()
-	ctx, cancel := context.WithCancel(ctx)
-	defer cancel()
+	serverCtx, serverCancel = context.WithCancel(context.Background())
 
 	logLevel := slog.LevelDebug
 	server.SetupLogger(logLevel)
 
-	mongoDBContainer, cleanup := prepareMongo(ctx)
+	mongoDBContainer, cleanup := prepareMongo(serverCtx)
 	defer cleanup()
 
-	portBindings, err := mongoDBContainer.Ports(ctx)
+	portBindings, err := mongoDBContainer.Ports(serverCtx)
 	if err != nil {
 		slog.Error("couldn't retrive test containers ports", slog.String("error", err.Error()))
 		os.Exit(1)
@@ -45,7 +48,7 @@ func TestMain(m *testing.M) {
 	}
 	dynamicMongoPort := bindings[0].HostPort
 
-	mongoHost, err := mongoDBContainer.Host(ctx)
+	mongoHost, err := mongoDBContainer.Host(serverCtx)
 	if err != nil {
 		slog.Error("couldn't retrieve test container host", slog.String("error", err.Error()))
 		os.Exit(1)
@@ -78,15 +81,15 @@ func TestMain(m *testing.M) {
 	ServerUrl = fmt.Sprintf("http://%s:%s", appHost, appPort)
 
 	go func() {
-		if err := server.Run(ctx); err != nil {
+		if err := server.Run(serverCtx); err != nil {
 			slog.Error("server Run failed", slog.String("error", err.Error()))
-			os.Exit(1) // Consider exiting if server fails to start
+			os.Exit(1)
 		}
 		slog.Info("server Run finished")
 	}()
 
 	err = waitForReady(
-		ctx,
+		serverCtx,
 		5*time.Second,
 		200*time.Millisecond,
 		ServerUrl+"/monitoring/heartbeat",
@@ -97,6 +100,7 @@ func TestMain(m *testing.M) {
 	}
 
 	exitCode := m.Run()
+	serverCancel()
 	os.Exit(exitCode)
 }
 
@@ -124,4 +128,28 @@ func prepareMongo(ctx context.Context) (*mongodb.MongoDBContainer, func()) {
 	}
 
 	return mongoDBContainer, cleanup
+}
+
+func restartServer(t *testing.T) {
+	t.Helper()
+	serverCancel()
+
+	time.Sleep(1 * time.Second)
+
+	serverCtx, serverCancel = context.WithCancel(context.Background())
+
+	go func() {
+		if err := server.Run(serverCtx); err != nil {
+			slog.Error("server Run failed", slog.String("error", err.Error()))
+		}
+		slog.Info("server Run finished")
+	}()
+
+	err := waitForReady(
+		serverCtx,
+		5*time.Second,
+		200*time.Millisecond,
+		ServerUrl+"/monitoring/heartbeat",
+	)
+	require.NoError(t, err, "ready endpoint not answering")
 }

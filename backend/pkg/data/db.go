@@ -45,16 +45,16 @@ type Db interface {
 		pageSize int,
 	) ([]Condition, PaginationResult, error)
 
-	CreateMedicine(ctx context.Context, medicine Medicine) (Medicine, error)
-	MedicineById(ctx context.Context, id uuid.UUID) (Medicine, error)
-	FindMedicinesByPatientId(
+	CreatePrescription(ctx context.Context, prescription Prescription) (Prescription, error)
+	PrescriptionById(ctx context.Context, id uuid.UUID) (Prescription, error)
+	FindPrescriptionsByPatientId(
 		ctx context.Context,
 		patientId uuid.UUID,
 		from time.Time,
 		to *time.Time,
 		page int,
 		pageSize int,
-	) ([]Medicine, PaginationResult, error)
+	) ([]Prescription, PaginationResult, error)
 
 	CreateResource(ctx context.Context, name string, typ ResourceType) (Resource, error)
 	ResourceById(ctx context.Context, id uuid.UUID) (Resource, error)

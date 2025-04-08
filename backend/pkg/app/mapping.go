@@ -1,6 +1,7 @@
 package app
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/oapi-codegen/runtime/types"
@@ -67,22 +68,34 @@ func dataCondToCondDisplay(c data.Condition) api.ConditionDisplay {
 	}
 }
 
-func newMedToDataMed(m api.NewMedicine) data.Medicine {
-	return data.Medicine{
-		PatientId: m.PatientId,
-		Name:      m.Name,
-		Start:     m.Start,
-		End:       m.End,
+func newPrescToDataPresc(p api.NewPrescription) data.Prescription {
+	return data.Prescription{
+		PatientId:   p.PatientId,
+		Name:        p.Name,
+		Start:       p.Start,
+		End:         p.End,
+		DoctorsNote: p.DoctorsNote,
 	}
 }
 
-func dataMedToMedDisplay(m data.Medicine) api.MedicineDisplay {
-	return api.MedicineDisplay{
-		Id:    &m.Id,
-		Name:  m.Name,
-		Start: m.Start,
-		End:   m.End,
+func dataPrescToPresc(
+	p data.Prescription,
+	appt *data.Appointment,
+	patient *data.Patient,
+	doctor *data.Doctor,
+) api.Prescription {
+	presc := api.Prescription{
+		Id:          &p.Id,
+		Name:        p.Name,
+		Start:       p.Start,
+		End:         p.End,
+		DoctorsNote: p.DoctorsNote,
 	}
+	if appt != nil {
+		presc.AppointmentId = &appt.Id
+		presc.Appointment = asPtr(dataApptToApptDisplay(*appt, *patient, *doctor))
+	}
+	return presc
 }
 
 func resourceToEquipment(r data.Resource) api.Equipment {
@@ -112,6 +125,21 @@ func newApptToDataAppt(a api.NewAppointmentRequest) data.Appointment {
 		appt.Type = string(*a.Type)
 	}
 	return appt
+}
+
+func dataApptToApptDisplay(
+	appt data.Appointment,
+	patient data.Patient,
+	doctor data.Doctor,
+) api.AppointmentDisplay {
+	return api.AppointmentDisplay{
+		Id:                  appt.Id,
+		AppointmentDateTime: appt.AppointmentDateTime,
+		DoctorName:          fmt.Sprintf("%s %s", doctor.FirstName, doctor.LastName),
+		PatientName:         fmt.Sprintf("%s %s", patient.FirstName, patient.LastName),
+		Status:              api.AppointmentStatus(appt.Status),
+		Type:                api.AppointmentType(appt.Type),
+	}
 }
 
 func dataApptToPatientAppt(

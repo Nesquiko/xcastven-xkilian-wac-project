@@ -65,13 +65,13 @@ func (m *MongoDb) FindConditionsByPatientId(
 	conditions := make([]Condition, 0)
 	pagination := PaginationResult{Page: page}
 
-	filter := bson.M{"patientId": patientId}
-	dateFilter := bson.M{}
-	dateFilter["$gte"] = from
-	if to != nil {
-		dateFilter["$lt"] = *to
+	filter := bson.M{
+		"patientId": patientId,
+		"end":       bson.M{"$gte": from},
 	}
-	filter["start"] = dateFilter
+	if to != nil {
+		filter["start"] = bson.M{"$lte": *to}
+	}
 
 	totalCount, err := collection.CountDocuments(ctx, filter)
 	if err != nil {

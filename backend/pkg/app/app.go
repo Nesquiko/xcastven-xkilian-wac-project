@@ -45,7 +45,10 @@ type App interface {
 	CreatePatientCondition(ctx context.Context, cond api.NewCondition) (api.ConditionDisplay, error)
 	ConditionById(ctx context.Context, id uuid.UUID) (api.ConditionDisplay, error)
 
-	CreatePatientMedicine(ctx context.Context, cond api.NewMedicine) (api.MedicineDisplay, error)
+	CreatePatientPrescription(
+		ctx context.Context,
+		pres api.NewPrescription,
+	) (api.Prescription, error)
 
 	CreateResource(ctx context.Context, resource api.NewResource) (api.NewResource, error)
 	ReserveResource(

@@ -119,7 +119,7 @@ func newDoctor(email string) *api.DoctorRegistration {
 		Email:          "dr.default@example.com",
 		FirstName:      "Gregory",
 		LastName:       "House",
-		Specialization: api.UROLOGIST,
+		Specialization: api.Urologist,
 		Role:           api.UserRoleDoctor,
 	}
 	if email != "" {

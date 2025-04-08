@@ -73,7 +73,7 @@ func (a monolithApp) DoctorsCalendar(
 	}
 
 	calendar := api.DoctorCalendar{
-		Appointments: make([]api.AppointmentDisplay, len(appts)),
+		Appointments: asPtr(make([]api.AppointmentDisplay, len(appts))),
 	}
 
 	for i, appt := range appts {
@@ -81,7 +81,7 @@ func (a monolithApp) DoctorsCalendar(
 		if err != nil {
 			return api.DoctorCalendar{}, fmt.Errorf("DoctorCalendar patient find: %w", err)
 		}
-		calendar.Appointments[i] = dataApptToApptDisplay(appt, patient, doctor)
+		(*calendar.Appointments)[i] = dataApptToApptDisplay(appt, patient, doctor)
 
 	}
 

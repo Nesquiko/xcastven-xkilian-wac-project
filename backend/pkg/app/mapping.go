@@ -85,17 +85,28 @@ func dataPrescToPresc(
 	doctor *data.Doctor,
 ) api.Prescription {
 	presc := api.Prescription{
-		Id:          &p.Id,
-		Name:        p.Name,
-		Start:       p.Start,
-		End:         p.End,
-		DoctorsNote: p.DoctorsNote,
+		Id:            &p.Id,
+		Name:          p.Name,
+		Start:         p.Start,
+		End:           p.End,
+		DoctorsNote:   p.DoctorsNote,
+		AppointmentId: p.AppointmentId,
 	}
 	if appt != nil {
 		presc.AppointmentId = &appt.Id
 		presc.Appointment = asPtr(dataApptToApptDisplay(*appt, *patient, *doctor))
 	}
 	return presc
+}
+
+func dataPrescToPrescDisplay(p data.Prescription) api.PrescriptionDisplay {
+	return api.PrescriptionDisplay{
+		Id:            &p.Id,
+		AppointmentId: p.AppointmentId,
+		End:           p.End,
+		Name:          p.Name,
+		Start:         p.Start,
+	}
 }
 
 func resourceToEquipment(r data.Resource) api.Equipment {

@@ -20,6 +20,128 @@ import (
 	"github.com/Nesquiko/wac/pkg/server"
 )
 
+func TestPatientsCalendar(t *testing.T) {
+	t.Parallel()
+
+	patientEmail := fmt.Sprintf("test.patient.calendar.%s@patient.com", uuid.NewString())
+	patient := mustCreatePatient(t, newPatient(patientEmail))
+
+	doctorEmail := fmt.Sprintf("test.patient.calendar.%s@doctor.com", uuid.NewString())
+	doctor := mustCreateDoctor(t, newDoctor(doctorEmail))
+
+	appointmentIds := make(map[uuid.UUID]bool)
+	appointmentTimes := make(map[uuid.UUID]time.Time)
+	startDate := time.Date(2025, time.April, 5, 0, 0, 0, 0, time.UTC)
+	for i := range 10 {
+		appointmentTime := startDate.Add(time.Duration(i) * 24 * time.Hour)
+		newAppointmentReq := api.NewAppointmentRequest{
+			PatientId:           patient.Id,
+			DoctorId:            doctor.Id,
+			AppointmentDateTime: appointmentTime,
+		}
+		createdAppointment := mustCreateAppointment(t, newAppointmentReq)
+		appointmentIds[*createdAppointment.Id] = true
+		appointmentTimes[*createdAppointment.Id] = appointmentTime
+	}
+
+	conditionIds := make(map[uuid.UUID]bool)
+	conditionStartDates := make(map[uuid.UUID]time.Time)
+	for i := range 10 {
+		conditionStartDate := startDate.Add(time.Duration(i) * 24 * time.Hour)
+		newConditionReq := api.NewCondition{
+			PatientId: patient.Id,
+			Start:     conditionStartDate,
+			End:       asPtr(conditionStartDate.AddDate(1, 0, 0)),
+			Name:      fmt.Sprintf("Condition %d", i),
+		}
+		createdCondition := mustCreateCondition(t, newConditionReq)
+		conditionIds[*createdCondition.Id] = true
+		conditionStartDates[*createdCondition.Id] = conditionStartDate
+	}
+
+	prescriptionIds := make(map[uuid.UUID]bool)
+	prescriptionDates := make(map[uuid.UUID]time.Time)
+	for i := range 10 {
+		prescriptionDate := startDate.Add(time.Duration(i) * 24 * time.Hour)
+		newPrescriptionReq := api.NewPrescription{
+			PatientId: patient.Id,
+			Start:     prescriptionDate,
+			End:       prescriptionDate.AddDate(1, 0, 0),
+			Name:      "Medication",
+		}
+		createdPrescription := mustCreatePrescription(t, newPrescriptionReq)
+		prescriptionIds[*createdPrescription.Id] = true
+		prescriptionDates[*createdPrescription.Id] = prescriptionDate
+	}
+
+	fromDate := startDate.AddDate(0, 0, 3)
+	toDate := startDate.AddDate(0, 0, 6)
+
+	url := fmt.Sprintf(
+		"%s/patients/%s/calendar?from=%s&to=%s",
+		ServerUrl,
+		patient.Id,
+		netUrl.QueryEscape(fromDate.Format("2006-01-02")),
+		netUrl.QueryEscape(toDate.Format("2006-01-02")),
+	)
+
+	res, err := http.Get(url)
+	require.NoError(t, err, "http.Get failed for PatientsCalendar")
+	defer res.Body.Close()
+
+	require.Equal(t, http.StatusOK, res.StatusCode, "Expected '200 OK' status code")
+
+	var patientCalendar api.PatientsCalendar
+	err = json.NewDecoder(res.Body).Decode(&patientCalendar)
+	require.NoError(t, err, "Failed to decode patient calendar")
+
+	assert := assert.New(t)
+	assert.NotNil(patientCalendar.Appointments)
+	assert.Len(*patientCalendar.Appointments, 4)
+
+	for _, appt := range *patientCalendar.Appointments {
+		assert.True(appointmentIds[appt.Id], "Unexpected appointment ID")
+		assert.True(
+			appointmentTimes[appt.Id].Equal(appt.AppointmentDateTime),
+			"Appointment date time mismatch",
+		)
+		assert.True(
+			fromDate.Before(appt.AppointmentDateTime) || fromDate.Equal(appt.AppointmentDateTime),
+		)
+		assert.True(
+			toDate.After(appt.AppointmentDateTime) || toDate.Equal(appt.AppointmentDateTime),
+		)
+	}
+
+	assert.NotNil(patientCalendar.Conditions)
+	assert.Len(*patientCalendar.Conditions, 7)
+
+	for _, cond := range *patientCalendar.Conditions {
+		assert.True(conditionIds[*cond.Id], "Unexpected condition ID")
+		assert.True(
+			conditionStartDates[*cond.Id].Equal(cond.Start),
+			"Condition start date mismatch",
+		)
+		assert.True(
+			!(toDate.Before(cond.Start) || fromDate.After(*cond.End)),
+			"Condition date range does not intersect with from-to range",
+		)
+
+	}
+
+	assert.NotNil(patientCalendar.Prescriptions)
+	assert.Len(*patientCalendar.Prescriptions, 7)
+
+	for _, presc := range *patientCalendar.Prescriptions {
+		assert.True(prescriptionIds[*presc.Id], "Unexpected prescription ID")
+		assert.True(prescriptionDates[*presc.Id].Equal(presc.Start), "Prescription date mismatch")
+		assert.True(
+			!(toDate.Before(presc.Start) || fromDate.After(presc.End)),
+			"Prescription date range does not intersect with from-to range",
+		)
+	}
+}
+
 func TestDoctorsCalendar(t *testing.T) {
 	t.Parallel()
 
@@ -66,9 +188,10 @@ func TestDoctorsCalendar(t *testing.T) {
 	require.NoError(t, err, "Failed to decode doctor calendar")
 
 	assert := assert.New(t)
-	assert.Len(doctorCalendar.Appointments, 4)
+	assert.NotNil(doctorCalendar.Appointments)
+	assert.Len(*doctorCalendar.Appointments, 4)
 
-	for _, appt := range doctorCalendar.Appointments {
+	for _, appt := range *doctorCalendar.Appointments {
 		assert.True(appointmentIds[appt.Id], "Unexpected appointment ID")
 		assert.True(
 			appointmentTimes[appt.Id].Equal(appt.AppointmentDateTime),
@@ -414,4 +537,36 @@ func mustCreateAppointment(t *testing.T, request api.NewAppointmentRequest) api.
 	require.NotEmpty(*createdAppointment.Id, "mustCreateAppointment: Response ID is empty UUID")
 
 	return createdAppointment
+}
+
+func mustCreatePrescription(t *testing.T, request api.NewPrescription) api.PrescriptionDisplay {
+	t.Helper()
+	require := require.New(t)
+
+	reqBodyBytes, err := json.Marshal(request)
+	require.NoError(err, "mustCreatePrescription: Failed to marshal request")
+
+	url := fmt.Sprintf("%s/prescriptions", ServerUrl)
+	res, err := http.Post(url, server.ApplicationJSON, bytes.NewBuffer(reqBodyBytes))
+	require.NoError(err, "mustCreatePrescription: http.Post failed")
+	defer res.Body.Close()
+
+	bodyBytes, readErr := io.ReadAll(res.Body)
+	require.NoError(readErr, "mustCreatePrescription: Failed to read response body")
+	res.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+
+	require.Equal(
+		http.StatusCreated,
+		res.StatusCode,
+		"mustCreatePrescription: Expected '201 Created'. Body: %s",
+		string(bodyBytes),
+	)
+
+	var createdPrescription api.PrescriptionDisplay
+	err = json.NewDecoder(res.Body).Decode(&createdPrescription)
+	require.NoError(err, "mustCreatePrescription: Failed to decode response")
+	require.NotNil(createdPrescription.Id, "mustCreatePrescription: Response ID is nil")
+	require.NotEmpty(*createdPrescription.Id, "mustCreatePrescription: Response ID is empty UUID")
+
+	return createdPrescription
 }

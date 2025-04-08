@@ -41,14 +41,19 @@ type App interface {
 	CreatePatient(ctx context.Context, p api.PatientRegistration) (api.Patient, error)
 	PatientById(ctx context.Context, id uuid.UUID) (api.Patient, error)
 	PatientByEmail(ctx context.Context, email string) (api.Patient, error)
-	PatientsCalendar(patientId api.PatientId, params api.PatientsCalendarParams)
+	PatientsCalendar(
+		ctx context.Context,
+		patientId uuid.UUID,
+		from api.From,
+		to *api.To,
+	) (api.PatientsCalendar, error)
 
 	CreateDoctor(ctx context.Context, d api.DoctorRegistration) (api.Doctor, error)
 	DoctorById(ctx context.Context, id uuid.UUID) (api.Doctor, error)
 	DoctorByEmail(ctx context.Context, email string) (api.Doctor, error)
 	DoctorsCalendar(
 		ctx context.Context,
-		doctorId api.DoctorId,
+		doctorId uuid.UUID,
 		from api.From,
 		to *api.To,
 	) (api.DoctorCalendar, error)

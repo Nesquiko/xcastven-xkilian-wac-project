@@ -26,6 +26,12 @@ type Db interface {
 		from time.Time,
 		to *time.Time,
 	) ([]Appointment, error)
+	AppointmentsByPatientId(
+		ctx context.Context,
+		patientId uuid.UUID,
+		from time.Time,
+		to *time.Time,
+	) ([]Appointment, error)
 	CancelAppointment(
 		ctx context.Context,
 		appointmentId uuid.UUID,
@@ -54,9 +60,7 @@ type Db interface {
 		patientId uuid.UUID,
 		from time.Time,
 		to *time.Time,
-		page int,
-		pageSize int,
-	) ([]Condition, PaginationResult, error)
+	) ([]Condition, error)
 
 	CreatePrescription(ctx context.Context, prescription Prescription) (Prescription, error)
 	PrescriptionById(ctx context.Context, id uuid.UUID) (Prescription, error)
@@ -65,9 +69,7 @@ type Db interface {
 		patientId uuid.UUID,
 		from time.Time,
 		to *time.Time,
-		page int,
-		pageSize int,
-	) ([]Prescription, PaginationResult, error)
+	) ([]Prescription, error)
 
 	CreateResource(ctx context.Context, name string, typ ResourceType) (Resource, error)
 	ResourceById(ctx context.Context, id uuid.UUID) (Resource, error)

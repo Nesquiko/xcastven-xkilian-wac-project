@@ -206,11 +206,40 @@ func (m *MongoDb) AppointmentsByDoctorId(
 	from time.Time,
 	to *time.Time,
 ) ([]Appointment, error) {
+	appts, err := m.appointmentsByIdField(ctx, "doctorId", doctorId, from, to)
+	if err != nil {
+		return nil, fmt.Errorf("AppointmentsByDoctorId cursor error: %w", err)
+	}
+
+	return appts, nil
+}
+
+func (m *MongoDb) AppointmentsByPatientId(
+	ctx context.Context,
+	patientId uuid.UUID,
+	from time.Time,
+	to *time.Time,
+) ([]Appointment, error) {
+	appts, err := m.appointmentsByIdField(ctx, "patientId", patientId, from, to)
+	if err != nil {
+		return nil, fmt.Errorf("AppointmentsByPatientId cursor error: %w", err)
+	}
+
+	return appts, nil
+}
+
+func (m *MongoDb) appointmentsByIdField(
+	ctx context.Context,
+	idField string,
+	id uuid.UUID,
+	from time.Time,
+	to *time.Time,
+) ([]Appointment, error) {
 	appointmentsColl := m.Database.Collection(appointmentsCollection)
 	appointments := make([]Appointment, 0)
 
 	filter := bson.M{
-		"doctorId":            doctorId,
+		idField:               id,
 		"appointmentDateTime": bson.M{"$gte": from},
 	}
 	if to != nil {
@@ -226,7 +255,7 @@ func (m *MongoDb) AppointmentsByDoctorId(
 		if errors.Is(err, mongo.ErrNoDocuments) {
 			return appointments, nil
 		}
-		return nil, fmt.Errorf("AppointmentsByDoctorId: find failed: %w", err)
+		return nil, fmt.Errorf("appointmentsByIdField find failed: %w", err)
 	}
 
 	defer func() {
@@ -236,11 +265,11 @@ func (m *MongoDb) AppointmentsByDoctorId(
 	}()
 
 	if err = cursor.All(ctx, &appointments); err != nil {
-		return nil, fmt.Errorf("AppointmentsByDoctorId: decode failed: %w", err)
+		return nil, fmt.Errorf("appointmentsByIdField decode failed: %w", err)
 	}
 
 	if err = cursor.Err(); err != nil {
-		return nil, fmt.Errorf("AppointmentsByDoctorId: cursor error: %w", err)
+		return nil, fmt.Errorf("appointmentsByIdField cursor error: %w", err)
 	}
 
 	return appointments, nil

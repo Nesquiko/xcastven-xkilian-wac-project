@@ -148,3 +148,35 @@ func TestCreatePatientCondition(t *testing.T) {
 		"Response condition end time should be nil as it wasn't provided",
 	)
 }
+
+func mustCreateCondition(t *testing.T, request api.NewCondition) api.ConditionDisplay {
+	t.Helper()
+	require := require.New(t)
+
+	reqBodyBytes, err := json.Marshal(request)
+	require.NoError(err, "mustCreateCondition: Failed to marshal request")
+
+	url := fmt.Sprintf("%s/conditions", ServerUrl)
+	res, err := http.Post(url, server.ApplicationJSON, bytes.NewBuffer(reqBodyBytes))
+	require.NoError(err, "mustCreateCondition: http.Post failed")
+	defer res.Body.Close()
+
+	bodyBytes, readErr := io.ReadAll(res.Body)
+	require.NoError(readErr, "mustCreateCondition: Failed to read response body")
+	res.Body = io.NopCloser(bytes.NewBuffer(bodyBytes))
+
+	require.Equal(
+		http.StatusCreated,
+		res.StatusCode,
+		"mustCreateCondition: Expected '201 Created'. Body: %s",
+		string(bodyBytes),
+	)
+
+	var createdCondition api.ConditionDisplay
+	err = json.NewDecoder(res.Body).Decode(&createdCondition)
+	require.NoError(err, "mustCreateCondition: Failed to decode response")
+	require.NotNil(createdCondition.Id, "mustCreateCondition: Response ID is nil")
+	require.NotEmpty(*createdCondition.Id, "mustCreateCondition: Response ID is empty UUID")
+
+	return createdCondition
+}

@@ -200,7 +200,14 @@ func (s Server) PatientsCalendar(
 	patientId api.PatientId,
 	params api.PatientsCalendarParams,
 ) {
-	panic("unimplemented")
+	calendar, err := s.app.PatientsCalendar(r.Context(), patientId, params.From, params.To)
+	if err != nil {
+		slog.Error(UnexpectedError, "error", err.Error(), "where", "PatientsCalendar")
+		encodeError(w, internalServerError())
+		return
+	}
+
+	encode(w, http.StatusOK, calendar)
 }
 
 // PatientsMedicalHistoryFiles implements api.ServerInterface.

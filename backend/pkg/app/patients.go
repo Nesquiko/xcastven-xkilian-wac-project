@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 
@@ -51,10 +52,6 @@ func (a monolithApp) PatientByEmail(ctx context.Context, email string) (api.Pati
 	return dataPatientToApiPatient(patient), nil
 }
 
-func (a monolithApp) PatientsCalendar(patientId api.PatientId, params api.PatientsCalendarParams) {
-	panic("unimplemented")
-}
-
 func (a monolithApp) CreatePatientPrescription(
 	ctx context.Context,
 	pres api.NewPrescription,
@@ -87,4 +84,68 @@ func (a monolithApp) CreatePatientPrescription(
 	}
 
 	return dataPrescToPresc(prescription, appt, patient, doctor), nil
+}
+
+func (a monolithApp) PatientsCalendar(
+	ctx context.Context,
+	patientId uuid.UUID,
+	from api.From,
+	to *api.To,
+) (api.PatientsCalendar, error) {
+	var toTime *time.Time = nil
+	if to != nil {
+		toTime = &to.Time
+	}
+
+	appts, err := a.db.AppointmentsByPatientId(ctx, patientId, from.Time, toTime)
+	if err != nil {
+		return api.PatientsCalendar{}, fmt.Errorf("PatientsCalendar appointments: %w", err)
+	}
+
+	conds, err := a.db.FindConditionsByPatientId(ctx, patientId, from.Time, toTime)
+	if err != nil {
+		return api.PatientsCalendar{}, fmt.Errorf("PatientsCalendar conditions: %w", err)
+	}
+
+	prescriptions, err := a.db.FindPrescriptionsByPatientId(ctx, patientId, from.Time, toTime)
+	if err != nil {
+		return api.PatientsCalendar{}, fmt.Errorf("PatientsCalendar prescriptions: %w", err)
+	}
+
+	calendar := api.PatientsCalendar{}
+	var doctor *data.Doctor = nil
+	if len(appts) != 0 {
+		calendar.Appointments = asPtr(make([]api.AppointmentDisplay, len(appts)))
+
+		d, err := a.db.DoctorById(ctx, appts[0].DoctorId)
+		if err != nil {
+			return api.PatientsCalendar{}, fmt.Errorf("PatientsCalendar doc find: %w", err)
+		}
+		doctor = &d
+	}
+
+	if len(conds) != 0 {
+		calendar.Conditions = asPtr(make([]api.ConditionDisplay, len(conds)))
+	}
+	if len(prescriptions) != 0 {
+		calendar.Prescriptions = asPtr(make([]api.PrescriptionDisplay, len(prescriptions)))
+	}
+
+	for i, appt := range appts {
+		patient, err := a.db.PatientById(ctx, appt.PatientId)
+		if err != nil {
+			return api.PatientsCalendar{}, fmt.Errorf("PatientsCalendar patient find: %w", err)
+		}
+		(*calendar.Appointments)[i] = dataApptToApptDisplay(appt, patient, *doctor)
+	}
+
+	for i, cond := range conds {
+		(*calendar.Conditions)[i] = dataCondToCondDisplay(cond)
+	}
+
+	for i, presc := range prescriptions {
+		(*calendar.Prescriptions)[i] = dataPrescToPrescDisplay(presc)
+	}
+
+	return calendar, nil
 }

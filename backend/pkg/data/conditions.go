@@ -58,12 +58,9 @@ func (m *MongoDb) FindConditionsByPatientId(
 	patientId uuid.UUID,
 	from time.Time,
 	to *time.Time,
-	page int,
-	pageSize int,
-) ([]Condition, PaginationResult, error) {
+) ([]Condition, error) {
 	collection := m.Database.Collection(conditionsCollection)
 	conditions := make([]Condition, 0)
-	pagination := PaginationResult{Page: page}
 
 	filter := bson.M{
 		"patientId": patientId,
@@ -73,41 +70,13 @@ func (m *MongoDb) FindConditionsByPatientId(
 		filter["start"] = bson.M{"$lte": *to}
 	}
 
-	totalCount, err := collection.CountDocuments(ctx, filter)
-	if err != nil {
-		// don't wrap ErrNoDocuments as an error here, count 0 is valid
-		if !errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, PaginationResult{}, fmt.Errorf(
-				"FindConditionsByPatientId: count failed: %w",
-				err,
-			)
-		}
-		// If ErrNoDocuments, totalCount will be 0, which is correct
-	}
-	pagination.Total = totalCount
-
-	if totalCount == 0 {
-		pagination.PageSize = 0
-		return conditions, pagination, nil
-	}
-
-	limit := int64(pageSize)
-	offset := int64(page) * limit
-	opts := options.Find().
-		SetLimit(limit).
-		SetSkip(offset).
-		SetSort(bson.D{{Key: "start", Value: 1}})
-
+	opts := options.Find().SetSort(bson.D{{Key: "start", Value: 1}})
 	cursor, err := collection.Find(ctx, filter, opts)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			pagination.PageSize = 0
-			return conditions, pagination, nil
+			return conditions, nil
 		}
-		return nil, PaginationResult{}, fmt.Errorf(
-			"FindConditionsByPatientId: find failed: %w",
-			err,
-		)
+		return nil, fmt.Errorf("FindConditionsByPatientId: find failed: %w", err)
 	}
 
 	defer func() {
@@ -117,21 +86,14 @@ func (m *MongoDb) FindConditionsByPatientId(
 	}()
 
 	if err = cursor.All(ctx, &conditions); err != nil {
-		return nil, PaginationResult{}, fmt.Errorf(
-			"FindConditionsByPatientId: decode failed: %w",
-			err,
-		)
+		return nil, fmt.Errorf("FindConditionsByPatientId: decode failed: %w", err)
 	}
 
 	if err = cursor.Err(); err != nil {
-		return nil, PaginationResult{}, fmt.Errorf(
-			"FindConditionsByPatientIdPaginated: cursor error: %w",
-			err,
-		)
+		return nil, fmt.Errorf("FindConditionsByPatientIdPaginated: cursor error: %w", err)
 	}
 
-	pagination.PageSize = len(conditions)
-	return conditions, pagination, nil
+	return conditions, nil
 }
 
 func (m *MongoDb) conditionExists(ctx context.Context, id uuid.UUID) error {

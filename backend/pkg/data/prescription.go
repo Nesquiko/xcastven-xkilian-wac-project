@@ -14,12 +14,13 @@ import (
 )
 
 type Prescription struct {
-	Id          uuid.UUID `bson:"_id"                   json:"id"`
-	PatientId   uuid.UUID `bson:"patientId"             json:"patientId"` // Reference to Patient._id
-	Name        string    `bson:"name"                  json:"name"`
-	Start       time.Time `bson:"start"                 json:"start"`
-	End         time.Time `bson:"end"                   json:"end"`
-	DoctorsNote *string   `bson:"doctorsNote,omitempty" json:"doctorsNote,omitempty"`
+	Id            uuid.UUID  `bson:"_id"                     json:"id"`
+	PatientId     uuid.UUID  `bson:"patientId"               json:"patientId"`               // Reference to Patient._id
+	AppointmentId *uuid.UUID `bson:"appointmentId,omitempty" json:"appointmentId,omitempty"` // Reference to Appointment._id
+	Name          string     `bson:"name"                    json:"name"`
+	Start         time.Time  `bson:"start"                   json:"start"`
+	End           time.Time  `bson:"end"                     json:"end"`
+	DoctorsNote   *string    `bson:"doctorsNote,omitempty"   json:"doctorsNote,omitempty"`
 }
 
 func (m *MongoDb) CreatePrescription(
@@ -62,12 +63,9 @@ func (m *MongoDb) FindPrescriptionsByPatientId(
 	patientId uuid.UUID,
 	from time.Time,
 	to *time.Time,
-	page int,
-	pageSize int,
-) ([]Prescription, PaginationResult, error) {
+) ([]Prescription, error) {
 	collection := m.Database.Collection(prescriptionsCollection)
 	prescriptions := make([]Prescription, 0)
-	pagination := PaginationResult{Page: page}
 
 	filter := bson.M{
 		"patientId": patientId,
@@ -77,41 +75,13 @@ func (m *MongoDb) FindPrescriptionsByPatientId(
 		filter["start"] = bson.M{"$lte": *to}
 	}
 
-	totalCount, err := collection.CountDocuments(ctx, filter)
-	if err != nil {
-		// don't wrap ErrNoDocuments as an error here, count 0 is valid
-		if !errors.Is(err, mongo.ErrNoDocuments) {
-			return nil, PaginationResult{}, fmt.Errorf(
-				"FindPrescriptionsByPatientId count failed: %w",
-				err,
-			)
-		}
-		// If ErrNoDocuments, totalCount will be 0, which is correct
-	}
-	pagination.Total = totalCount
-
-	if totalCount == 0 {
-		pagination.PageSize = 0
-		return prescriptions, pagination, nil
-	}
-
-	limit := int64(pageSize)
-	offset := int64(page) * limit
-	findOptions := options.Find().
-		SetLimit(limit).
-		SetSkip(offset).
-		SetSort(bson.D{{Key: "start", Value: 1}})
-
+	findOptions := options.Find().SetSort(bson.D{{Key: "start", Value: 1}})
 	cursor, err := collection.Find(ctx, filter, findOptions)
 	if err != nil {
 		if errors.Is(err, mongo.ErrNoDocuments) {
-			pagination.PageSize = 0
-			return prescriptions, pagination, nil
+			return prescriptions, nil
 		}
-		return nil, PaginationResult{}, fmt.Errorf(
-			"FindPrescriptionsByPatientId find failed: %w",
-			err,
-		)
+		return nil, fmt.Errorf("FindPrescriptionsByPatientId find failed: %w", err)
 	}
 
 	defer func() {
@@ -122,20 +92,13 @@ func (m *MongoDb) FindPrescriptionsByPatientId(
 
 	if err = cursor.All(ctx, &prescriptions); err != nil {
 		slog.Error("Failed to decode documents from cursor", "error", err)
-		return nil, PaginationResult{}, fmt.Errorf(
-			"FindPrescriptionsByPatientId decode failed: %w",
-			err,
-		)
+		return nil, fmt.Errorf("FindPrescriptionsByPatientId decode failed: %w", err)
 	}
 
 	if err = cursor.Err(); err != nil {
 		slog.Error("Prescriptions cursor iteration error", "error", err)
-		return nil, PaginationResult{}, fmt.Errorf(
-			"FindPrescriptionsByPatientId cursor error: %w",
-			err,
-		)
+		return nil, fmt.Errorf("FindPrescriptionsByPatientId cursor error: %w", err)
 	}
 
-	pagination.PageSize = len(prescriptions)
-	return prescriptions, pagination, nil
+	return prescriptions, nil
 }

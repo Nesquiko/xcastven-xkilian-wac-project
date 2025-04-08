@@ -36,8 +36,10 @@ export namespace Components {
         "handleSelectDate": (date: Date) => void;
         "handleSelectPrescription": (prescription: PrescriptionDisplay) => void;
         "hoveredConditionId": string;
+        "hoveredPrescriptionId": string;
         "prescriptions": Array<PrescriptionDisplay>;
         "setHoveredConditionId": (value: string | null) => void;
+        "setHoveredPrescriptionId": (value: string | null) => void;
     }
     interface XcastvenXkilianProjectConditionDetail {
         "conditionId": string;
@@ -86,6 +88,8 @@ export namespace Components {
     interface XcastvenXkilianProjectLegend {
         "handleResetSelection": () => void;
     }
+    interface XcastvenXkilianProjectLogin {
+    }
     interface XcastvenXkilianProjectPrescriptionDetail {
         "handleResetSelection": () => void;
         "prescriptionId": string;
@@ -93,6 +97,8 @@ export namespace Components {
     interface XcastvenXkilianProjectPrescriptionsList {
         "handleSelectPrescription": (prescription: PrescriptionDisplay) => void;
         "prescriptions": Array<PrescriptionDisplay>;
+    }
+    interface XcastvenXkilianProjectRegister {
     }
 }
 declare global {
@@ -168,6 +174,12 @@ declare global {
         prototype: HTMLXcastvenXkilianProjectLegendElement;
         new (): HTMLXcastvenXkilianProjectLegendElement;
     };
+    interface HTMLXcastvenXkilianProjectLoginElement extends Components.XcastvenXkilianProjectLogin, HTMLStencilElement {
+    }
+    var HTMLXcastvenXkilianProjectLoginElement: {
+        prototype: HTMLXcastvenXkilianProjectLoginElement;
+        new (): HTMLXcastvenXkilianProjectLoginElement;
+    };
     interface HTMLXcastvenXkilianProjectPrescriptionDetailElement extends Components.XcastvenXkilianProjectPrescriptionDetail, HTMLStencilElement {
     }
     var HTMLXcastvenXkilianProjectPrescriptionDetailElement: {
@@ -179,6 +191,12 @@ declare global {
     var HTMLXcastvenXkilianProjectPrescriptionsListElement: {
         prototype: HTMLXcastvenXkilianProjectPrescriptionsListElement;
         new (): HTMLXcastvenXkilianProjectPrescriptionsListElement;
+    };
+    interface HTMLXcastvenXkilianProjectRegisterElement extends Components.XcastvenXkilianProjectRegister, HTMLStencilElement {
+    }
+    var HTMLXcastvenXkilianProjectRegisterElement: {
+        prototype: HTMLXcastvenXkilianProjectRegisterElement;
+        new (): HTMLXcastvenXkilianProjectRegisterElement;
     };
     interface HTMLElementTagNameMap {
         "ambulance-app": HTMLAmbulanceAppElement;
@@ -193,8 +211,10 @@ declare global {
         "xcastven-xkilian-project-header": HTMLXcastvenXkilianProjectHeaderElement;
         "xcastven-xkilian-project-home-page": HTMLXcastvenXkilianProjectHomePageElement;
         "xcastven-xkilian-project-legend": HTMLXcastvenXkilianProjectLegendElement;
+        "xcastven-xkilian-project-login": HTMLXcastvenXkilianProjectLoginElement;
         "xcastven-xkilian-project-prescription-detail": HTMLXcastvenXkilianProjectPrescriptionDetailElement;
         "xcastven-xkilian-project-prescriptions-list": HTMLXcastvenXkilianProjectPrescriptionsListElement;
+        "xcastven-xkilian-project-register": HTMLXcastvenXkilianProjectRegisterElement;
     }
 }
 declare namespace LocalJSX {
@@ -226,8 +246,10 @@ declare namespace LocalJSX {
         "handleSelectDate"?: (date: Date) => void;
         "handleSelectPrescription"?: (prescription: PrescriptionDisplay) => void;
         "hoveredConditionId"?: string;
+        "hoveredPrescriptionId"?: string;
         "prescriptions"?: Array<PrescriptionDisplay>;
         "setHoveredConditionId"?: (value: string | null) => void;
+        "setHoveredPrescriptionId"?: (value: string | null) => void;
     }
     interface XcastvenXkilianProjectConditionDetail {
         "conditionId"?: string;
@@ -276,6 +298,8 @@ declare namespace LocalJSX {
     interface XcastvenXkilianProjectLegend {
         "handleResetSelection"?: () => void;
     }
+    interface XcastvenXkilianProjectLogin {
+    }
     interface XcastvenXkilianProjectPrescriptionDetail {
         "handleResetSelection"?: () => void;
         "prescriptionId"?: string;
@@ -283,6 +307,8 @@ declare namespace LocalJSX {
     interface XcastvenXkilianProjectPrescriptionsList {
         "handleSelectPrescription"?: (prescription: PrescriptionDisplay) => void;
         "prescriptions"?: Array<PrescriptionDisplay>;
+    }
+    interface XcastvenXkilianProjectRegister {
     }
     interface IntrinsicElements {
         "ambulance-app": AmbulanceApp;
@@ -297,8 +323,10 @@ declare namespace LocalJSX {
         "xcastven-xkilian-project-header": XcastvenXkilianProjectHeader;
         "xcastven-xkilian-project-home-page": XcastvenXkilianProjectHomePage;
         "xcastven-xkilian-project-legend": XcastvenXkilianProjectLegend;
+        "xcastven-xkilian-project-login": XcastvenXkilianProjectLogin;
         "xcastven-xkilian-project-prescription-detail": XcastvenXkilianProjectPrescriptionDetail;
         "xcastven-xkilian-project-prescriptions-list": XcastvenXkilianProjectPrescriptionsList;
+        "xcastven-xkilian-project-register": XcastvenXkilianProjectRegister;
     }
 }
 export { LocalJSX as JSX };
@@ -317,8 +345,10 @@ declare module "@stencil/core" {
             "xcastven-xkilian-project-header": LocalJSX.XcastvenXkilianProjectHeader & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectHeaderElement>;
             "xcastven-xkilian-project-home-page": LocalJSX.XcastvenXkilianProjectHomePage & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectHomePageElement>;
             "xcastven-xkilian-project-legend": LocalJSX.XcastvenXkilianProjectLegend & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectLegendElement>;
+            "xcastven-xkilian-project-login": LocalJSX.XcastvenXkilianProjectLogin & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectLoginElement>;
             "xcastven-xkilian-project-prescription-detail": LocalJSX.XcastvenXkilianProjectPrescriptionDetail & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectPrescriptionDetailElement>;
             "xcastven-xkilian-project-prescriptions-list": LocalJSX.XcastvenXkilianProjectPrescriptionsList & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectPrescriptionsListElement>;
+            "xcastven-xkilian-project-register": LocalJSX.XcastvenXkilianProjectRegister & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectRegisterElement>;
         }
     }
 }

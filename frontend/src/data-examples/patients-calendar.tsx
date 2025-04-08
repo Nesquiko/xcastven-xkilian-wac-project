@@ -77,16 +77,23 @@ export const PatientsCalendarExample: PatientsCalendar = {
     {
       id: "prescription-4",
       name: "Growth hormone",
-      start: new Date(2025, 3, 4, 0, 0, 0, 0),
+      start: new Date(2025, 3, 3, 0, 0, 0, 0),
       end: new Date(2025, 3, 5, 0, 0, 0, 0),
       appointmentId: "appointment-1"
     } satisfies PrescriptionDisplay,
     {
       id: "prescription-5",
       name: "Golden dust",
-      start: new Date(2025, 3, 12, 0, 0, 0, 0),
-      end: new Date(2025, 3, 14, 0, 0, 0, 0),
+      start: new Date(2025, 3, 3, 0, 0, 0, 0),
+      end: new Date(2025, 3, 7, 0, 0, 0, 0),
       appointmentId: "appointment-2"
+    } satisfies PrescriptionDisplay,
+    {
+      id: "prescription-6",
+      name: "Ibalgin",
+      start: new Date(2025, 3, 3, 0, 0, 0, 0),
+      end: new Date(2025, 3, 3, 0, 0, 0, 0),
+      appointmentId: "appointment-3"
     } satisfies PrescriptionDisplay,
     {
       id: "prescription-6",

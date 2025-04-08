@@ -151,6 +151,13 @@ export const ConditionOrderColors: Array<string> = [
   "#FBC02D",
 ];
 
+export const PrescriptionOrderColors: Array<string> = [
+  "#FF8080",
+  "#FF0000",
+  "#800000",
+  "#1A0000",
+];
+
 export const getAppointmentActions = (
   appointmentStatus: AppointmentStatus,
   handleRescheduleAppointment: (appointment: PatientAppointment) => void,

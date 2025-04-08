@@ -21,7 +21,9 @@ export class Homepage {
   @State() selectedPrescription: PrescriptionDisplay = null;
   @State() isDrawerOpen: boolean = false;
   @State() showLegend: boolean = false;
+
   @State() hoveredConditionId: string = null;
+  @State() hoveredPrescriptionId: string = null;
 
   @State() currentViewMonth: number = TODAY.getMonth();
   @State() currentViewYear: number = TODAY.getFullYear();
@@ -155,7 +157,7 @@ export class Homepage {
     return this.prescriptions.filter((prescription: PrescriptionDisplay): boolean => {
       const { start, end } = prescription;
       return date >= start && date <= end;
-    });
+    }).sort((a: PrescriptionDisplay, b: PrescriptionDisplay) => b.start.getTime() - a.start.getTime());
   };
 
   render() {
@@ -181,6 +183,8 @@ export class Homepage {
           handleSelectPrescription={this.handleSelectPrescription}
           hoveredConditionId={this.hoveredConditionId}
           setHoveredConditionId={(value: string | null) => this.hoveredConditionId = value}
+          hoveredPrescriptionId={this.hoveredPrescriptionId}
+          setHoveredPrescriptionId={(value: string | null) => this.hoveredPrescriptionId = value}
           currentViewMonth={this.currentViewMonth}
           currentViewYear={this.currentViewYear}
           handlePreviousMonth={this.handlePreviousMonth}

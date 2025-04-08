@@ -1,4 +1,11 @@
-import { AppointmentStatusColor, ConditionOrderColors, DAYS_OF_WEEK, formatDate, formatTime } from '../../utils/utils';
+import {
+  AppointmentStatusColor,
+  ConditionOrderColors,
+  DAYS_OF_WEEK,
+  formatDate,
+  formatTime,
+  PrescriptionOrderColors,
+} from '../../utils/utils';
 import { Component, h, Prop } from '@stencil/core';
 import { AppointmentDisplay, ConditionDisplay, PrescriptionDisplay } from '../../api/generated';
 
@@ -18,6 +25,8 @@ export class Calendar {
   @Prop() handleSelectPrescription: (prescription: PrescriptionDisplay) => void;
   @Prop() hoveredConditionId: string;
   @Prop() setHoveredConditionId: (value: string | null) => void;
+  @Prop() hoveredPrescriptionId: string;
+  @Prop() setHoveredPrescriptionId: (value: string | null) => void;
   @Prop() currentViewMonth: number;
   @Prop() currentViewYear: number;
   @Prop() handlePreviousMonth: () => void;
@@ -37,41 +46,45 @@ export class Calendar {
 
     return (
       <div
-        class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 bg-black text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-10"
+        class="absolute bg-black text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-100"
+        style={{
+          top: '4px',
+          right: 'calc(100% + 8px)',
+        }}
       >
         <div class="flex flex-col gap-y-1 w-full">
           <span class="w-full text-center">{appointment.type}</span>
 
           <div class="flex flex-col gap-y-1 items-center justify-center">
             <div class="space-x-1 flex items-center text-gray-400">
-              <span
-                class="material-symbols-outlined"
-                style={{ fontSize: '16px' }}
-              >
-                event
-              </span>
+            <span
+              class="material-symbols-outlined"
+              style={{ fontSize: '16px' }}
+            >
+              event
+            </span>
               <div>{formatDate(appointment.appointmentDateTime)}</div>
             </div>
 
             <div class="space-x-1 flex items-center text-gray-400">
-              <span
-                class="material-symbols-outlined"
-                style={{ fontSize: '16px' }}
-              >
-                timer
-              </span>
+            <span
+              class="material-symbols-outlined"
+              style={{ fontSize: '16px' }}
+            >
+              timer
+            </span>
               <div>
                 {formatTime(appointment.appointmentDateTime)}
               </div>
             </div>
 
             <div class="space-x-1 flex items-center text-gray-400">
-                <span
-                  class="material-symbols-outlined"
-                  style={{ fontSize: '16px' }}
-                >
-                  format_list_bulleted
-                </span>
+            <span
+              class="material-symbols-outlined"
+              style={{ fontSize: '16px' }}
+            >
+              format_list_bulleted
+            </span>
               <div>{displayStatus}</div>
             </div>
           </div>
@@ -83,7 +96,7 @@ export class Calendar {
   private getConditionTooltipContent = (condition: ConditionDisplay) => {
     return (
       <div
-        class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 bg-black text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-10"
+        class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 bg-black text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-100"
       >
         <div class="flex flex-col gap-y-1 w-full">
           <span class="w-full text-center">{condition.name}</span>
@@ -116,8 +129,37 @@ export class Calendar {
     );
   };
 
-  private getPrescriptionTooltipContent = () => {
-    // TODO: prescription tooltip
+  private getPrescriptionTooltipContent = (
+    prescription: PrescriptionDisplay,
+    offsetRight: string,
+  ) => {
+    return (
+      <div
+        class="absolute bg-black text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-100"
+        style={{
+          top: '4px',
+          right: `calc(${offsetRight} + 24px)`,
+        }}
+      >
+        <div class="flex flex-col gap-y-1 w-full">
+          <span class="w-full text-center">{prescription.name}</span>
+
+          <div class="flex flex-col gap-y-1 items-center justify-center">
+            <div class="space-x-1 flex items-center text-gray-400">
+              <span class="material-symbols-outlined text-base">line_start_circle</span>
+              <div>{formatDate(prescription.start)}</div>
+            </div>
+
+            {prescription.end && (
+              <div class="space-x-1 flex items-center text-gray-400">
+                <span class="material-symbols-outlined text-base">line_end_circle</span>
+                <div>{formatDate(prescription.end)}</div>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
   };
 
   private renderCalendar = () => {
@@ -157,6 +199,11 @@ export class Calendar {
         </div>
       );
     }
+
+    const prescriptionColorMap: Record<string, string> = {};
+    this.prescriptions.forEach((prescription: PrescriptionDisplay, index: number) => {
+      prescriptionColorMap[prescription.id] = PrescriptionOrderColors[index % PrescriptionOrderColors.length];
+    });
 
     const conditionColorMap: Record<string, string> = {};
     this.conditions.forEach((condition: ConditionDisplay, index: number) => {
@@ -248,6 +295,9 @@ export class Calendar {
       const conditionsForDate: Array<ConditionDisplay> = this.getConditionsForDate(currentDate);
 
       const prescriptionsForDate: Array<PrescriptionDisplay> = this.getPrescriptionsForDate(currentDate);
+      let offset: number = 0;
+      let zIndex: number = 10;
+      let ellipsisDisplayed: boolean = false;
 
       currentMonthDays.push(
         <div
@@ -260,11 +310,50 @@ export class Calendar {
             this.handleSelectDate(currentDate);
           }}
         >
-          <div class={`py-1 w-full text-center flex flex-row justify-between items-center ${isToday && 'bg-[#7357be] text-white'}`}>
-            <div class="w-10" />
-            <div>{i}</div>
-            {/* TODO: display icon for prescriptions */}
-            <div class="w-10" />
+          <div class={`py-1 w-full flex flex-row justify-between items-center relative ${isToday && 'bg-[#7357be] text-white'}`}>
+            <div class="w-full h-full text-center">{i}</div>
+            {prescriptionsForDate.length > 0 && prescriptionsForDate.reverse()
+              .map((prescription: PrescriptionDisplay, index: number) => {
+                const prescriptionOffset: string = (4 + offset).toString() + "px";
+                const prescriptionZIndex: string = zIndex.toString();
+                offset += 16;
+                zIndex -= 1;
+
+                const prescriptionColor: string = prescriptionColorMap[prescription.id];
+
+                if (index >= 2 && !ellipsisDisplayed) {
+                  ellipsisDisplayed = true;
+                  return (
+                    <span style={{ position: 'absolute', top: '4px', right: '40px' }}>...</span>
+                  )
+                }
+
+                return (
+                  <div class="inline-block group">
+                    <span
+                      class="material-symbols-outlined cursor-pointer transition-all duration-200"
+                      style={{
+                        fontSize: this.hoveredPrescriptionId === prescription.id ? '24px' : '20px',
+                        position: 'absolute',
+                        top: '4px',
+                        right: prescriptionOffset,
+                        zIndex: prescriptionZIndex,
+                        color: prescriptionColor,
+                      }}
+                      onMouseEnter={() => (this.setHoveredPrescriptionId(prescription.id))}
+                      onMouseLeave={() => (this.setHoveredPrescriptionId(null))}
+                      onClick={(event: Event) => {
+                        event.stopPropagation();
+                        this.handleSelectPrescription(prescriptionsForDate[0]);
+                      }}
+                    >
+                      medication
+                    </span>
+                    {this.getPrescriptionTooltipContent(prescription, prescriptionOffset)}
+                  </div>
+                );
+              })
+            }
           </div>
 
           <div class="relative w-full h-full flex flex-row flex-wrap gap-1 items-start justify-center">
@@ -280,15 +369,16 @@ export class Calendar {
                 >
                   <div
                     class={`cursor-pointer circle rounded-full transition-all duration-200
-                    w-3 h-3 hover:w-4 hover:h-4
-                    sm:w-[0.875rem] sm:h-[0.875rem] sm:hover:w-5 sm:hover:h-5
-                    md:w-4 md:h-4 md:hover:w-6 md:hover:h-6
-                    lg:w-5 lg:h-5 lg:hover:w-7 lg:hover:h-7
-                  `}
+                      w-3 h-3 hover:w-4 hover:h-4
+                      sm:w-[0.875rem] sm:h-[0.875rem] sm:hover:w-5 sm:hover:h-5
+                      md:w-4 md:h-4 md:hover:w-6 md:hover:h-6
+                      lg:w-5 lg:h-5 lg:hover:w-7 lg:hover:h-7
+                    `}
                     style={{
                       backgroundColor: AppointmentStatusColor[appointment.status].background,
                     }}
                   ></div>
+
                   {this.getAppointmentTooltipContent(appointment)}
                 </button>
               ))
@@ -376,11 +466,10 @@ export class Calendar {
           ))}
         </div>
 
-        <div
-          class="flex-1 grid grid-cols-7 grid-rows-6 border-x border-t border-[#d8c7ed] divide-x divide-y divide-[#d8c7ed]">
+        <div class="relative z-20 flex-1 grid grid-cols-7 grid-rows-6 border-x border-t border-[#d8c7ed] divide-x divide-y divide-[#d8c7ed]">
           {this.renderCalendar()}
         </div>
       </div>
     );
-  }
+  };
 }

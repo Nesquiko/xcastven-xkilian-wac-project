@@ -32,47 +32,47 @@ export class Header {
     }
 
     return (
-      <div class="bg-gray-800 flex items-center px-3 py-1 text-white h-[48px]">
-          <span class="relative">
-            <md-icon-button
-              id="menu-button"
-              class="mr-2"
-              onClick={this.handleToggleHeaderMenu}
-            >
-              <span class="material-symbols-outlined text-white">menu</span>
-            </md-icon-button>
+      <div class="bg-gray-800 flex items-center px-3 py-1 text-white h-[48px] z-10">
+        <span class="relative">
+          <md-icon-button
+            id="menu-button"
+            class="mr-2"
+            onClick={this.handleToggleHeaderMenu}
+          >
+            <span class="material-symbols-outlined text-white">menu</span>
+          </md-icon-button>
 
-            <md-menu id="header-md-menu" anchor="menu-button" style={{ position: 'absolute', zIndex: 90 }}>
-              <md-menu-item>
-                <div
-                  slot="headline"
-                  class="text-sm w-48 flex flex-row items-center gap-x-2 z-90"
+          <md-menu id="header-md-menu" anchor="menu-button" style={{ position: 'absolute', zIndex: 90 }}>
+            <md-menu-item>
+              <div
+                slot="headline"
+                class="text-sm w-48 flex flex-row items-center gap-x-2 z-90"
+              >
+                <span
+                  class="material-symbols-outlined"
+                  style={{ fontSize: '20px' }}
                 >
-                  <span
-                    class="material-symbols-outlined"
-                    style={{ fontSize: '20px' }}
-                  >
-                    calendar_month
-                  </span>
-                  <span>Schedule an appointment</span>
-                </div>
-              </md-menu-item>
-              <md-menu-item>
-                <div
-                  slot="headline"
-                  class="text-sm w-48 flex flex-row items-center gap-x-2 z-90"
+                  calendar_month
+                </span>
+                <span>Schedule an appointment</span>
+              </div>
+            </md-menu-item>
+            <md-menu-item>
+              <div
+                slot="headline"
+                class="text-sm w-48 flex flex-row items-center gap-x-2 z-90"
+              >
+                <span
+                  class="material-symbols-outlined"
+                  style={{ fontSize: '20px' }}
                 >
-                  <span
-                    class="material-symbols-outlined"
-                    style={{ fontSize: '20px' }}
-                  >
-                    coronavirus
-                  </span>
-                  <span>Register a condition</span>
-                </div>
-              </md-menu-item>
-            </md-menu>
-          </span>
+                  coronavirus
+                </span>
+                <span>Register a condition</span>
+              </div>
+            </md-menu-item>
+          </md-menu>
+        </span>
 
         <div class="flex flex-1 items-center justify-center gap-x-10">
           <md-icon-button
@@ -105,16 +105,16 @@ export class Header {
             onClick={this.handleNextMonth}
             title="Next month"
           >
-              <span class="material-symbols-outlined text-white">
-                chevron_right
-              </span>
+            <span class="material-symbols-outlined text-white">
+              chevron_right
+            </span>
           </md-icon-button>
         </div>
 
         <md-icon-button onClick={() => console.log('account clicked')}>
-            <span class="material-symbols-outlined text-white">
-              account_circle
-            </span>
+          <span class="material-symbols-outlined text-white">
+            account_circle
+          </span>
         </md-icon-button>
       </div>
     );

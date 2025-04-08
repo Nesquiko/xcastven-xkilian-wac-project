@@ -61,30 +61,30 @@ export class AppointmentsList {
             class="m-1"
             onClick={() => console.log('view older appointments clicked')}
           >
-            <span class="material-symbols-outlined text-gray-600">
+            <md-icon class="text-gray-600">
               arrow_back
-            </span>
+            </md-icon>
           </md-icon-button>
           <md-icon-button
             title="Schedule an appointment"
             class="m-1 w-20"
             onClick={() => console.log('schedule an appointment')}
           >
-            <span class="material-symbols-outlined text-gray-600">
+            <md-icon class="text-gray-600">
               calendar_month
-            </span>
-            <span class="material-symbols-outlined text-gray-600">
+            </md-icon>
+            <md-icon class="text-gray-600">
               add
-            </span>
+            </md-icon>
           </md-icon-button>
           <md-icon-button
             title="View newer appointments"
             class="m-1"
             onClick={() => console.log('view newer appointments clicked')}
           >
-            <span class="material-symbols-outlined text-gray-600">
+            <md-icon class="text-gray-600">
               arrow_forward
-            </span>
+            </md-icon>
           </md-icon-button>
         </div>
       </div>

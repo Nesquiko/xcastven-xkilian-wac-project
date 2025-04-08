@@ -19,9 +19,9 @@ export class PrescriptionDetail {
         <div class="relative w-full max-w-md">
           <div class="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-0">
             <md-icon-button onClick={this.handleResetSelection}>
-              <span class="material-symbols-outlined text-gray-600">
+              <md-icon class="text-gray-600">
                 arrow_forward
-              </span>
+              </md-icon>
             </md-icon-button>
           </div>
 
@@ -33,12 +33,11 @@ export class PrescriptionDetail {
         <div class="w-full max-w-md px-4 py-3 rounded-md bg-gray-200 mb-6">
           <div class="w-full flex flex-row justify-between items-center mb-1">
             <div class="text-gray-500 flex flex-row items-center gap-x-2">
-              <span
-                class="material-symbols-outlined"
+              <md-icon
                 style={{ fontSize: '16px' }}
               >
                 medication
-              </span>
+              </md-icon>
               Name
             </div>
             <span class="font-medium text-gray-600">
@@ -48,12 +47,11 @@ export class PrescriptionDetail {
 
           <div class="w-full flex flex-row justify-between items-center mb-1">
             <div class="text-gray-500 flex flex-row items-center gap-x-2">
-              <span
-                class="material-symbols-outlined"
+              <md-icon
                 style={{ fontSize: '16px' }}
               >
                 line_start_circle
-              </span>
+              </md-icon>
               From
             </div>
             <span class="font-medium text-gray-600">
@@ -65,12 +63,11 @@ export class PrescriptionDetail {
             <>
               <div class="w-full flex flex-row justify-between items-center mb-1">
                 <div class="text-gray-500 flex flex-row items-center gap-x-2">
-                  <span
-                    class="material-symbols-outlined"
+                  <md-icon
                     style={{ fontSize: '16px' }}
                   >
                     line_end_circle
-                  </span>
+                  </md-icon>
                   To
                 </div>
                 <span class="font-medium text-gray-600">
@@ -80,12 +77,11 @@ export class PrescriptionDetail {
 
               <div class="w-full flex flex-row justify-between items-center mb-1">
                 <div class="text-gray-500 flex flex-row items-center gap-x-2">
-                  <span
-                    class="material-symbols-outlined"
+                  <md-icon
                     style={{ fontSize: '16px' }}
                   >
                     timer
-                  </span>
+                  </md-icon>
                   Duration
                 </div>
                 <span class="font-medium text-gray-600">
@@ -101,12 +97,11 @@ export class PrescriptionDetail {
 
         <div class="w-full max-w-md px-4 py-3 rounded-md bg-gray-200 mb-6 overflow-y-auto max-h-32">
           <div class="text-gray-500 flex flex-row items-center gap-x-2">
-            <span
-              class="material-symbols-outlined"
+            <md-icon
               style={{ fontSize: '16px' }}
             >
               description
-            </span>
+            </md-icon>
             Doctor's note
           </div>
           {this.prescription.doctorsNote && (

@@ -30,19 +30,19 @@ export class PrescriptionsList {
                     </div>
                     <div class="flex items-center">
                       {TODAY.getTime() > prescription.end.getTime() ? (
-                        <span
-                          class="material-symbols-outlined text-gray-500"
+                        <md-icon
+                          class="text-gray-500"
                           style={{ fontSize: '16px' }}
                         >
                           check_circle
-                        </span>
+                        </md-icon>
                       ) : (
-                        <span
-                          class="material-symbols-outlined text-gray-500"
+                        <md-icon
+                          class="text-gray-500"
                           style={{ fontSize: '16px' }}
                         >
                           pending
-                        </span>
+                        </md-icon>
                       )}
                     </div>
                   </div>
@@ -79,18 +79,18 @@ export class PrescriptionsList {
             class="m-1"
             onClick={() => console.log('view older prescriptions clicked')}
           >
-            <span class="material-symbols-outlined text-gray-600">
+            <md-icon class="text-gray-600">
               arrow_back
-            </span>
+            </md-icon>
           </md-icon-button>
           <md-icon-button
             title="View newer prescriptions"
             class="m-1"
             onClick={() => console.log('view newer prescriptions clicked')}
           >
-            <span class="material-symbols-outlined text-gray-600">
+            <md-icon class="text-gray-600">
               arrow_forward
-            </span>
+            </md-icon>
           </md-icon-button>
         </div>
       </div>

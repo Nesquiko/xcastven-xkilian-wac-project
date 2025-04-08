@@ -20,18 +20,18 @@ export class Footer {
             onClick={this.handleScheduleAppointment}
             title="Schedule an appointment"
           >
-        <span
-          class="material-symbols-outlined absolute top-[10px] left-4"
+        <md-icon
+          class="absolute top-[10px] left-4"
           style={{ fontSize: '20px' }}
         >
           event
-        </span>
-            <span
-              class="sm:text-transparent material-symbols-outlined absolute top-[10px] left-10"
+        </md-icon>
+            <md-icon
+              class="sm:text-transparent absolute top-[10px] left-10"
               style={{ fontSize: '20px' }}
             >
-          add
-        </span>
+              add
+            </md-icon>
             <span class="pl-8 text-center sm:inline hidden">Schedule an appointment</span>
           </md-text-button>
 
@@ -40,18 +40,18 @@ export class Footer {
             onClick={this.handleRegisterCondition}
             title="Register a condition"
           >
-        <span
-          class="material-symbols-outlined absolute top-[10px] left-4"
-          style={{ fontSize: '20px' }}
-        >
-          coronavirus
-        </span>
-            <span
-              class="sm:text-transparent material-symbols-outlined absolute top-[10px] left-10"
+            <md-icon
+              class="absolute top-[10px] left-4"
               style={{ fontSize: '20px' }}
             >
-          add
-        </span>
+              coronavirus
+            </md-icon>
+            <md-icon
+              class="sm:text-transparent absolute top-[10px] left-10"
+              style={{ fontSize: '20px' }}
+            >
+              add
+            </md-icon>
             <span class="pl-8 text-center sm:inline hidden">Register a condition</span>
           </md-text-button>
         </div>
@@ -63,7 +63,7 @@ export class Footer {
             onClick={this.handleToggleLegendMenu}
             title="Legend"
           >
-            <span class="material-symbols-outlined text-[#7357be]">more_horiz</span>
+            <md-icon class="text-[#7357be]">more_horiz</md-icon>
           </md-icon-button>
         </div>
       </div>

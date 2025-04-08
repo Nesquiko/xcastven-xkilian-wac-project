@@ -29,9 +29,9 @@ export class ConditionDetail {
         <div class="relative w-full max-w-md">
           <div class="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-0">
             <md-icon-button onClick={this.handleResetSelection}>
-              <span class="material-symbols-outlined text-gray-600">
+              <md-icon class="text-gray-600">
                 arrow_forward
-              </span>
+              </md-icon>
             </md-icon-button>
           </div>
 
@@ -43,12 +43,11 @@ export class ConditionDetail {
         <div class="w-full max-w-md px-4 py-3 rounded-md bg-gray-200 mb-6">
           <div class="w-full flex flex-row justify-between items-center mb-1">
             <div class="text-gray-500 flex flex-row items-center gap-x-2">
-              <span
-                class="material-symbols-outlined"
+              <md-icon
                 style={{ fontSize: '16px' }}
               >
                 edit
-              </span>
+              </md-icon>
               Name
             </div>
             <span class="font-medium text-gray-600">
@@ -58,12 +57,11 @@ export class ConditionDetail {
 
           <div class="w-full flex flex-row justify-between items-center mb-1">
             <div class="text-gray-500 flex flex-row items-center gap-x-2">
-              <span
-                class="material-symbols-outlined"
+              <md-icon
                 style={{ fontSize: '16px' }}
               >
                 line_start_circle
-              </span>
+              </md-icon>
               From
             </div>
             <span class="font-medium text-gray-600">
@@ -75,12 +73,11 @@ export class ConditionDetail {
             <>
               <div class="w-full flex flex-row justify-between items-center mb-1">
                 <div class="text-gray-500 flex flex-row items-center gap-x-2">
-                  <span
-                    class="material-symbols-outlined"
+                  <md-icon
                     style={{ fontSize: '16px' }}
                   >
                     line_end_circle
-                  </span>
+                  </md-icon>
                   To
                 </div>
                 <span class="font-medium text-gray-600">
@@ -90,12 +87,11 @@ export class ConditionDetail {
 
               <div class="w-full flex flex-row justify-between items-center mb-1">
                 <div class="text-gray-500 flex flex-row items-center gap-x-2">
-                  <span
-                    class="material-symbols-outlined"
+                  <md-icon
                     style={{ fontSize: '16px' }}
                   >
                     timer
-                  </span>
+                  </md-icon>
                   Duration
                 </div>
                 <span class="font-medium text-gray-600">
@@ -110,14 +106,13 @@ export class ConditionDetail {
 
           <div class="w-full flex flex-row justify-between items-center">
             <div class="text-gray-500 flex flex-row items-center gap-x-2">
-              <span
-                class="material-symbols-outlined"
+              <md-icon
                 style={{ fontSize: '16px' }}
               >
                 {this.condition.end
                   ? 'check_circle'
                   : 'pending'}
-              </span>
+              </md-icon>
               Status
             </div>
             <span class="font-medium text-gray-600">
@@ -129,12 +124,11 @@ export class ConditionDetail {
         <div class="w-full max-w-md px-4 py-3 rounded-md bg-gray-200 mb-6">
           <div class="flex flex-row justify-between items-center mb-2">
             <div class="text-gray-500 flex flex-row items-center gap-x-2">
-              <span
-                class="material-symbols-outlined"
+              <md-icon
                 style={{ fontSize: '16px' }}
               >
                 calendar_month
-              </span>
+              </md-icon>
               Appointments
             </div>
             {this.condition.appointments.length > 0 && (
@@ -144,11 +138,11 @@ export class ConditionDetail {
                 }
                 style={{ width: '24px', height: '24px' }}
               >
-                <span class="material-symbols-outlined">
+                <md-icon>
                   {this.expandedConditionId === this.condition.id
                     ? 'expand_less'
                     : 'expand_more'}
-                </span>
+                </md-icon>
               </md-icon-button>
             )}
           </div>
@@ -169,12 +163,12 @@ export class ConditionDetail {
                     }
                   >
                     <div class="flex items-center">
-                      <span
-                        class="material-symbols-outlined text-gray-500 mr-2"
+                      <md-icon
+                        class="text-gray-500 mr-2"
                         style={{ fontSize: '14px' }}
                       >
                         calendar_month
-                      </span>
+                      </md-icon>
                       {getDateAndTimeTitle(appointment.appointmentDateTime, "medium", "text-sm")}
                     </div>
                     <div class="text-xs text-gray-600 font-medium">

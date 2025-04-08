@@ -202,9 +202,9 @@ export class AppointmentScheduler {
               class="mr-2"
               onClick={showDetails ? () => this.resetSelection() : undefined}
             >
-              <span class="material-symbols-outlined text-white">
+              <md-icon class="text-white">
                 {showDetails ? "arrow_back" : "menu"}
-              </span>
+              </md-icon>
             </md-icon-button>
             <h1 class="flex-1 text-center text-xl font-medium">
               {(showDetails ? 'Complete your appointment' : 'Schedule an appointment')}
@@ -214,9 +214,9 @@ export class AppointmentScheduler {
               class="mr-2"
               onClick={showDetails ? () => this.resetSelection() : undefined}
             >
-              <span class="material-symbols-outlined text-white">
+              <md-icon class="text-white">
                 account_circle
-              </span>
+              </md-icon>
             </md-icon-button>
           </div>
 
@@ -230,7 +230,7 @@ export class AppointmentScheduler {
               <div class="max-w-md w-full rounded-lg bg-white p-4 shadow-md mb-6">
                 <div class="mb-4 flex items-center justify-between">
                   <md-icon-button onClick={() => this.prevMonth()}>
-                    <span class="material-symbols-outlined">chevron_left</span>
+                    <md-icon>chevron_left</md-icon>
                   </md-icon-button>
                   <div class="text-center flex items-center">
                     <span class="font-medium">{this.getMonthName()}</span>
@@ -250,7 +250,7 @@ export class AppointmentScheduler {
                     </select>
                   </div>
                   <md-icon-button onClick={() => this.nextMonth()}>
-                    <span class="material-symbols-outlined">chevron_right</span>
+                    <md-icon>chevron_right</md-icon>
                   </md-icon-button>
                 </div>
 

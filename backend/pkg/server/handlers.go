@@ -94,7 +94,14 @@ func (s Server) DoctorsTimeslots(
 	doctorId api.DoctorId,
 	params api.DoctorsTimeslotsParams,
 ) {
-	panic("unimplemented")
+	slots, err := s.app.DoctorTimeSlots(r.Context(), doctorId, params.Date.Time)
+	if err != nil {
+		slog.Error(UnexpectedError, "error", err.Error(), "where", "DoctorsCalendar")
+		encodeError(w, internalServerError())
+		return
+	}
+
+	encode(w, http.StatusOK, slots)
 }
 
 // GetAvailableResources implements api.ServerInterface.

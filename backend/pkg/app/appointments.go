@@ -3,6 +3,7 @@ package app
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 
@@ -210,4 +211,38 @@ func (a monolithApp) DecideAppointment(
 	)
 
 	return doctorAppointment, nil
+}
+
+func (a monolithApp) DoctorTimeSlots(
+	ctx context.Context,
+	doctorId uuid.UUID,
+	date time.Time,
+) (api.DoctorTimeslots, error) {
+	appointments, err := a.db.AppointmentsByDoctorIdAndDate(ctx, doctorId, date)
+	if err != nil {
+		return api.DoctorTimeslots{}, fmt.Errorf("DoctorTimeSlots: %w", err)
+	}
+
+	bookedHours := make(map[int]bool)
+	for _, appt := range appointments {
+		bookedHours[appt.AppointmentDateTime.Hour()] = true
+	}
+
+	var slots []api.TimeSlot
+	for hour := 8; hour <= 14; hour++ {
+		status := api.Available
+		if bookedHours[hour] {
+			status = api.Unavailable
+		}
+
+		slotTime := time.Date(date.Year(), date.Month(), date.Day(), hour, 0, 0, 0, date.Location()).
+			Format("15:04")
+
+		slots = append(slots, api.TimeSlot{
+			Status: status,
+			Time:   slotTime,
+		})
+	}
+
+	return api.DoctorTimeslots{Slots: slots}, nil
 }

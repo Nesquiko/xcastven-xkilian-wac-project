@@ -44,6 +44,11 @@ type Db interface {
 		denyReason *string,
 		resources []Resource,
 	) (Appointment, error)
+	AppointmentsByDoctorIdAndDate(
+		ctx context.Context,
+		doctorId uuid.UUID,
+		date time.Time,
+	) ([]Appointment, error)
 
 	CreatePatient(ctx context.Context, patient Patient) (Patient, error)
 	PatientById(ctx context.Context, id uuid.UUID) (Patient, error)

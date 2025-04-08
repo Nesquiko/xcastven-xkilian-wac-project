@@ -228,6 +228,72 @@ func (m *MongoDb) AppointmentsByPatientId(
 	return appts, nil
 }
 
+func (m *MongoDb) AppointmentsByDoctorIdAndDate(
+	ctx context.Context,
+	doctorId uuid.UUID,
+	date time.Time,
+) ([]Appointment, error) {
+	startOfDay := time.Date(date.Year(), date.Month(), date.Day(), 0, 0, 0, 0, date.Location())
+	endOfDay := startOfDay.AddDate(0, 0, 1).Add(-1 * time.Nanosecond)
+
+	appts, err := m.appointmentsByIdFieldAndDateRange(
+		ctx,
+		"doctorId",
+		doctorId,
+		startOfDay,
+		endOfDay,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("AppointmentsByDoctorIdAndDate cursor error: %w", err)
+	}
+
+	return appts, nil
+}
+
+func (m *MongoDb) appointmentsByIdFieldAndDateRange(
+	ctx context.Context,
+	idField string,
+	id uuid.UUID,
+	start time.Time,
+	end time.Time,
+) ([]Appointment, error) {
+	appointmentsColl := m.Database.Collection(appointmentsCollection)
+	appointments := make([]Appointment, 0)
+
+	filter := bson.M{
+		idField: id,
+		"appointmentDateTime": bson.M{
+			"$gte": start,
+			"$lte": end,
+		},
+	}
+	opts := options.Find().SetSort(bson.D{{Key: "appointmentDateTime", Value: 1}})
+
+	cursor, err := appointmentsColl.Find(ctx, filter, opts)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return appointments, nil
+		}
+		return nil, fmt.Errorf("appointmentsByIdFieldAndDateRange find failed: %w", err)
+	}
+
+	defer func() {
+		if cerr := cursor.Close(ctx); cerr != nil {
+			slog.Warn("Failed to close cursor", "error", cerr.Error())
+		}
+	}()
+
+	if err = cursor.All(ctx, &appointments); err != nil {
+		return nil, fmt.Errorf("appointmentsByIdFieldAndDateRange decode failed: %w", err)
+	}
+
+	if err = cursor.Err(); err != nil {
+		return nil, fmt.Errorf("appointmentsByIdFieldAndDateRange cursor error: %w", err)
+	}
+
+	return appointments, nil
+}
+
 func (m *MongoDb) appointmentsByIdField(
 	ctx context.Context,
 	idField string,

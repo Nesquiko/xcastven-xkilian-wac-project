@@ -20,6 +20,73 @@ import (
 	"github.com/Nesquiko/wac/pkg/server"
 )
 
+func TestDoctorsTimeslots(t *testing.T) {
+	t.Parallel()
+
+	doctorEmail := fmt.Sprintf("test.doctor.timeslots.%s@doctor.com", uuid.NewString())
+	doctor := mustCreateDoctor(t, newDoctor(doctorEmail))
+
+	patientEmail := fmt.Sprintf("test.doctor.timeslots.%s@patient.com", uuid.NewString())
+	patient := mustCreatePatient(t, newPatient(patientEmail))
+
+	date := time.Now().AddDate(0, 0, 1).Truncate(24 * time.Hour)
+
+	appointmentTime := time.Date(
+		date.Year(),
+		date.Month(),
+		date.Day(),
+		10,
+		0,
+		0,
+		0,
+		time.UTC,
+	)
+	newAppointmentReq := api.NewAppointmentRequest{
+		PatientId:           patient.Id,
+		DoctorId:            doctor.Id,
+		AppointmentDateTime: appointmentTime,
+	}
+	mustCreateAppointment(t, newAppointmentReq)
+
+	url := fmt.Sprintf(
+		"%s/doctors/%s/timeslots?date=%s",
+		ServerUrl,
+		doctor.Id,
+		netUrl.QueryEscape(date.Format("2006-01-02")),
+	)
+
+	res, err := http.Get(url)
+	require.NoError(t, err, "http.Get failed for DoctorsTimeslots")
+	defer res.Body.Close()
+
+	require.Equal(t, http.StatusOK, res.StatusCode, "Expected '200 OK' status code")
+
+	var doctorTimeslots api.DoctorTimeslots
+	err = json.NewDecoder(res.Body).Decode(&doctorTimeslots)
+	require.NoError(t, err, "Failed to decode doctor timeslots")
+
+	assert := assert.New(t)
+	require.Len(t, doctorTimeslots.Slots, 7)
+
+	for i, slot := range doctorTimeslots.Slots {
+		hour := 8 + i
+		expectedTime := time.Date(date.Year(), date.Month(), date.Day(), hour, 0, 0, 0, time.UTC).
+			Format("15:04")
+		assert.Equal(expectedTime, slot.Time, "Time mismatch for hour %d", hour)
+
+		if hour == 10 {
+			assert.Equal(
+				api.Unavailable,
+				slot.Status,
+				"Expected 'unavailable' status for hour %d",
+				hour,
+			)
+		} else {
+			assert.Equal(api.Available, slot.Status, "Expected 'available' status for hour %d", hour)
+		}
+	}
+}
+
 func TestPatientsCalendar(t *testing.T) {
 	t.Parallel()
 

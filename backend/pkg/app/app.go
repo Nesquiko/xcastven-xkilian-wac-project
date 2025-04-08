@@ -46,6 +46,12 @@ type App interface {
 	CreateDoctor(ctx context.Context, d api.DoctorRegistration) (api.Doctor, error)
 	DoctorById(ctx context.Context, id uuid.UUID) (api.Doctor, error)
 	DoctorByEmail(ctx context.Context, email string) (api.Doctor, error)
+	DoctorsCalendar(
+		ctx context.Context,
+		doctorId api.DoctorId,
+		from api.From,
+		to *api.To,
+	) (api.DoctorCalendar, error)
 
 	CreatePatientCondition(ctx context.Context, cond api.NewCondition) (api.ConditionDisplay, error)
 	ConditionById(ctx context.Context, id uuid.UUID) (api.ConditionDisplay, error)

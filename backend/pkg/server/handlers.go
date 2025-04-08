@@ -77,7 +77,14 @@ func (s Server) DoctorsCalendar(
 	doctorId api.DoctorId,
 	params api.DoctorsCalendarParams,
 ) {
-	panic("unimplemented")
+	calendar, err := s.app.DoctorsCalendar(r.Context(), doctorId, params.From, params.To)
+	if err != nil {
+		slog.Error(UnexpectedError, "error", err.Error(), "where", "DoctorsCalendar")
+		encodeError(w, internalServerError())
+		return
+	}
+
+	encode(w, http.StatusOK, calendar)
 }
 
 // DoctorsTimeslots implements api.ServerInterface.

@@ -1,4 +1,5 @@
 type: object
+required: [appointments]
 properties:
   appointments:
     type: array

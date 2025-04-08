@@ -20,6 +20,12 @@ type Db interface {
 
 	CreateAppointment(ctx context.Context, appointment Appointment) (Appointment, error)
 	AppointmentById(ctx context.Context, id uuid.UUID) (Appointment, error)
+	AppointmentsByDoctorId(
+		ctx context.Context,
+		doctorId uuid.UUID,
+		from time.Time,
+		to *time.Time,
+	) ([]Appointment, error)
 	CancelAppointment(
 		ctx context.Context,
 		appointmentId uuid.UUID,

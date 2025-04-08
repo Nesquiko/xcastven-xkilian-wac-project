@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	netUrl "net/url"
 	"testing"
 	"time"
 
@@ -18,6 +19,69 @@ import (
 	"github.com/Nesquiko/wac/pkg/api"
 	"github.com/Nesquiko/wac/pkg/server"
 )
+
+func TestDoctorsCalendar(t *testing.T) {
+	t.Parallel()
+
+	doctorEmail := fmt.Sprintf("test.doctor.calendar.%s@doctor.com", uuid.NewString())
+	doctor := mustCreateDoctor(t, newDoctor(doctorEmail))
+
+	patientEmail := fmt.Sprintf("test.doctor.calendar.%s@patient.com", uuid.NewString())
+	patient := mustCreatePatient(t, newPatient(patientEmail))
+
+	appointmentIds := make(map[uuid.UUID]bool)
+	appointmentTimes := make(map[uuid.UUID]time.Time)
+	startDate := time.Now().Add(24 * time.Hour).Truncate(24 * time.Hour)
+	for i := range 10 {
+		appointmentTime := startDate.Add(time.Duration(i) * 24 * time.Hour)
+		newAppointmentReq := api.NewAppointmentRequest{
+			PatientId:           patient.Id,
+			DoctorId:            doctor.Id,
+			AppointmentDateTime: appointmentTime,
+		}
+		createdAppointment := mustCreateAppointment(t, newAppointmentReq)
+		appointmentIds[*createdAppointment.Id] = true
+		appointmentTimes[*createdAppointment.Id] = appointmentTime
+	}
+
+	fromDate := startDate.Add(3 * 24 * time.Hour)
+	toDate := startDate.Add(6 * 24 * time.Hour)
+
+	url := fmt.Sprintf(
+		"%s/doctors/%s/calendar?from=%s&to=%s",
+		ServerUrl,
+		doctor.Id,
+		netUrl.QueryEscape(fromDate.Format("2006-01-02")),
+		netUrl.QueryEscape(toDate.Format("2006-01-02")),
+	)
+
+	res, err := http.Get(url)
+	require.NoError(t, err, "http.Get failed for DoctorsCalendar")
+	defer res.Body.Close()
+
+	require.Equal(t, http.StatusOK, res.StatusCode, "Expected '200 OK' status code")
+
+	var doctorCalendar api.DoctorCalendar
+	err = json.NewDecoder(res.Body).Decode(&doctorCalendar)
+	require.NoError(t, err, "Failed to decode doctor calendar")
+
+	assert := assert.New(t)
+	assert.Len(doctorCalendar.Appointments, 4)
+
+	for _, appt := range doctorCalendar.Appointments {
+		assert.True(appointmentIds[appt.Id], "Unexpected appointment ID")
+		assert.True(
+			appointmentTimes[appt.Id].Equal(appt.AppointmentDateTime),
+			"Appointment date time mismatch",
+		)
+		assert.True(
+			fromDate.Before(appt.AppointmentDateTime) || fromDate.Equal(appt.AppointmentDateTime),
+		)
+		assert.True(
+			toDate.After(appt.AppointmentDateTime) || toDate.Equal(appt.AppointmentDateTime),
+		)
+	}
+}
 
 func TestDecideAppointmentApprove(t *testing.T) {
 	t.Parallel()

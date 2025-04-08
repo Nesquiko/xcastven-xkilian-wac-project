@@ -10,6 +10,7 @@ import (
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
 type Appointment struct {
@@ -197,6 +198,52 @@ func (m *MongoDb) DecideAppointment(
 	}
 
 	return appointment, nil
+}
+
+func (m *MongoDb) AppointmentsByDoctorId(
+	ctx context.Context,
+	doctorId uuid.UUID,
+	from time.Time,
+	to *time.Time,
+) ([]Appointment, error) {
+	appointmentsColl := m.Database.Collection(appointmentsCollection)
+	appointments := make([]Appointment, 0)
+
+	filter := bson.M{
+		"doctorId":            doctorId,
+		"appointmentDateTime": bson.M{"$gte": from},
+	}
+	if to != nil {
+		filter["appointmentDateTime"] = bson.M{
+			"$gte": from,
+			"$lte": *to,
+		}
+	}
+	opts := options.Find().SetSort(bson.D{{Key: "appointmentDateTime", Value: 1}})
+
+	cursor, err := appointmentsColl.Find(ctx, filter, opts)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return appointments, nil
+		}
+		return nil, fmt.Errorf("AppointmentsByDoctorId: find failed: %w", err)
+	}
+
+	defer func() {
+		if cerr := cursor.Close(ctx); cerr != nil {
+			slog.Warn("Failed to close cursor", "error", cerr.Error())
+		}
+	}()
+
+	if err = cursor.All(ctx, &appointments); err != nil {
+		return nil, fmt.Errorf("AppointmentsByDoctorId: decode failed: %w", err)
+	}
+
+	if err = cursor.Err(); err != nil {
+		return nil, fmt.Errorf("AppointmentsByDoctorId: cursor error: %w", err)
+	}
+
+	return appointments, nil
 }
 
 func (m *MongoDb) scheduleAppointment(

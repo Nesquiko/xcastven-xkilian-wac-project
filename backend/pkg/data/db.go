@@ -49,6 +49,11 @@ type Db interface {
 		doctorId uuid.UUID,
 		date time.Time,
 	) ([]Appointment, error)
+	RescheduleAppointment(
+		ctx context.Context,
+		appointmentId uuid.UUID,
+		newDateTime time.Time,
+	) (Appointment, error)
 
 	CreatePatient(ctx context.Context, patient Patient) (Patient, error)
 	PatientById(ctx context.Context, id uuid.UUID) (Patient, error)

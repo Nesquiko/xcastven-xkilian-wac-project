@@ -250,6 +250,72 @@ func (m *MongoDb) AppointmentsByDoctorIdAndDate(
 	return appts, nil
 }
 
+func (m *MongoDb) RescheduleAppointment(
+	ctx context.Context,
+	appointmentId uuid.UUID,
+	newDateTime time.Time,
+) (Appointment, error) {
+	appointment, err := m.AppointmentById(ctx, appointmentId)
+	if err != nil {
+		return Appointment{}, fmt.Errorf("RescheduleAppointment: %w", err)
+	}
+
+	if appointment.Status != "scheduled" && appointment.Status != "requested" {
+		return Appointment{}, fmt.Errorf(
+			"RescheduleAppointment appointment %s is not in a reschedulable state",
+			appointmentId,
+		)
+	}
+
+	availabilityFilter := bson.M{
+		"doctorId":            appointment.DoctorId,
+		"appointmentDateTime": newDateTime,
+		"status":              bson.M{"$nin": []string{"cancelled", "denied"}},
+	}
+
+	appointmentsColl := m.Database.Collection(appointmentsCollection)
+	count, err := appointmentsColl.CountDocuments(ctx, availabilityFilter)
+	if err != nil {
+		return Appointment{}, fmt.Errorf(
+			"RescheduleAppointment doctor availability check failed: %w",
+			err,
+		)
+	}
+
+	if count > 0 {
+		return Appointment{}, fmt.Errorf(
+			"%w at %s",
+			ErrDoctorUnavailable,
+			newDateTime.Format(time.RFC3339),
+		)
+	}
+
+	update := bson.M{
+		"$set": bson.M{
+			"appointmentDateTime": newDateTime,
+			"status":              "requested",
+		},
+	}
+	filter := bson.M{"_id": appointmentId}
+
+	_, err = appointmentsColl.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return Appointment{}, fmt.Errorf(
+			"RescheduleAppointment failed to update appointment: %w",
+			err,
+		)
+	}
+
+	if err := m.DeleteReservationsByAppointmentId(ctx, appointmentId); err != nil {
+		return Appointment{}, fmt.Errorf(
+			"RescheduleAppointment failed to delete reservations: %w",
+			err,
+		)
+	}
+
+	return m.AppointmentById(ctx, appointmentId)
+}
+
 func (m *MongoDb) appointmentsByIdFieldAndDateRange(
 	ctx context.Context,
 	idField string,

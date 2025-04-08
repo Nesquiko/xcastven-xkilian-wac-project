@@ -246,3 +246,33 @@ func (a monolithApp) DoctorTimeSlots(
 
 	return api.DoctorTimeslots{Slots: slots}, nil
 }
+
+func (a monolithApp) RescheduleAppointment(
+	ctx context.Context,
+	appointmentId api.AppointmentId,
+	newDateTime time.Time,
+) (api.PatientAppointment, error) {
+	appt, err := a.db.RescheduleAppointment(ctx, appointmentId, newDateTime)
+	if err != nil {
+		return api.PatientAppointment{}, fmt.Errorf("RescheduleAppointment: %w", err)
+	}
+
+	doc, err := a.db.DoctorById(ctx, appt.DoctorId)
+	if err != nil {
+		return api.PatientAppointment{}, fmt.Errorf("RescheduleAppointment find doctor: %w", err)
+	}
+
+	var cond *data.Condition
+	if appt.ConditionId != nil {
+		c, err := a.db.ConditionById(ctx, *appt.ConditionId)
+		if err != nil {
+			return api.PatientAppointment{}, fmt.Errorf(
+				"RescheduleAppointment find condition: %w",
+				err,
+			)
+		}
+		cond = &c
+	}
+
+	return dataApptToPatientAppt(appt, doc, cond), nil
+}

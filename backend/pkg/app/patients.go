@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"math/rand"
 	"time"
 
 	"github.com/google/uuid"
@@ -148,4 +149,57 @@ func (a monolithApp) PatientsCalendar(
 	}
 
 	return calendar, nil
+}
+
+func (a monolithApp) PatientMedicalHistoryFiles(
+	ctx context.Context,
+	patientId uuid.UUID,
+	page int,
+	pageSize int,
+) (api.MedicalHistoryFileList, error) {
+	files := make([]string, 0)
+	for i := range pageSize {
+		fileType := dummyFileTypes[rand.Intn(len(dummyFileTypes))]
+		date := time.Now().AddDate(0, 0, -rand.Intn(365)).Format("2006-01-02")
+		files = append(files, fmt.Sprintf("%s_%s_%d.pdf", fileType, date, i))
+	}
+
+	pagination := api.Pagination{
+		Page:     page,
+		PageSize: pageSize,
+		Total:    38,
+	}
+
+	return api.MedicalHistoryFileList{
+		Files:      files,
+		Pagination: pagination,
+	}, nil
+}
+
+var dummyFileTypes = []string{
+	"lab_result",
+	"medical_report",
+	"prescription",
+	"discharge_summary",
+	"consultation_note",
+	"radiology_report",
+	"pathology_report",
+	"medical_certificate",
+	"referral_letter",
+	"follow_up_note",
+	"progress_note",
+	"medication_list",
+	"allergy_report",
+	"immunization_record",
+	"vital_signs_chart",
+	"medical_history",
+	"family_medical_history",
+	"surgical_report",
+	"anesthesia_report",
+	"recovery_room_note",
+	"physical_examination_report",
+	"diagnostic_test_result",
+	"treatment_plan",
+	"care_plan",
+	"discharge_plan",
 }

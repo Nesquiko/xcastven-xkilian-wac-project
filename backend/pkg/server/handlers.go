@@ -224,7 +224,19 @@ func (s Server) PatientsMedicalHistoryFiles(
 	patientId api.PatientId,
 	params api.PatientsMedicalHistoryFilesParams,
 ) {
-	panic("unimplemented")
+	files, err := s.app.PatientMedicalHistoryFiles(
+		r.Context(),
+		patientId,
+		params.Page,
+		params.PageSize,
+	)
+	if err != nil {
+		slog.Error(UnexpectedError, "error", err.Error(), "where", "PatientMedicalHistoryFiles")
+		encodeError(w, internalServerError())
+		return
+	}
+
+	encode(w, http.StatusOK, files)
 }
 
 // RescheduleAppointment implements api.ServerInterface.
@@ -233,7 +245,20 @@ func (s Server) RescheduleAppointment(
 	r *http.Request,
 	appointmentId api.AppointmentId,
 ) {
-	panic("unimplemented")
+	req, decodeErr := Decode[api.AppointmentReschedule](w, r)
+	if decodeErr != nil {
+		encodeError(w, decodeErr)
+		return
+	}
+
+	appt, err := s.app.RescheduleAppointment(r.Context(), appointmentId, req.NewAppointmentDateTime)
+	if err != nil {
+		slog.Error(UnexpectedError, "error", err.Error(), "where", "RescheduleAppointment")
+		encodeError(w, internalServerError())
+		return
+	}
+
+	encode(w, http.StatusOK, appt)
 }
 
 // CreatePatientCondition implements api.ServerInterface.

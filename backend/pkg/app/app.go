@@ -37,11 +37,11 @@ type App interface {
 		appointmentId uuid.UUID,
 		decision api.AppointmentDecision,
 	) (api.DoctorAppointment, error)
-	DoctorTimeSlots(
+	RescheduleAppointment(
 		ctx context.Context,
-		doctorId uuid.UUID,
-		date time.Time,
-	) (api.DoctorTimeslots, error)
+		appointmentId api.AppointmentId,
+		newDateTime time.Time,
+	) (api.PatientAppointment, error)
 
 	CreatePatient(ctx context.Context, p api.PatientRegistration) (api.Patient, error)
 	PatientById(ctx context.Context, id uuid.UUID) (api.Patient, error)
@@ -52,6 +52,12 @@ type App interface {
 		from api.From,
 		to *api.To,
 	) (api.PatientsCalendar, error)
+	PatientMedicalHistoryFiles(
+		ctx context.Context,
+		patientId uuid.UUID,
+		page int,
+		pageSize int,
+	) (api.MedicalHistoryFileList, error)
 
 	CreateDoctor(ctx context.Context, d api.DoctorRegistration) (api.Doctor, error)
 	DoctorById(ctx context.Context, id uuid.UUID) (api.Doctor, error)
@@ -62,6 +68,11 @@ type App interface {
 		from api.From,
 		to *api.To,
 	) (api.DoctorCalendar, error)
+	DoctorTimeSlots(
+		ctx context.Context,
+		doctorId uuid.UUID,
+		date time.Time,
+	) (api.DoctorTimeslots, error)
 
 	CreatePatientCondition(ctx context.Context, cond api.NewCondition) (api.ConditionDisplay, error)
 	ConditionById(ctx context.Context, id uuid.UUID) (api.ConditionDisplay, error)

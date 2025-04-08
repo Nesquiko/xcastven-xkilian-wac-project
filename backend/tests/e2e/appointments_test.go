@@ -20,6 +20,59 @@ import (
 	"github.com/Nesquiko/wac/pkg/server"
 )
 
+func TestRescheduleAppointment(t *testing.T) {
+	t.Parallel()
+
+	patientEmail := fmt.Sprintf("test.reschedule.appt.%s@patient.com", uuid.NewString())
+	patient := mustCreatePatient(t, newPatient(patientEmail))
+
+	doctorEmail := fmt.Sprintf("test.reschedule.appt.%s@doctor.com", uuid.NewString())
+	doctor := mustCreateDoctor(t, newDoctor(doctorEmail))
+
+	appointmentTime := time.Now().Add(24 * time.Hour).Truncate(time.Hour)
+	newAppointmentReq := api.NewAppointmentRequest{
+		PatientId:           patient.Id,
+		DoctorId:            doctor.Id,
+		AppointmentDateTime: appointmentTime,
+	}
+	createdAppointment := mustCreateAppointment(t, newAppointmentReq)
+	appointmentId := *createdAppointment.Id
+
+	newDateTime := appointmentTime.Add(2 * 24 * time.Hour)
+	rescheduleReq := api.AppointmentReschedule{
+		NewAppointmentDateTime: newDateTime,
+	}
+	rescheduleReqBody, err := json.Marshal(rescheduleReq)
+	require.NoError(t, err, "Failed to marshal reschedule request")
+
+	url := fmt.Sprintf("%s/appointments/%s", ServerUrl, appointmentId)
+	req, err := http.NewRequest(http.MethodPatch, url, bytes.NewBuffer(rescheduleReqBody))
+	require.NoError(t, err, "Failed to create HTTP PATCH request")
+	req.Header.Set("Content-Type", server.ApplicationJSON)
+
+	res, err := http.DefaultClient.Do(req)
+	require.NoError(t, err, "http.Patch failed for RescheduleAppointment")
+	defer res.Body.Close()
+
+	require.Equal(t, http.StatusOK, res.StatusCode, "Expected '200 OK' status code")
+
+	var fetchedAppointment api.PatientAppointment
+	err = json.NewDecoder(res.Body).Decode(&fetchedAppointment)
+	require.NoError(t, err, "Failed to decode fetched appointment")
+
+	assert := assert.New(t)
+	assert.Equal(appointmentId, *fetchedAppointment.Id, "Appointment ID mismatch")
+	assert.True(
+		newDateTime.Equal(fetchedAppointment.AppointmentDateTime),
+		"Appointment date time mismatch",
+	)
+	assert.Equal(
+		api.Requested,
+		fetchedAppointment.Status,
+		"Appointment status should be 'requested'",
+	)
+}
+
 func TestDoctorsTimeslots(t *testing.T) {
 	t.Parallel()
 

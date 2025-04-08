@@ -55,13 +55,36 @@ func (a monolithApp) PatientsCalendar(patientId api.PatientId, params api.Patien
 	panic("unimplemented")
 }
 
-func (a monolithApp) CreatePatientMedicine(
+func (a monolithApp) CreatePatientPrescription(
 	ctx context.Context,
-	m api.NewMedicine,
-) (api.MedicineDisplay, error) {
-	med, err := a.db.CreateMedicine(ctx, newMedToDataMed(m))
+	pres api.NewPrescription,
+) (api.Prescription, error) {
+	prescription, err := a.db.CreatePrescription(ctx, newPrescToDataPresc(pres))
 	if err != nil {
-		return api.MedicineDisplay{}, fmt.Errorf("CreatePatientMedicine: %w", err)
+		return api.Prescription{}, fmt.Errorf("CreatePatientPrescription: %w", err)
 	}
-	return dataMedToMedDisplay(med), nil
+
+	var appt *data.Appointment = nil
+	var patient *data.Patient = nil
+	var doctor *data.Doctor = nil
+
+	if pres.AppointmentId != nil {
+		appointment, err := a.db.AppointmentById(ctx, *pres.AppointmentId)
+		if err != nil {
+			return api.Prescription{}, fmt.Errorf("CreatePatientPrescription appt find: %w", err)
+		}
+		p, err := a.db.PatientById(ctx, appointment.PatientId)
+		if err != nil {
+			return api.Prescription{}, fmt.Errorf("CreatePatientPrescription patient find: %w", err)
+		}
+		patient = &p
+
+		d, err := a.db.DoctorById(ctx, appointment.DoctorId)
+		if err != nil {
+			return api.Prescription{}, fmt.Errorf("CreatePatientPrescription doc find: %w", err)
+		}
+		doctor = &d
+	}
+
+	return dataPrescToPresc(prescription, appt, patient, doctor), nil
 }

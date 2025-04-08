@@ -54,7 +54,20 @@ func (s Server) DecideAppointment(
 	r *http.Request,
 	appointmentId api.AppointmentId,
 ) {
-	panic("unimplemented")
+	req, decodeErr := Decode[api.AppointmentDecision](w, r)
+	if decodeErr != nil {
+		encodeError(w, decodeErr)
+		return
+	}
+
+	doctorAppt, err := s.app.DecideAppointment(r.Context(), appointmentId, req)
+	if err != nil {
+		slog.Error(UnexpectedError, "error", err.Error(), "where", "DecideAppointment")
+		encodeError(w, internalServerError())
+		return
+	}
+
+	encode(w, http.StatusOK, doctorAppt)
 }
 
 // DoctorsCalendar implements api.ServerInterface.
@@ -221,21 +234,21 @@ func (s Server) CreatePatientCondition(w http.ResponseWriter, r *http.Request) {
 }
 
 // CreatePatientMedicine implements api.ServerInterface.
-func (s Server) CreatePatientMedicine(w http.ResponseWriter, r *http.Request) {
-	req, decodeErr := Decode[api.NewMedicine](w, r)
+func (s Server) CreatePrescription(w http.ResponseWriter, r *http.Request) {
+	req, decodeErr := Decode[api.NewPrescription](w, r)
 	if decodeErr != nil {
 		encodeError(w, decodeErr)
 		return
 	}
 
-	med, err := s.app.CreatePatientMedicine(r.Context(), req)
+	presc, err := s.app.CreatePatientPrescription(r.Context(), req)
 	if err != nil {
-		slog.Error(UnexpectedError, "error", err.Error(), "where", "CreatePatientMedicine")
+		slog.Error(UnexpectedError, "error", err.Error(), "where", "CreatePrescription")
 		encodeError(w, internalServerError())
 		return
 	}
 
-	encode(w, http.StatusCreated, med)
+	encode(w, http.StatusCreated, presc)
 }
 
 // RequestAppointment implements api.ServerInterface.

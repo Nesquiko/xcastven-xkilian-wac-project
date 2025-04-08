@@ -17,20 +17,20 @@ type MongoDb struct {
 var _ Db = (*MongoDb)(nil)
 
 const (
-	patientsCollection     = "patients"
-	doctorsCollection      = "doctors"
-	conditionsCollection   = "conditions"
-	medicinesCollection    = "medicine"
-	appointmentsCollection = "appointments"
-	resourcesCollection    = "resources"
-	reservationsCollection = "reservations"
+	patientsCollection      = "patients"
+	doctorsCollection       = "doctors"
+	conditionsCollection    = "conditions"
+	prescriptionsCollection = "prescriptions"
+	appointmentsCollection  = "appointments"
+	resourcesCollection     = "resources"
+	reservationsCollection  = "reservations"
 )
 
 var Collections = []string{
 	patientsCollection,
 	doctorsCollection,
 	conditionsCollection,
-	medicinesCollection,
+	prescriptionsCollection,
 	appointmentsCollection,
 	resourcesCollection,
 	reservationsCollection,
@@ -108,14 +108,14 @@ func initIndexes(ctx context.Context, mongoDb *mongo.Database) error {
 				Options: options.Index().SetName("idx_condition_patientId_start"),
 			},
 		},
-		medicinesCollection: {
+		prescriptionsCollection: {
 			{
 				Keys:    bson.D{{Key: "patientId", Value: 1}},
-				Options: options.Index().SetName("idx_medicine_patientId"),
+				Options: options.Index().SetName("idx_presription_patientId"),
 			},
 			{
 				Keys:    bson.D{{Key: "patientId", Value: 1}, {Key: "start", Value: 1}},
-				Options: options.Index().SetName("idx_medicine_patientId_start"),
+				Options: options.Index().SetName("idx_presription_patientId_start"),
 			},
 		},
 		appointmentsCollection: {

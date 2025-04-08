@@ -14,7 +14,7 @@ post:
           $ref: "../components/schemas/appointments/AppointmentDecision.yaml"
   responses:
     "200":
-      description: Appointment successfully cancelled.
+      description: Appointment successfully accpted or denied.
       content:
         application/json:
           schema:

@@ -32,6 +32,11 @@ type App interface {
 		doctorId uuid.UUID,
 		appointmentId uuid.UUID,
 	) (api.DoctorAppointment, error)
+	DecideAppointment(
+		ctx context.Context,
+		appointmentId uuid.UUID,
+		decision api.AppointmentDecision,
+	) (api.DoctorAppointment, error)
 
 	CreatePatient(ctx context.Context, p api.PatientRegistration) (api.Patient, error)
 	PatientById(ctx context.Context, id uuid.UUID) (api.Patient, error)
@@ -45,7 +50,10 @@ type App interface {
 	CreatePatientCondition(ctx context.Context, cond api.NewCondition) (api.ConditionDisplay, error)
 	ConditionById(ctx context.Context, id uuid.UUID) (api.ConditionDisplay, error)
 
-	CreatePatientMedicine(ctx context.Context, cond api.NewMedicine) (api.MedicineDisplay, error)
+	CreatePatientPrescription(
+		ctx context.Context,
+		pres api.NewPrescription,
+	) (api.Prescription, error)
 
 	CreateResource(ctx context.Context, resource api.NewResource) (api.NewResource, error)
 	ReserveResource(

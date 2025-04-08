@@ -20,7 +20,7 @@ import (
 	"github.com/Nesquiko/wac/pkg/server"
 )
 
-func TestCreatePatientMedicine(t *testing.T) {
+func TestCreatePatientPrescription(t *testing.T) {
 	t.Parallel()
 
 	patientEmail := fmt.Sprintf("test.patient.med.ok.%s@example.com", uuid.NewString())
@@ -29,19 +29,23 @@ func TestCreatePatientMedicine(t *testing.T) {
 	require.NotEmpty(t, createdPatient.Id, "Setup failed: Created patient ID is empty")
 
 	startTime := time.Now().Truncate(time.Second)
+	endTime := startTime.AddDate(0, 1, 0)
 	medicineName := "Atorvastatin 20mg"
-	newMedicineRequest := api.NewMedicine{
-		Name:      medicineName,
-		PatientId: createdPatient.Id,
-		Start:     startTime,
+	doctorsNote := "Take it however times you want"
+	newPrescRequest := api.NewPrescription{
+		Name:        medicineName,
+		PatientId:   createdPatient.Id,
+		Start:       startTime,
+		DoctorsNote: &doctorsNote,
+		End:         endTime,
 	}
 
-	reqBodyBytes, err := json.Marshal(newMedicineRequest)
-	require.NoError(t, err, "Failed to marshal NewMedicine request")
+	reqBodyBytes, err := json.Marshal(newPrescRequest)
+	require.NoError(t, err, "Failed to marshal NewPrescription request")
 
-	url := fmt.Sprintf("%s/medicine", ServerUrl)
+	url := fmt.Sprintf("%s/prescriptions", ServerUrl)
 	res, err := http.Post(url, server.ApplicationJSON, bytes.NewBuffer(reqBodyBytes))
-	require.NoError(t, err, "http.Post failed for CreatePatientMedicine")
+	require.NoError(t, err, "http.Post failed for CreatePatientPrescription")
 	defer res.Body.Close()
 
 	bodyBytes, readErr := io.ReadAll(res.Body)
@@ -55,23 +59,34 @@ func TestCreatePatientMedicine(t *testing.T) {
 		string(bodyBytes),
 	)
 
-	var createdMedicine api.MedicineDisplay
-	err = json.NewDecoder(res.Body).Decode(&createdMedicine)
-	require.NoError(t, err, "Failed to decode successful response body into MedicineDisplay")
+	var createdPrescription api.Prescription
+	err = json.NewDecoder(res.Body).Decode(&createdPrescription)
+	require.NoError(t, err, "Failed to decode successful response body into Prescription")
 
 	assert := assert.New(t)
-	assert.NotNil(createdMedicine.Id, "Response medicine ID should not be nil")
-	assert.NotEmpty(createdMedicine.Id, "Response medicine ID should not be empty or nil UUID")
-	assert.Equal(medicineName, createdMedicine.Name, "Response medicine name mismatch")
+	assert.NotNil(createdPrescription.Id, "Response prescription ID should not be nil")
+	assert.NotEmpty(
+		createdPrescription.Id,
+		"Response prescription ID should not be empty or nil UUID",
+	)
+	assert.Equal(medicineName, createdPrescription.Name, "Response prescription name mismatch")
 	assert.WithinDuration(
 		startTime,
-		createdMedicine.Start,
+		createdPrescription.Start,
 		time.Second,
-		"Response medicine start time mismatch",
+		"Response prescription start time mismatch",
 	)
-	assert.Nil(
-		createdMedicine.End,
-		"Response medicine end time should be nil as it wasn't provided",
+	assert.WithinDuration(
+		endTime,
+		createdPrescription.End,
+		time.Second,
+		"Response prescription end time mismatch",
+	)
+	assert.NotNil(createdPrescription.DoctorsNote)
+	assert.Equal(
+		doctorsNote,
+		*createdPrescription.DoctorsNote,
+		"Response prescription doctorsNote mismatch",
 	)
 }
 

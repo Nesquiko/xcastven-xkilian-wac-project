@@ -10,5 +10,20 @@ properties:
     type: string
     description: Required reason if the action is 'reject'. Optional otherwise.
     example: "Doctor schedule conflict. Please choose another time."
+  facilities:
+    type: array
+    description: List of facilities to be reserved.
+    items:
+      $ref: "../resources/Facility.yaml"
+  equipment:
+    type: array
+    description: List of equipment to be reserved.
+    items:
+      $ref: "../resources/Equipment.yaml"
+  medicine:
+    type: array
+    description: List of medicine to be reserved.
+    items:
+      $ref: "../resources/Medicine.yaml"
 required:
   - action

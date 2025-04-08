@@ -139,6 +139,135 @@ func (m *MongoDb) CancelAppointment(
 	return nil
 }
 
+func (m *MongoDb) DecideAppointment(
+	ctx context.Context,
+	appointmentId uuid.UUID,
+	decision string,
+	denyReason *string,
+	resources []Resource,
+) (Appointment, error) {
+	appointment, err := m.AppointmentById(ctx, appointmentId)
+	if err != nil {
+		return Appointment{}, fmt.Errorf("DecideAppointment: %w", err)
+	}
+
+	if appointment.Status != "requested" {
+		return Appointment{}, fmt.Errorf(
+			"DecideAppointment appointment %s is not in scheduled state",
+			appointmentId,
+		)
+	}
+
+	if decision == "accept" {
+		for _, resource := range resources {
+			_, err := m.CreateReservation(
+				ctx,
+				appointmentId,
+				resource.Id,
+				resource.Name,
+				resource.Type,
+				appointment.AppointmentDateTime,
+				appointment.EndTime,
+			)
+			if err != nil {
+				return Appointment{}, fmt.Errorf(
+					"DecideAppointment failed to reserve resource %s: %w",
+					resource.Id,
+					err,
+				)
+			}
+		}
+
+		_, err = m.scheduleAppointment(ctx, appointmentId)
+		if err != nil {
+			return Appointment{}, fmt.Errorf("DecideAppointment: %w", err)
+		}
+
+		appointment, err = m.updateAppointmentResources(ctx, appointmentId, resources)
+		if err != nil {
+			return Appointment{}, fmt.Errorf("DecideAppointment: %w", err)
+		}
+	} else if decision == "reject" {
+		appointment, err = m.denyAppointment(ctx, appointmentId, denyReason)
+		if err != nil {
+			return Appointment{}, fmt.Errorf("DecideAppointment: %w", err)
+		}
+	} else {
+		return Appointment{}, fmt.Errorf("DecideAppointment invalid decision %s for appointment %s", decision, appointmentId)
+	}
+
+	return appointment, nil
+}
+
+func (m *MongoDb) scheduleAppointment(
+	ctx context.Context,
+	appointmentId uuid.UUID,
+) (Appointment, error) {
+	appointmentsColl := m.Database.Collection(appointmentsCollection)
+	update := bson.M{"$set": bson.M{"status": "scheduled"}}
+	filter := bson.M{"_id": appointmentId}
+
+	_, err := appointmentsColl.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return Appointment{}, fmt.Errorf("scheduleAppointment: %w", err)
+	}
+
+	return m.AppointmentById(ctx, appointmentId)
+}
+
+func (m *MongoDb) denyAppointment(
+	ctx context.Context,
+	appointmentId uuid.UUID,
+	reason *string,
+) (Appointment, error) {
+	appointmentsColl := m.Database.Collection(appointmentsCollection)
+	update := bson.M{"$set": bson.M{"status": "denied", "reason": reason}}
+	filter := bson.M{"_id": appointmentId}
+
+	_, err := appointmentsColl.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return Appointment{}, fmt.Errorf("denyAppointment: %w", err)
+	}
+
+	return m.AppointmentById(ctx, appointmentId)
+}
+
+func (m *MongoDb) updateAppointmentResources(
+	ctx context.Context,
+	appointmentId uuid.UUID,
+	resources []Resource,
+) (Appointment, error) {
+	appointmentsColl := m.Database.Collection(appointmentsCollection)
+
+	var facilities, equipment, medicine []Resource
+	for _, resource := range resources {
+		switch resource.Type {
+		case ResourceTypeFacility:
+			facilities = append(facilities, resource)
+		case ResourceTypeEquipment:
+			equipment = append(equipment, resource)
+		case ResourceTypeMedicine:
+			medicine = append(medicine, resource)
+		}
+	}
+
+	update := bson.M{
+		"$set": bson.M{
+			"facilities": facilities,
+			"equipment":  equipment,
+			"medicines":  medicine,
+		},
+	}
+	filter := bson.M{"_id": appointmentId}
+
+	_, err := appointmentsColl.UpdateOne(ctx, filter, update)
+	if err != nil {
+		return Appointment{}, fmt.Errorf("updateAppointmentResources: %w", err)
+	}
+
+	return m.AppointmentById(ctx, appointmentId)
+}
+
 func (m *MongoDb) appointmentExists(ctx context.Context, id uuid.UUID) error {
 	appointmentsColl := m.Database.Collection(appointmentsCollection)
 	filter := bson.M{"_id": id}

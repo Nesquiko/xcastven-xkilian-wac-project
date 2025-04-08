@@ -25,6 +25,13 @@ type Db interface {
 		appointmentId uuid.UUID,
 		cancellationReason *string,
 	) error
+	DecideAppointment(
+		ctx context.Context,
+		appointmentId uuid.UUID,
+		decision string,
+		denyReason *string,
+		resources []Resource,
+	) (Appointment, error)
 
 	CreatePatient(ctx context.Context, patient Patient) (Patient, error)
 	PatientById(ctx context.Context, id uuid.UUID) (Patient, error)
@@ -45,16 +52,16 @@ type Db interface {
 		pageSize int,
 	) ([]Condition, PaginationResult, error)
 
-	CreateMedicine(ctx context.Context, medicine Medicine) (Medicine, error)
-	MedicineById(ctx context.Context, id uuid.UUID) (Medicine, error)
-	FindMedicinesByPatientId(
+	CreatePrescription(ctx context.Context, prescription Prescription) (Prescription, error)
+	PrescriptionById(ctx context.Context, id uuid.UUID) (Prescription, error)
+	FindPrescriptionsByPatientId(
 		ctx context.Context,
 		patientId uuid.UUID,
 		from time.Time,
 		to *time.Time,
 		page int,
 		pageSize int,
-	) ([]Medicine, PaginationResult, error)
+	) ([]Prescription, PaginationResult, error)
 
 	CreateResource(ctx context.Context, name string, typ ResourceType) (Resource, error)
 	ResourceById(ctx context.Context, id uuid.UUID) (Resource, error)

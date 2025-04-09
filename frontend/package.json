@@ -36,8 +36,8 @@
     "loader/"
   ],
   "scripts": {
-    "build": "tailwindcss -i ./src/tailwind.css -o ./www/build/tailwind.css && stencil build",
-    "start": "bun openapi && concurrently \"stencil build --dev --watch --serve\" \"tailwindcss -i ./src/tailwind.css -o ./www/build/tailwind.css --watch\"",
+    "build": "tailwindcss -i ./src/tailwind.css -o ./www/build/xcastven-xkilian-project.css && stencil build",
+    "start": "bun openapi && concurrently \"tailwindcss -i ./src/tailwind.css -o ./www/build/xcastven-xkilian-project.css --watch\" \"stencil build --dev --watch --serve\"",
     "test": "stencil test --spec --e2e",
     "test.watch": "stencil test --spec --e2e --watchAll",
     "generate": "stencil generate",

@@ -36,19 +36,19 @@ export class ConditionsList {
                     </div>
                     <div class="flex items-center">
                       {condition.end ? (
-                        <span
-                          class="material-symbols-outlined text-gray-500"
+                        <md-icon
+                          class="text-gray-500"
                           style={{ fontSize: '16px' }}
                         >
                           check_circle
-                        </span>
+                        </md-icon>
                       ) : (
-                        <span
-                          class="material-symbols-outlined text-gray-500"
+                        <md-icon
+                          class="text-gray-500"
                           style={{ fontSize: '16px' }}
                         >
                           pending
-                        </span>
+                        </md-icon>
                       )}
                     </div>
                   </div>
@@ -85,30 +85,30 @@ export class ConditionsList {
             class="m-1"
             onClick={() => console.log('view older conditions clicked')}
           >
-            <span class="material-symbols-outlined text-gray-600">
+            <md-icon class="text-gray-600">
               arrow_back
-            </span>
+            </md-icon>
           </md-icon-button>
           <md-icon-button
             title="Register a condition"
             class="m-1 w-20"
             onClick={() => console.log('register a condition')}
           >
-            <span class="material-symbols-outlined text-gray-600">
+            <md-icon class="text-gray-600">
               coronavirus
-            </span>
-            <span class="material-symbols-outlined text-gray-600">
-          add
-        </span>
+            </md-icon>
+            <md-icon class="text-gray-600">
+              add
+            </md-icon>
           </md-icon-button>
           <md-icon-button
             title="View newer conditions"
             class="m-1"
             onClick={() => console.log('view newer conditions clicked')}
           >
-        <span class="material-symbols-outlined text-gray-600">
-          arrow_forward
-        </span>
+            <md-icon class="text-gray-600">
+              arrow_forward
+            </md-icon>
           </md-icon-button>
         </div>
       </div>

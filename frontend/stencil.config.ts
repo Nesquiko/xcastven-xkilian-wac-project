@@ -3,7 +3,7 @@ import { Config } from '@stencil/core';
 export const config: Config = {
   globalScript: 'src/global/app.ts',
   namespace: 'xcastven-xkilian-project',
-  globalStyle: 'www/build/tailwind.css',
+  globalStyle: 'www/build/xcastven-xkilian-project.css',
   outputTargets: [
     {
       type: 'dist',

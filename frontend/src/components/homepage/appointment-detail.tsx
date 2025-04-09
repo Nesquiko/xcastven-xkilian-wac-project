@@ -45,9 +45,9 @@ export class AppointmentDetail {
         <div class="relative w-full max-w-md">
           <div class="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-0">
             <md-icon-button onClick={this.handleResetSelection}>
-              <span class="material-symbols-outlined text-gray-600">
+              <md-icon class="text-gray-600">
                 arrow_forward
-              </span>
+              </md-icon>
             </md-icon-button>
           </div>
 
@@ -59,12 +59,11 @@ export class AppointmentDetail {
         <div class="w-full max-w-md px-4 py-3 rounded-md bg-gray-200 mb-6">
           <div class="w-full flex flex-row justify-between items-center mb-1">
             <div class="text-gray-500 flex flex-row items-center gap-x-2">
-              <span
-                class="material-symbols-outlined"
+              <md-icon
                 style={{ fontSize: '16px' }}
               >
                 calendar_month
-              </span>
+              </md-icon>
               Date
             </div>
             <span class="font-medium text-gray-600">
@@ -74,12 +73,11 @@ export class AppointmentDetail {
 
           <div class="w-full flex flex-row justify-between items-center mb-1">
             <div class="text-gray-500 flex flex-row items-center gap-x-2">
-              <span
-                class="material-symbols-outlined"
+              <md-icon
                 style={{ fontSize: '16px' }}
               >
                 schedule
-              </span>
+              </md-icon>
               Time
             </div>
             <span class="font-medium text-gray-600">
@@ -89,12 +87,11 @@ export class AppointmentDetail {
 
           <div class="w-full flex flex-row justify-between items-center mb-1">
             <div class="text-gray-500 flex flex-row items-center gap-x-2">
-              <span
-                class="material-symbols-outlined"
+              <md-icon
                 style={{ fontSize: '16px' }}
               >
                 format_list_bulleted
-              </span>
+              </md-icon>
               Type
             </div>
             <span class="font-medium text-gray-600">
@@ -105,12 +102,11 @@ export class AppointmentDetail {
           {instanceOfDoctorAppointment(this.appointment) ? (
             <div class="w-full flex flex-row justify-between items-center">
               <div class="text-gray-500 flex flex-row items-center gap-x-2">
-              <span
-                class="material-symbols-outlined"
+              <md-icon
                 style={{ fontSize: '16px' }}
               >
                 person
-              </span>
+              </md-icon>
                 Patient
               </div>
               <span class="font-medium text-gray-600">
@@ -121,12 +117,11 @@ export class AppointmentDetail {
           ) : (
             <div class="w-full flex flex-row justify-between items-center">
               <div class="text-gray-500 flex flex-row items-center gap-x-2">
-              <span
-                class="material-symbols-outlined"
+              <md-icon
                 style={{ fontSize: '16px' }}
               >
                 person
-              </span>
+              </md-icon>
                 Doctor
               </div>
               <span class="font-medium text-gray-600">
@@ -138,12 +133,11 @@ export class AppointmentDetail {
 
           <div class="w-full flex flex-row justify-between items-center">
             <div class="text-gray-500 flex flex-row items-center gap-x-2">
-              <span
-                class="material-symbols-outlined"
+              <md-icon
                 style={{ fontSize: '16px' }}
               >
                 info
-              </span>
+              </md-icon>
               Status
             </div>
             <span class="font-medium text-gray-600">
@@ -154,12 +148,11 @@ export class AppointmentDetail {
 
         <div class="w-full max-w-md px-4 py-3 rounded-md bg-gray-200 mb-6 overflow-y-auto max-h-32">
           <div class="text-gray-500 flex flex-row items-center gap-x-2 mb-1">
-            <span
-              class="material-symbols-outlined"
+            <md-icon
               style={{ fontSize: '16px' }}
             >
               description
-            </span>
+            </md-icon>
             Reason
           </div>
           <p class="text-sm font-medium text-gray-600 text-wrap ml-1">

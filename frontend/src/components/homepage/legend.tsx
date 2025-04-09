@@ -14,9 +14,9 @@ export class Legend {
         <div class="relative w-full max-w-md">
           <div class="absolute left-0 top-1/2 transform -translate-y-1/2 -translate-x-0">
             <md-icon-button onClick={this.handleResetSelection}>
-              <span class="material-symbols-outlined text-gray-600">
+              <md-icon class="text-gray-600">
                 arrow_forward
-              </span>
+              </md-icon>
             </md-icon-button>
           </div>
 

@@ -57,34 +57,31 @@ export class Calendar {
 
           <div class="flex flex-col gap-y-1 items-center justify-center">
             <div class="space-x-1 flex items-center text-gray-400">
-            <span
-              class="material-symbols-outlined"
+            <md-icon
               style={{ fontSize: '16px' }}
             >
               event
-            </span>
+            </md-icon>
               <div>{formatDate(appointment.appointmentDateTime)}</div>
             </div>
 
             <div class="space-x-1 flex items-center text-gray-400">
-            <span
-              class="material-symbols-outlined"
+            <md-icon
               style={{ fontSize: '16px' }}
             >
               timer
-            </span>
+            </md-icon>
               <div>
                 {formatTime(appointment.appointmentDateTime)}
               </div>
             </div>
 
             <div class="space-x-1 flex items-center text-gray-400">
-            <span
-              class="material-symbols-outlined"
+            <md-icon
               style={{ fontSize: '16px' }}
             >
               format_list_bulleted
-            </span>
+            </md-icon>
               <div>{displayStatus}</div>
             </div>
           </div>
@@ -103,23 +100,21 @@ export class Calendar {
 
           <div class="flex flex-col gap-y-1 items-center justify-center">
             <div class="space-x-1 flex items-center text-gray-400">
-              <span
-                class="material-symbols-outlined"
+              <md-icon
                 style={{ fontSize: '16px' }}
               >
                 line_start_circle
-              </span>
+              </md-icon>
               <div>{formatDate(condition.start)}</div>
             </div>
 
             {condition.end && (
               <div class="space-x-1 flex items-center text-gray-400">
-                <span
-                  class="material-symbols-outlined"
+                <md-icon
                   style={{ fontSize: '16px' }}
                 >
                   line_end_circle
-                </span>
+                </md-icon>
                 <div>{formatDate(condition.end)}</div>
               </div>
             )}
@@ -146,13 +141,13 @@ export class Calendar {
 
           <div class="flex flex-col gap-y-1 items-center justify-center">
             <div class="space-x-1 flex items-center text-gray-400">
-              <span class="material-symbols-outlined text-base">line_start_circle</span>
+              <md-icon class="text-base">line_start_circle</md-icon>
               <div>{formatDate(prescription.start)}</div>
             </div>
 
             {prescription.end && (
               <div class="space-x-1 flex items-center text-gray-400">
-                <span class="material-symbols-outlined text-base">line_end_circle</span>
+                <md-icon class="text-base">line_end_circle</md-icon>
                 <div>{formatDate(prescription.end)}</div>
               </div>
             )}
@@ -330,8 +325,8 @@ export class Calendar {
 
                 return (
                   <div class="inline-block group">
-                    <span
-                      class="material-symbols-outlined cursor-pointer transition-all duration-200"
+                    <md-icon
+                      class="cursor-pointer transition-all duration-200"
                       style={{
                         fontSize: this.hoveredPrescriptionId === prescription.id ? '24px' : '20px',
                         position: 'absolute',
@@ -348,7 +343,7 @@ export class Calendar {
                       }}
                     >
                       medication
-                    </span>
+                    </md-icon>
                     {this.getPrescriptionTooltipContent(prescription, prescriptionOffset)}
                   </div>
                 );

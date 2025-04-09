@@ -24,7 +24,7 @@ const data = {
 };
 
 @Component({
-  tag: 'xcastven-xkilian-appointment-scheduler',
+  tag: 'xcastven-xkilian-project-appointment-scheduler',
   shadow: false,
 })
 export class AppointmentScheduler {
@@ -195,165 +195,165 @@ export class AppointmentScheduler {
     const showDetails = this.showDetailsPanel();
 
     return (
-        <div class="flex h-screen flex-col w-full flex-1 overflow-auto">
-          {/* Header */}
-          <div class="bg-gray-800 flex items-center px-3 py-1 text-white">
-            <md-icon-button
-              class="mr-2"
-              onClick={showDetails ? () => this.resetSelection() : undefined}
-            >
-              <span class="material-symbols-outlined text-white">
-                {showDetails ? "arrow_back" : "menu"}
-              </span>
-            </md-icon-button>
-            <h1 class="flex-1 text-center text-xl font-medium">
-              {(showDetails ? 'Complete your appointment' : 'Schedule an appointment')}
-              <a class="text-gray-400 text-sm ml-5 hover:underline" target="_blank" href="https://github.com/Nesquiko/xcastven-xkilian-wac-project">Link to repo</a>
-            </h1>
-            <md-icon-button
-              class="mr-2"
-              onClick={showDetails ? () => this.resetSelection() : undefined}
-            >
-              <span class="material-symbols-outlined text-white">
-                account_circle
-              </span>
-            </md-icon-button>
-          </div>
+      <div class="flex h-screen flex-col w-full flex-1 overflow-auto">
+        {/* Header */}
+        <div class="bg-gray-800 flex items-center px-3 py-1 text-white">
+          <md-icon-button
+            class="mr-2"
+            onClick={showDetails ? () => this.resetSelection() : undefined}
+          >
+            <md-icon class="text-white">
+              {showDetails ? "arrow_back" : "menu"}
+            </md-icon>
+          </md-icon-button>
+          <h1 class="flex-1 text-center text-xl font-medium">
+            {(showDetails ? 'Complete your appointment' : 'Schedule an appointment')}
+            <a class="text-gray-400 text-sm ml-5 hover:underline" target="_blank" href="https://github.com/Nesquiko/xcastven-xkilian-wac-project">Link to repo</a>
+          </h1>
+          <md-icon-button
+            class="mr-2"
+            onClick={showDetails ? () => this.resetSelection() : undefined}
+          >
+            <md-icon class="text-white">
+              account_circle
+            </md-icon>
+          </md-icon-button>
+        </div>
 
-          {/* Content */}
-          <div class="flex flex-1 flex-col md:flex-row mx-auto w-full">
-            {/* Left panel - Calendar */}
-            <div
-              class={`flex flex-col justify-center items-center bg-gray-300 p-6 transition-all duration-600 ease-in-out ${
-                showDetails ? "md:w-1/2 w-full" : "w-full"
-              }`}>
-              <div class="max-w-md w-full rounded-lg bg-white p-4 shadow-md mb-6">
-                <div class="mb-4 flex items-center justify-between">
-                  <md-icon-button onClick={() => this.prevMonth()}>
-                    <span class="material-symbols-outlined">chevron_left</span>
-                  </md-icon-button>
-                  <div class="text-center flex items-center">
-                    <span class="font-medium">{this.getMonthName()}</span>
-                    <span class="mx-1">,</span>
-                    <select
-                      class="bg-transparent border-none font-medium"
-                      onChange={(e: Event) => this.handleYearChange(e)}
-                    >
-                      {yearOptions.map((year) => (
-                        <option
-                          value={year.toString()}
-                          selected={year === this.currentViewYear}
-                        >
-                          {year}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <md-icon-button onClick={() => this.nextMonth()}>
-                    <span class="material-symbols-outlined">chevron_right</span>
-                  </md-icon-button>
+        {/* Content */}
+        <div class="flex flex-1 flex-col md:flex-row mx-auto w-full">
+          {/* Left panel - Calendar */}
+          <div
+            class={`flex flex-col justify-center items-center bg-gray-300 p-6 transition-all duration-600 ease-in-out ${
+              showDetails ? "md:w-1/2 w-full" : "w-full"
+            }`}>
+            <div class="max-w-md w-full rounded-lg bg-white p-4 shadow-md mb-6">
+              <div class="mb-4 flex items-center justify-between">
+                <md-icon-button onClick={() => this.prevMonth()}>
+                  <md-icon>chevron_left</md-icon>
+                </md-icon-button>
+                <div class="text-center flex items-center">
+                  <span class="font-medium">{this.getMonthName()}</span>
+                  <span class="mx-1">,</span>
+                  <select
+                    class="bg-transparent border-none font-medium"
+                    onChange={(e: Event) => this.handleYearChange(e)}
+                  >
+                    {yearOptions.map((year) => (
+                      <option
+                        value={year.toString()}
+                        selected={year === this.currentViewYear}
+                      >
+                        {year}
+                      </option>
+                    ))}
+                  </select>
                 </div>
-
-                <div class="grid grid-cols-7 gap-1">
-                  {DAYS_OF_WEEK.map((day) => (
-                    <div class="px-3 py-2 text-center text-sm font-medium text-gray-600">
-                      {day.short}
-                    </div>
-                  ))}
-                  {this.renderCalendar()}
-                </div>
+                <md-icon-button onClick={() => this.nextMonth()}>
+                  <md-icon>chevron_right</md-icon>
+                </md-icon-button>
               </div>
 
-              {/* Time selector */}
-              <div class="max-w-lg w-full px-4">
+              <div class="grid grid-cols-7 gap-1">
+                {DAYS_OF_WEEK.map((day) => (
+                  <div class="px-3 py-2 text-center text-sm font-medium text-gray-600">
+                    {day.short}
+                  </div>
+                ))}
+                {this.renderCalendar()}
+              </div>
+            </div>
+
+            {/* Time selector */}
+            <div class="max-w-lg w-full px-4">
+              <md-filled-select
+                label="Select a time"
+                class="w-full"
+                value={this.selectedTime}
+                onInput={(e: Event) => this.handleTimeChange(e)}
+              >
+                {this.availableTimes.map((time: TimeSlot) => (
+                  <md-select-option
+                    value={time.time}
+                    disabled={time.status !== "available"}
+                  >
+                    <div slot="headline">{time.time}</div>
+                  </md-select-option>
+                ))}
+              </md-filled-select>
+            </div>
+
+            {/* Selected date and time summary (visible on mobile when details panel is shown) */}
+            {showDetails && (
+              <div class="mt-6 p-4 bg-white rounded-lg shadow-md md:hidden">
+                {getDateAndTimeTitle(this.selectedDate, this.selectedTime, "bold")}
+              </div>
+            )}
+          </div>
+
+          {/* Right panel - Details */}
+          {showDetails && (
+            <div
+              class={`m-auto p-6 md:w-1/2 max-w-lg w-full flex flex-col justify-center transform transition-all duration-500 ease-in-out opacity-100
+                         animate-[slideInFromBottom_0.5s_ease-out]
+                         md:animate-[slideInFromRight_0.5s_ease-out]`}
+            >
+              <div class="mb-6 hidden md:block">
+                {getDateAndTimeTitle(this.selectedDate, this.selectedTime, "bold")}
+              </div>
+
+              <div class="mb-6">
                 <md-filled-select
-                  label="Select a time"
+                  label="Appointment type"
                   class="w-full"
-                  value={this.selectedTime}
-                  onInput={(e: Event) => this.handleTimeChange(e)}
+                  value={this.selectedAppointmentType}
+                  onInput={(e: Event) => this.handleAppointmentTypeChange(e)}
                 >
-                  {this.availableTimes.map((time: TimeSlot) => (
-                    <md-select-option
-                      value={time.time}
-                      disabled={time.status !== "available"}
-                    >
-                      <div slot="headline">{time.time}</div>
+                  {this.appointmentTypes.map((appointmentType: AppointmentType) => (
+                    <md-select-option value={appointmentType}>
+                      <div slot="headline">{appointmentType}</div>
                     </md-select-option>
                   ))}
                 </md-filled-select>
               </div>
 
-              {/* Selected date and time summary (visible on mobile when details panel is shown) */}
-              {showDetails && (
-                <div class="mt-6 p-4 bg-white rounded-lg shadow-md md:hidden">
-                  {getDateAndTimeTitle(this.selectedDate, this.selectedTime, "bold")}
-                </div>
-              )}
-            </div>
-
-            {/* Right panel - Details */}
-            {showDetails && (
-              <div
-                class={`m-auto p-6 md:w-1/2 max-w-lg w-full flex flex-col justify-center transform transition-all duration-500 ease-in-out opacity-100
-                         animate-[slideInFromBottom_0.5s_ease-out]
-                         md:animate-[slideInFromRight_0.5s_ease-out]`}
-              >
-                <div class="mb-6 hidden md:block">
-                  {getDateAndTimeTitle(this.selectedDate, this.selectedTime, "bold")}
-                </div>
-
-                <div class="mb-6">
-                  <md-filled-select
-                    label="Appointment type"
-                    class="w-full"
-                    value={this.selectedAppointmentType}
-                    onInput={(e: Event) => this.handleAppointmentTypeChange(e)}
-                  >
-                    {this.appointmentTypes.map((appointmentType: AppointmentType) => (
-                      <md-select-option value={appointmentType}>
-                        <div slot="headline">{appointmentType}</div>
-                      </md-select-option>
-                    ))}
-                  </md-filled-select>
-                </div>
-
-                <div class="mb-6">
-                  <md-filled-select
-                    label="Doctor / Specialist"
-                    class="w-full"
-                    value={this.selectedDoctor}
-                    onInput={(e: Event) => this.handleDoctorChange(e)}
-                  >
-                    {this.doctors.map((doctor: Doctor) => (
-                      <md-select-option value={doctor.id}>
-                        <div slot="headline">Dr. {doctor.firstName} {doctor.lastName}</div>
-                      </md-select-option>
-                    ))}
-                  </md-filled-select>
-                </div>
-
-                <div class="mb-6">
-                  <md-filled-text-field
-                    class="w-full"
-                    label="Appointment reason"
-                    placeholder="Briefly describe your reason for visit (optional)"
-                    type="textarea"
-                    rows="4"
-                    value={this.appointmentReason}
-                    onInput={(e: Event) => this.handleAppointmentReasonChange(e)}
-                  ></md-filled-text-field>
-                </div>
-
-                <md-filled-button
-                  class="w-full rounded-full bg-[#7357be] text-white"
-                  onClick={() => this.handleScheduleAppointment()}
+              <div class="mb-6">
+                <md-filled-select
+                  label="Doctor / Specialist"
+                  class="w-full"
+                  value={this.selectedDoctor}
+                  onInput={(e: Event) => this.handleDoctorChange(e)}
                 >
-                  Schedule
-                </md-filled-button>
+                  {this.doctors.map((doctor: Doctor) => (
+                    <md-select-option value={doctor.id}>
+                      <div slot="headline">Dr. {doctor.firstName} {doctor.lastName}</div>
+                    </md-select-option>
+                  ))}
+                </md-filled-select>
               </div>
-            )}
-          </div>
+
+              <div class="mb-6">
+                <md-filled-text-field
+                  class="w-full"
+                  label="Appointment reason"
+                  placeholder="Briefly describe your reason for visit (optional)"
+                  type="textarea"
+                  rows="4"
+                  value={this.appointmentReason}
+                  onInput={(e: Event) => this.handleAppointmentReasonChange(e)}
+                ></md-filled-text-field>
+              </div>
+
+              <md-filled-button
+                class="w-full rounded-full bg-[#7357be] text-white"
+                onClick={() => this.handleScheduleAppointment()}
+              >
+                Schedule
+              </md-filled-button>
+            </div>
+          )}
         </div>
+      </div>
     );
   };
 }

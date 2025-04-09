@@ -39,7 +39,7 @@ export class Header {
             class="mr-2"
             onClick={this.handleToggleHeaderMenu}
           >
-            <span class="material-symbols-outlined text-white">menu</span>
+            <md-icon class="text-white">menu</md-icon>
           </md-icon-button>
 
           <md-menu id="header-md-menu" anchor="menu-button" style={{ position: 'absolute', zIndex: 90 }}>
@@ -48,12 +48,11 @@ export class Header {
                 slot="headline"
                 class="text-sm w-48 flex flex-row items-center gap-x-2 z-90"
               >
-                <span
-                  class="material-symbols-outlined"
+                <md-icon
                   style={{ fontSize: '20px' }}
                 >
                   calendar_month
-                </span>
+                </md-icon>
                 <span>Schedule an appointment</span>
               </div>
             </md-menu-item>
@@ -62,12 +61,11 @@ export class Header {
                 slot="headline"
                 class="text-sm w-48 flex flex-row items-center gap-x-2 z-90"
               >
-                <span
-                  class="material-symbols-outlined"
+                <md-icon
                   style={{ fontSize: '20px' }}
                 >
                   coronavirus
-                </span>
+                </md-icon>
                 <span>Register a condition</span>
               </div>
             </md-menu-item>
@@ -79,9 +77,9 @@ export class Header {
             onClick={this.handlePreviousMonth}
             title="Previous month"
           >
-            <span class="material-symbols-outlined text-white">
+            <md-icon class="text-white">
               chevron_left
-            </span>
+            </md-icon>
           </md-icon-button>
           <div class="text-center flex items-center w-48 justify-center">
             <span class="font-medium">{this.getMonthName()}</span>
@@ -105,16 +103,16 @@ export class Header {
             onClick={this.handleNextMonth}
             title="Next month"
           >
-            <span class="material-symbols-outlined text-white">
+            <md-icon class="text-white">
               chevron_right
-            </span>
+            </md-icon>
           </md-icon-button>
         </div>
 
         <md-icon-button onClick={() => console.log('account clicked')}>
-          <span class="material-symbols-outlined text-white">
+          <md-icon class="text-white">
             account_circle
-          </span>
+          </md-icon>
         </md-icon-button>
       </div>
     );

@@ -63,7 +63,6 @@
     "@material/web": "^2.3.0",
     "@openapitools/openapi-generator-cli": "2.4.19",
     "date-fns": "^4.1.0",
-    "stencil-router-v2": "^0.6.0",
     "tailwindcss": "^4.1.3"
   }
 }

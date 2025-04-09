@@ -8,15 +8,16 @@ import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { AppointmentDisplay, Condition, ConditionDisplay, DoctorAppointment, PatientAppointment, PrescriptionDisplay } from "./api/generated";
 export { AppointmentDisplay, Condition, ConditionDisplay, DoctorAppointment, PatientAppointment, PrescriptionDisplay } from "./api/generated";
 export namespace Components {
-    interface XcastvenXkilianAppointmentScheduler {
-    }
     interface XcastvenXkilianProjectApp {
+        "basePath": string;
     }
     interface XcastvenXkilianProjectAppointmentDetail {
         "appointmentId": string;
         "handleCancelAppointment": (appointment: PatientAppointment | DoctorAppointment) => void;
         "handleRescheduleAppointment": (appointment: PatientAppointment | DoctorAppointment) => void;
         "handleResetSelection": () => void;
+    }
+    interface XcastvenXkilianProjectAppointmentScheduler {
     }
     interface XcastvenXkilianProjectAppointmentsList {
         "appointments": Array<AppointmentDisplay>;
@@ -102,12 +103,6 @@ export namespace Components {
     }
 }
 declare global {
-    interface HTMLXcastvenXkilianAppointmentSchedulerElement extends Components.XcastvenXkilianAppointmentScheduler, HTMLStencilElement {
-    }
-    var HTMLXcastvenXkilianAppointmentSchedulerElement: {
-        prototype: HTMLXcastvenXkilianAppointmentSchedulerElement;
-        new (): HTMLXcastvenXkilianAppointmentSchedulerElement;
-    };
     interface HTMLXcastvenXkilianProjectAppElement extends Components.XcastvenXkilianProjectApp, HTMLStencilElement {
     }
     var HTMLXcastvenXkilianProjectAppElement: {
@@ -119,6 +114,12 @@ declare global {
     var HTMLXcastvenXkilianProjectAppointmentDetailElement: {
         prototype: HTMLXcastvenXkilianProjectAppointmentDetailElement;
         new (): HTMLXcastvenXkilianProjectAppointmentDetailElement;
+    };
+    interface HTMLXcastvenXkilianProjectAppointmentSchedulerElement extends Components.XcastvenXkilianProjectAppointmentScheduler, HTMLStencilElement {
+    }
+    var HTMLXcastvenXkilianProjectAppointmentSchedulerElement: {
+        prototype: HTMLXcastvenXkilianProjectAppointmentSchedulerElement;
+        new (): HTMLXcastvenXkilianProjectAppointmentSchedulerElement;
     };
     interface HTMLXcastvenXkilianProjectAppointmentsListElement extends Components.XcastvenXkilianProjectAppointmentsList, HTMLStencilElement {
     }
@@ -199,9 +200,9 @@ declare global {
         new (): HTMLXcastvenXkilianProjectRegisterElement;
     };
     interface HTMLElementTagNameMap {
-        "xcastven-xkilian-appointment-scheduler": HTMLXcastvenXkilianAppointmentSchedulerElement;
         "xcastven-xkilian-project-app": HTMLXcastvenXkilianProjectAppElement;
         "xcastven-xkilian-project-appointment-detail": HTMLXcastvenXkilianProjectAppointmentDetailElement;
+        "xcastven-xkilian-project-appointment-scheduler": HTMLXcastvenXkilianProjectAppointmentSchedulerElement;
         "xcastven-xkilian-project-appointments-list": HTMLXcastvenXkilianProjectAppointmentsListElement;
         "xcastven-xkilian-project-calendar": HTMLXcastvenXkilianProjectCalendarElement;
         "xcastven-xkilian-project-condition-detail": HTMLXcastvenXkilianProjectConditionDetailElement;
@@ -218,15 +219,16 @@ declare global {
     }
 }
 declare namespace LocalJSX {
-    interface XcastvenXkilianAppointmentScheduler {
-    }
     interface XcastvenXkilianProjectApp {
+        "basePath"?: string;
     }
     interface XcastvenXkilianProjectAppointmentDetail {
         "appointmentId"?: string;
         "handleCancelAppointment"?: (appointment: PatientAppointment | DoctorAppointment) => void;
         "handleRescheduleAppointment"?: (appointment: PatientAppointment | DoctorAppointment) => void;
         "handleResetSelection"?: () => void;
+    }
+    interface XcastvenXkilianProjectAppointmentScheduler {
     }
     interface XcastvenXkilianProjectAppointmentsList {
         "appointments"?: Array<AppointmentDisplay>;
@@ -311,9 +313,9 @@ declare namespace LocalJSX {
     interface XcastvenXkilianProjectRegister {
     }
     interface IntrinsicElements {
-        "xcastven-xkilian-appointment-scheduler": XcastvenXkilianAppointmentScheduler;
         "xcastven-xkilian-project-app": XcastvenXkilianProjectApp;
         "xcastven-xkilian-project-appointment-detail": XcastvenXkilianProjectAppointmentDetail;
+        "xcastven-xkilian-project-appointment-scheduler": XcastvenXkilianProjectAppointmentScheduler;
         "xcastven-xkilian-project-appointments-list": XcastvenXkilianProjectAppointmentsList;
         "xcastven-xkilian-project-calendar": XcastvenXkilianProjectCalendar;
         "xcastven-xkilian-project-condition-detail": XcastvenXkilianProjectConditionDetail;
@@ -333,9 +335,9 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
-            "xcastven-xkilian-appointment-scheduler": LocalJSX.XcastvenXkilianAppointmentScheduler & JSXBase.HTMLAttributes<HTMLXcastvenXkilianAppointmentSchedulerElement>;
             "xcastven-xkilian-project-app": LocalJSX.XcastvenXkilianProjectApp & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectAppElement>;
             "xcastven-xkilian-project-appointment-detail": LocalJSX.XcastvenXkilianProjectAppointmentDetail & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectAppointmentDetailElement>;
+            "xcastven-xkilian-project-appointment-scheduler": LocalJSX.XcastvenXkilianProjectAppointmentScheduler & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectAppointmentSchedulerElement>;
             "xcastven-xkilian-project-appointments-list": LocalJSX.XcastvenXkilianProjectAppointmentsList & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectAppointmentsListElement>;
             "xcastven-xkilian-project-calendar": LocalJSX.XcastvenXkilianProjectCalendar & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectCalendarElement>;
             "xcastven-xkilian-project-condition-detail": LocalJSX.XcastvenXkilianProjectConditionDetail & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectConditionDetailElement>;

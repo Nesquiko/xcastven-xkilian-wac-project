@@ -14,11 +14,11 @@ import '@material/web/ripple/ripple';
 import '@material/web/select/filled-select';
 import '@material/web/select/outlined-select';
 import '@material/web/select/select-option';
-import '@material/web/textfield/filled-text-field';
-import '@material/web/textfield/outlined-text-field';
 import '@material/web/tabs/primary-tab';
 import '@material/web/tabs/secondary-tab';
 import '@material/web/tabs/tabs';
+import '@material/web/textfield/filled-text-field';
+import '@material/web/textfield/outlined-text-field';
 
 export default function () {
   // or export default async function()

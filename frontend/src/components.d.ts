@@ -5,8 +5,8 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { AppointmentDisplay, Condition, ConditionDisplay, DoctorAppointment, PatientAppointment, PrescriptionDisplay } from "./api/generated";
-export { AppointmentDisplay, Condition, ConditionDisplay, DoctorAppointment, PatientAppointment, PrescriptionDisplay } from "./api/generated";
+import { AppointmentDisplay, Condition, ConditionDisplay, DoctorAppointment, PatientAppointment, PrescriptionDisplay, UserRole } from "./api/generated";
+export { AppointmentDisplay, Condition, ConditionDisplay, DoctorAppointment, PatientAppointment, PrescriptionDisplay, UserRole } from "./api/generated";
 export namespace Components {
     interface XcastvenXkilianProjectApp {
         "basePath": string;
@@ -38,9 +38,11 @@ export namespace Components {
         "handleSelectPrescription": (prescription: PrescriptionDisplay) => void;
         "hoveredConditionId": string;
         "hoveredPrescriptionId": string;
+        "isDoctor": boolean;
         "prescriptions": Array<PrescriptionDisplay>;
         "setHoveredConditionId": (value: string | null) => void;
         "setHoveredPrescriptionId": (value: string | null) => void;
+        "user": { email: string; role: UserRole };
     }
     interface XcastvenXkilianProjectConditionDetail {
         "conditionId": string;
@@ -249,9 +251,11 @@ declare namespace LocalJSX {
         "handleSelectPrescription"?: (prescription: PrescriptionDisplay) => void;
         "hoveredConditionId"?: string;
         "hoveredPrescriptionId"?: string;
+        "isDoctor"?: boolean;
         "prescriptions"?: Array<PrescriptionDisplay>;
         "setHoveredConditionId"?: (value: string | null) => void;
         "setHoveredPrescriptionId"?: (value: string | null) => void;
+        "user"?: { email: string; role: UserRole };
     }
     interface XcastvenXkilianProjectConditionDetail {
         "conditionId"?: string;

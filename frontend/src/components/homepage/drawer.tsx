@@ -1,13 +1,6 @@
+import { AppointmentDisplay, Condition, ConditionDisplay, DoctorAppointment, PatientAppointment, PrescriptionDisplay } from '../../api/generated';
 import { formatDate } from '../../utils/utils';
 import { Component, h, Prop, State } from '@stencil/core';
-import {
-  AppointmentDisplay,
-  Condition,
-  ConditionDisplay,
-  DoctorAppointment,
-  PatientAppointment,
-  PrescriptionDisplay,
-} from '../../api/generated';
 
 @Component({
   tag: 'xcastven-xkilian-project-drawer',
@@ -36,7 +29,7 @@ export class Drawer {
 
   @State() activeTab: number = 0;
 
-  private handleTabChange = (event) => {
+  private handleTabChange = event => {
     const tabBar = event.target;
     this.activeTab = tabBar.activeTabIndex;
   };
@@ -44,27 +37,21 @@ export class Drawer {
   render() {
     return (
       <div
-        class={`fixed top-0 right-0 h-full min-w-md max-w-md bg-white shadow-lg transform transition-transform duration-300 z-100 ${
+        class={`fixed top-0 right-0 z-100 h-full max-w-md min-w-md transform bg-white shadow-lg transition-transform duration-300 ${
           this.isDrawerOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
         onClick={(e: MouseEvent) => e.stopPropagation()}
       >
-        <div class="p-4 flex flex-col h-full">
-
+        <div class="flex h-full flex-col p-4">
           {/* Selected date */}
           {this.selectedDate ? (
             <div class="w-full">
-              <h2 class="w-full mb-6 text-center text-[#7357be] font-medium text-lg">
-                {formatDate(this.selectedDate)}
-              </h2>
+              <h2 class="mb-6 w-full text-center text-lg font-medium text-[#7357be]">{formatDate(this.selectedDate)}</h2>
 
-              <div class="flex flex-col gap-y-2 w-full justify-center items-center">
+              <div class="flex w-full flex-col items-center justify-center gap-y-2">
                 {/* Tabs */}
-                <div class="w-full max-w-md bg-gray-100 rounded-lg overflow-hidden">
-                  <md-tabs
-                    class="w-full"
-                    onchange={(e) => this.handleTabChange(e)}
-                  >
+                <div class="w-full max-w-md overflow-hidden rounded-lg bg-gray-100">
+                  <md-tabs class="w-full" onchange={e => this.handleTabChange(e)}>
                     <md-primary-tab class="w-1/3 px-4">
                       <span class="w-full">My appointments</span>
                     </md-primary-tab>
@@ -87,10 +74,7 @@ export class Drawer {
 
                 {/* Conditions Tab Content */}
                 <div class={`w-full max-w-md ${this.activeTab === 1 ? 'block' : 'hidden'}`}>
-                  <xcastven-xkilian-project-conditions-list
-                    conditions={this.getConditionsForDate(this.selectedDate)}
-                    handleSelectCondition={this.handleSelectCondition}
-                  />
+                  <xcastven-xkilian-project-conditions-list conditions={this.getConditionsForDate(this.selectedDate)} handleSelectCondition={this.handleSelectCondition} />
                 </div>
 
                 {/* Prescriptions Tab Content */}
@@ -118,17 +102,12 @@ export class Drawer {
               handleToggleConditionStatus={this.handleToggleConditionStatus}
             />
           ) : this.selectedPrescription ? (
-            <xcastven-xkilian-project-prescription-detail
-              prescriptionId={this.selectedPrescription.id}
-              handleResetSelection={this.handleResetSelection}
-            />
-          ) : this.showLegend && (
-            <xcastven-xkilian-project-legend
-              handleResetSelection={this.handleResetSelection}
-            />
+            <xcastven-xkilian-project-prescription-detail prescriptionId={this.selectedPrescription.id} handleResetSelection={this.handleResetSelection} />
+          ) : (
+            this.showLegend && <xcastven-xkilian-project-legend handleResetSelection={this.handleResetSelection} />
           )}
         </div>
       </div>
     );
-  };
+  }
 }

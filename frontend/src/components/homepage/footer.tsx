@@ -11,62 +11,37 @@ export class Footer {
 
   render() {
     return (
-      <div class="w-full px-3 py-1 bg-[#d8c7ed] flex flex-row justify-between h-[48px]">
+      <div class="flex h-[48px] w-full flex-row justify-between bg-[#d8c7ed] px-3 py-1">
         <div class="w-10"></div>
 
-        <div class="w-full flex flex-row justify-center items-center gap-x-3">
-          <md-text-button
-            class="text-sm sm:w-56 w-18 relative pr-3 text-[#7357be]"
-            onClick={this.handleScheduleAppointment}
-            title="Schedule an appointment"
-          >
-        <md-icon
-          class="absolute top-[10px] left-4"
-          style={{ fontSize: '20px' }}
-        >
-          event
-        </md-icon>
-            <md-icon
-              class="sm:text-transparent absolute top-[10px] left-10"
-              style={{ fontSize: '20px' }}
-            >
+        <div class="flex w-full flex-row items-center justify-center gap-x-3">
+          <md-text-button class="relative w-18 pr-3 text-sm text-[#7357be] sm:w-56" onClick={this.handleScheduleAppointment} title="Schedule an appointment">
+            <md-icon class="absolute top-[10px] left-4" style={{ fontSize: '20px' }}>
+              event
+            </md-icon>
+            <md-icon class="absolute top-[10px] left-10 sm:text-transparent" style={{ fontSize: '20px' }}>
               add
             </md-icon>
-            <span class="pl-8 text-center sm:inline hidden">Schedule an appointment</span>
+            <span class="hidden pl-8 text-center sm:inline">Schedule an appointment</span>
           </md-text-button>
 
-          <md-text-button
-            class="text-sm sm:w-48 w-18 relative pr-3 text-[#7357be]"
-            onClick={this.handleRegisterCondition}
-            title="Register a condition"
-          >
-            <md-icon
-              class="absolute top-[10px] left-4"
-              style={{ fontSize: '20px' }}
-            >
+          <md-text-button class="relative w-18 pr-3 text-sm text-[#7357be] sm:w-48" onClick={this.handleRegisterCondition} title="Register a condition">
+            <md-icon class="absolute top-[10px] left-4" style={{ fontSize: '20px' }}>
               coronavirus
             </md-icon>
-            <md-icon
-              class="sm:text-transparent absolute top-[10px] left-10"
-              style={{ fontSize: '20px' }}
-            >
+            <md-icon class="absolute top-[10px] left-10 sm:text-transparent" style={{ fontSize: '20px' }}>
               add
             </md-icon>
-            <span class="pl-8 text-center sm:inline hidden">Register a condition</span>
+            <span class="hidden pl-8 text-center sm:inline">Register a condition</span>
           </md-text-button>
         </div>
 
-        <div class="w-10 relative z-98">
-          <md-icon-button
-            id="legend-button"
-            class="mr-2 text-[#7357be]"
-            onClick={this.handleToggleLegendMenu}
-            title="Legend"
-          >
+        <div class="relative z-98 w-10">
+          <md-icon-button id="legend-button" class="mr-2 text-[#7357be]" onClick={this.handleToggleLegendMenu} title="Legend">
             <md-icon class="text-[#7357be]">more_horiz</md-icon>
           </md-icon-button>
         </div>
       </div>
     );
-  };
+  }
 }

@@ -1,16 +1,17 @@
-import { Component, h, State } from '@stencil/core';
-import {
-  TODAY,
-} from '../../utils/utils';
-import { AppointmentDisplay, ConditionDisplay, PrescriptionDisplay } from '../../api/generated';
+import { AppointmentDisplay, ConditionDisplay, PrescriptionDisplay, UserRole } from '../../api/generated';
 import { PatientsCalendarExample } from '../../data-examples/patients-calendar';
+import { TODAY } from '../../utils/utils';
 import { StyledHost } from '../StyledHost';
+import { Component, h, State } from '@stencil/core';
 
 @Component({
   tag: 'xcastven-xkilian-project-home-page',
   shadow: false,
 })
 export class Homepage {
+  private user: { email: string; role: UserRole } = JSON.parse(sessionStorage.getItem('user'));
+  private isDoctor: boolean = this.user.role === 'doctor';
+
   @State() appointments: Array<AppointmentDisplay> = PatientsCalendarExample.appointments;
   @State() conditions: Array<ConditionDisplay> = PatientsCalendarExample.conditions;
   @State() prescriptions: Array<PrescriptionDisplay> = PatientsCalendarExample.prescriptions;
@@ -133,11 +134,7 @@ export class Homepage {
   private getAppointmentsForDate = (date: Date): Array<AppointmentDisplay> => {
     return this.appointments.filter((appointment: AppointmentDisplay): boolean => {
       const appointmentDate: Date = new Date(appointment.appointmentDateTime);
-      return (
-        appointmentDate.getFullYear() === date.getFullYear() &&
-        appointmentDate.getMonth() === date.getMonth() &&
-        appointmentDate.getDate() === date.getDate()
-      );
+      return appointmentDate.getFullYear() === date.getFullYear() && appointmentDate.getMonth() === date.getMonth() && appointmentDate.getDate() === date.getDate();
     });
   };
 
@@ -154,15 +151,17 @@ export class Homepage {
   private getPrescriptionsForDate = (date: Date): Array<PrescriptionDisplay> => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
-    return this.prescriptions.filter((prescription: PrescriptionDisplay): boolean => {
-      const { start, end } = prescription;
-      return date >= start && date <= end;
-    }).sort((a: PrescriptionDisplay, b: PrescriptionDisplay) => b.start.getTime() - a.start.getTime());
+    return this.prescriptions
+      .filter((prescription: PrescriptionDisplay): boolean => {
+        const { start, end } = prescription;
+        return date >= start && date <= end;
+      })
+      .sort((a: PrescriptionDisplay, b: PrescriptionDisplay) => b.start.getTime() - a.start.getTime());
   };
 
   render() {
     return (
-      <StyledHost class="flex h-screen flex-col w-full overflow-hidden">
+      <StyledHost class="flex h-screen w-full flex-col overflow-hidden">
         <xcastven-xkilian-project-header
           currentViewMonth={this.currentViewMonth}
           currentViewYear={this.currentViewYear}
@@ -172,6 +171,8 @@ export class Homepage {
         />
 
         <xcastven-xkilian-project-calendar
+          user={this.user}
+          isDoctor={this.isDoctor}
           appointments={this.appointments}
           conditions={this.conditions}
           prescriptions={this.prescriptions}
@@ -182,9 +183,9 @@ export class Homepage {
           handleSelectCondition={this.handleSelectCondition}
           handleSelectPrescription={this.handleSelectPrescription}
           hoveredConditionId={this.hoveredConditionId}
-          setHoveredConditionId={(value: string | null) => this.hoveredConditionId = value}
+          setHoveredConditionId={(value: string | null) => (this.hoveredConditionId = value)}
           hoveredPrescriptionId={this.hoveredPrescriptionId}
-          setHoveredPrescriptionId={(value: string | null) => this.hoveredPrescriptionId = value}
+          setHoveredPrescriptionId={(value: string | null) => (this.hoveredPrescriptionId = value)}
           currentViewMonth={this.currentViewMonth}
           currentViewYear={this.currentViewYear}
           handlePreviousMonth={this.handlePreviousMonth}
@@ -197,12 +198,7 @@ export class Homepage {
           handleToggleLegendMenu={this.handleToggleLegendMenu}
         />
 
-        {this.isDrawerOpen && (
-          <div
-            class="fixed inset-0 bg-black/50 z-99"
-            onClick={() => this.handleResetSelection()}
-          />
-        )}
+        {this.isDrawerOpen && <div class="fixed inset-0 z-99 bg-black/50" onClick={() => this.handleResetSelection()} />}
 
         <xcastven-xkilian-project-drawer
           isDrawerOpen={this.isDrawerOpen}
@@ -211,7 +207,6 @@ export class Homepage {
           selectedCondition={this.selectedCondition}
           selectedPrescription={this.selectedPrescription}
           showLegend={this.showLegend}
-
           handleResetSelection={this.handleResetSelection}
           getAppointmentsForDate={this.getAppointmentsForDate}
           getConditionsForDate={this.getConditionsForDate}
@@ -219,7 +214,6 @@ export class Homepage {
           handleSelectAppointment={this.handleSelectAppointment}
           handleSelectCondition={this.handleSelectCondition}
           handleSelectPrescription={this.handleSelectPrescription}
-
           handleRescheduleAppointment={this.handleRescheduleAppointment}
           handleCancelAppointment={this.handleCancelAppointment}
           handleScheduleAppointmentFromCondition={this.handleScheduleAppointmentFromCondition}
@@ -227,5 +221,5 @@ export class Homepage {
         />
       </StyledHost>
     );
-  };
+  }
 }

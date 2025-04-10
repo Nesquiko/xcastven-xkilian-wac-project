@@ -1,19 +1,14 @@
-import {
-  AppointmentStatusColor,
-  ConditionOrderColors,
-  DAYS_OF_WEEK,
-  formatDate,
-  formatTime,
-  PrescriptionOrderColors,
-} from '../../utils/utils';
+import { AppointmentDisplay, AppointmentStatus, ConditionDisplay, PrescriptionDisplay, UserRole } from '../../api/generated';
+import { AppointmentStatusColor, ConditionOrderColors, DAYS_OF_WEEK, formatDate, formatTime, PrescriptionOrderColors } from '../../utils/utils';
 import { Component, h, Prop } from '@stencil/core';
-import { AppointmentDisplay, ConditionDisplay, PrescriptionDisplay } from '../../api/generated';
 
 @Component({
   tag: 'xcastven-xkilian-project-calendar',
   shadow: false,
 })
 export class Calendar {
+  @Prop() user: { email: string; role: UserRole };
+  @Prop() isDoctor: boolean;
   @Prop() appointments: Array<AppointmentDisplay>;
   @Prop() conditions: Array<ConditionDisplay>;
   @Prop() prescriptions: Array<PrescriptionDisplay>;
@@ -46,42 +41,28 @@ export class Calendar {
 
     return (
       <div
-        class="absolute bg-black text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-100"
+        class="pointer-events-none absolute z-100 rounded bg-black px-2 py-1 text-xs whitespace-nowrap text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100"
         style={{
           top: '4px',
           right: 'calc(100% + 8px)',
         }}
       >
-        <div class="flex flex-col gap-y-1 w-full">
+        <div class="flex w-full flex-col gap-y-1">
           <span class="w-full text-center">{appointment.type}</span>
 
-          <div class="flex flex-col gap-y-1 items-center justify-center">
-            <div class="space-x-1 flex items-center text-gray-400">
-            <md-icon
-              style={{ fontSize: '16px' }}
-            >
-              event
-            </md-icon>
+          <div class="flex flex-col items-center justify-center gap-y-1">
+            <div class="flex items-center space-x-1 text-gray-400">
+              <md-icon style={{ fontSize: '16px' }}>event</md-icon>
               <div>{formatDate(appointment.appointmentDateTime)}</div>
             </div>
 
-            <div class="space-x-1 flex items-center text-gray-400">
-            <md-icon
-              style={{ fontSize: '16px' }}
-            >
-              timer
-            </md-icon>
-              <div>
-                {formatTime(appointment.appointmentDateTime)}
-              </div>
+            <div class="flex items-center space-x-1 text-gray-400">
+              <md-icon style={{ fontSize: '16px' }}>timer</md-icon>
+              <div>{formatTime(appointment.appointmentDateTime)}</div>
             </div>
 
-            <div class="space-x-1 flex items-center text-gray-400">
-            <md-icon
-              style={{ fontSize: '16px' }}
-            >
-              format_list_bulleted
-            </md-icon>
+            <div class="flex items-center space-x-1 text-gray-400">
+              <md-icon style={{ fontSize: '16px' }}>format_list_bulleted</md-icon>
               <div>{displayStatus}</div>
             </div>
           </div>
@@ -92,29 +73,19 @@ export class Calendar {
 
   private getConditionTooltipContent = (condition: ConditionDisplay) => {
     return (
-      <div
-        class="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-1 bg-black text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-100"
-      >
-        <div class="flex flex-col gap-y-1 w-full">
+      <div class="pointer-events-none absolute bottom-full left-1/2 z-100 mb-1 -translate-x-1/2 transform rounded bg-black px-2 py-1 text-xs whitespace-nowrap text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100">
+        <div class="flex w-full flex-col gap-y-1">
           <span class="w-full text-center">{condition.name}</span>
 
-          <div class="flex flex-col gap-y-1 items-center justify-center">
-            <div class="space-x-1 flex items-center text-gray-400">
-              <md-icon
-                style={{ fontSize: '16px' }}
-              >
-                line_start_circle
-              </md-icon>
+          <div class="flex flex-col items-center justify-center gap-y-1">
+            <div class="flex items-center space-x-1 text-gray-400">
+              <md-icon style={{ fontSize: '16px' }}>line_start_circle</md-icon>
               <div>{formatDate(condition.start)}</div>
             </div>
 
             {condition.end && (
-              <div class="space-x-1 flex items-center text-gray-400">
-                <md-icon
-                  style={{ fontSize: '16px' }}
-                >
-                  line_end_circle
-                </md-icon>
+              <div class="flex items-center space-x-1 text-gray-400">
+                <md-icon style={{ fontSize: '16px' }}>line_end_circle</md-icon>
                 <div>{formatDate(condition.end)}</div>
               </div>
             )}
@@ -124,29 +95,26 @@ export class Calendar {
     );
   };
 
-  private getPrescriptionTooltipContent = (
-    prescription: PrescriptionDisplay,
-    offsetRight: string,
-  ) => {
+  private getPrescriptionTooltipContent = (prescription: PrescriptionDisplay, offsetRight: string) => {
     return (
       <div
-        class="absolute bg-black text-white text-xs py-1 px-2 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none z-100"
+        class="pointer-events-none absolute z-100 rounded bg-black px-2 py-1 text-xs whitespace-nowrap text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100"
         style={{
           top: '4px',
           right: `calc(${offsetRight} + 24px)`,
         }}
       >
-        <div class="flex flex-col gap-y-1 w-full">
+        <div class="flex w-full flex-col gap-y-1">
           <span class="w-full text-center">{prescription.name}</span>
 
-          <div class="flex flex-col gap-y-1 items-center justify-center">
-            <div class="space-x-1 flex items-center text-gray-400">
+          <div class="flex flex-col items-center justify-center gap-y-1">
+            <div class="flex items-center space-x-1 text-gray-400">
               <md-icon class="text-base">line_start_circle</md-icon>
               <div>{formatDate(prescription.start)}</div>
             </div>
 
             {prescription.end && (
-              <div class="space-x-1 flex items-center text-gray-400">
+              <div class="flex items-center space-x-1 text-gray-400">
                 <md-icon class="text-base">line_end_circle</md-icon>
                 <div>{formatDate(prescription.end)}</div>
               </div>
@@ -157,7 +125,7 @@ export class Calendar {
     );
   };
 
-  private renderCalendar = () => {
+  private renderPatientsCalendar = () => {
     const year: number = this.currentViewYear;
     const month: number = this.currentViewMonth;
     const today: Date = new Date();
@@ -186,12 +154,9 @@ export class Calendar {
     const daysInPrevMonth: number = this.getDaysInMonth(year, month - 1);
     for (let i: number = firstDayOfMonth - 1; i >= 0; i--) {
       prevMonthDays.push(
-        <div
-          class="px-3 py-2 text-center text-sm text-gray-400 bg-gray-200 w-full flex items-center justify-center"
-          onClick={this.handlePreviousMonth}
-        >
+        <div class="flex w-full items-center justify-center bg-gray-200 px-3 py-2 text-center text-sm text-gray-400" onClick={this.handlePreviousMonth}>
           {daysInPrevMonth - i}
-        </div>
+        </div>,
       );
     }
 
@@ -206,10 +171,7 @@ export class Calendar {
     });
 
     const calculateConditionHeights = () => {
-      const sortedConditions: Array<ConditionDisplay> = [...this.conditions]
-        .sort((a: ConditionDisplay, b: ConditionDisplay): number =>
-          a.start.getTime() - b.start.getTime()
-        );
+      const sortedConditions: Array<ConditionDisplay> = [...this.conditions].sort((a: ConditionDisplay, b: ConditionDisplay): number => a.start.getTime() - b.start.getTime());
 
       const timeline: Map<number, Set<string>> = new Map();
 
@@ -278,13 +240,10 @@ export class Calendar {
       const currentDate: Date = new Date(year, month, i);
       currentDate.setHours(0, 0, 0, 0);
 
-      const dateKey: string = year + "-" + month + "-" + i;
+      const dateKey: string = year + '-' + month + '-' + i;
       const appointmentsForDay: Array<AppointmentDisplay> = appointmentsByDate.get(dateKey) ?? [];
 
-      const isToday: boolean =
-        i === today.getDate() &&
-        this.currentViewMonth === today.getMonth() &&
-        this.currentViewYear === today.getFullYear();
+      const isToday: boolean = i === today.getDate() && this.currentViewMonth === today.getMonth() && this.currentViewYear === today.getFullYear();
       const isPastDate: boolean = currentDate < today;
 
       const conditionsForDate: Array<ConditionDisplay> = this.getConditionsForDate(currentDate);
@@ -297,19 +256,17 @@ export class Calendar {
       currentMonthDays.push(
         <div
           role="button"
-          class={`flex flex-col text-sm relative w-full items-center justify-center
-          ${isPastDate ? 'text-gray-400' : 'hover:border-[#9d83c6] hover:border-2 bg-[#f0eafa]'}
-        `}
+          class={`relative flex w-full flex-col items-center justify-center text-sm ${isPastDate ? 'text-gray-400' : 'bg-[#f0eafa] hover:border-2 hover:border-[#9d83c6]'} `}
           onClick={(event: MouseEvent) => {
             event.stopPropagation();
             this.handleSelectDate(currentDate);
           }}
         >
-          <div class={`py-1 w-full flex flex-row justify-between items-center relative ${isToday && 'bg-[#7357be] text-white'}`}>
-            <div class="w-full h-full text-center">{i}</div>
-            {prescriptionsForDate.length > 0 && prescriptionsForDate.reverse()
-              .map((prescription: PrescriptionDisplay, index: number) => {
-                const prescriptionOffset: string = (4 + offset).toString() + "px";
+          <div class={`relative flex w-full flex-row items-center justify-between py-1 ${isToday && 'bg-[#7357be] text-white'}`}>
+            <div class="h-full w-full text-center">{i}</div>
+            {prescriptionsForDate.length > 0 &&
+              prescriptionsForDate.reverse().map((prescription: PrescriptionDisplay, index: number) => {
+                const prescriptionOffset: string = (4 + offset).toString() + 'px';
                 const prescriptionZIndex: string = zIndex.toString();
                 offset += 16;
                 zIndex -= 1;
@@ -318,13 +275,11 @@ export class Calendar {
 
                 if (index >= 2 && !ellipsisDisplayed) {
                   ellipsisDisplayed = true;
-                  return (
-                    <span style={{ position: 'absolute', top: '4px', right: '40px' }}>...</span>
-                  )
+                  return <span style={{ position: 'absolute', top: '4px', right: '40px' }}>...</span>;
                 }
 
                 return (
-                  <div class="inline-block group">
+                  <div class="group inline-block">
                     <md-icon
                       class="cursor-pointer transition-all duration-200"
                       style={{
@@ -335,8 +290,8 @@ export class Calendar {
                         zIndex: prescriptionZIndex,
                         color: prescriptionColor,
                       }}
-                      onMouseEnter={() => (this.setHoveredPrescriptionId(prescription.id))}
-                      onMouseLeave={() => (this.setHoveredPrescriptionId(null))}
+                      onMouseEnter={() => this.setHoveredPrescriptionId(prescription.id)}
+                      onMouseLeave={() => this.setHoveredPrescriptionId(null)}
                       onClick={(event: Event) => {
                         event.stopPropagation();
                         this.handleSelectPrescription(prescriptionsForDate[0]);
@@ -347,28 +302,22 @@ export class Calendar {
                     {this.getPrescriptionTooltipContent(prescription, prescriptionOffset)}
                   </div>
                 );
-              })
-            }
+              })}
           </div>
 
-          <div class="relative w-full h-full flex flex-row flex-wrap gap-1 items-start justify-center">
-            {appointmentsForDay.length > 0 && (
+          <div class="relative flex h-full w-full flex-row flex-wrap items-start justify-center gap-1">
+            {appointmentsForDay.length > 0 &&
               appointmentsForDay.map((appointment, index: number) => (
                 <button
                   key={appointment.id + index}
-                  class="circle-container relative group"
+                  class="circle-container group relative"
                   onClick={(event: MouseEvent) => {
                     event.stopPropagation();
                     this.handleSelectAppointment(appointment);
                   }}
                 >
                   <div
-                    class={`cursor-pointer circle rounded-full transition-all duration-200
-                      w-3 h-3 hover:w-4 hover:h-4
-                      sm:w-[0.875rem] sm:h-[0.875rem] sm:hover:w-5 sm:hover:h-5
-                      md:w-4 md:h-4 md:hover:w-6 md:hover:h-6
-                      lg:w-5 lg:h-5 lg:hover:w-7 lg:hover:h-7
-                    `}
+                    class={`circle h-3 w-3 cursor-pointer rounded-full transition-all duration-200 hover:h-4 hover:w-4 sm:h-[0.875rem] sm:w-[0.875rem] sm:hover:h-5 sm:hover:w-5 md:h-4 md:w-4 md:hover:h-6 md:hover:w-6 lg:h-5 lg:w-5 lg:hover:h-7 lg:hover:w-7`}
                     style={{
                       backgroundColor: AppointmentStatusColor[appointment.status].background,
                     }}
@@ -376,8 +325,7 @@ export class Calendar {
 
                   {this.getAppointmentTooltipContent(appointment)}
                 </button>
-              ))
-            )}
+              ))}
           </div>
 
           {conditionsForDate.map((condition: ConditionDisplay) => {
@@ -390,15 +338,15 @@ export class Calendar {
             return (
               <div
                 key={condition.id}
-                class="absolute left-0 right-0 cursor-pointer transition-all duration-200 group"
+                class="group absolute right-0 left-0 cursor-pointer transition-all duration-200"
                 style={{
-                  bottom: "0px",
+                  bottom: '0px',
                   height: this.hoveredConditionId === condition.id ? `${conditionHeight + 6}px` : `${conditionHeight}px`,
                   zIndex: (50 - conditionHeight).toString(),
                   backgroundColor: conditionColor,
                 }}
-                onMouseEnter={() => (this.setHoveredConditionId(condition.id))}
-                onMouseLeave={() => (this.setHoveredConditionId(null))}
+                onMouseEnter={() => this.setHoveredConditionId(condition.id)}
+                onMouseLeave={() => this.setHoveredConditionId(null)}
                 onClick={(event: MouseEvent) => {
                   event.stopPropagation();
                   this.handleSelectCondition(condition);
@@ -407,7 +355,7 @@ export class Calendar {
                 <div class="relative">
                   {isStartDate && (
                     <div
-                      class="absolute left-0 top-0 transform -translate-y-3 w-5 h-5 rounded-tr-full"
+                      class="absolute top-0 left-0 h-5 w-5 -translate-y-3 transform rounded-tr-full"
                       style={{
                         backgroundColor: conditionColor,
                       }}
@@ -416,7 +364,7 @@ export class Calendar {
 
                   {isEndDate && (
                     <div
-                      class="absolute right-0 top-0 transform -translate-y-3 w-5 h-5 rounded-tl-full"
+                      class="absolute top-0 right-0 h-5 w-5 -translate-y-3 transform rounded-tl-full"
                       style={{
                         backgroundColor: conditionColor,
                       }}
@@ -428,19 +376,116 @@ export class Calendar {
               </div>
             );
           })}
-        </div>
+        </div>,
       );
     }
 
     const totalCells = 42;
-    const remainingCells =
-      totalCells - (prevMonthDays.length + currentMonthDays.length);
+    const remainingCells = totalCells - (prevMonthDays.length + currentMonthDays.length);
     for (let i = 1; i <= remainingCells; i++) {
       nextMonthDays.push(
+        <div class="flex w-full items-center justify-center bg-gray-200 px-3 py-2 text-center text-sm text-gray-400" onClick={this.handleNextMonth}>
+          {i}
+        </div>,
+      );
+    }
+
+    return [...prevMonthDays, ...currentMonthDays, ...nextMonthDays];
+  };
+
+  private renderDoctorsCalendar = () => {
+    const year: number = this.currentViewYear;
+    const month: number = this.currentViewMonth;
+    const today: Date = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const daysInMonth: number = this.getDaysInMonth(year, month);
+    const firstDayOfMonth: number = this.getFirstDayOfMonth(year, month);
+
+    const prevMonthDays = [];
+    const currentMonthDays = [];
+    const nextMonthDays = [];
+
+    const appointmentsByDateAndStatus = new Map<string, Map<AppointmentStatus, Array<AppointmentDisplay>>>();
+
+    this.appointments.forEach((appointment: AppointmentDisplay) => {
+      const date: Date = appointment.appointmentDateTime;
+      const dateKey: string = date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate();
+      const status: AppointmentStatus = appointment.status;
+
+      if (!appointmentsByDateAndStatus.has(dateKey)) {
+        appointmentsByDateAndStatus.set(dateKey, new Map());
+      }
+
+      const appointmentsByStatus: Map<AppointmentStatus, Array<AppointmentDisplay>> = appointmentsByDateAndStatus.get(dateKey);
+
+      for (const statusType of ['requested', 'scheduled', 'denied', 'completed', 'cancelled']) {
+        if (!appointmentsByStatus.has(statusType as AppointmentStatus)) {
+          appointmentsByStatus.set(statusType as AppointmentStatus, []);
+        }
+      }
+
+      appointmentsByStatus.get(status).push(appointment);
+    });
+
+    const daysInPrevMonth: number = this.getDaysInMonth(year, month - 1);
+    for (let i: number = firstDayOfMonth - 1; i >= 0; i--) {
+      prevMonthDays.push(
+        <div class="flex w-full items-center justify-center bg-gray-200 px-3 py-2 text-center text-sm text-gray-400" onClick={this.handlePreviousMonth}>
+          {daysInPrevMonth - i}
+        </div>,
+      );
+    }
+
+    for (let i: number = 1; i <= daysInMonth; i++) {
+      const currentDate: Date = new Date(year, month, i);
+      currentDate.setHours(0, 0, 0, 0);
+
+      const dateKey: string = year + '-' + month + '-' + i;
+
+      let appointmentsForDay: Map<AppointmentStatus, Array<AppointmentDisplay>>;
+      if (appointmentsByDateAndStatus.has(dateKey)) {
+        appointmentsForDay = appointmentsByDateAndStatus.get(dateKey);
+      }
+
+      const isToday: boolean = i === today.getDate() && this.currentViewMonth === today.getMonth() && this.currentViewYear === today.getFullYear();
+      const isPastDate: boolean = currentDate < today;
+
+      currentMonthDays.push(
         <div
-          class="px-3 py-2 text-center text-sm text-gray-400 bg-gray-200 w-full flex items-center justify-center"
-          onClick={this.handleNextMonth}
+          role="button"
+          class={`relative flex w-full flex-col items-center justify-start text-sm ${isPastDate ? 'text-gray-400' : 'bg-[#f0eafa] hover:border-2 hover:border-[#9d83c6]'} `}
+          onClick={(event: MouseEvent) => {
+            event.stopPropagation();
+            this.handleSelectDate(currentDate);
+          }}
         >
+          <div class={`relative flex w-full flex-col items-center py-1 ${isToday && 'bg-[#7357be] text-white'}`}>
+            <div class="h-full w-full text-center">{i}</div>
+          </div>
+
+          <div class="flex h-full w-full flex-row flex-wrap items-start justify-center gap-1">
+            {appointmentsForDay && (
+              <div class="flex h-20 items-center justify-center rounded-full bg-[#7357be]">
+                <span class="text-xl font-medium text-white">{appointmentsForDay.get('scheduled').length}</span>
+              </div>
+            )}
+
+            {appointmentsForDay && (
+              <div class="flex h-20 items-center justify-center rounded-full bg-[#9d83c6]">
+                <span class="text-xl font-medium text-white">{appointmentsForDay.get('requested').length}</span>
+              </div>
+            )}
+          </div>
+        </div>,
+      );
+    }
+
+    const totalCells = 42;
+    const remainingCells: number = totalCells - (prevMonthDays.length + currentMonthDays.length);
+    for (let i = 1; i <= remainingCells; i++) {
+      nextMonthDays.push(
+        <div class="flex w-full items-center justify-center bg-gray-200 px-3 py-2 text-center text-sm text-gray-400" onClick={this.handleNextMonth}>
           {i}
         </div>,
       );
@@ -451,9 +496,9 @@ export class Calendar {
 
   render() {
     return (
-      <div class="flex flex-1 h-[calc(100vh-96px)] flex-col overflow-x-hidden overflow-y-auto">
+      <div class="flex h-[calc(100vh-96px)] flex-1 flex-col overflow-x-hidden overflow-y-auto">
         <div class="grid grid-cols-7 bg-[#d8c7ed]">
-          {DAYS_OF_WEEK.map((day: { short: string, long: string }) => (
+          {DAYS_OF_WEEK.map((day: { short: string; long: string }) => (
             <div class="px-4 py-3 text-center text-sm font-medium text-[#7357be]">
               <span class="inline md:hidden">{day.short}</span>
               <span class="hidden md:inline">{day.long}</span>
@@ -461,10 +506,10 @@ export class Calendar {
           ))}
         </div>
 
-        <div class="relative z-20 flex-1 grid grid-cols-7 grid-rows-6 border-x border-t border-[#d8c7ed] divide-x divide-y divide-[#d8c7ed]">
-          {this.renderCalendar()}
+        <div class="relative z-20 grid flex-1 grid-cols-7 grid-rows-6 divide-x divide-y divide-[#d8c7ed] border-x border-t border-[#d8c7ed]">
+          {!this.isDoctor ? this.renderPatientsCalendar() : this.renderDoctorsCalendar()}
         </div>
       </div>
     );
-  };
+  }
 }

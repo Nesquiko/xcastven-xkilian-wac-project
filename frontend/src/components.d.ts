@@ -42,7 +42,7 @@ export namespace Components {
         "prescriptions": Array<PrescriptionDisplay>;
         "setHoveredConditionId": (value: string | null) => void;
         "setHoveredPrescriptionId": (value: string | null) => void;
-        "user": { email: string, role: UserRole };
+        "user": { email: string; role: UserRole };
     }
     interface XcastvenXkilianProjectConditionDetail {
         "conditionId": string;
@@ -255,7 +255,7 @@ declare namespace LocalJSX {
         "prescriptions"?: Array<PrescriptionDisplay>;
         "setHoveredConditionId"?: (value: string | null) => void;
         "setHoveredPrescriptionId"?: (value: string | null) => void;
-        "user"?: { email: string, role: UserRole };
+        "user"?: { email: string; role: UserRole };
     }
     interface XcastvenXkilianProjectConditionDetail {
         "conditionId"?: string;

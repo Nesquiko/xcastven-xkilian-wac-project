@@ -1,43 +1,27 @@
-import { h } from "@stencil/core";
-import {
-  AppointmentStatus,
-  PatientAppointment,
-} from '../api/generated';
+import { AppointmentStatus, PatientAppointment } from '../api/generated';
+import { h } from '@stencil/core';
 
 export const DAYS_OF_WEEK: Array<{ short: string; long: string }> = [
-  { short: "Mo", long: "Monday" },
-  { short: "Tu", long: "Tuesday" },
-  { short: "We", long: "Wednesday" },
-  { short: "Th", long: "Thursday" },
-  { short: "Fr", long: "Friday" },
-  { short: "Sa", long: "Saturday" },
-  { short: "Su", long: "Sunday" },
+  { short: 'Mo', long: 'Monday' },
+  { short: 'Tu', long: 'Tuesday' },
+  { short: 'We', long: 'Wednesday' },
+  { short: 'Th', long: 'Thursday' },
+  { short: 'Fr', long: 'Friday' },
+  { short: 'Sa', long: 'Saturday' },
+  { short: 'Su', long: 'Sunday' },
 ];
 
-export const MONTHS: Array<string> = [
-  "January",
-  "February",
-  "March",
-  "April",
-  "May",
-  "June",
-  "July",
-  "August",
-  "September",
-  "October",
-  "November",
-  "December",
-];
+export const MONTHS: Array<string> = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 
 export const TODAY: Date = new Date();
 
 export const formatDate = (date: Date) => {
-  if (!date) return "";
+  if (!date) return '';
   return `${MONTHS[date.getMonth()]} ${date.getDate()}, ${date.getFullYear()}`;
 };
 
 export const formatTime = (date: Date): string => {
-  if (!date) return "";
+  if (!date) return '';
 
   const hours: string = date.getHours().toString();
   const minutes: string = date.getMinutes().toString().padStart(2, '0');
@@ -45,20 +29,15 @@ export const formatTime = (date: Date): string => {
   return `${hours}:${minutes}`;
 };
 
-export const getDateAndTimeTitle = (
-  dateTime: Date,
-  fontWeight: string,
-  className?: string,
-) => {
+export const getDateAndTimeTitle = (dateTime: Date, fontWeight: string, className?: string) => {
   return (
-    <h2 class={"text-2xl text-center" + className && " " + className}>
-      {dateTime && (
-        <span class={"text-[#7357be] font-" + fontWeight}>{formatDate(dateTime)}</span>
-      )}
+    <h2 class={'text-center text-2xl' + className && ' ' + className}>
+      {dateTime && <span class={'font- text-[#7357be]' + fontWeight}>{formatDate(dateTime)}</span>}
       {dateTime.getHours() !== null && (
-        <span class="text-gray-600"> at <span class={"text-[#7357be] font-" + fontWeight}>
-          {formatTime(dateTime)}
-        </span></span>
+        <span class="text-gray-600">
+          {' '}
+          at <span class={'font- text-[#7357be]' + fontWeight}>{formatTime(dateTime)}</span>
+        </span>
       )}
     </h2>
   );
@@ -66,7 +45,7 @@ export const getDateAndTimeTitle = (
 
 export const formatDateDelta = (startDate: Date, endDate: Date = new Date()) => {
   if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
-    return "Invalid date";
+    return 'Invalid date';
   }
 
   if (endDate < startDate) {
@@ -89,7 +68,7 @@ export const formatDateDelta = (startDate: Date, endDate: Date = new Date()) => 
   }
 
   if (years === 0 && months === 0 && days === 0) {
-    return "Less than a day";
+    return 'Less than a day';
   }
 
   const parts: string[] = [];
@@ -116,76 +95,48 @@ export const formatDateDelta = (startDate: Date, endDate: Date = new Date()) => 
 };
 
 export const AppointmentStatusColor = {
-  "requested": {
-    background: "#9d83c6",
-    foreground: "#000000",
+  requested: {
+    background: '#9d83c6',
+    foreground: '#000000',
   },
-  "scheduled": {
-    background: "#7357be",
-    foreground: "#ffffff",
+  scheduled: {
+    background: '#7357be',
+    foreground: '#ffffff',
   },
-  "completed": {
-    background: "#2E8B57",
-    foreground: "#ffffff",
+  completed: {
+    background: '#2E8B57',
+    foreground: '#ffffff',
   },
-  "canceled": {
-    background: "#F08080",
-    foreground: "#ffffff",
+  canceled: {
+    background: '#F08080',
+    foreground: '#ffffff',
   },
-  "denied": {
-    background: "#4f4f4f",
-    foreground: "#000000",
-  }
+  denied: {
+    background: '#4f4f4f',
+    foreground: '#000000',
+  },
 };
 
-export const ConditionOrderColors: Array<string> = [
-  "#1976D2",
-  "#7B1FA2",
-  "#388E3C",
-  "#D32F2F",
-  "#F57C00",
-  "#512DA8",
-  "#00796B",
-  "#795548",
-  "#0097A7",
-  "#FBC02D",
-];
+export const ConditionOrderColors: Array<string> = ['#1976D2', '#7B1FA2', '#388E3C', '#D32F2F', '#F57C00', '#512DA8', '#00796B', '#795548', '#0097A7', '#FBC02D'];
 
-export const PrescriptionOrderColors: Array<string> = [
-  "#FF8080",
-  "#FF0000",
-  "#800000",
-  "#1A0000",
-];
+export const PrescriptionOrderColors: Array<string> = ['#FF8080', '#FF0000', '#800000', '#1A0000'];
 
 export const getAppointmentActions = (
   appointmentStatus: AppointmentStatus,
   handleRescheduleAppointment: (appointment: PatientAppointment) => void,
   handleCancelAppointment: (appointment: PatientAppointment) => void,
 ) => {
-  const rescheduleButton = (
-    displayTitle: string,
-    widthClass: string,
-  ) => {
+  const rescheduleButton = (displayTitle: string, widthClass: string) => {
     return (
-      <md-filled-button
-        class={`${widthClass} rounded-full bg-[#7357be]`}
-        onClick={handleRescheduleAppointment}
-      >
+      <md-filled-button class={`${widthClass} rounded-full bg-[#7357be]`} onClick={handleRescheduleAppointment}>
         {displayTitle}
       </md-filled-button>
-    )
+    );
   };
 
-  const cancelButton = (
-    displayTitle: string,
-    widthClass: string,
-  ) => {
+  const cancelButton = (displayTitle: string, widthClass: string) => {
     return (
-      <md-filled-button
-        class={`${widthClass} rounded-full bg-[#7357be]`}
-        onClick={handleCancelAppointment}
-      >
+      <md-filled-button class={`${widthClass} rounded-full bg-[#7357be]`} onClick={handleCancelAppointment}>
         {displayTitle}
       </md-filled-button>
     );
@@ -194,17 +145,13 @@ export const getAppointmentActions = (
   switch (appointmentStatus) {
     case 'scheduled':
       return (
-        <div class="w-full max-w-md flex flex-row justify-between items-center gap-x-3">
-          {rescheduleButton("Re-schedule", "w-1/2")}
-          {cancelButton("Cancel", "w-1/2")}
+        <div class="flex w-full max-w-md flex-row items-center justify-between gap-x-3">
+          {rescheduleButton('Re-schedule', 'w-1/2')}
+          {cancelButton('Cancel', 'w-1/2')}
         </div>
       );
-    case "requested":
-      return (
-        <div class="w-full max-w-md flex flex-row justify-between items-center gap-x-3">
-          {cancelButton("Cancel request", "w-full")}
-        </div>
-      );
+    case 'requested':
+      return <div class="flex w-full max-w-md flex-row items-center justify-between gap-x-3">{cancelButton('Cancel request', 'w-full')}</div>;
     default:
       return null;
   }

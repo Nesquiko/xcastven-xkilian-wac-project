@@ -41,6 +41,7 @@ func (e *ApiError) Error() string {
 func NewServer(app app.App, spec *openapi3.T, middlewareLogger *httplog.Logger) http.Handler {
 	r := chi.NewMux()
 	r.Use(heartbeat())
+	r.Use(optionsMiddleware)
 	srv := Server{app: app}
 
 	validationOpts := OapiValidationOptions{

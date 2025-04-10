@@ -1,12 +1,16 @@
-import { UserRole } from '../../api/generated';
+import { ApiError } from '../../api/api';
+import { Registration, UserRole } from '../../api/generated';
+import { Api } from '../../components';
 import { StyledHost } from '../StyledHost';
-import { Component, h, State } from '@stencil/core';
+import { Component, h, Prop, State } from '@stencil/core';
 
 @Component({
   tag: 'xcastven-xkilian-project-register',
   shadow: false,
 })
 export class Register {
+  @Prop() api: Api;
+
   @State() email: string;
   @State() firstName: string;
   @State() lastName: string;
@@ -27,7 +31,7 @@ export class Register {
     this.lastName = (event.target as HTMLTextAreaElement).value;
   };
 
-  private handleRegister = (role: UserRole) => {
+  private handleRegister = async (role: UserRole) => {
     this.emailError = null;
     this.firstNameError = null;
     this.lastNameError = null;
@@ -53,7 +57,36 @@ export class Register {
       return;
     }
 
-    console.log('Register as', role, 'with values:', '\nEmail:', this.email, '\nFirst Name:', this.firstName, '\nLast Name:', this.lastName, '\nRole:', role);
+    let request: Registration;
+    if (role === UserRole.Doctor) {
+      request = {
+        role: 'doctor',
+        email: this.email,
+        firstName: this.firstName,
+        lastName: this.lastName,
+        specialization: 'urologist',
+      };
+    } else {
+      request = {
+        role: 'patient',
+        email: this.email,
+        firstName: this.firstName,
+        lastName: this.lastName,
+      };
+    }
+
+    try {
+      await this.api.auth.registerUser({ registration: request });
+      window.navigation.navigate('login');
+    } catch (err) {
+      if (!(err instanceof ApiError)) {
+        return;
+      }
+
+      if (err.errDetail.status === 409) {
+        // TODO kili conflicting email
+      }
+    }
   };
 
   render() {
@@ -73,10 +106,25 @@ export class Register {
             <span class="font-medium text-white">MediCal</span>
           </h1>
           <div class="w-full p-6">
-            <md-filled-text-field label="Email" class="mb-6 w-full" value={this.email} onInput={(e: Event) => this.handleEmailChange(e)} />
+            <md-filled-text-field
+              label="Email"
+              class="mb-6 w-full"
+              value={this.email}
+              onInput={(e: Event) => this.handleEmailChange(e)}
+            />
             <div class="flex flex-row items-center justify-between gap-x-3">
-              <md-filled-text-field label="First Name" class="mb-6 w-full" value={this.firstName} onInput={(e: Event) => this.handleFirstNameChange(e)} />
-              <md-filled-text-field label="Last Name" class="mb-6 w-full" value={this.lastName} onInput={(e: Event) => this.handleLastNameChange(e)} />
+              <md-filled-text-field
+                label="First Name"
+                class="mb-6 w-full"
+                value={this.firstName}
+                onInput={(e: Event) => this.handleFirstNameChange(e)}
+              />
+              <md-filled-text-field
+                label="Last Name"
+                class="mb-6 w-full"
+                value={this.lastName}
+                onInput={(e: Event) => this.handleLastNameChange(e)}
+              />
             </div>
 
             {this.emailError ? (
@@ -84,14 +132,22 @@ export class Register {
             ) : this.firstNameError ? (
               <div class="mb-6 w-full text-center text-sm text-red-500">{this.firstNameError}</div>
             ) : (
-              this.lastNameError && <div class="mb-6 w-full text-center text-sm text-red-500">{this.lastNameError}</div>
+              this.lastNameError && (
+                <div class="mb-6 w-full text-center text-sm text-red-500">{this.lastNameError}</div>
+              )
             )}
 
             <div class="flex flex-row items-center justify-between gap-x-3">
-              <md-text-button class="w-1/2 rounded-full px-4 py-3" onClick={() => this.handleRegister(UserRole.Doctor)}>
+              <md-text-button
+                class="w-1/2 rounded-full px-4 py-3"
+                onClick={() => this.handleRegister(UserRole.Doctor)}
+              >
                 Register as doctor
               </md-text-button>
-              <md-filled-button class="w-1/2 rounded-full bg-[#9d83c6] px-4 py-3" onClick={() => this.handleRegister(UserRole.Patient)}>
+              <md-filled-button
+                class="w-1/2 rounded-full bg-[#9d83c6] px-4 py-3"
+                onClick={() => this.handleRegister(UserRole.Patient)}
+              >
                 Register
               </md-filled-button>
             </div>

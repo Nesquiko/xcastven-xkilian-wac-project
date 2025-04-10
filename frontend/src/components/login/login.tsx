@@ -1,12 +1,15 @@
-import { User, UserRole } from '../../api/generated';
+import { Api, ApiError } from '../../api/api';
+import { UserRole } from '../../api/generated';
 import { StyledHost } from '../StyledHost';
-import { Component, h, State } from '@stencil/core';
+import { Component, h, Prop, State } from '@stencil/core';
 
 @Component({
   tag: 'xcastven-xkilian-project-login',
   shadow: false,
 })
 export class Login {
+  @Prop() api: Api;
+
   @State() email: string;
 
   @State() emailError: string;
@@ -15,7 +18,7 @@ export class Login {
     this.email = (event.target as HTMLTextAreaElement).value;
   };
 
-  private handleLogin = (role: UserRole) => {
+  private handleLogin = async (role: UserRole) => {
     this.emailError = null;
 
     if (!this.email) {
@@ -31,14 +34,19 @@ export class Login {
       return;
     }
 
-    const user = {
-      email: this.email,
-      role: role,
-    };
+    try {
+      const user = await this.api.auth.loginUser({ loginRequest: { email: this.email, role } });
+      sessionStorage.setItem('user', JSON.stringify(user));
+      window.navigation.navigate('homepage');
+    } catch (err) {
+      if (!(err instanceof ApiError)) {
+        return;
+      }
 
-    sessionStorage.setItem('user', JSON.stringify(user));
-
-    window.navigation.navigate('homepage');
+      if (err.errDetail.status === 404) {
+        // TODO kili email not found
+      }
+    }
   };
 
   render() {
@@ -61,15 +69,29 @@ export class Login {
             <span class="font-medium text-white">MediCal</span>
           </h1>
           <div class="w-full p-6">
-            <md-filled-text-field label="Email" class="mb-6 w-full" value={this.email} onInput={(e: Event) => this.handleEmailChange(e)} />
+            <md-filled-text-field
+              label="Email"
+              class="mb-6 w-full"
+              value={this.email}
+              onInput={(e: Event) => this.handleEmailChange(e)}
+            />
 
-            {this.emailError && <div class="mb-6 w-full text-center text-sm text-red-500">{this.emailError}</div>}
+            {this.emailError && (
+              <div class="mb-6 w-full text-center text-sm text-red-500">{this.emailError}</div>
+            )}
 
             <div class="flex flex-row items-center justify-between gap-x-3">
-              <md-text-button class="w-1/2 rounded-full px-4 py-3" onClick={() => this.handleLogin(UserRole.Doctor)}>
+              <md-text-button
+                class="w-1/2 rounded-full px-4 py-3"
+                onClick={() => this.handleLogin(UserRole.Doctor)}
+              >
                 Login as doctor
               </md-text-button>
-              <md-filled-button class="w-1/2 rounded-full bg-[#9d83c6] px-4 py-3" onClick={() => this.handleLogin(UserRole.Patient)} type="submit">
+              <md-filled-button
+                class="w-1/2 rounded-full bg-[#9d83c6] px-4 py-3"
+                onClick={() => this.handleLogin(UserRole.Patient)}
+                type="submit"
+              >
                 Login
               </md-filled-button>
             </div>

@@ -1,4 +1,5 @@
-import { UserRole } from '../../api/generated';
+import { newApi } from '../../api/api';
+import { LoginRequest } from '../../api/generated';
 import { StyledHost } from '../StyledHost';
 import { Component, h, Prop, State } from '@stencil/core';
 
@@ -6,9 +7,12 @@ import { Component, h, Prop, State } from '@stencil/core';
   tag: 'xcastven-xkilian-project-app',
 })
 export class App {
+  @Prop() apiBase: string = 'http://localhost:42069';
+  @Prop() basePath: string = '';
+
   @State() private relativePath: string = '';
 
-  @Prop() basePath: string = '';
+  private api = newApi(this.apiBase);
 
   componentWillLoad() {
     const baseUri = new URL(this.basePath, document.baseURI || '/').pathname;
@@ -25,7 +29,7 @@ export class App {
       if ((ev as any).canIntercept) {
         (ev as any).intercept();
       }
-      let path = new URL((ev as any).destination.url).pathname;
+      const path = new URL((ev as any).destination.url).pathname;
       toRelative(path);
     });
 
@@ -34,21 +38,17 @@ export class App {
 
   render() {
     let element: string = 'homepage';
-    let user: {
-      email: string;
-      role: UserRole;
-    };
+    const user: LoginRequest | null = JSON.parse(sessionStorage.getItem('user'));
 
-    user = JSON.parse(sessionStorage.getItem('user'));
-    if (!user) {
-      element = <xcastven-xkilian-project-login />;
+    if (!user && !this.relativePath.startsWith('register')) {
+      element = <xcastven-xkilian-project-login api={this.api} />;
     } else {
       if (this.relativePath === '' || this.relativePath.startsWith('homepage')) {
         element = <xcastven-xkilian-project-home-page />;
       } else if (this.relativePath.startsWith('login')) {
-        element = <xcastven-xkilian-project-login />;
+        element = <xcastven-xkilian-project-login api={this.api} />;
       } else if (this.relativePath.startsWith('register')) {
-        element = <xcastven-xkilian-project-register />;
+        element = <xcastven-xkilian-project-register api={this.api} />;
       } else if (this.relativePath.startsWith('scheduleAppointment')) {
         element = <xcastven-xkilian-project-appointment-scheduler />;
       } else if (this.relativePath.startsWith('registerCondition')) {

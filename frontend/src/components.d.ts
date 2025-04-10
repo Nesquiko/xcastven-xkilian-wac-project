@@ -6,9 +6,14 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { AppointmentDisplay, AppointmentStatus, Condition, ConditionDisplay, DoctorAppointment, PatientAppointment, PrescriptionDisplay, UserRole } from "./api/generated";
+import { Api } from "./api/api";
+import { Api as Api1 } from "./components";
 export { AppointmentDisplay, AppointmentStatus, Condition, ConditionDisplay, DoctorAppointment, PatientAppointment, PrescriptionDisplay, UserRole } from "./api/generated";
+export { Api } from "./api/api";
+export { Api as Api1 } from "./components";
 export namespace Components {
     interface XcastvenXkilianProjectApp {
+        "apiBase": string;
         "basePath": string;
     }
     interface XcastvenXkilianProjectAppointmentDetail {
@@ -97,6 +102,7 @@ export namespace Components {
         "handleResetSelection": () => void;
     }
     interface XcastvenXkilianProjectLogin {
+        "api": Api;
     }
     interface XcastvenXkilianProjectPrescriptionDetail {
         "handleResetSelection": () => void;
@@ -107,6 +113,7 @@ export namespace Components {
         "prescriptions": Array<PrescriptionDisplay>;
     }
     interface XcastvenXkilianProjectRegister {
+        "api": Api1;
     }
 }
 declare global {
@@ -227,6 +234,7 @@ declare global {
 }
 declare namespace LocalJSX {
     interface XcastvenXkilianProjectApp {
+        "apiBase"?: string;
         "basePath"?: string;
     }
     interface XcastvenXkilianProjectAppointmentDetail {
@@ -315,6 +323,7 @@ declare namespace LocalJSX {
         "handleResetSelection"?: () => void;
     }
     interface XcastvenXkilianProjectLogin {
+        "api"?: Api;
     }
     interface XcastvenXkilianProjectPrescriptionDetail {
         "handleResetSelection"?: () => void;
@@ -325,6 +334,7 @@ declare namespace LocalJSX {
         "prescriptions"?: Array<PrescriptionDisplay>;
     }
     interface XcastvenXkilianProjectRegister {
+        "api"?: Api1;
     }
     interface IntrinsicElements {
         "xcastven-xkilian-project-app": XcastvenXkilianProjectApp;

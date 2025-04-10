@@ -102,6 +102,7 @@ func (s Server) LoginUser(w http.ResponseWriter, r *http.Request) {
 		}
 
 		encode(w, http.StatusOK, doc)
+		return
 	}
 
 	patient, err := s.app.PatientByEmail(r.Context(), string(req.Email))

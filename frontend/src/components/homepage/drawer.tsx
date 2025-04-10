@@ -1,4 +1,12 @@
-import { AppointmentDisplay, Condition, ConditionDisplay, DoctorAppointment, PatientAppointment, PrescriptionDisplay } from '../../api/generated';
+import {
+  AppointmentDisplay, AppointmentStatus,
+  Condition,
+  ConditionDisplay,
+  DoctorAppointment,
+  PatientAppointment,
+  PrescriptionDisplay,
+  UserRole,
+} from '../../api/generated';
 import { formatDate } from '../../utils/utils';
 import { Component, h, Prop, State } from '@stencil/core';
 
@@ -7,17 +15,22 @@ import { Component, h, Prop, State } from '@stencil/core';
   shadow: false,
 })
 export class Drawer {
+  @Prop() user: { email: string, role: UserRole };
+  @Prop() isDoctor: boolean;
+
   @Prop() isDrawerOpen: boolean;
   @Prop() selectedDate: Date;
   @Prop() selectedAppointment: AppointmentDisplay;
   @Prop() selectedCondition: ConditionDisplay;
   @Prop() selectedPrescription: PrescriptionDisplay;
+  @Prop() selectedAppointmentStatusGroup: AppointmentStatus;
   @Prop() showLegend: boolean;
 
   @Prop() handleResetSelection: () => void;
   @Prop() getAppointmentsForDate: (date: Date) => Array<AppointmentDisplay>;
   @Prop() getConditionsForDate: (date: Date) => Array<ConditionDisplay>;
   @Prop() getPrescriptionsForDate: (date: Date) => Array<PrescriptionDisplay>;
+  @Prop() getAppointmentsForDateByStatus: (date: Date, appointmentStatus: AppointmentStatus) => Array<AppointmentDisplay>;
   @Prop() handleSelectAppointment: (appointment: AppointmentDisplay) => void;
   @Prop() handleSelectCondition: (condition: ConditionDisplay) => void;
   @Prop() handleSelectPrescription: (prescription: PrescriptionDisplay) => void;
@@ -44,7 +57,7 @@ export class Drawer {
       >
         <div class="flex h-full flex-col p-4">
           {/* Selected date */}
-          {this.selectedDate ? (
+          {this.selectedDate && !this.isDoctor ? (
             <div class="w-full">
               <h2 class="mb-6 w-full text-center text-lg font-medium text-[#7357be]">{formatDate(this.selectedDate)}</h2>
 
@@ -86,6 +99,42 @@ export class Drawer {
                 </div>
               </div>
             </div>
+          ) : this.selectedDate && this.isDoctor ? (
+            <div class="w-full">
+              <h2
+                class="mb-6 w-full text-center text-lg font-medium text-[#7357be]">{formatDate(this.selectedDate)}</h2>
+
+              <div class="flex w-full flex-col items-center justify-center gap-y-2">
+                {/* Tabs */}
+                <div class="w-full max-w-md overflow-hidden rounded-lg bg-gray-100">
+                  <md-tabs class="w-full" onchange={e => this.handleTabChange(e)}>
+                    <md-primary-tab class="w-1/5 px-4">
+                      <span class="w-full">Scheduled</span>
+                    </md-primary-tab>
+                    <md-primary-tab class="w-1/5 px-4">
+                      <span class="w-full">Requested</span>
+                    </md-primary-tab>
+                    <md-primary-tab class="w-1/5 px-4">
+                      <span class="w-full">Denied</span>
+                    </md-primary-tab>
+                    <md-primary-tab class="w-1/5 px-4">
+                      <span class="w-full">Completed</span>
+                    </md-primary-tab>
+                    <md-primary-tab class="w-1/5 px-4">
+                      <span class="w-full">Cancelled</span>
+                    </md-primary-tab>
+                  </md-tabs>
+                </div>
+
+                {/* Appointments Tab Content */}
+                <div class={`w-full max-w-md ${this.activeTab === 0 ? 'block' : 'hidden'}`}>
+                  <xcastven-xkilian-project-appointments-list
+                    appointments={this.getAppointmentsForDateByStatus(this.selectedDate, this.selectedAppointmentStatusGroup)}
+                    handleSelectAppointment={this.handleSelectAppointment}
+                  />
+                </div>
+              </div>
+            </div>
           ) : this.selectedAppointment ? (
             <xcastven-xkilian-project-appointment-detail
               appointmentId={this.selectedAppointment.id}
@@ -102,7 +151,8 @@ export class Drawer {
               handleToggleConditionStatus={this.handleToggleConditionStatus}
             />
           ) : this.selectedPrescription ? (
-            <xcastven-xkilian-project-prescription-detail prescriptionId={this.selectedPrescription.id} handleResetSelection={this.handleResetSelection} />
+            <xcastven-xkilian-project-prescription-detail prescriptionId={this.selectedPrescription.id}
+                                                          handleResetSelection={this.handleResetSelection} />
           ) : (
             this.showLegend && <xcastven-xkilian-project-legend handleResetSelection={this.handleResetSelection} />
           )}

@@ -18,6 +18,7 @@ export class Calendar {
   @Prop() handleSelectAppointment: (appointment: AppointmentDisplay) => void;
   @Prop() handleSelectCondition: (condition: ConditionDisplay) => void;
   @Prop() handleSelectPrescription: (prescription: PrescriptionDisplay) => void;
+  @Prop() handleSelectAppointmentStatusGroup: (date: Date, status: AppointmentStatus) => void;
   @Prop() hoveredConditionId: string;
   @Prop() setHoveredConditionId: (value: string | null) => void;
   @Prop() hoveredPrescriptionId: string;
@@ -393,6 +394,30 @@ export class Calendar {
     return [...prevMonthDays, ...currentMonthDays, ...nextMonthDays];
   };
 
+  private getAppointmentStatusGroupTooltipContent = (
+    appointmentStatus: AppointmentStatus,
+    appointmentCount: number,
+  ) => {
+    return (
+      <div
+        class="pointer-events-none absolute z-100 rounded bg-black px-2 py-1 text-xs whitespace-nowrap text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100"
+        style={{
+          top: '4px',
+          right: 'calc(100% + 8px)',
+        }}
+      >
+        <div class="flex w-full flex-col gap-y-1">
+          <span class="w-full text-center">{appointmentStatus[0].toUpperCase() + appointmentStatus.slice(1)}</span>
+
+          <div class="flex items-center space-x-1 text-gray-400">
+            <md-icon style={{ fontSize: '16px' }}>calendar_month</md-icon>
+            <div>{appointmentCount} appointment{appointmentCount !== 1 && "s"}</div>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   private renderDoctorsCalendar = () => {
     const year: number = this.currentViewYear;
     const month: number = this.currentViewMonth;
@@ -449,12 +474,12 @@ export class Calendar {
       }
 
       const isToday: boolean = i === today.getDate() && this.currentViewMonth === today.getMonth() && this.currentViewYear === today.getFullYear();
-      const isPastDate: boolean = currentDate < today;
+      // const isPastDate: boolean = currentDate < today;
 
       currentMonthDays.push(
         <div
           role="button"
-          class={`relative flex w-full flex-col items-center justify-start text-sm ${isPastDate ? 'text-gray-400' : 'bg-[#f0eafa] hover:border-2 hover:border-[#9d83c6]'} `}
+          class={`relative flex w-full flex-col items-center justify-start text-sm cursor-pointer`}
           onClick={(event: MouseEvent) => {
             event.stopPropagation();
             this.handleSelectDate(currentDate);
@@ -465,16 +490,32 @@ export class Calendar {
           </div>
 
           <div class="flex h-full w-full flex-row flex-wrap items-start justify-center gap-1">
-            {appointmentsForDay && (
-              <div class="flex h-20 items-center justify-center rounded-full bg-[#7357be]">
-                <span class="text-xl font-medium text-white">{appointmentsForDay.get('scheduled').length}</span>
-              </div>
-            )}
+            {appointmentsForDay && ["scheduled", "requested"].map((appointmentStatus: AppointmentStatus) => (
+                <button
+                  class="circle-container group relative"
+                  onClick={(event: MouseEvent) => {
+                    event.stopPropagation();
+                    this.handleSelectAppointmentStatusGroup(currentDate, appointmentStatus);
+                  }}
+                >
+                  <div
+                    class={`circle cursor-pointer rounded-full transition-all duration-200
+                      h-5 w-5 hover:h-6 hover:w-6
+                      sm:h-6 sm:w-6 sm:hover:h-7 sm:hover:w-7
+                      md:h-7 md:w-7 md:hover:h-8 md:hover:w-8
+                      lg:h-8 lg:w-8 lg:hover:h-9 lg:hover:w-9
+                      flex items-center justify-center text-white
+                    `}
+                    style={{
+                      backgroundColor: AppointmentStatusColor[appointmentStatus].background,
+                    }}
+                  >
+                    {appointmentsForDay.get(appointmentStatus).length}
+                  </div>
 
-            {appointmentsForDay && (
-              <div class="flex h-20 items-center justify-center rounded-full bg-[#9d83c6]">
-                <span class="text-xl font-medium text-white">{appointmentsForDay.get('requested').length}</span>
-              </div>
+                  {this.getAppointmentStatusGroupTooltipContent(appointmentStatus, appointmentsForDay.get(appointmentStatus).length)}
+                </button>
+              )
             )}
           </div>
         </div>,
@@ -485,7 +526,8 @@ export class Calendar {
     const remainingCells: number = totalCells - (prevMonthDays.length + currentMonthDays.length);
     for (let i = 1; i <= remainingCells; i++) {
       nextMonthDays.push(
-        <div class="flex w-full items-center justify-center bg-gray-200 px-3 py-2 text-center text-sm text-gray-400" onClick={this.handleNextMonth}>
+        <div class="flex w-full items-center justify-center bg-gray-200 px-3 py-2 text-center text-sm text-gray-400"
+             onClick={this.handleNextMonth}>
           {i}
         </div>,
       );
@@ -511,5 +553,5 @@ export class Calendar {
         </div>
       </div>
     );
-  }
+  };
 }

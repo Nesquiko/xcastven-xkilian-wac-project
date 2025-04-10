@@ -5,8 +5,8 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { AppointmentDisplay, Condition, ConditionDisplay, DoctorAppointment, PatientAppointment, PrescriptionDisplay, UserRole } from "./api/generated";
-export { AppointmentDisplay, Condition, ConditionDisplay, DoctorAppointment, PatientAppointment, PrescriptionDisplay, UserRole } from "./api/generated";
+import { AppointmentDisplay, AppointmentStatus, Condition, ConditionDisplay, DoctorAppointment, PatientAppointment, PrescriptionDisplay, UserRole } from "./api/generated";
+export { AppointmentDisplay, AppointmentStatus, Condition, ConditionDisplay, DoctorAppointment, PatientAppointment, PrescriptionDisplay, UserRole } from "./api/generated";
 export namespace Components {
     interface XcastvenXkilianProjectApp {
         "basePath": string;
@@ -33,6 +33,7 @@ export namespace Components {
         "handleNextMonth": () => void;
         "handlePreviousMonth": () => void;
         "handleSelectAppointment": (appointment: AppointmentDisplay) => void;
+        "handleSelectAppointmentStatusGroup": (date: Date, status: AppointmentStatus) => void;
         "handleSelectCondition": (condition: ConditionDisplay) => void;
         "handleSelectDate": (date: Date) => void;
         "handleSelectPrescription": (prescription: PrescriptionDisplay) => void;
@@ -57,6 +58,7 @@ export namespace Components {
     }
     interface XcastvenXkilianProjectDrawer {
         "getAppointmentsForDate": (date: Date) => Array<AppointmentDisplay>;
+        "getAppointmentsForDateByStatus": (date: Date, appointmentStatus: AppointmentStatus) => Array<AppointmentDisplay>;
         "getConditionsForDate": (date: Date) => Array<ConditionDisplay>;
         "getPrescriptionsForDate": (date: Date) => Array<PrescriptionDisplay>;
         "handleCancelAppointment": (appointment: PatientAppointment | DoctorAppointment) => void;
@@ -67,12 +69,15 @@ export namespace Components {
         "handleSelectCondition": (condition: ConditionDisplay) => void;
         "handleSelectPrescription": (prescription: PrescriptionDisplay) => void;
         "handleToggleConditionStatus": () => void;
+        "isDoctor": boolean;
         "isDrawerOpen": boolean;
         "selectedAppointment": AppointmentDisplay;
+        "selectedAppointmentStatusGroup": AppointmentStatus;
         "selectedCondition": ConditionDisplay;
         "selectedDate": Date;
         "selectedPrescription": PrescriptionDisplay;
         "showLegend": boolean;
+        "user": { email: string, role: UserRole };
     }
     interface XcastvenXkilianProjectFooter {
         "handleRegisterCondition": () => void;
@@ -246,6 +251,7 @@ declare namespace LocalJSX {
         "handleNextMonth"?: () => void;
         "handlePreviousMonth"?: () => void;
         "handleSelectAppointment"?: (appointment: AppointmentDisplay) => void;
+        "handleSelectAppointmentStatusGroup"?: (date: Date, status: AppointmentStatus) => void;
         "handleSelectCondition"?: (condition: ConditionDisplay) => void;
         "handleSelectDate"?: (date: Date) => void;
         "handleSelectPrescription"?: (prescription: PrescriptionDisplay) => void;
@@ -270,6 +276,7 @@ declare namespace LocalJSX {
     }
     interface XcastvenXkilianProjectDrawer {
         "getAppointmentsForDate"?: (date: Date) => Array<AppointmentDisplay>;
+        "getAppointmentsForDateByStatus"?: (date: Date, appointmentStatus: AppointmentStatus) => Array<AppointmentDisplay>;
         "getConditionsForDate"?: (date: Date) => Array<ConditionDisplay>;
         "getPrescriptionsForDate"?: (date: Date) => Array<PrescriptionDisplay>;
         "handleCancelAppointment"?: (appointment: PatientAppointment | DoctorAppointment) => void;
@@ -280,12 +287,15 @@ declare namespace LocalJSX {
         "handleSelectCondition"?: (condition: ConditionDisplay) => void;
         "handleSelectPrescription"?: (prescription: PrescriptionDisplay) => void;
         "handleToggleConditionStatus"?: () => void;
+        "isDoctor"?: boolean;
         "isDrawerOpen"?: boolean;
         "selectedAppointment"?: AppointmentDisplay;
+        "selectedAppointmentStatusGroup"?: AppointmentStatus;
         "selectedCondition"?: ConditionDisplay;
         "selectedDate"?: Date;
         "selectedPrescription"?: PrescriptionDisplay;
         "showLegend"?: boolean;
+        "user"?: { email: string, role: UserRole };
     }
     interface XcastvenXkilianProjectFooter {
         "handleRegisterCondition"?: () => void;

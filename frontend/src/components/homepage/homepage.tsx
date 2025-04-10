@@ -1,4 +1,10 @@
-import { AppointmentDisplay, ConditionDisplay, PrescriptionDisplay, UserRole } from '../../api/generated';
+import {
+  AppointmentDisplay,
+  AppointmentStatus,
+  ConditionDisplay,
+  PrescriptionDisplay,
+  UserRole,
+} from '../../api/generated';
 import { PatientsCalendarExample } from '../../data-examples/patients-calendar';
 import { TODAY } from '../../utils/utils';
 import { StyledHost } from '../StyledHost';
@@ -20,6 +26,8 @@ export class Homepage {
   @State() selectedAppointment: AppointmentDisplay = null;
   @State() selectedCondition: ConditionDisplay = null;
   @State() selectedPrescription: PrescriptionDisplay = null;
+  @State() selectedAppointmentStatusGroup: AppointmentStatus = null;
+
   @State() isDrawerOpen: boolean = false;
   @State() showLegend: boolean = false;
 
@@ -85,38 +93,33 @@ export class Homepage {
   };
 
   private handleSelectDate = (date: Date) => {
-    this.showLegend = false;
+    this.handleResetSelection();
     this.selectedDate = date;
-    this.selectedAppointment = null;
-    this.selectedCondition = null;
-    this.selectedPrescription = null;
     this.isDrawerOpen = true;
   };
 
   private handleSelectAppointment = (appointment: AppointmentDisplay) => {
-    this.showLegend = false;
+    this.handleResetSelection();
     this.selectedAppointment = appointment;
-    this.selectedCondition = null;
-    this.selectedDate = null;
-    this.selectedPrescription = null;
     this.isDrawerOpen = true;
   };
 
   private handleSelectCondition = (condition: ConditionDisplay) => {
-    this.showLegend = false;
+    this.handleResetSelection();
     this.selectedCondition = condition;
-    this.selectedAppointment = null;
-    this.selectedDate = null;
-    this.selectedPrescription = null;
     this.isDrawerOpen = true;
   };
 
   private handleSelectPrescription = (prescription: PrescriptionDisplay) => {
-    this.showLegend = false;
+    this.handleResetSelection();
     this.selectedPrescription = prescription;
-    this.selectedDate = null;
-    this.selectedAppointment = null;
-    this.selectedCondition = null;
+    this.isDrawerOpen = true;
+  };
+
+  private handleSelectAppointmentStatusGroup = (date: Date, appointmentStatus: AppointmentStatus) => {
+    this.handleResetSelection();
+    this.selectedDate = date;
+    this.selectedAppointmentStatusGroup = appointmentStatus;
     this.isDrawerOpen = true;
   };
 
@@ -159,6 +162,18 @@ export class Homepage {
       .sort((a: PrescriptionDisplay, b: PrescriptionDisplay) => b.start.getTime() - a.start.getTime());
   };
 
+  private getAppointmentsForDateByStatus = (
+    date: Date,
+    appointmentStatus: AppointmentStatus
+  ) => {
+    return this.appointments.filter((appointment: AppointmentDisplay): boolean => {
+      if (appointment.status === appointmentStatus) {
+        const appointmentDate: Date = new Date(appointment.appointmentDateTime);
+        return appointmentDate.getFullYear() === date.getFullYear() && appointmentDate.getMonth() === date.getMonth() && appointmentDate.getDate() === date.getDate();
+      }
+    });
+  };
+
   render() {
     return (
       <StyledHost class="flex h-screen w-full flex-col overflow-hidden">
@@ -182,6 +197,7 @@ export class Homepage {
           handleSelectAppointment={this.handleSelectAppointment}
           handleSelectCondition={this.handleSelectCondition}
           handleSelectPrescription={this.handleSelectPrescription}
+          handleSelectAppointmentStatusGroup={this.handleSelectAppointmentStatusGroup}
           hoveredConditionId={this.hoveredConditionId}
           setHoveredConditionId={(value: string | null) => (this.hoveredConditionId = value)}
           hoveredPrescriptionId={this.hoveredPrescriptionId}
@@ -201,16 +217,20 @@ export class Homepage {
         {this.isDrawerOpen && <div class="fixed inset-0 z-99 bg-black/50" onClick={() => this.handleResetSelection()} />}
 
         <xcastven-xkilian-project-drawer
+          user={this.user}
+          isDoctor={this.isDoctor}
           isDrawerOpen={this.isDrawerOpen}
           selectedDate={this.selectedDate}
           selectedAppointment={this.selectedAppointment}
           selectedCondition={this.selectedCondition}
           selectedPrescription={this.selectedPrescription}
+          selectedAppointmentStatusGroup={this.selectedAppointmentStatusGroup}
           showLegend={this.showLegend}
           handleResetSelection={this.handleResetSelection}
           getAppointmentsForDate={this.getAppointmentsForDate}
           getConditionsForDate={this.getConditionsForDate}
           getPrescriptionsForDate={this.getPrescriptionsForDate}
+          getAppointmentsForDateByStatus={this.getAppointmentsForDateByStatus}
           handleSelectAppointment={this.handleSelectAppointment}
           handleSelectCondition={this.handleSelectCondition}
           handleSelectPrescription={this.handleSelectPrescription}

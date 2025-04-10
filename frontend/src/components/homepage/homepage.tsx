@@ -2,7 +2,7 @@ import { Component, h, State } from '@stencil/core';
 import {
   TODAY,
 } from '../../utils/utils';
-import { AppointmentDisplay, ConditionDisplay, PrescriptionDisplay } from '../../api/generated';
+import { AppointmentDisplay, ConditionDisplay, PrescriptionDisplay, UserRole } from '../../api/generated';
 import { PatientsCalendarExample } from '../../data-examples/patients-calendar';
 import { StyledHost } from '../StyledHost';
 
@@ -11,6 +11,9 @@ import { StyledHost } from '../StyledHost';
   shadow: false,
 })
 export class Homepage {
+  private user: { email: string, role: UserRole } = JSON.parse(sessionStorage.getItem("user"));
+  private isDoctor: boolean = this.user.role === "doctor";
+
   @State() appointments: Array<AppointmentDisplay> = PatientsCalendarExample.appointments;
   @State() conditions: Array<ConditionDisplay> = PatientsCalendarExample.conditions;
   @State() prescriptions: Array<PrescriptionDisplay> = PatientsCalendarExample.prescriptions;
@@ -172,6 +175,8 @@ export class Homepage {
         />
 
         <xcastven-xkilian-project-calendar
+          user={this.user}
+          isDoctor={this.isDoctor}
           appointments={this.appointments}
           conditions={this.conditions}
           prescriptions={this.prescriptions}

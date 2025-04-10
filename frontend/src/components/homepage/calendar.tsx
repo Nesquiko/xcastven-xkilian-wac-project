@@ -7,13 +7,21 @@ import {
   PrescriptionOrderColors,
 } from '../../utils/utils';
 import { Component, h, Prop } from '@stencil/core';
-import { AppointmentDisplay, ConditionDisplay, PrescriptionDisplay } from '../../api/generated';
+import {
+  AppointmentDisplay,
+  AppointmentStatus,
+  ConditionDisplay,
+  PrescriptionDisplay,
+  UserRole,
+} from '../../api/generated';
 
 @Component({
   tag: 'xcastven-xkilian-project-calendar',
   shadow: false,
 })
 export class Calendar {
+  @Prop() user: { email: string, role: UserRole };
+  @Prop() isDoctor: boolean;
   @Prop() appointments: Array<AppointmentDisplay>;
   @Prop() conditions: Array<ConditionDisplay>;
   @Prop() prescriptions: Array<PrescriptionDisplay>;
@@ -57,31 +65,31 @@ export class Calendar {
 
           <div class="flex flex-col gap-y-1 items-center justify-center">
             <div class="space-x-1 flex items-center text-gray-400">
-            <md-icon
-              style={{ fontSize: '16px' }}
-            >
-              event
-            </md-icon>
+              <md-icon
+                style={{ fontSize: '16px' }}
+              >
+                event
+              </md-icon>
               <div>{formatDate(appointment.appointmentDateTime)}</div>
             </div>
 
             <div class="space-x-1 flex items-center text-gray-400">
-            <md-icon
-              style={{ fontSize: '16px' }}
-            >
-              timer
-            </md-icon>
+              <md-icon
+                style={{ fontSize: '16px' }}
+              >
+                timer
+              </md-icon>
               <div>
                 {formatTime(appointment.appointmentDateTime)}
               </div>
             </div>
 
             <div class="space-x-1 flex items-center text-gray-400">
-            <md-icon
-              style={{ fontSize: '16px' }}
-            >
-              format_list_bulleted
-            </md-icon>
+              <md-icon
+                style={{ fontSize: '16px' }}
+              >
+                format_list_bulleted
+              </md-icon>
               <div>{displayStatus}</div>
             </div>
           </div>
@@ -157,7 +165,7 @@ export class Calendar {
     );
   };
 
-  private renderCalendar = () => {
+  private renderPatientsCalendar = () => {
     const year: number = this.currentViewYear;
     const month: number = this.currentViewMonth;
     const today: Date = new Date();
@@ -298,8 +306,8 @@ export class Calendar {
         <div
           role="button"
           class={`flex flex-col text-sm relative w-full items-center justify-center
-          ${isPastDate ? 'text-gray-400' : 'hover:border-[#9d83c6] hover:border-2 bg-[#f0eafa]'}
-        `}
+            ${isPastDate ? 'text-gray-400' : 'hover:border-[#9d83c6] hover:border-2 bg-[#f0eafa]'}
+          `}
           onClick={(event: MouseEvent) => {
             event.stopPropagation();
             this.handleSelectDate(currentDate);
@@ -449,6 +457,120 @@ export class Calendar {
     return [...prevMonthDays, ...currentMonthDays, ...nextMonthDays];
   };
 
+  private renderDoctorsCalendar = () => {
+    const year: number = this.currentViewYear;
+    const month: number = this.currentViewMonth;
+    const today: Date = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    const daysInMonth: number = this.getDaysInMonth(year, month);
+    const firstDayOfMonth: number = this.getFirstDayOfMonth(year, month);
+
+    const prevMonthDays = [];
+    const currentMonthDays = [];
+    const nextMonthDays = [];
+
+    const appointmentsByDateAndStatus = new Map<string, Map<AppointmentStatus, Array<AppointmentDisplay>>>();
+
+    this.appointments.forEach((appointment: AppointmentDisplay) => {
+      const date: Date = appointment.appointmentDateTime;
+      const dateKey: string = date.getFullYear() + '-' + date.getMonth() + '-' + date.getDate();
+      const status: AppointmentStatus = appointment.status;
+
+      if (!appointmentsByDateAndStatus.has(dateKey)) {
+        appointmentsByDateAndStatus.set(dateKey, new Map());
+      }
+
+      const appointmentsByStatus: Map<AppointmentStatus, Array<AppointmentDisplay>> =
+        appointmentsByDateAndStatus.get(dateKey);
+
+      for (const statusType of ["requested", "scheduled", "denied", "completed", "cancelled"]) {
+        if (!appointmentsByStatus.has(statusType as AppointmentStatus)) {
+          appointmentsByStatus.set(statusType as AppointmentStatus, []);
+        }
+      }
+
+      appointmentsByStatus.get(status).push(appointment);
+    });
+
+    const daysInPrevMonth: number = this.getDaysInMonth(year, month - 1);
+    for (let i: number = firstDayOfMonth - 1; i >= 0; i--) {
+      prevMonthDays.push(
+        <div
+          class="px-3 py-2 text-center text-sm text-gray-400 bg-gray-200 w-full flex items-center justify-center"
+          onClick={this.handlePreviousMonth}
+        >
+          {daysInPrevMonth - i}
+        </div>
+      );
+    }
+
+    for (let i: number = 1; i <= daysInMonth; i++) {
+      const currentDate: Date = new Date(year, month, i);
+      currentDate.setHours(0, 0, 0, 0);
+
+      const dateKey: string = year + "-" + month + "-" + i;
+
+      let appointmentsForDay: Map<AppointmentStatus, Array<AppointmentDisplay>>;
+      if (appointmentsByDateAndStatus.has(dateKey)) {
+        appointmentsForDay = appointmentsByDateAndStatus.get(dateKey);
+      }
+
+      const isToday: boolean =
+        i === today.getDate() &&
+        this.currentViewMonth === today.getMonth() &&
+        this.currentViewYear === today.getFullYear();
+      const isPastDate: boolean = currentDate < today;
+
+      currentMonthDays.push(
+        <div
+          role="button"
+          class={`flex flex-col text-sm relative w-full items-center justify-start
+          ${isPastDate ? 'text-gray-400' : 'hover:border-[#9d83c6] hover:border-2 bg-[#f0eafa]'}
+        `}
+          onClick={(event: MouseEvent) => {
+            event.stopPropagation();
+            this.handleSelectDate(currentDate);
+          }}
+        >
+          <div class={`py-1 w-full flex flex-col items-center relative ${isToday && 'bg-[#7357be] text-white'}`}>
+            <div class="w-full h-full text-center">{i}</div>
+          </div>
+
+          <div class="w-full h-full flex flex-row flex-wrap gap-1 items-start justify-center">
+            {appointmentsForDay && (
+              <div class="h-20 h-20 bg-[#7357be] rounded-full flex items-center justify-center">
+                <span class="text-xl font-medium text-white">{appointmentsForDay.get('scheduled').length}</span>
+              </div>
+            )}
+
+            {appointmentsForDay && (
+              <div class="h-20 h-20 bg-[#9d83c6] rounded-full flex items-center justify-center">
+                <span class="text-xl font-medium text-white">{appointmentsForDay.get('requested').length}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    const totalCells = 42;
+    const remainingCells: number =
+      totalCells - (prevMonthDays.length + currentMonthDays.length);
+    for (let i = 1; i <= remainingCells; i++) {
+      nextMonthDays.push(
+        <div
+          class="px-3 py-2 text-center text-sm text-gray-400 bg-gray-200 w-full flex items-center justify-center"
+          onClick={this.handleNextMonth}
+        >
+          {i}
+        </div>,
+      );
+    }
+
+    return [...prevMonthDays, ...currentMonthDays, ...nextMonthDays];
+  };
+
   render() {
     return (
       <div class="flex flex-1 h-[calc(100vh-96px)] flex-col overflow-x-hidden overflow-y-auto">
@@ -462,7 +584,7 @@ export class Calendar {
         </div>
 
         <div class="relative z-20 flex-1 grid grid-cols-7 grid-rows-6 border-x border-t border-[#d8c7ed] divide-x divide-y divide-[#d8c7ed]">
-          {this.renderCalendar()}
+          {!this.isDoctor ? this.renderPatientsCalendar() : this.renderDoctorsCalendar()}
         </div>
       </div>
     );

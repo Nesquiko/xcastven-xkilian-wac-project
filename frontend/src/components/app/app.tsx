@@ -1,5 +1,6 @@
 import { Component, h, Prop, State } from '@stencil/core';
 import { StyledHost } from '../StyledHost';
+import { UserRole } from '../../api/generated';
 
 @Component({
   tag: 'xcastven-xkilian-project-app',
@@ -31,16 +32,26 @@ export class App {
 
   render() {
     let element: string = "homepage";
-    let entryId: string = "@new";
+    let user: {
+      email: string;
+      role: UserRole;
+    };
 
-    if (this.relativePath.startsWith("homepage")) {
-      element = <xcastven-xkilian-project-homepage />;
-    } else if (this.relativePath.startsWith("login")) {
+    user = JSON.parse(sessionStorage.getItem("user"));
+    if (!user) {
       element = <xcastven-xkilian-project-login />;
-    } else if (this.relativePath.startsWith("register")) {
-      element = <xcastven-xkilian-project-register />;
-    } else if (this.relativePath.startsWith("scheduleAppointment")) {
-      element = <xcastven-xkilian-project-appointment-scheduler />;
+    } else {
+      if (this.relativePath === "" || this.relativePath.startsWith("homepage")) {
+        element = <xcastven-xkilian-project-home-page />;
+      } else if (this.relativePath.startsWith("login")) {
+        element = <xcastven-xkilian-project-login />;
+      } else if (this.relativePath.startsWith("register")) {
+        element = <xcastven-xkilian-project-register />;
+      } else if (this.relativePath.startsWith("scheduleAppointment")) {
+        element = <xcastven-xkilian-project-appointment-scheduler />;
+      } else if (this.relativePath.startsWith("registerCondition")) {
+        element = <xcastven-xkilian-project-condition-registerer />;
+      }
     }
 
     /*const navigate = (path:string) => {

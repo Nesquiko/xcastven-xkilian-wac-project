@@ -1,6 +1,6 @@
 import { Component, h, State } from '@stencil/core';
 import { StyledHost } from '../StyledHost';
-import { UserRole } from '../../api/generated';
+import { User, UserRole } from '../../api/generated';
 
 @Component({
   tag: 'xcastven-xkilian-project-login',
@@ -31,10 +31,14 @@ export class Login {
       return;
     }
 
-    console.log("Login as", role, "with values:",
-      "\nEmail:", this.email,
-      "\nRole:", role,
-    );
+    const user = {
+      email: this.email,
+      role: role,
+    };
+
+    sessionStorage.setItem("user", JSON.stringify(user));
+
+    window.navigation.navigate("homepage");
   };
 
   render() {
@@ -78,6 +82,7 @@ export class Login {
               <md-filled-button
                 class="bg-[#9d83c6] rounded-full px-4 py-3 w-1/2"
                 onClick={() => this.handleLogin(UserRole.Patient)}
+                type="submit"
               >
                 Login
               </md-filled-button>

@@ -43,7 +43,8 @@
     "generate": "stencil generate",
     "format": "prettier --write './**/*.{ts,tsx,js,jsx,json}'",
     "openapi": "bun run --cwd ../api bundle && openapi-generator-cli generate -g typescript-fetch -i ../api/api.bundled.yaml -o src/api/generated",
-    "lint": "eslint src/**/*.{ts,tsx}"
+    "lint": "eslint src/**/*.{ts,tsx}",
+    "tsc": "tsc --noEmit"
   },
   "devDependencies": {
     "@stencil/core": "^4.29.2",

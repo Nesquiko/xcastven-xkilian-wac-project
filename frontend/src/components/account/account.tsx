@@ -25,29 +25,27 @@ export class Account {
     if (!this.user) return;
 
     return (
-      <StyledHost class="flex h-screen w-full flex-col bg-gray-300 overflow-hidden">
-        <xcastven-xkilian-project-header
-          type="account"
-        />
+      <StyledHost class="flex h-screen w-full flex-col overflow-hidden bg-gray-300">
+        <xcastven-xkilian-project-header type="account" />
 
         {/* Content */}
-        <div class="relative flex items-center justify-center flex-1 h-full w-full">
-          <div class="p-6 mx-6 w-full max-w-md rounded-md bg-white shadow-lg md:mx-0">
+        <div class="relative flex h-full w-full flex-1 items-center justify-center">
+          <div class="mx-6 w-full max-w-md rounded-md bg-white p-6 shadow-lg md:mx-0">
             <div class="flex flex-row items-center justify-between">
               <span class="text-gray-600">First name:</span>
-              <span class="font-medium text-[#7357be] text-base">{this.user.firstName}</span>
+              <span class="text-base font-medium text-[#7357be]">{this.user.firstName}</span>
             </div>
             <div class="flex flex-row items-center justify-between">
               <span class="text-gray-600">Last name:</span>
-              <span class="font-medium text-[#7357be] text-base">{this.user.lastName}</span>
+              <span class="text-base font-medium text-[#7357be]">{this.user.lastName}</span>
             </div>
             <div class="flex flex-row items-center justify-between">
               <span class="text-gray-600">Email:</span>
-              <span class="font-medium text-[#7357be] text-base">{this.user.email}</span>
+              <span class="text-base font-medium text-[#7357be]">{this.user.email}</span>
             </div>
-            <div class="flex flex-row items-center justify-between mb-6">
+            <div class="mb-6 flex flex-row items-center justify-between">
               <span class="text-gray-600">Role:</span>
-              <span class="font-medium text-[#7357be] text-base">{this.user.role}</span>
+              <span class="text-base font-medium text-[#7357be]">{this.user.role}</span>
             </div>
 
             <div class="flex flex-row items-center justify-between gap-x-3">

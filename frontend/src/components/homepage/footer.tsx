@@ -21,7 +21,10 @@ export class Footer {
             <md-icon class="absolute top-[10px] left-4" style={{ fontSize: '20px' }}>
               event
             </md-icon>
-            <md-icon class="absolute top-[10px] left-10 sm:text-transparent" style={{ fontSize: '20px' }}>
+            <md-icon
+              class="absolute top-[10px] left-10 sm:text-transparent"
+              style={{ fontSize: '20px' }}
+            >
               add
             </md-icon>
             <span class="hidden pl-8 text-center sm:inline">Schedule an appointment</span>
@@ -35,7 +38,10 @@ export class Footer {
             <md-icon class="absolute top-[10px] left-4" style={{ fontSize: '20px' }}>
               coronavirus
             </md-icon>
-            <md-icon class="absolute top-[10px] left-10 sm:text-transparent" style={{ fontSize: '20px' }}>
+            <md-icon
+              class="absolute top-[10px] left-10 sm:text-transparent"
+              style={{ fontSize: '20px' }}
+            >
               add
             </md-icon>
             <span class="hidden pl-8 text-center sm:inline">Register a condition</span>
@@ -43,7 +49,12 @@ export class Footer {
         </div>
 
         <div class="relative z-98 w-10">
-          <md-icon-button id="legend-button" class="mr-2 text-[#7357be]" onClick={this.handleToggleLegendMenu} title="Legend">
+          <md-icon-button
+            id="legend-button"
+            class="mr-2 text-[#7357be]"
+            onClick={this.handleToggleLegendMenu}
+            title="Legend"
+          >
             <md-icon class="text-[#7357be]">more_horiz</md-icon>
           </md-icon-button>
         </div>

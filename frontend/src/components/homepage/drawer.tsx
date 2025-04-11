@@ -1,8 +1,12 @@
 import {
-  AppointmentDisplay, AppointmentStatus,
+  AppointmentDisplay,
+  AppointmentStatus,
   Condition,
   ConditionDisplay,
-  DoctorAppointment, Equipment, Facility, Medicine,
+  DoctorAppointment,
+  Equipment,
+  Facility,
+  Medicine,
   PatientAppointment,
   PrescriptionDisplay,
   User,
@@ -33,33 +37,47 @@ export class Drawer {
   @Prop() getAppointmentsForDate: (date: Date) => Array<AppointmentDisplay>;
   @Prop() getConditionsForDate: (date: Date) => Array<ConditionDisplay>;
   @Prop() getPrescriptionsForDate: (date: Date) => Array<PrescriptionDisplay>;
-  @Prop() getAppointmentsForDateByStatus: (date: Date, appointmentStatus: AppointmentStatus) => Array<AppointmentDisplay>;
+  @Prop() getAppointmentsForDateByStatus: (
+    date: Date,
+    appointmentStatus: AppointmentStatus,
+  ) => Array<AppointmentDisplay>;
   @Prop() handleSelectAppointment: (appointment: AppointmentDisplay) => void;
   @Prop() handleSelectCondition: (condition: ConditionDisplay) => void;
   @Prop() handleSelectPrescription: (prescription: PrescriptionDisplay) => void;
 
-  @Prop() handleRescheduleAppointment: (appointment: PatientAppointment | DoctorAppointment) => void;
+  @Prop() handleRescheduleAppointment: (
+    appointment: PatientAppointment | DoctorAppointment,
+  ) => void;
   @Prop() handleCancelAppointment: (appointment: PatientAppointment | DoctorAppointment) => void;
 
   @Prop() handleAcceptAppointment: (appointment: PatientAppointment | DoctorAppointment) => void;
   @Prop() handleDenyAppointment: (appointment: PatientAppointment | DoctorAppointment) => void;
-  @Prop() handleSaveResourcesOnAppointment: (appointment: PatientAppointment | DoctorAppointment, resources: {
-    facility: Facility,
-    equipment: Equipment,
-    medicine: Medicine,
-  }) => void;
+  @Prop() handleSaveResourcesOnAppointment: (
+    appointment: PatientAppointment | DoctorAppointment,
+    resources: {
+      facility: Facility;
+      equipment: Equipment;
+      medicine: Medicine;
+    },
+  ) => void;
 
   @Prop() handleScheduleAppointmentFromCondition: (condition: Condition) => void;
   @Prop() handleToggleConditionStatus: (condition: Condition) => void;
 
   render() {
     const displayStatus: AppointmentStatus = (
-      this.activeTab === 0 ? "scheduled" :
-        this.activeTab === 1 ? "requested" :
-          this.activeTab === 2 ? "denied" :
-            this.activeTab === 3 ? "completed" :
-              this.activeTab === 4 ? "cancelled" :
-                "scheduled") as AppointmentStatus;
+      this.activeTab === 0
+        ? 'scheduled'
+        : this.activeTab === 1
+          ? 'requested'
+          : this.activeTab === 2
+            ? 'denied'
+            : this.activeTab === 3
+              ? 'completed'
+              : this.activeTab === 4
+                ? 'cancelled'
+                : 'scheduled'
+    ) as AppointmentStatus;
 
     return (
       <div
@@ -68,11 +86,13 @@ export class Drawer {
         }`}
         onClick={(e: MouseEvent) => e.stopPropagation()}
       >
-        <div class="flex h-full flex-col p-4 overflow-y-auto">
+        <div class="flex h-full flex-col overflow-y-auto p-4">
           {/* Selected date */}
           {this.selectedDate && !this.isDoctor ? (
             <div class="w-full">
-              <h2 class="mb-6 w-full text-center text-lg font-medium text-[#7357be]">{formatDate(this.selectedDate)}</h2>
+              <h2 class="mb-6 w-full text-center text-lg font-medium text-[#7357be]">
+                {formatDate(this.selectedDate)}
+              </h2>
 
               <div class="flex w-full flex-col items-center justify-center gap-y-2">
                 {/* Tabs */}
@@ -101,7 +121,10 @@ export class Drawer {
 
                 {/* Conditions Tab Content */}
                 <div class={`w-full max-w-md ${this.activeTab === 1 ? 'block' : 'hidden'}`}>
-                  <xcastven-xkilian-project-conditions-list conditions={this.getConditionsForDate(this.selectedDate)} handleSelectCondition={this.handleSelectCondition} />
+                  <xcastven-xkilian-project-conditions-list
+                    conditions={this.getConditionsForDate(this.selectedDate)}
+                    handleSelectCondition={this.handleSelectCondition}
+                  />
                 </div>
 
                 {/* Prescriptions Tab Content */}
@@ -115,13 +138,18 @@ export class Drawer {
             </div>
           ) : this.selectedDate && this.isDoctor ? (
             <div class="w-full">
-              <h2
-                class="mb-6 w-full text-center text-lg font-medium text-[#7357be]">{formatDate(this.selectedDate)}</h2>
+              <h2 class="mb-6 w-full text-center text-lg font-medium text-[#7357be]">
+                {formatDate(this.selectedDate)}
+              </h2>
 
               <div class="flex w-full flex-col items-center justify-center gap-y-2">
                 {/* Tabs */}
                 <div class="w-full max-w-md overflow-hidden rounded-lg bg-gray-100">
-                  <md-tabs class="w-full" activeTabIndex={this.activeTab} onchange={this.handleTabChange}>
+                  <md-tabs
+                    class="w-full"
+                    activeTabIndex={this.activeTab}
+                    onchange={this.handleTabChange}
+                  >
                     <md-primary-tab class="w-1/5 px-4">
                       <span class="w-full">Scheduled</span>
                     </md-primary-tab>
@@ -145,11 +173,12 @@ export class Drawer {
                   <xcastven-xkilian-project-appointments-list
                     user={this.user}
                     isDoctor={this.isDoctor}
-                    appointments={
-                      this.getAppointmentsForDateByStatus(this.selectedDate, displayStatus)
-                    }
+                    appointments={this.getAppointmentsForDateByStatus(
+                      this.selectedDate,
+                      displayStatus,
+                    )}
                     handleSelectAppointment={this.handleSelectAppointment}
-                    noDataMessage={"No " + displayStatus + " appointments for this date"}
+                    noDataMessage={'No ' + displayStatus + ' appointments for this date'}
                   />
                 </div>
               </div>
@@ -180,7 +209,9 @@ export class Drawer {
               handleResetSelection={this.handleResetSelection}
             />
           ) : (
-            this.showLegend && <xcastven-xkilian-project-legend handleResetSelection={this.handleResetSelection} />
+            this.showLegend && (
+              <xcastven-xkilian-project-legend handleResetSelection={this.handleResetSelection} />
+            )
           )}
         </div>
       </div>

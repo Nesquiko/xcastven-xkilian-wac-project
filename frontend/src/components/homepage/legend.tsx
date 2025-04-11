@@ -18,7 +18,9 @@ export class Legend {
             </md-icon-button>
           </div>
 
-          <h2 class="mb-6 w-full text-center text-xl font-medium text-[#7357be]">Calendar Legend</h2>
+          <h2 class="mb-6 w-full text-center text-xl font-medium text-[#7357be]">
+            Calendar Legend
+          </h2>
         </div>
 
         <div class="flex flex-col gap-y-1 rounded-md bg-gray-200 p-2">

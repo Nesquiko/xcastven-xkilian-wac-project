@@ -1,12 +1,18 @@
 import {
   AppointmentDisplay,
-  AppointmentStatus, Condition,
-  ConditionDisplay, DoctorAppointment, Equipment, Facility, Medicine, PatientAppointment,
+  AppointmentStatus,
+  Condition,
+  ConditionDisplay,
+  DoctorAppointment,
+  Equipment,
+  Facility,
+  Medicine,
+  PatientAppointment,
   PrescriptionDisplay,
   User,
 } from '../../api/generated';
-import { PatientsCalendarExample } from '../../data-examples/patients-calendar';
 import { DoctorsCalendarExample } from '../../data-examples/doctors-calendar';
+import { PatientsCalendarExample } from '../../data-examples/patients-calendar';
 import { TODAY } from '../../utils/utils';
 import { StyledHost } from '../StyledHost';
 import { Component, h, State } from '@stencil/core';
@@ -89,10 +95,10 @@ export class Homepage {
   private handleSaveResourcesOnAppointment = (
     appointment: PatientAppointment | DoctorAppointment,
     resources: {
-      facility: Facility,
-      equipment: Equipment,
-      medicine: Medicine,
-    }
+      facility: Facility;
+      equipment: Equipment;
+      medicine: Medicine;
+    },
   ) => {
     console.log('Save resources on appointment', appointment, resources);
   };
@@ -109,7 +115,7 @@ export class Homepage {
   private handleSelectDate = (date: Date) => {
     this.handleResetSelection();
     this.selectedDate = date;
-    this.selectedAppointmentStatusGroup = "scheduled";
+    this.selectedAppointmentStatusGroup = 'scheduled';
     this.isDrawerOpen = true;
   };
 
@@ -131,7 +137,10 @@ export class Homepage {
     this.isDrawerOpen = true;
   };
 
-  private handleSelectAppointmentStatusGroup = (date: Date, appointmentStatus: AppointmentStatus) => {
+  private handleSelectAppointmentStatusGroup = (
+    date: Date,
+    appointmentStatus: AppointmentStatus,
+  ) => {
     this.handleResetSelection();
     this.selectedDate = date;
     this.selectedAppointmentStatusGroup = appointmentStatus;
@@ -160,7 +169,11 @@ export class Homepage {
   private getAppointmentsForDate = (date: Date): Array<AppointmentDisplay> => {
     return this.appointments.filter((appointment: AppointmentDisplay): boolean => {
       const appointmentDate: Date = new Date(appointment.appointmentDateTime);
-      return appointmentDate.getFullYear() === date.getFullYear() && appointmentDate.getMonth() === date.getMonth() && appointmentDate.getDate() === date.getDate();
+      return (
+        appointmentDate.getFullYear() === date.getFullYear() &&
+        appointmentDate.getMonth() === date.getMonth() &&
+        appointmentDate.getDate() === date.getDate()
+      );
     });
   };
 
@@ -182,17 +195,20 @@ export class Homepage {
         const { start, end } = prescription;
         return date >= start && date <= end;
       })
-      .sort((a: PrescriptionDisplay, b: PrescriptionDisplay) => b.start.getTime() - a.start.getTime());
+      .sort(
+        (a: PrescriptionDisplay, b: PrescriptionDisplay) => b.start.getTime() - a.start.getTime(),
+      );
   };
 
-  private getAppointmentsForDateByStatus = (
-    date: Date,
-    appointmentStatus: AppointmentStatus
-  ) => {
+  private getAppointmentsForDateByStatus = (date: Date, appointmentStatus: AppointmentStatus) => {
     return this.appointments.filter((appointment: AppointmentDisplay): boolean => {
       if (appointment.status === appointmentStatus) {
         const appointmentDate: Date = new Date(appointment.appointmentDateTime);
-        return appointmentDate.getFullYear() === date.getFullYear() && appointmentDate.getMonth() === date.getMonth() && appointmentDate.getDate() === date.getDate();
+        return (
+          appointmentDate.getFullYear() === date.getFullYear() &&
+          appointmentDate.getMonth() === date.getMonth() &&
+          appointmentDate.getDate() === date.getDate()
+        );
       }
     });
   };
@@ -232,11 +248,11 @@ export class Homepage {
           handleNextMonth={this.handleNextMonth}
         />
 
-        <xcastven-xkilian-project-footer
-          handleToggleLegendMenu={this.handleToggleLegendMenu}
-        />
+        <xcastven-xkilian-project-footer handleToggleLegendMenu={this.handleToggleLegendMenu} />
 
-        {this.isDrawerOpen && <div class="fixed inset-0 z-99 bg-black/50" onClick={() => this.handleResetSelection()} />}
+        {this.isDrawerOpen && (
+          <div class="fixed inset-0 z-99 bg-black/50" onClick={() => this.handleResetSelection()} />
+        )}
 
         <xcastven-xkilian-project-drawer
           user={this.user}

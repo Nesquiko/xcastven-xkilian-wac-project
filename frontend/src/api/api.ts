@@ -1,5 +1,5 @@
 import { AuthApi, ErrorDetail } from './generated';
-import { Configuration, FetchAPI, ResponseError } from './generated/runtime';
+import { Configuration, FetchAPI, ResponseError } from './generated';
 
 export interface Api {
   auth: AuthApi;
@@ -35,7 +35,7 @@ export function newApi(apiBase: string): Api {
 }
 
 export class ApiError extends Error {
-  override name: 'ApiError' = 'ApiError';
+  override name: 'ApiError' = 'ApiError' as const;
   constructor(public errDetail: ErrorDetail) {
     super();
   }

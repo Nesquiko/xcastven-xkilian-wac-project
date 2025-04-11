@@ -1,6 +1,6 @@
 import { ApiError } from '../../api/api';
-import { Registration, UserRole } from '../../api/generated';
 import { Api } from '../../api/api';
+import { Registration, UserRole } from '../../api/generated';
 import { StyledHost } from '../StyledHost';
 import { Component, h, Prop, State } from '@stencil/core';
 

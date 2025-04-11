@@ -18,7 +18,20 @@ export const DAYS_OF_WEEK: Array<{ short: string; long: string }> = [
   { short: 'Su', long: 'Sunday' },
 ];
 
-export const MONTHS: Array<string> = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+export const MONTHS: Array<string> = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+];
 
 export const TODAY: Date = new Date();
 
@@ -124,7 +137,18 @@ export const AppointmentStatusColor = {
   },
 };
 
-export const ConditionOrderColors: Array<string> = ['#1976D2', '#7B1FA2', '#388E3C', '#D32F2F', '#F57C00', '#512DA8', '#00796B', '#795548', '#0097A7', '#FBC02D'];
+export const ConditionOrderColors: Array<string> = [
+  '#1976D2',
+  '#7B1FA2',
+  '#388E3C',
+  '#D32F2F',
+  '#F57C00',
+  '#512DA8',
+  '#00796B',
+  '#795548',
+  '#0097A7',
+  '#FBC02D',
+];
 
 export const PrescriptionOrderColors: Array<string> = ['#FF8080', '#FF0000', '#800000', '#1A0000'];
 
@@ -167,11 +191,14 @@ export const getPatientAppointmentActions = (
 const doctorButton = (
   displayTitle: string,
   widthClass: string,
-  onClick: (appointment: PatientAppointment | DoctorAppointment, resources?: {
-    facilities: Array<Facility>,
-    equipment: Array<Equipment>,
-    medicine: Array<Medicine>,
-  }) => void,
+  onClick: (
+    appointment: PatientAppointment | DoctorAppointment,
+    resources?: {
+      facilities: Array<Facility>;
+      equipment: Array<Equipment>;
+      medicine: Array<Medicine>;
+    },
+  ) => void,
 ) => {
   return (
     <md-filled-button class={`${widthClass} rounded-full bg-[#7357be]`} onClick={onClick}>
@@ -185,11 +212,14 @@ export const getDoctorAppointmentActions = (
   handleCancelAppointment: (appointment: PatientAppointment | DoctorAppointment) => void,
   handleAcceptAppointment: (appointment: PatientAppointment | DoctorAppointment) => void,
   handleDenyAppointment: (appointment: PatientAppointment | DoctorAppointment) => void,
-  handleSaveResourcesOnAppointment: (appointment: PatientAppointment | DoctorAppointment, resources: {
-    facilities: Array<Facility>,
-    equipment: Array<Equipment>,
-    medicine: Array<Medicine>,
-  }) => void,
+  handleSaveResourcesOnAppointment: (
+    appointment: PatientAppointment | DoctorAppointment,
+    resources: {
+      facilities: Array<Facility>;
+      equipment: Array<Equipment>;
+      medicine: Array<Medicine>;
+    },
+  ) => void,
 ) => {
   switch (appointmentStatus) {
     case 'scheduled':

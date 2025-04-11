@@ -23,7 +23,9 @@ export class PrescriptionDetail {
             </md-icon-button>
           </div>
 
-          <h2 class="mb-6 w-full text-center text-xl font-medium text-[#7357be]">Prescription details</h2>
+          <h2 class="mb-6 w-full text-center text-xl font-medium text-[#7357be]">
+            Prescription details
+          </h2>
         </div>
 
         <div class="mb-6 w-full max-w-md rounded-md bg-gray-200 px-4 py-3">
@@ -58,7 +60,9 @@ export class PrescriptionDetail {
                   <md-icon style={{ fontSize: '16px' }}>timer</md-icon>
                   Duration
                 </div>
-                <span class="font-medium text-gray-600">{formatDateDelta(this.prescription.start, this.prescription.end)}</span>
+                <span class="font-medium text-gray-600">
+                  {formatDateDelta(this.prescription.start, this.prescription.end)}
+                </span>
               </div>
             </>
           )}
@@ -69,7 +73,11 @@ export class PrescriptionDetail {
             <md-icon style={{ fontSize: '16px' }}>description</md-icon>
             Doctor's note
           </div>
-          {this.prescription.doctorsNote && <p class="mt-1 ml-1 text-sm font-medium text-wrap text-gray-600">{this.prescription.doctorsNote}</p>}
+          {this.prescription.doctorsNote && (
+            <p class="mt-1 ml-1 text-sm font-medium text-wrap text-gray-600">
+              {this.prescription.doctorsNote}
+            </p>
+          )}
         </div>
       </div>
     );

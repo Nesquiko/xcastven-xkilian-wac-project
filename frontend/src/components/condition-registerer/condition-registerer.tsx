@@ -8,7 +8,7 @@ import { Component, h, State } from '@stencil/core';
 export class ConditionRegisterer {
   @State() selectedStart: Date = null;
   @State() selectedEnd: Date = null;
-  @State() conditionName: string = "";
+  @State() conditionName: string = '';
   @State() isOngoing: boolean = false;
   @State() hoveredDate: Date = null;
 
@@ -67,29 +67,53 @@ export class ConditionRegisterer {
 
     const daysInPrevMonth = this.getDaysInMonth(year, month - 1);
     for (let i = firstDayOfMonth - 1; i >= 0; i--) {
-      prevMonthDays.unshift(<div class="p-3 text-center text-sm text-gray-400">{daysInPrevMonth - i}</div>);
+      prevMonthDays.unshift(
+        <div class="p-3 text-center text-sm text-gray-400">{daysInPrevMonth - i}</div>,
+      );
     }
 
     for (let i = 1; i <= daysInMonth; i++) {
       const currentDate = new Date(year, month, i);
       currentDate.setHours(0, 0, 0, 0);
 
-      const isSelectedStart: boolean = this.selectedStart && this.selectedStart.getDate() === i && this.selectedStart.getMonth() === month && this.selectedStart.getFullYear() === year;
-      const isSelectedEnd: boolean = this.selectedEnd && this.selectedEnd.getDate() === i && this.selectedEnd.getMonth() === month && this.selectedEnd.getFullYear() === year;
-      const isInRange: boolean = this.selectedStart && this.selectedEnd && currentDate >= this.selectedStart && currentDate <= this.selectedEnd;
-      const isHoveredInRange: boolean = this.selectedStart && this.hoveredDate && currentDate >= this.selectedStart && currentDate <= this.hoveredDate;
+      const isSelectedStart: boolean =
+        this.selectedStart &&
+        this.selectedStart.getDate() === i &&
+        this.selectedStart.getMonth() === month &&
+        this.selectedStart.getFullYear() === year;
+      const isSelectedEnd: boolean =
+        this.selectedEnd &&
+        this.selectedEnd.getDate() === i &&
+        this.selectedEnd.getMonth() === month &&
+        this.selectedEnd.getFullYear() === year;
+      const isInRange: boolean =
+        this.selectedStart &&
+        this.selectedEnd &&
+        currentDate >= this.selectedStart &&
+        currentDate <= this.selectedEnd;
+      const isHoveredInRange: boolean =
+        this.selectedStart &&
+        this.hoveredDate &&
+        currentDate >= this.selectedStart &&
+        currentDate <= this.hoveredDate;
 
       const isPastDate: boolean = currentDate > today;
 
       currentMonthDays.push(
         <div
-          class={`rounded-md p-3 text-center text-sm
-            ${isSelectedStart || isSelectedEnd ? 'bg-[#7357be] text-white' :
-            (this.isOngoing && !isPastDate && this.selectedStart < currentDate) ? 'bg-[#d8c7ed]' :
-            isInRange ? 'bg-[#d8c7ed] text-black' :
-            isHoveredInRange ? 'bg-gray-200' :
-            isPastDate ? 'text-gray-400 cursor-not-allowed' : 'cursor-pointer hover:bg-gray-200'}
-          `}
+          class={`rounded-md p-3 text-center text-sm ${
+            isSelectedStart || isSelectedEnd
+              ? 'bg-[#7357be] text-white'
+              : this.isOngoing && !isPastDate && this.selectedStart < currentDate
+                ? 'bg-[#d8c7ed]'
+                : isInRange
+                  ? 'bg-[#d8c7ed] text-black'
+                  : isHoveredInRange
+                    ? 'bg-gray-200'
+                    : isPastDate
+                      ? 'cursor-not-allowed text-gray-400'
+                      : 'cursor-pointer hover:bg-gray-200'
+          } `}
           onClick={() => !isPastDate && this.handleSelectDay(i)}
           onMouseOver={() => !isPastDate && this.handleMouseOver(i)}
           onMouseOut={this.handleMouseOut}
@@ -140,11 +164,11 @@ export class ConditionRegisterer {
     this.nameError = null;
 
     if (!this.selectedStart) {
-      this.startError = "Condition start is required";
+      this.startError = 'Condition start is required';
     } else if (!this.selectedEnd && !this.isOngoing) {
-      this.endError = "Condition can either end or be ongoing";
-    } else if (this.conditionName === "") {
-      this.nameError = "Condition name is required";
+      this.endError = 'Condition can either end or be ongoing';
+    } else if (this.conditionName === '') {
+      this.nameError = 'Condition name is required';
     }
 
     if (this.startError || this.endError || this.nameError) {
@@ -153,21 +177,20 @@ export class ConditionRegisterer {
 
     console.log(
       'Register a condition:' +
-      '\nStart: ' +
-      this.selectedStart.toLocaleDateString() +
-      (this.selectedEnd ? ('\nEnd: ' +
-      this.selectedEnd.toLocaleDateString()) : "") +
-      '\nName: ' +
-      this.conditionName +
-      '\nStatus: ' +
-      (this.selectedEnd ? "Gone" : "Ongoing")
+        '\nStart: ' +
+        this.selectedStart.toLocaleDateString() +
+        (this.selectedEnd ? '\nEnd: ' + this.selectedEnd.toLocaleDateString() : '') +
+        '\nName: ' +
+        this.conditionName +
+        '\nStatus: ' +
+        (this.selectedEnd ? 'Gone' : 'Ongoing'),
     );
   };
 
   private resetSelection = () => {
     this.selectedStart = null;
     this.selectedEnd = null;
-    this.conditionName = "";
+    this.conditionName = '';
     this.isOngoing = false;
   };
 
@@ -191,21 +214,20 @@ export class ConditionRegisterer {
     return (
       <div class="flex h-screen w-full flex-1 flex-col overflow-auto">
         {/* Header */}
-        <xcastven-xkilian-project-header
-          type="registerCondition"
-        />
+        <xcastven-xkilian-project-header type="registerCondition" />
 
         {/* Content */}
         <div class="mx-auto flex w-full flex-1 flex-col md:flex-row">
           {/* Left panel - Calendar */}
           <div
-            class={`flex flex-col items-center justify-center bg-gray-300 p-6 transition-all duration-600 ease-in-out ${showDetails ? 'w-full md:w-1/2' : 'w-full'}`}>
-            <h2 class="font-medium text-gray-600 mb-3 w-full text-center">
-              {!this.selectedStart ?
-                'Select the day your condition started:' :
-                this.selectedStart && (!this.selectedEnd || !this.isOngoing) &&
-                'Select the day your condition ended, if it ended:'
-              }
+            class={`flex flex-col items-center justify-center bg-gray-300 p-6 transition-all duration-600 ease-in-out ${showDetails ? 'w-full md:w-1/2' : 'w-full'}`}
+          >
+            <h2 class="mb-3 w-full text-center font-medium text-gray-600">
+              {!this.selectedStart
+                ? 'Select the day your condition started:'
+                : this.selectedStart &&
+                  (!this.selectedEnd || !this.isOngoing) &&
+                  'Select the day your condition ended, if it ended:'}
             </h2>
 
             <div class="mb-6 w-full max-w-md rounded-lg bg-white p-4 shadow-md">
@@ -232,7 +254,7 @@ export class ConditionRegisterer {
                 </md-icon-button>
               </div>
 
-              <div class="grid grid-cols-7 mb-3 gap-1">
+              <div class="mb-3 grid grid-cols-7 gap-1">
                 {DAYS_OF_WEEK.map(day => (
                   <div class="p-3 text-center text-sm font-medium text-gray-600">{day.short}</div>
                 ))}
@@ -240,7 +262,7 @@ export class ConditionRegisterer {
               </div>
             </div>
             {this.selectedStart && (
-              <div class="animate-[slideInFromBottom_0.5s_ease-out] min-w-md max-w-md flex flex-row items-center justify-center gap-x-3">
+              <div class="flex max-w-md min-w-md animate-[slideInFromBottom_0.5s_ease-out] flex-row items-center justify-center gap-x-3">
                 <label htmlFor="switch" class="font-medium text-gray-600">
                   Condition is still ongoing
                 </label>
@@ -249,7 +271,7 @@ export class ConditionRegisterer {
                   checked={this.isOngoing}
                   onChange={() => {
                     if (this.selectedEnd) this.selectedEnd = null;
-                    this.isOngoing = !this.isOngoing
+                    this.isOngoing = !this.isOngoing;
                   }}
                 />
               </div>
@@ -259,7 +281,7 @@ export class ConditionRegisterer {
           {/* Right panel - Details */}
           {showDetails && (
             <div
-              class={`relative m-auto flex h-full flex-1 w-full max-w-lg transform animate-[slideInFromBottom_0.5s_ease-out] flex-col justify-center p-6 opacity-100 transition-all duration-500 ease-in-out md:w-1/2 md:animate-[slideInFromRight_0.5s_ease-out]`}
+              class={`relative m-auto flex h-full w-full max-w-lg flex-1 transform animate-[slideInFromBottom_0.5s_ease-out] flex-col justify-center p-6 opacity-100 transition-all duration-500 ease-in-out md:w-1/2 md:animate-[slideInFromRight_0.5s_ease-out]`}
             >
               <md-icon-button class="absolute top-5 left-5" onClick={this.resetSelection}>
                 <md-icon>arrow_back</md-icon>
@@ -289,18 +311,23 @@ export class ConditionRegisterer {
                         <md-icon style={{ fontSize: '16px' }}>timer</md-icon>
                         Duration
                       </div>
-                      <span
-                        class="font-medium text-gray-600">{formatDateDelta(this.selectedStart, this.selectedEnd)}</span>
+                      <span class="font-medium text-gray-600">
+                        {formatDateDelta(this.selectedStart, this.selectedEnd)}
+                      </span>
                     </div>
                   </>
                 )}
 
                 <div class="flex w-full flex-row items-center justify-between">
                   <div class="flex flex-row items-center gap-x-2 text-gray-500">
-                    <md-icon style={{ fontSize: '16px' }}>{this.selectedEnd ? 'check_circle' : 'pending'}</md-icon>
+                    <md-icon style={{ fontSize: '16px' }}>
+                      {this.selectedEnd ? 'check_circle' : 'pending'}
+                    </md-icon>
                     Status
                   </div>
-                  <span class="font-medium text-gray-600">{this.selectedEnd ? 'Gone' : 'Ongoing'}</span>
+                  <span class="font-medium text-gray-600">
+                    {this.selectedEnd ? 'Gone' : 'Ongoing'}
+                  </span>
                 </div>
               </div>
 
@@ -317,8 +344,10 @@ export class ConditionRegisterer {
                 <div class="mb-6 w-full text-center text-sm text-red-500">{this.startError}</div>
               ) : this.endError ? (
                 <div class="mb-6 w-full text-center text-sm text-red-500">{this.endError}</div>
-              ) : this.nameError && (
-                <div class="mb-6 w-full text-center text-sm text-red-500">{this.startError}</div>
+              ) : (
+                this.nameError && (
+                  <div class="mb-6 w-full text-center text-sm text-red-500">{this.startError}</div>
+                )
               )}
 
               <md-filled-button

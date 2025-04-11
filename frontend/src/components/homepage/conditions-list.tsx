@@ -17,7 +17,8 @@ export class ConditionsList {
       <div class="w-full overflow-hidden rounded-lg bg-white shadow-sm">
         {this.conditions.length ? (
           this.conditions.map((condition: ConditionDisplay, index: number) => {
-            const isExpanded: boolean = this.expandedConditionId && condition.id === this.expandedConditionId;
+            const isExpanded: boolean =
+              this.expandedConditionId && condition.id === this.expandedConditionId;
 
             return (
               <div key={condition.id}>
@@ -42,12 +43,16 @@ export class ConditionsList {
                   <div class="flex flex-row items-center justify-between">
                     <span class="text-sm text-gray-400">
                       From:
-                      <span class="ml-2 text-sm font-medium text-gray-600">{formatDate(condition.start)}</span>
+                      <span class="ml-2 text-sm font-medium text-gray-600">
+                        {formatDate(condition.start)}
+                      </span>
                     </span>
                     {condition.end && (
                       <span class="text-sm text-gray-400">
                         To:
-                        <span class="ml-2 text-sm font-medium text-gray-600">{formatDate(condition.end)}</span>
+                        <span class="ml-2 text-sm font-medium text-gray-600">
+                          {formatDate(condition.end)}
+                        </span>
                       </span>
                     )}
                   </div>
@@ -56,20 +61,34 @@ export class ConditionsList {
             );
           })
         ) : (
-          <div class={`flex h-16 w-full flex-col justify-center border-2 border-transparent bg-gray-200 px-4 py-2 text-center text-sm font-medium text-gray-600`}>
+          <div
+            class={`flex h-16 w-full flex-col justify-center border-2 border-transparent bg-gray-200 px-4 py-2 text-center text-sm font-medium text-gray-600`}
+          >
             No conditions for this date
           </div>
         )}
 
         <div class="flex h-12 w-full flex-row items-center justify-between">
-          <md-icon-button title="View older conditions" class="m-1" onClick={() => console.log('view older conditions clicked')}>
+          <md-icon-button
+            title="View older conditions"
+            class="m-1"
+            onClick={() => console.log('view older conditions clicked')}
+          >
             <md-icon class="text-gray-600">arrow_back</md-icon>
           </md-icon-button>
-          <md-icon-button title="Register a condition" class="m-1 w-20" onClick={() => console.log('register a condition')}>
+          <md-icon-button
+            title="Register a condition"
+            class="m-1 w-20"
+            onClick={() => console.log('register a condition')}
+          >
             <md-icon class="text-gray-600">coronavirus</md-icon>
             <md-icon class="text-gray-600">add</md-icon>
           </md-icon-button>
-          <md-icon-button title="View newer conditions" class="m-1" onClick={() => console.log('view newer conditions clicked')}>
+          <md-icon-button
+            title="View newer conditions"
+            class="m-1"
+            onClick={() => console.log('view newer conditions clicked')}
+          >
             <md-icon class="text-gray-600">arrow_forward</md-icon>
           </md-icon-button>
         </div>

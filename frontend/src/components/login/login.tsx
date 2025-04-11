@@ -35,7 +35,9 @@ export class Login {
     }
 
     try {
-      const user: User = await this.api.auth.loginUser({ loginRequest: { email: this.email, role } });
+      const user: User = await this.api.auth.loginUser({
+        loginRequest: { email: this.email, role },
+      });
       sessionStorage.setItem('user', JSON.stringify(user));
       window.navigation.navigate('homepage');
     } catch (err) {
@@ -44,7 +46,7 @@ export class Login {
       }
 
       if (err.errDetail.status === 404) {
-        this.emailError = "Email not found"
+        this.emailError = 'Email not found';
         return;
       }
     }

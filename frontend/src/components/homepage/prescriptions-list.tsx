@@ -38,12 +38,16 @@ export class PrescriptionsList {
                   <div class="flex flex-row items-center justify-between">
                     <span class="text-sm text-gray-400">
                       From:
-                      <span class="ml-2 text-sm font-medium text-gray-600">{formatDate(prescription.start)}</span>
+                      <span class="ml-2 text-sm font-medium text-gray-600">
+                        {formatDate(prescription.start)}
+                      </span>
                     </span>
                     {prescription.end && (
                       <span class="text-sm text-gray-400">
                         To:
-                        <span class="ml-2 text-sm font-medium text-gray-600">{formatDate(prescription.end)}</span>
+                        <span class="ml-2 text-sm font-medium text-gray-600">
+                          {formatDate(prescription.end)}
+                        </span>
                       </span>
                     )}
                   </div>
@@ -52,16 +56,26 @@ export class PrescriptionsList {
             );
           })
         ) : (
-          <div class={`flex h-16 w-full flex-col justify-center border-2 border-transparent bg-gray-200 px-4 py-2 text-center text-sm font-medium text-gray-600`}>
+          <div
+            class={`flex h-16 w-full flex-col justify-center border-2 border-transparent bg-gray-200 px-4 py-2 text-center text-sm font-medium text-gray-600`}
+          >
             No prescriptions for this date
           </div>
         )}
 
         <div class="flex h-12 w-full flex-row items-center justify-between">
-          <md-icon-button title="View older prescriptions" class="m-1" onClick={() => console.log('view older prescriptions clicked')}>
+          <md-icon-button
+            title="View older prescriptions"
+            class="m-1"
+            onClick={() => console.log('view older prescriptions clicked')}
+          >
             <md-icon class="text-gray-600">arrow_back</md-icon>
           </md-icon-button>
-          <md-icon-button title="View newer prescriptions" class="m-1" onClick={() => console.log('view newer prescriptions clicked')}>
+          <md-icon-button
+            title="View newer prescriptions"
+            class="m-1"
+            onClick={() => console.log('view newer prescriptions clicked')}
+          >
             <md-icon class="text-gray-600">arrow_forward</md-icon>
           </md-icon-button>
         </div>

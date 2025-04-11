@@ -1,5 +1,18 @@
-import { AppointmentDisplay, AppointmentStatus, ConditionDisplay, PrescriptionDisplay, UserRole } from '../../api/generated';
-import { AppointmentStatusColor, ConditionOrderColors, DAYS_OF_WEEK, formatDate, formatTime, PrescriptionOrderColors } from '../../utils/utils';
+import {
+  AppointmentDisplay,
+  AppointmentStatus,
+  ConditionDisplay,
+  PrescriptionDisplay,
+  UserRole,
+} from '../../api/generated';
+import {
+  AppointmentStatusColor,
+  ConditionOrderColors,
+  DAYS_OF_WEEK,
+  formatDate,
+  formatTime,
+  PrescriptionOrderColors,
+} from '../../utils/utils';
 import { Component, h, Prop } from '@stencil/core';
 
 @Component({
@@ -96,7 +109,10 @@ export class Calendar {
     );
   };
 
-  private getPrescriptionTooltipContent = (prescription: PrescriptionDisplay, offsetRight: string) => {
+  private getPrescriptionTooltipContent = (
+    prescription: PrescriptionDisplay,
+    offsetRight: string,
+  ) => {
     return (
       <div
         class="pointer-events-none absolute z-100 rounded bg-black px-2 py-1 text-xs whitespace-nowrap text-white opacity-0 transition-opacity duration-200 group-hover:opacity-100"
@@ -155,7 +171,10 @@ export class Calendar {
     const daysInPrevMonth: number = this.getDaysInMonth(year, month - 1);
     for (let i: number = firstDayOfMonth - 1; i >= 0; i--) {
       prevMonthDays.push(
-        <div class="flex w-full items-center justify-center bg-gray-200 px-3 py-2 text-center text-sm text-gray-400" onClick={this.handlePreviousMonth}>
+        <div
+          class="flex w-full items-center justify-center bg-gray-200 px-3 py-2 text-center text-sm text-gray-400"
+          onClick={this.handlePreviousMonth}
+        >
           {daysInPrevMonth - i}
         </div>,
       );
@@ -163,7 +182,8 @@ export class Calendar {
 
     const prescriptionColorMap: Record<string, string> = {};
     this.prescriptions.forEach((prescription: PrescriptionDisplay, index: number) => {
-      prescriptionColorMap[prescription.id] = PrescriptionOrderColors[index % PrescriptionOrderColors.length];
+      prescriptionColorMap[prescription.id] =
+        PrescriptionOrderColors[index % PrescriptionOrderColors.length];
     });
 
     const conditionColorMap: Record<string, string> = {};
@@ -172,7 +192,9 @@ export class Calendar {
     });
 
     const calculateConditionHeights = () => {
-      const sortedConditions: Array<ConditionDisplay> = [...this.conditions].sort((a: ConditionDisplay, b: ConditionDisplay): number => a.start.getTime() - b.start.getTime());
+      const sortedConditions: Array<ConditionDisplay> = [...this.conditions].sort(
+        (a: ConditionDisplay, b: ConditionDisplay): number => a.start.getTime() - b.start.getTime(),
+      );
 
       const timeline: Map<number, Set<string>> = new Map();
 
@@ -244,12 +266,16 @@ export class Calendar {
       const dateKey: string = year + '-' + month + '-' + i;
       const appointmentsForDay: Array<AppointmentDisplay> = appointmentsByDate.get(dateKey) ?? [];
 
-      const isToday: boolean = i === today.getDate() && this.currentViewMonth === today.getMonth() && this.currentViewYear === today.getFullYear();
+      const isToday: boolean =
+        i === today.getDate() &&
+        this.currentViewMonth === today.getMonth() &&
+        this.currentViewYear === today.getFullYear();
       const isPastDate: boolean = currentDate < today;
 
       const conditionsForDate: Array<ConditionDisplay> = this.getConditionsForDate(currentDate);
 
-      const prescriptionsForDate: Array<PrescriptionDisplay> = this.getPrescriptionsForDate(currentDate);
+      const prescriptionsForDate: Array<PrescriptionDisplay> =
+        this.getPrescriptionsForDate(currentDate);
       let offset: number = 0;
       let zIndex: number = 10;
       let ellipsisDisplayed: boolean = false;
@@ -263,47 +289,54 @@ export class Calendar {
             this.handleSelectDate(currentDate);
           }}
         >
-          <div class={`relative flex w-full flex-row items-center justify-between py-1 mb-[1px] ${isToday && 'bg-[#7357be] text-white'}`}>
+          <div
+            class={`relative mb-[1px] flex w-full flex-row items-center justify-between py-1 ${isToday && 'bg-[#7357be] text-white'}`}
+          >
             <div class="h-full w-full text-center">{i}</div>
             {prescriptionsForDate.length > 0 &&
-              prescriptionsForDate.reverse().map((prescription: PrescriptionDisplay, index: number) => {
-                const prescriptionOffset: string = (4 + offset).toString() + 'px';
-                const prescriptionZIndex: string = zIndex.toString();
-                offset += 16;
-                zIndex -= 1;
+              prescriptionsForDate
+                .reverse()
+                .map((prescription: PrescriptionDisplay, index: number) => {
+                  const prescriptionOffset: string = (4 + offset).toString() + 'px';
+                  const prescriptionZIndex: string = zIndex.toString();
+                  offset += 16;
+                  zIndex -= 1;
 
-                const prescriptionColor: string = prescriptionColorMap[prescription.id];
+                  const prescriptionColor: string = prescriptionColorMap[prescription.id];
 
-                if (index >= 2 && !ellipsisDisplayed) {
-                  ellipsisDisplayed = true;
-                  return <span style={{ position: 'absolute', top: '4px', right: '40px' }}>...</span>;
-                }
+                  if (index >= 2 && !ellipsisDisplayed) {
+                    ellipsisDisplayed = true;
+                    return (
+                      <span style={{ position: 'absolute', top: '4px', right: '40px' }}>...</span>
+                    );
+                  }
 
-                return (
-                  <div class="group inline-block">
-                    <md-icon
-                      class="cursor-pointer transition-all duration-200"
-                      style={{
-                        fontSize: this.hoveredPrescriptionId === prescription.id ? '24px' : '20px',
-                        position: 'absolute',
-                        top: '4px',
-                        right: prescriptionOffset,
-                        zIndex: prescriptionZIndex,
-                        color: prescriptionColor,
-                      }}
-                      onMouseEnter={() => this.setHoveredPrescriptionId(prescription.id)}
-                      onMouseLeave={() => this.setHoveredPrescriptionId(null)}
-                      onClick={(event: Event) => {
-                        event.stopPropagation();
-                        this.handleSelectPrescription(prescriptionsForDate[0]);
-                      }}
-                    >
-                      medication
-                    </md-icon>
-                    {this.getPrescriptionTooltipContent(prescription, prescriptionOffset)}
-                  </div>
-                );
-              })}
+                  return (
+                    <div class="group inline-block">
+                      <md-icon
+                        class="cursor-pointer transition-all duration-200"
+                        style={{
+                          fontSize:
+                            this.hoveredPrescriptionId === prescription.id ? '24px' : '20px',
+                          position: 'absolute',
+                          top: '4px',
+                          right: prescriptionOffset,
+                          zIndex: prescriptionZIndex,
+                          color: prescriptionColor,
+                        }}
+                        onMouseEnter={() => this.setHoveredPrescriptionId(prescription.id)}
+                        onMouseLeave={() => this.setHoveredPrescriptionId(null)}
+                        onClick={(event: Event) => {
+                          event.stopPropagation();
+                          this.handleSelectPrescription(prescriptionsForDate[0]);
+                        }}
+                      >
+                        medication
+                      </md-icon>
+                      {this.getPrescriptionTooltipContent(prescription, prescriptionOffset)}
+                    </div>
+                  );
+                })}
           </div>
 
           <div class="relative flex h-full w-full flex-row flex-wrap items-start justify-center gap-1">
@@ -331,7 +364,8 @@ export class Calendar {
 
           {conditionsForDate.map((condition: ConditionDisplay) => {
             const isStartDate: boolean = currentDate.getTime() === condition.start.getTime();
-            const isEndDate: boolean = condition.end && currentDate.getTime() === condition.end.getTime();
+            const isEndDate: boolean =
+              condition.end && currentDate.getTime() === condition.end.getTime();
 
             const conditionHeight: number = conditionHeightMap[condition.id];
             const conditionColor: string = conditionColorMap[condition.id];
@@ -342,7 +376,10 @@ export class Calendar {
                 class="group absolute right-0 left-0 cursor-pointer transition-all duration-200"
                 style={{
                   bottom: '0px',
-                  height: this.hoveredConditionId === condition.id ? `${conditionHeight + 6}px` : `${conditionHeight}px`,
+                  height:
+                    this.hoveredConditionId === condition.id
+                      ? `${conditionHeight + 6}px`
+                      : `${conditionHeight}px`,
                   zIndex: (50 - conditionHeight).toString(),
                   backgroundColor: conditionColor,
                 }}
@@ -385,7 +422,10 @@ export class Calendar {
     const remainingCells = totalCells - (prevMonthDays.length + currentMonthDays.length);
     for (let i = 1; i <= remainingCells; i++) {
       nextMonthDays.push(
-        <div class="flex w-full items-center justify-center bg-gray-200 px-3 py-2 text-center text-sm text-gray-400" onClick={this.handleNextMonth}>
+        <div
+          class="flex w-full items-center justify-center bg-gray-200 px-3 py-2 text-center text-sm text-gray-400"
+          onClick={this.handleNextMonth}
+        >
           {i}
         </div>,
       );
@@ -407,11 +447,15 @@ export class Calendar {
         }}
       >
         <div class="flex w-full flex-col gap-y-1">
-          <span class="w-full text-center">{appointmentStatus[0].toUpperCase() + appointmentStatus.slice(1)}</span>
+          <span class="w-full text-center">
+            {appointmentStatus[0].toUpperCase() + appointmentStatus.slice(1)}
+          </span>
 
           <div class="flex items-center space-x-1 text-gray-400">
             <md-icon style={{ fontSize: '16px' }}>calendar_month</md-icon>
-            <div>{appointmentCount} appointment{appointmentCount !== 1 && "s"}</div>
+            <div>
+              {appointmentCount} appointment{appointmentCount !== 1 && 's'}
+            </div>
           </div>
         </div>
       </div>
@@ -431,7 +475,10 @@ export class Calendar {
     const currentMonthDays = [];
     const nextMonthDays = [];
 
-    const appointmentsByDateAndStatus = new Map<string, Map<AppointmentStatus, Array<AppointmentDisplay>>>();
+    const appointmentsByDateAndStatus = new Map<
+      string,
+      Map<AppointmentStatus, Array<AppointmentDisplay>>
+    >();
 
     this.appointments.forEach((appointment: AppointmentDisplay) => {
       const date: Date = appointment.appointmentDateTime;
@@ -442,7 +489,10 @@ export class Calendar {
         appointmentsByDateAndStatus.set(dateKey, new Map());
       }
 
-      const appointmentsByStatus: Map<AppointmentStatus, Array<AppointmentDisplay>> = appointmentsByDateAndStatus.get(dateKey);
+      const appointmentsByStatus: Map<
+        AppointmentStatus,
+        Array<AppointmentDisplay>
+      > = appointmentsByDateAndStatus.get(dateKey);
 
       for (const statusType of ['requested', 'scheduled', 'denied', 'completed', 'cancelled']) {
         if (!appointmentsByStatus.has(statusType as AppointmentStatus)) {
@@ -456,7 +506,10 @@ export class Calendar {
     const daysInPrevMonth: number = this.getDaysInMonth(year, month - 1);
     for (let i: number = firstDayOfMonth - 1; i >= 0; i--) {
       prevMonthDays.push(
-        <div class="flex w-full items-center justify-center bg-gray-200 px-3 py-2 text-center text-sm text-gray-400" onClick={this.handlePreviousMonth}>
+        <div
+          class="flex w-full items-center justify-center bg-gray-200 px-3 py-2 text-center text-sm text-gray-400"
+          onClick={this.handlePreviousMonth}
+        >
           {daysInPrevMonth - i}
         </div>,
       );
@@ -473,82 +526,87 @@ export class Calendar {
         appointmentsForDay = appointmentsByDateAndStatus.get(dateKey);
       }
 
-      const isToday: boolean = i === today.getDate() && this.currentViewMonth === today.getMonth() && this.currentViewYear === today.getFullYear();
+      const isToday: boolean =
+        i === today.getDate() &&
+        this.currentViewMonth === today.getMonth() &&
+        this.currentViewYear === today.getFullYear();
       const isPastDate: boolean = currentDate.getTime() >= today.getTime();
 
       currentMonthDays.push(
         <div
           role="button"
-          class={`relative flex w-full flex-col items-center justify-start text-sm cursor-pointer hover:border-2 hover:border-[#9d83c6]`}
+          class={`relative flex w-full cursor-pointer flex-col items-center justify-start text-sm hover:border-2 hover:border-[#9d83c6]`}
           onClick={(event: MouseEvent) => {
             event.stopPropagation();
             this.handleSelectDate(currentDate);
           }}
         >
-          <div class={`relative flex w-full flex-col items-center py-1 mb-[1px] ${isToday && 'bg-[#7357be] text-white'}`}>
+          <div
+            class={`relative mb-[1px] flex w-full flex-col items-center py-1 ${isToday && 'bg-[#7357be] text-white'}`}
+          >
             <div class="h-full w-full text-center">{i}</div>
           </div>
 
           <div class="flex h-full w-full flex-row flex-wrap items-start justify-center gap-1">
-            {appointmentsForDay && isPastDate && ["scheduled", "requested"].map((appointmentStatus: AppointmentStatus) => {
-              if (appointmentsForDay.get(appointmentStatus).length === 0) return;
+            {appointmentsForDay &&
+              isPastDate &&
+              ['scheduled', 'requested'].map((appointmentStatus: AppointmentStatus) => {
+                if (appointmentsForDay.get(appointmentStatus).length === 0) return;
 
-              return (
-                <button
-                  class="circle-container group relative"
-                  onClick={(event: MouseEvent) => {
-                    event.stopPropagation();
-                    this.handleSelectAppointmentStatusGroup(currentDate, appointmentStatus);
-                  }}
-                >
-                  <div
-                    class={`circle cursor-pointer rounded-full transition-all duration-200
-                      h-5 w-5 hover:h-6 hover:w-6
-                      sm:h-6 sm:w-6 sm:hover:h-7 sm:hover:w-7
-                      md:h-7 md:w-7 md:hover:h-8 md:hover:w-8
-                      lg:h-8 lg:w-8 lg:hover:h-9 lg:hover:w-9
-                      flex items-center justify-center text-white
-                    `}
-                    style={{
-                      backgroundColor: AppointmentStatusColor[appointmentStatus].background,
+                return (
+                  <button
+                    class="circle-container group relative"
+                    onClick={(event: MouseEvent) => {
+                      event.stopPropagation();
+                      this.handleSelectAppointmentStatusGroup(currentDate, appointmentStatus);
                     }}
                   >
-                    {appointmentsForDay.get(appointmentStatus).length}
-                  </div>
+                    <div
+                      class={`circle flex h-5 w-5 cursor-pointer items-center justify-center rounded-full text-white transition-all duration-200 hover:h-6 hover:w-6 sm:h-6 sm:w-6 sm:hover:h-7 sm:hover:w-7 md:h-7 md:w-7 md:hover:h-8 md:hover:w-8 lg:h-8 lg:w-8 lg:hover:h-9 lg:hover:w-9`}
+                      style={{
+                        backgroundColor: AppointmentStatusColor[appointmentStatus].background,
+                      }}
+                    >
+                      {appointmentsForDay.get(appointmentStatus).length}
+                    </div>
 
-                  {this.getAppointmentStatusGroupTooltipContent(appointmentStatus, appointmentsForDay.get(appointmentStatus).length)}
-                </button>
-            )})}
+                    {this.getAppointmentStatusGroupTooltipContent(
+                      appointmentStatus,
+                      appointmentsForDay.get(appointmentStatus).length,
+                    )}
+                  </button>
+                );
+              })}
 
-            {appointmentsForDay && !isPastDate && ["completed", "cancelled"].map((appointmentStatus: AppointmentStatus) => {
-              if (appointmentsForDay.get(appointmentStatus).length === 0) return;
+            {appointmentsForDay &&
+              !isPastDate &&
+              ['completed', 'cancelled'].map((appointmentStatus: AppointmentStatus) => {
+                if (appointmentsForDay.get(appointmentStatus).length === 0) return;
 
-              return (
-                <button
-                  class="circle-container group relative"
-                  onClick={(event: MouseEvent) => {
-                    event.stopPropagation();
-                    this.handleSelectAppointmentStatusGroup(currentDate, appointmentStatus);
-                  }}
-                >
-                  <div
-                    class={`circle cursor-pointer rounded-full transition-all duration-200
-                      h-5 w-5 hover:h-6 hover:w-6
-                      sm:h-6 sm:w-6 sm:hover:h-7 sm:hover:w-7
-                      md:h-7 md:w-7 md:hover:h-8 md:hover:w-8
-                      lg:h-8 lg:w-8 lg:hover:h-9 lg:hover:w-9
-                      flex items-center justify-center text-white
-                    `}
-                    style={{
-                      backgroundColor: AppointmentStatusColor[appointmentStatus].background,
+                return (
+                  <button
+                    class="circle-container group relative"
+                    onClick={(event: MouseEvent) => {
+                      event.stopPropagation();
+                      this.handleSelectAppointmentStatusGroup(currentDate, appointmentStatus);
                     }}
                   >
-                    {appointmentsForDay.get(appointmentStatus).length}
-                  </div>
+                    <div
+                      class={`circle flex h-5 w-5 cursor-pointer items-center justify-center rounded-full text-white transition-all duration-200 hover:h-6 hover:w-6 sm:h-6 sm:w-6 sm:hover:h-7 sm:hover:w-7 md:h-7 md:w-7 md:hover:h-8 md:hover:w-8 lg:h-8 lg:w-8 lg:hover:h-9 lg:hover:w-9`}
+                      style={{
+                        backgroundColor: AppointmentStatusColor[appointmentStatus].background,
+                      }}
+                    >
+                      {appointmentsForDay.get(appointmentStatus).length}
+                    </div>
 
-                  {this.getAppointmentStatusGroupTooltipContent(appointmentStatus, appointmentsForDay.get(appointmentStatus).length)}
-                </button>
-            )})}
+                    {this.getAppointmentStatusGroupTooltipContent(
+                      appointmentStatus,
+                      appointmentsForDay.get(appointmentStatus).length,
+                    )}
+                  </button>
+                );
+              })}
           </div>
         </div>,
       );
@@ -558,8 +616,10 @@ export class Calendar {
     const remainingCells: number = totalCells - (prevMonthDays.length + currentMonthDays.length);
     for (let i = 1; i <= remainingCells; i++) {
       nextMonthDays.push(
-        <div class="flex w-full items-center justify-center bg-gray-200 px-3 py-2 text-center text-sm text-gray-400"
-             onClick={this.handleNextMonth}>
+        <div
+          class="flex w-full items-center justify-center bg-gray-200 px-3 py-2 text-center text-sm text-gray-400"
+          onClick={this.handleNextMonth}
+        >
           {i}
         </div>,
       );
@@ -585,5 +645,5 @@ export class Calendar {
         </div>
       </div>
     );
-  };
+  }
 }

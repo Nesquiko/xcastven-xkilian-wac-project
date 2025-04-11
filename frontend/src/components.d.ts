@@ -21,13 +21,18 @@ export namespace Components {
         "handleAcceptAppointment": (appointment: PatientAppointment | DoctorAppointment) => void;
         "handleCancelAppointment": (appointment: PatientAppointment | DoctorAppointment) => void;
         "handleDenyAppointment": (appointment: PatientAppointment | DoctorAppointment) => void;
-        "handleRescheduleAppointment": (appointment: PatientAppointment | DoctorAppointment) => void;
+        "handleRescheduleAppointment": (
+    appointment: PatientAppointment | DoctorAppointment,
+  ) => void;
         "handleResetSelection": () => void;
-        "handleSaveResourcesOnAppointment": (appointment: PatientAppointment | DoctorAppointment, resources: {
-    facility: Facility,
-    equipment: Equipment,
-    medicine: Medicine,
-  }) => void;
+        "handleSaveResourcesOnAppointment": (
+    appointment: PatientAppointment | DoctorAppointment,
+    resources: {
+      facility: Facility;
+      equipment: Equipment;
+      medicine: Medicine;
+    },
+  ) => void;
         "isDoctor": boolean;
         "user": User;
     }
@@ -78,19 +83,27 @@ export namespace Components {
     interface XcastvenXkilianProjectDrawer {
         "activeTab": number;
         "getAppointmentsForDate": (date: Date) => Array<AppointmentDisplay>;
-        "getAppointmentsForDateByStatus": (date: Date, appointmentStatus: AppointmentStatus) => Array<AppointmentDisplay>;
+        "getAppointmentsForDateByStatus": (
+    date: Date,
+    appointmentStatus: AppointmentStatus,
+  ) => Array<AppointmentDisplay>;
         "getConditionsForDate": (date: Date) => Array<ConditionDisplay>;
         "getPrescriptionsForDate": (date: Date) => Array<PrescriptionDisplay>;
         "handleAcceptAppointment": (appointment: PatientAppointment | DoctorAppointment) => void;
         "handleCancelAppointment": (appointment: PatientAppointment | DoctorAppointment) => void;
         "handleDenyAppointment": (appointment: PatientAppointment | DoctorAppointment) => void;
-        "handleRescheduleAppointment": (appointment: PatientAppointment | DoctorAppointment) => void;
+        "handleRescheduleAppointment": (
+    appointment: PatientAppointment | DoctorAppointment,
+  ) => void;
         "handleResetSelection": () => void;
-        "handleSaveResourcesOnAppointment": (appointment: PatientAppointment | DoctorAppointment, resources: {
-    facility: Facility,
-    equipment: Equipment,
-    medicine: Medicine,
-  }) => void;
+        "handleSaveResourcesOnAppointment": (
+    appointment: PatientAppointment | DoctorAppointment,
+    resources: {
+      facility: Facility;
+      equipment: Equipment;
+      medicine: Medicine;
+    },
+  ) => void;
         "handleScheduleAppointmentFromCondition": (condition: Condition) => void;
         "handleSelectAppointment": (appointment: AppointmentDisplay) => void;
         "handleSelectCondition": (condition: ConditionDisplay) => void;
@@ -116,7 +129,7 @@ export namespace Components {
         "handleNextMonth"?: () => void;
         "handlePreviousMonth"?: () => void;
         "handleYearChange"?: (event: Event) => void;
-        "type": "calendar" | "account" | "scheduleAppointment" | "registerCondition";
+        "type": 'calendar' | 'account' | 'scheduleAppointment' | 'registerCondition';
     }
     interface XcastvenXkilianProjectHomePage {
     }
@@ -280,13 +293,18 @@ declare namespace LocalJSX {
         "handleAcceptAppointment"?: (appointment: PatientAppointment | DoctorAppointment) => void;
         "handleCancelAppointment"?: (appointment: PatientAppointment | DoctorAppointment) => void;
         "handleDenyAppointment"?: (appointment: PatientAppointment | DoctorAppointment) => void;
-        "handleRescheduleAppointment"?: (appointment: PatientAppointment | DoctorAppointment) => void;
+        "handleRescheduleAppointment"?: (
+    appointment: PatientAppointment | DoctorAppointment,
+  ) => void;
         "handleResetSelection"?: () => void;
-        "handleSaveResourcesOnAppointment"?: (appointment: PatientAppointment | DoctorAppointment, resources: {
-    facility: Facility,
-    equipment: Equipment,
-    medicine: Medicine,
-  }) => void;
+        "handleSaveResourcesOnAppointment"?: (
+    appointment: PatientAppointment | DoctorAppointment,
+    resources: {
+      facility: Facility;
+      equipment: Equipment;
+      medicine: Medicine;
+    },
+  ) => void;
         "isDoctor"?: boolean;
         "user"?: User;
     }
@@ -337,19 +355,27 @@ declare namespace LocalJSX {
     interface XcastvenXkilianProjectDrawer {
         "activeTab"?: number;
         "getAppointmentsForDate"?: (date: Date) => Array<AppointmentDisplay>;
-        "getAppointmentsForDateByStatus"?: (date: Date, appointmentStatus: AppointmentStatus) => Array<AppointmentDisplay>;
+        "getAppointmentsForDateByStatus"?: (
+    date: Date,
+    appointmentStatus: AppointmentStatus,
+  ) => Array<AppointmentDisplay>;
         "getConditionsForDate"?: (date: Date) => Array<ConditionDisplay>;
         "getPrescriptionsForDate"?: (date: Date) => Array<PrescriptionDisplay>;
         "handleAcceptAppointment"?: (appointment: PatientAppointment | DoctorAppointment) => void;
         "handleCancelAppointment"?: (appointment: PatientAppointment | DoctorAppointment) => void;
         "handleDenyAppointment"?: (appointment: PatientAppointment | DoctorAppointment) => void;
-        "handleRescheduleAppointment"?: (appointment: PatientAppointment | DoctorAppointment) => void;
+        "handleRescheduleAppointment"?: (
+    appointment: PatientAppointment | DoctorAppointment,
+  ) => void;
         "handleResetSelection"?: () => void;
-        "handleSaveResourcesOnAppointment"?: (appointment: PatientAppointment | DoctorAppointment, resources: {
-    facility: Facility,
-    equipment: Equipment,
-    medicine: Medicine,
-  }) => void;
+        "handleSaveResourcesOnAppointment"?: (
+    appointment: PatientAppointment | DoctorAppointment,
+    resources: {
+      facility: Facility;
+      equipment: Equipment;
+      medicine: Medicine;
+    },
+  ) => void;
         "handleScheduleAppointmentFromCondition"?: (condition: Condition) => void;
         "handleSelectAppointment"?: (appointment: AppointmentDisplay) => void;
         "handleSelectCondition"?: (condition: ConditionDisplay) => void;
@@ -375,7 +401,7 @@ declare namespace LocalJSX {
         "handleNextMonth"?: () => void;
         "handlePreviousMonth"?: () => void;
         "handleYearChange"?: (event: Event) => void;
-        "type"?: "calendar" | "account" | "scheduleAppointment" | "registerCondition";
+        "type"?: 'calendar' | 'account' | 'scheduleAppointment' | 'registerCondition';
     }
     interface XcastvenXkilianProjectHomePage {
     }

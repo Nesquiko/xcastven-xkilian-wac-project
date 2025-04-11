@@ -1,4 +1,9 @@
-import { AppointmentDisplay, ConditionDisplay, PatientsCalendar, PrescriptionDisplay } from '../api/generated';
+import {
+  AppointmentDisplay,
+  ConditionDisplay,
+  PatientsCalendar,
+  PrescriptionDisplay,
+} from '../api/generated';
 
 export const PatientsCalendarExample: PatientsCalendar = {
   appointments: [

@@ -33,7 +33,9 @@ export class ConditionDetail {
             </md-icon-button>
           </div>
 
-          <h2 class="mb-6 w-full text-center text-xl font-medium text-[#7357be]">Condition details</h2>
+          <h2 class="mb-6 w-full text-center text-xl font-medium text-[#7357be]">
+            Condition details
+          </h2>
         </div>
 
         <div class="mb-6 w-full max-w-md rounded-md bg-gray-200 px-4 py-3">
@@ -68,14 +70,18 @@ export class ConditionDetail {
                   <md-icon style={{ fontSize: '16px' }}>timer</md-icon>
                   Duration
                 </div>
-                <span class="font-medium text-gray-600">{formatDateDelta(this.condition.start, this.condition.end)}</span>
+                <span class="font-medium text-gray-600">
+                  {formatDateDelta(this.condition.start, this.condition.end)}
+                </span>
               </div>
             </>
           )}
 
           <div class="flex w-full flex-row items-center justify-between">
             <div class="flex flex-row items-center gap-x-2 text-gray-500">
-              <md-icon style={{ fontSize: '16px' }}>{this.condition.end ? 'check_circle' : 'pending'}</md-icon>
+              <md-icon style={{ fontSize: '16px' }}>
+                {this.condition.end ? 'check_circle' : 'pending'}
+              </md-icon>
               Status
             </div>
             <span class="font-medium text-gray-600">{this.condition.end ? 'Gone' : 'Ongoing'}</span>
@@ -89,8 +95,13 @@ export class ConditionDetail {
               Appointments
             </div>
             {this.condition.appointments.length > 0 && (
-              <md-icon-button onClick={() => this.toggleConditionAppointments(this.condition.id)} style={{ width: '24px', height: '24px' }}>
-                <md-icon>{this.expandedConditionId === this.condition.id ? 'expand_less' : 'expand_more'}</md-icon>
+              <md-icon-button
+                onClick={() => this.toggleConditionAppointments(this.condition.id)}
+                style={{ width: '24px', height: '24px' }}
+              >
+                <md-icon>
+                  {this.expandedConditionId === this.condition.id ? 'expand_less' : 'expand_more'}
+                </md-icon>
               </md-icon-button>
             )}
           </div>

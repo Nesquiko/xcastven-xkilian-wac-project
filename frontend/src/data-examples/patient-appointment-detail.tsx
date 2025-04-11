@@ -1,4 +1,9 @@
-import { ConditionDisplay, Doctor, PatientAppointment, PrescriptionDisplay } from '../api/generated';
+import {
+  ConditionDisplay,
+  Doctor,
+  PatientAppointment,
+  PrescriptionDisplay,
+} from '../api/generated';
 
 export const PatientAppointmentDetailExample: PatientAppointment = {
   id: 'patient-appointment-detail-1',

@@ -84,13 +84,13 @@ export class Login {
             )}
 
             <md-text-button
-              class="w-full rounded-full mb-3"
+              class="mb-3 w-full rounded-full"
               onClick={() => window.navigation.navigate('register')}
             >
               Don't have an account?
             </md-text-button>
 
-            <div class="flex flex-row items-center justify-between gap-x-3 mb-6">
+            <div class="mb-6 flex flex-row items-center justify-between gap-x-3">
               <md-outlined-button
                 class="w-1/2 rounded-full px-4 py-3"
                 onClick={() => this.handleLogin(UserRole.Doctor)}

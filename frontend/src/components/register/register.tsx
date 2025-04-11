@@ -139,7 +139,7 @@ export class Register {
             )}
 
             <md-text-button
-              class="w-full rounded-full mb-3"
+              class="mb-3 w-full rounded-full"
               onClick={() => window.navigation.navigate('login')}
             >
               Already have an account?

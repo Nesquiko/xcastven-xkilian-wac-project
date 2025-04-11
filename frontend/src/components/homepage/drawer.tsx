@@ -213,9 +213,7 @@ export class Drawer {
             />
           ) : (
             this.showLegend && (
-              <xcastven-xkilian-project-legend
-                handleResetSelection={this.handleResetSelection}
-              />
+              <xcastven-xkilian-project-legend handleResetSelection={this.handleResetSelection} />
             )
           )}
         </div>

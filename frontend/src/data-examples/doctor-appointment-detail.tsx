@@ -26,7 +26,13 @@ export const DoctorAppointmentDetailExample: DoctorAppointment = {
     email: 'patient@thefirst.sk',
     role: 'patient',
   } satisfies Patient,
-  facilities: [] satisfies Array<Facility>,
-  equipment: [] satisfies Array<Equipment>,
-  medicine: [] satisfies Array<Medicine>,
+  facilities: [
+    { id: "facility-1", name: 'Facility 1' },
+  ] satisfies Array<Facility>,
+  equipment: [
+    { id: 'equipment-1', name: 'Equipment 1' },
+  ] satisfies Array<Equipment>,
+  medicine: [
+    { id: 'medicine-1', name: 'Medicine 1' },
+  ] satisfies Array<Medicine>,
 } satisfies DoctorAppointment;

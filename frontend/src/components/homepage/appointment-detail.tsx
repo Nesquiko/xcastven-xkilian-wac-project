@@ -50,9 +50,9 @@ export class AppointmentDetail {
   @State() availableEquipment: Array<Equipment> = AvailableResourcesExample.equipment;
   @State() availableFacilities: Array<Facility> = AvailableResourcesExample.facilities;
   @State() availableMedicine: Array<Medicine> = AvailableResourcesExample.medicine;
-  @State() selectedEquipment: Equipment = null;
-  @State() selectedFacility: Facility = null;
-  @State() selectedMedicine: Medicine = null;
+  @State() selectedEquipment: Equipment = instanceOfDoctorAppointment(this.appointment) ? this.appointment.equipment[0] : null;
+  @State() selectedFacility: Facility = instanceOfDoctorAppointment(this.appointment) ? this.appointment.facilities[0] : null;
+  @State() selectedMedicine: Medicine = instanceOfDoctorAppointment(this.appointment) ? this.appointment.medicine[0] : null;
 
   private getPatientAppointmentStatusMessage = (appointmentStatus: AppointmentStatus) => {
     switch (appointmentStatus) {

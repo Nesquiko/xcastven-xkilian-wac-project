@@ -116,27 +116,34 @@ export class Register {
             <div class="flex flex-row items-center justify-between gap-x-3">
               <md-filled-text-field
                 label="First Name"
-                class="mb-6 w-full"
+                class="mb-3 w-full"
                 value={this.firstName}
                 onInput={(e: Event) => this.handleFirstNameChange(e)}
               />
               <md-filled-text-field
                 label="Last Name"
-                class="mb-6 w-full"
+                class="mb-3 w-full"
                 value={this.lastName}
                 onInput={(e: Event) => this.handleLastNameChange(e)}
               />
             </div>
 
             {this.emailError ? (
-              <div class="mb-6 w-full text-center text-sm text-red-500">{this.emailError}</div>
+              <div class="mb-3 w-full text-center text-sm text-red-500">{this.emailError}</div>
             ) : this.firstNameError ? (
-              <div class="mb-6 w-full text-center text-sm text-red-500">{this.firstNameError}</div>
+              <div class="mb-3 w-full text-center text-sm text-red-500">{this.firstNameError}</div>
             ) : (
               this.lastNameError && (
-                <div class="mb-6 w-full text-center text-sm text-red-500">{this.lastNameError}</div>
+                <div class="mb-3 w-full text-center text-sm text-red-500">{this.lastNameError}</div>
               )
             )}
+
+            <md-text-button
+              class="w-full rounded-full mb-3"
+              onClick={() => window.navigation.navigate('login')}
+            >
+              Already have an account?
+            </md-text-button>
 
             <div class="flex flex-row items-center justify-between gap-x-3">
               <md-text-button

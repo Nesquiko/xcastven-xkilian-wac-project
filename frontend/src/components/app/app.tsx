@@ -48,11 +48,15 @@ export class App {
       } else if (this.relativePath.startsWith('login')) {
         element = <xcastven-xkilian-project-login api={this.api} />;
       } else if (this.relativePath.startsWith('registerCondition')) {
-        element = <xcastven-xkilian-project-condition-registerer />;
+        const urlParams = new URLSearchParams(window.location.search);
+        const start: string = urlParams.get('start');
+        element = <xcastven-xkilian-project-condition-registerer startDate={start ? new Date(start) : null} />;
       } else if (this.relativePath.startsWith('register')) {
         element = <xcastven-xkilian-project-register api={this.api} />;
       } else if (this.relativePath.startsWith('scheduleAppointment')) {
-        element = <xcastven-xkilian-project-appointment-scheduler />;
+        const urlParams = new URLSearchParams(window.location.search);
+        const date: string = urlParams.get('date');
+        element = <xcastven-xkilian-project-appointment-scheduler initialDate={date ? new Date(date) : null} />;
       } else if (this.relativePath.startsWith('account')) {
         element = <xcastven-xkilian-project-account />;
       }

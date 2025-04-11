@@ -37,9 +37,11 @@ export namespace Components {
         "user": User;
     }
     interface XcastvenXkilianProjectAppointmentScheduler {
+        "initialDate": Date;
     }
     interface XcastvenXkilianProjectAppointmentsList {
         "appointments": Array<AppointmentDisplay>;
+        "currentDate": Date;
         "handleSelectAppointment": (appointment: AppointmentDisplay) => void;
         "isDoctor": boolean;
         "noDataMessage": string;
@@ -75,9 +77,11 @@ export namespace Components {
         "handleToggleConditionStatus": (condition: Condition) => void;
     }
     interface XcastvenXkilianProjectConditionRegisterer {
+        "startDate": Date;
     }
     interface XcastvenXkilianProjectConditionsList {
         "conditions": Array<ConditionDisplay>;
+        "currentDate": Date;
         "handleSelectCondition": (condition: ConditionDisplay) => void;
     }
     interface XcastvenXkilianProjectDrawer {
@@ -309,9 +313,11 @@ declare namespace LocalJSX {
         "user"?: User;
     }
     interface XcastvenXkilianProjectAppointmentScheduler {
+        "initialDate"?: Date;
     }
     interface XcastvenXkilianProjectAppointmentsList {
         "appointments"?: Array<AppointmentDisplay>;
+        "currentDate"?: Date;
         "handleSelectAppointment"?: (appointment: AppointmentDisplay) => void;
         "isDoctor"?: boolean;
         "noDataMessage"?: string;
@@ -347,9 +353,11 @@ declare namespace LocalJSX {
         "handleToggleConditionStatus"?: (condition: Condition) => void;
     }
     interface XcastvenXkilianProjectConditionRegisterer {
+        "startDate"?: Date;
     }
     interface XcastvenXkilianProjectConditionsList {
         "conditions"?: Array<ConditionDisplay>;
+        "currentDate"?: Date;
         "handleSelectCondition"?: (condition: ConditionDisplay) => void;
     }
     interface XcastvenXkilianProjectDrawer {

@@ -1,5 +1,5 @@
 import { AppointmentDisplay, User } from '../../api/generated';
-import { formatTime, getDateAndTimeTitle } from '../../utils/utils';
+import { formatTime, getDateAndTimeTitle, TODAY } from '../../utils/utils';
 import { Component, h, Prop } from '@stencil/core';
 
 @Component({
@@ -12,6 +12,15 @@ export class AppointmentsList {
   @Prop() appointments: Array<AppointmentDisplay>;
   @Prop() handleSelectAppointment: (appointment: AppointmentDisplay) => void;
   @Prop() noDataMessage: string;
+  @Prop() currentDate: Date;
+
+  private handleScheduleAppointmentFromDate = () => {
+    const year: number = this.currentDate.getFullYear();
+    const month: number = this.currentDate.getMonth() + 1;
+    const day: number = this.currentDate.getDate();
+    const date = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    window.navigation.navigate(`scheduleAppointment?date=${date}`);
+  };
 
   render() {
     return (
@@ -61,7 +70,8 @@ export class AppointmentsList {
           <md-icon-button
             title="Schedule an appointment"
             class="m-1 w-20"
-            onClick={() => console.log('schedule an appointment')}
+            onClick={this.handleScheduleAppointmentFromDate}
+            disabled={this.currentDate < TODAY}
           >
             <md-icon class="text-gray-600">calendar_month</md-icon>
             <md-icon class="text-gray-600">add</md-icon>

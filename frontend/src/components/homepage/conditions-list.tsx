@@ -1,5 +1,5 @@
 import { ConditionDisplay } from '../../api/generated';
-import { formatDate } from '../../utils/utils';
+import { formatDate, TODAY } from '../../utils/utils';
 import { Component, h, Prop, State } from '@stencil/core';
 
 @Component({
@@ -9,8 +9,17 @@ import { Component, h, Prop, State } from '@stencil/core';
 export class ConditionsList {
   @Prop() conditions: Array<ConditionDisplay>;
   @Prop() handleSelectCondition: (condition: ConditionDisplay) => void;
+  @Prop() currentDate: Date;
 
   @State() expandedConditionId: string = null;
+
+  private handleRegisterConditionFromDate = () => {
+    const year: number = this.currentDate.getFullYear();
+    const month: number = this.currentDate.getMonth() + 1;
+    const day: number = this.currentDate.getDate();
+    const start = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    window.navigation.navigate(`registerCondition?start=${start}`);
+  };
 
   render() {
     return (
@@ -79,7 +88,8 @@ export class ConditionsList {
           <md-icon-button
             title="Register a condition"
             class="m-1 w-20"
-            onClick={() => console.log('register a condition')}
+            onClick={this.handleRegisterConditionFromDate}
+            disabled={this.currentDate > TODAY}
           >
             <md-icon class="text-gray-600">coronavirus</md-icon>
             <md-icon class="text-gray-600">add</md-icon>

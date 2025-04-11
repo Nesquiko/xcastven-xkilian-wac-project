@@ -116,6 +116,7 @@ export class Drawer {
                     appointments={this.getAppointmentsForDate(this.selectedDate)}
                     handleSelectAppointment={this.handleSelectAppointment}
                     noDataMessage="No appointments for this date"
+                    currentDate={this.selectedDate}
                   />
                 </div>
 
@@ -124,6 +125,7 @@ export class Drawer {
                   <xcastven-xkilian-project-conditions-list
                     conditions={this.getConditionsForDate(this.selectedDate)}
                     handleSelectCondition={this.handleSelectCondition}
+                    currentDate={this.selectedDate}
                   />
                 </div>
 
@@ -179,6 +181,7 @@ export class Drawer {
                     )}
                     handleSelectAppointment={this.handleSelectAppointment}
                     noDataMessage={'No ' + displayStatus + ' appointments for this date'}
+                    currentDate={this.selectedDate}
                   />
                 </div>
               </div>
@@ -210,7 +213,9 @@ export class Drawer {
             />
           ) : (
             this.showLegend && (
-              <xcastven-xkilian-project-legend handleResetSelection={this.handleResetSelection} />
+              <xcastven-xkilian-project-legend
+                handleResetSelection={this.handleResetSelection}
+              />
             )
           )}
         </div>

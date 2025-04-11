@@ -1,11 +1,13 @@
 import { DAYS_OF_WEEK, formatDate, formatDateDelta, MONTHS, TODAY } from '../../utils/utils';
-import { Component, h, State } from '@stencil/core';
+import { Component, h, Prop, State } from '@stencil/core';
 
 @Component({
   tag: 'xcastven-xkilian-project-condition-registerer',
   shadow: false,
 })
 export class ConditionRegisterer {
+  @Prop() startDate: Date = null;
+
   @State() selectedStart: Date = null;
   @State() selectedEnd: Date = null;
   @State() conditionName: string = '';
@@ -18,6 +20,12 @@ export class ConditionRegisterer {
 
   @State() currentViewMonth: number = TODAY.getMonth();
   @State() currentViewYear: number = TODAY.getFullYear();
+
+  componentWillLoad() {
+    if (this.startDate) {
+      this.selectedStart = this.startDate;
+    }
+  }
 
   private getDaysInMonth = (year: number, month: number) => {
     return new Date(year, month + 1, 0).getDate();

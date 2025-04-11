@@ -74,22 +74,29 @@ export class Login {
           <div class="w-full p-6">
             <md-filled-text-field
               label="Email"
-              class="mb-6 w-full"
+              class="mb-3 w-full"
               value={this.email}
               onInput={(e: Event) => this.handleEmailChange(e)}
             />
 
             {this.emailError && (
-              <div class="mb-6 w-full text-center text-sm text-red-500">{this.emailError}</div>
+              <div class="mb-3 w-full text-center text-sm text-red-500">{this.emailError}</div>
             )}
 
-            <div class="flex flex-row items-center justify-between gap-x-3">
-              <md-text-button
+            <md-text-button
+              class="w-full rounded-full mb-3"
+              onClick={() => window.navigation.navigate('register')}
+            >
+              Don't have an account?
+            </md-text-button>
+
+            <div class="flex flex-row items-center justify-between gap-x-3 mb-6">
+              <md-outlined-button
                 class="w-1/2 rounded-full px-4 py-3"
                 onClick={() => this.handleLogin(UserRole.Doctor)}
               >
                 Login as doctor
-              </md-text-button>
+              </md-outlined-button>
               <md-filled-button
                 class="w-1/2 rounded-full bg-[#9d83c6] px-4 py-3"
                 onClick={() => this.handleLogin(UserRole.Patient)}

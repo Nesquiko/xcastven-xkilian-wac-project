@@ -3,13 +3,15 @@ import { AppointmentTimesExample } from '../../data-examples/appointment-times';
 import { AppointmentTypesExample } from '../../data-examples/appointment-types';
 import { AvailableDoctorsExample } from '../../data-examples/available-doctors';
 import { DAYS_OF_WEEK, getDateAndTimeTitle, MONTHS, TODAY } from '../../utils/utils';
-import { Component, h, State } from '@stencil/core';
+import { Component, h, Prop, State } from '@stencil/core';
 
 @Component({
   tag: 'xcastven-xkilian-project-appointment-scheduler',
   shadow: false,
 })
 export class AppointmentScheduler {
+  @Prop() initialDate: Date = null;
+
   @State() selectedDate: Date = null;
   @State() selectedTime: string = null;
   @State() selectedAppointmentType: string;
@@ -21,6 +23,12 @@ export class AppointmentScheduler {
   private availableTimes: Array<TimeSlot> = AppointmentTimesExample;
   private appointmentTypes: Array<AppointmentType> = AppointmentTypesExample;
   private doctors: Array<Doctor> = AvailableDoctorsExample;
+
+  componentWillLoad() {
+    if (this.initialDate) {
+      this.selectedDate = this.initialDate;
+    }
+  }
 
   private getDaysInMonth = (year: number, month: number) => {
     return new Date(year, month + 1, 0).getDate();

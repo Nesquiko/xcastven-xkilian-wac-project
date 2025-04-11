@@ -1,6 +1,6 @@
 import { ApiError } from '../../api/api';
 import { Registration, UserRole } from '../../api/generated';
-import { Api } from '../../components';
+import { Api } from '../../api/api';
 import { StyledHost } from '../StyledHost';
 import { Component, h, Prop, State } from '@stencil/core';
 
@@ -84,7 +84,8 @@ export class Register {
       }
 
       if (err.errDetail.status === 409) {
-        // TODO kili conflicting email
+        this.emailError = 'This email already has an account';
+        return;
       }
     }
   };

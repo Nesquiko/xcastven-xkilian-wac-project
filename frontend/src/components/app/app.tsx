@@ -37,7 +37,7 @@ export class App {
   }
 
   render() {
-    let element: string = 'homepage';
+    let element: string;
     const user: LoginRequest | null = JSON.parse(sessionStorage.getItem('user'));
 
     if (!user && !this.relativePath.startsWith('register')) {
@@ -47,12 +47,14 @@ export class App {
         element = <xcastven-xkilian-project-home-page />;
       } else if (this.relativePath.startsWith('login')) {
         element = <xcastven-xkilian-project-login api={this.api} />;
+      } else if (this.relativePath.startsWith('registerCondition')) {
+        element = <xcastven-xkilian-project-condition-registerer />;
       } else if (this.relativePath.startsWith('register')) {
         element = <xcastven-xkilian-project-register api={this.api} />;
       } else if (this.relativePath.startsWith('scheduleAppointment')) {
         element = <xcastven-xkilian-project-appointment-scheduler />;
-      } else if (this.relativePath.startsWith('registerCondition')) {
-        element = <xcastven-xkilian-project-condition-registerer />;
+      } else if (this.relativePath.startsWith('account')) {
+        element = <xcastven-xkilian-project-account />;
       }
     }
 

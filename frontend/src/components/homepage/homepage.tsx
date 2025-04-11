@@ -1,11 +1,12 @@
 import {
   AppointmentDisplay,
-  AppointmentStatus,
-  ConditionDisplay,
+  AppointmentStatus, Condition,
+  ConditionDisplay, DoctorAppointment, Equipment, Facility, Medicine, PatientAppointment,
   PrescriptionDisplay,
-  UserRole,
+  User,
 } from '../../api/generated';
 import { PatientsCalendarExample } from '../../data-examples/patients-calendar';
+import { DoctorsCalendarExample } from '../../data-examples/doctors-calendar';
 import { TODAY } from '../../utils/utils';
 import { StyledHost } from '../StyledHost';
 import { Component, h, State } from '@stencil/core';
@@ -15,10 +16,10 @@ import { Component, h, State } from '@stencil/core';
   shadow: false,
 })
 export class Homepage {
-  private user: { email: string; role: UserRole } = JSON.parse(sessionStorage.getItem('user'));
+  private user: User = JSON.parse(sessionStorage.getItem('user'));
   private isDoctor: boolean = this.user.role === 'doctor';
 
-  @State() appointments: Array<AppointmentDisplay> = PatientsCalendarExample.appointments;
+  @State() appointments: Array<AppointmentDisplay> = DoctorsCalendarExample.appointments;
   @State() conditions: Array<ConditionDisplay> = PatientsCalendarExample.conditions;
   @State() prescriptions: Array<PrescriptionDisplay> = PatientsCalendarExample.prescriptions;
 
@@ -36,6 +37,8 @@ export class Homepage {
 
   @State() currentViewMonth: number = TODAY.getMonth();
   @State() currentViewYear: number = TODAY.getFullYear();
+
+  @State() activeTab: number = 0;
 
   private handlePreviousMonth = () => {
     if (this.currentViewMonth === 0) {
@@ -67,20 +70,31 @@ export class Homepage {
     this.isDrawerOpen = true;
   };
 
-  private handleScheduleAppointment = () => {
-    console.log('Schedule an appointment');
+  private handleRescheduleAppointment = (appointment: PatientAppointment | DoctorAppointment) => {
+    console.log('Re-schedule appointment:', appointment);
   };
 
-  private handleRegisterCondition = () => {
-    console.log('Register a condition');
+  private handleCancelAppointment = (appointment: PatientAppointment | DoctorAppointment) => {
+    console.log('Cancel appointment:', appointment);
   };
 
-  private handleRescheduleAppointment = () => {
-    console.log('Re-schedule appointment:', this.selectedAppointment);
+  private handleAcceptAppointment = (appointment: PatientAppointment | DoctorAppointment) => {
+    console.log('Accept appointment:', appointment);
   };
 
-  private handleCancelAppointment = () => {
-    console.log('Cancel appointment:', this.selectedAppointment);
+  private handleDenyAppointment = (appointment: PatientAppointment | DoctorAppointment) => {
+    console.log('Deny appointment', appointment);
+  };
+
+  private handleSaveResourcesOnAppointment = (
+    appointment: PatientAppointment | DoctorAppointment,
+    resources: {
+      facility: Facility,
+      equipment: Equipment,
+      medicine: Medicine,
+    }
+  ) => {
+    console.log('Save resources on appointment', appointment, resources);
   };
 
   private handleResetSelection = () => {
@@ -95,6 +109,7 @@ export class Homepage {
   private handleSelectDate = (date: Date) => {
     this.handleResetSelection();
     this.selectedDate = date;
+    this.selectedAppointmentStatusGroup = "scheduled";
     this.isDrawerOpen = true;
   };
 
@@ -121,17 +136,25 @@ export class Homepage {
     this.selectedDate = date;
     this.selectedAppointmentStatusGroup = appointmentStatus;
     this.isDrawerOpen = true;
+
+    if (this.isDoctor) {
+      const statusToTabIndex: Record<AppointmentStatus, number> = {
+        scheduled: 0,
+        requested: 1,
+        denied: 2,
+        completed: 3,
+        cancelled: 4,
+      };
+      this.activeTab = statusToTabIndex[appointmentStatus];
+    }
   };
 
-  private handleScheduleAppointmentFromCondition = () => {
-    console.log('Schedule an appointment for condition:', this.selectedCondition);
+  private handleScheduleAppointmentFromCondition = (condition: Condition) => {
+    console.log('Schedule an appointment for condition:', condition);
   };
 
-  private handleToggleConditionStatus = () => {
-    this.selectedCondition = {
-      ...this.selectedCondition,
-      end: new Date(),
-    };
+  private handleToggleConditionStatus = (condition: Condition) => {
+    console.log('Toggle status of condition:', condition);
   };
 
   private getAppointmentsForDate = (date: Date): Array<AppointmentDisplay> => {
@@ -178,6 +201,7 @@ export class Homepage {
     return (
       <StyledHost class="flex h-screen w-full flex-col overflow-hidden">
         <xcastven-xkilian-project-header
+          type="calendar"
           currentViewMonth={this.currentViewMonth}
           currentViewYear={this.currentViewYear}
           handlePreviousMonth={this.handlePreviousMonth}
@@ -209,8 +233,6 @@ export class Homepage {
         />
 
         <xcastven-xkilian-project-footer
-          handleScheduleAppointment={this.handleScheduleAppointment}
-          handleRegisterCondition={this.handleRegisterCondition}
           handleToggleLegendMenu={this.handleToggleLegendMenu}
         />
 
@@ -226,6 +248,8 @@ export class Homepage {
           selectedPrescription={this.selectedPrescription}
           selectedAppointmentStatusGroup={this.selectedAppointmentStatusGroup}
           showLegend={this.showLegend}
+          activeTab={this.activeTab}
+          handleTabChange={(event: any) => (this.activeTab = event.target.activeTabIndex)}
           handleResetSelection={this.handleResetSelection}
           getAppointmentsForDate={this.getAppointmentsForDate}
           getConditionsForDate={this.getConditionsForDate}
@@ -236,6 +260,9 @@ export class Homepage {
           handleSelectPrescription={this.handleSelectPrescription}
           handleRescheduleAppointment={this.handleRescheduleAppointment}
           handleCancelAppointment={this.handleCancelAppointment}
+          handleAcceptAppointment={this.handleAcceptAppointment}
+          handleDenyAppointment={this.handleDenyAppointment}
+          handleSaveResourcesOnAppointment={this.handleSaveResourcesOnAppointment}
           handleScheduleAppointmentFromCondition={this.handleScheduleAppointmentFromCondition}
           handleToggleConditionStatus={this.handleToggleConditionStatus}
         />

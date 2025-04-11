@@ -7,7 +7,7 @@ export const PatientsCalendarExample: PatientsCalendar = {
       appointmentDateTime: new Date(2025, 3, 4, 10, 0, 0, 0),
       type: 'regular_check',
       doctorName: 'John Doe',
-      patientName: 'Kili',
+      patientName: 'Jozef Pacient',
       status: 'scheduled',
     } satisfies AppointmentDisplay,
     {
@@ -15,7 +15,7 @@ export const PatientsCalendarExample: PatientsCalendar = {
       appointmentDateTime: new Date(2025, 3, 4, 11, 0, 0, 0),
       type: 'regular_check',
       doctorName: 'John Doe',
-      patientName: 'Kili',
+      patientName: 'Jozef Pacient',
       status: 'scheduled',
     } satisfies AppointmentDisplay,
     {
@@ -23,7 +23,7 @@ export const PatientsCalendarExample: PatientsCalendar = {
       appointmentDateTime: new Date(2025, 3, 4, 12, 0, 0, 0),
       type: 'regular_check',
       doctorName: 'John Doe',
-      patientName: 'Kili',
+      patientName: 'Jozef Pacient',
       status: 'scheduled',
     } satisfies AppointmentDisplay,
   ] satisfies Array<AppointmentDisplay>,

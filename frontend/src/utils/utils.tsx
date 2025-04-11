@@ -1,4 +1,11 @@
-import { AppointmentStatus, PatientAppointment } from '../api/generated';
+import {
+  AppointmentStatus,
+  DoctorAppointment,
+  Equipment,
+  Facility,
+  Medicine,
+  PatientAppointment,
+} from '../api/generated';
 import { h } from '@stencil/core';
 
 export const DAYS_OF_WEEK: Array<{ short: string; long: string }> = [
@@ -52,9 +59,9 @@ export const formatDateDelta = (startDate: Date, endDate: Date = new Date()) => 
     return formatDateDelta(endDate, startDate);
   }
 
-  let years = endDate.getFullYear() - startDate.getFullYear();
-  let months = endDate.getMonth() - startDate.getMonth();
-  let days = endDate.getDate() - startDate.getDate();
+  let years: number = endDate.getFullYear() - startDate.getFullYear();
+  let months: number = endDate.getMonth() - startDate.getMonth();
+  let days: number = endDate.getDate() - startDate.getDate();
 
   if (days < 0) {
     const previousMonth = new Date(endDate.getFullYear(), endDate.getMonth(), 0);
@@ -82,7 +89,7 @@ export const formatDateDelta = (startDate: Date, endDate: Date = new Date()) => 
   }
 
   if (days > 0 || (years === 0 && months === 0)) {
-    parts.push(`${days} ${days === 1 ? 'day' : 'days'}`);
+    parts.push(`${days + 1} ${days === 1 ? 'day' : 'days'}`);
   }
 
   if (parts.length === 1) {
@@ -107,7 +114,7 @@ export const AppointmentStatusColor = {
     background: '#2E8B57',
     foreground: '#ffffff',
   },
-  canceled: {
+  cancelled: {
     background: '#F08080',
     foreground: '#ffffff',
   },
@@ -121,37 +128,84 @@ export const ConditionOrderColors: Array<string> = ['#1976D2', '#7B1FA2', '#388E
 
 export const PrescriptionOrderColors: Array<string> = ['#FF8080', '#FF0000', '#800000', '#1A0000'];
 
-export const getAppointmentActions = (
+const patientButton = (
+  displayTitle: string,
+  widthClass: string,
+  onClick: (appointment: PatientAppointment) => void,
+) => {
+  return (
+    <md-filled-button class={`${widthClass} rounded-full bg-[#7357be]`} onClick={onClick}>
+      {displayTitle}
+    </md-filled-button>
+  );
+};
+
+export const getPatientAppointmentActions = (
   appointmentStatus: AppointmentStatus,
   handleRescheduleAppointment: (appointment: PatientAppointment) => void,
   handleCancelAppointment: (appointment: PatientAppointment) => void,
 ) => {
-  const rescheduleButton = (displayTitle: string, widthClass: string) => {
-    return (
-      <md-filled-button class={`${widthClass} rounded-full bg-[#7357be]`} onClick={handleRescheduleAppointment}>
-        {displayTitle}
-      </md-filled-button>
-    );
-  };
-
-  const cancelButton = (displayTitle: string, widthClass: string) => {
-    return (
-      <md-filled-button class={`${widthClass} rounded-full bg-[#7357be]`} onClick={handleCancelAppointment}>
-        {displayTitle}
-      </md-filled-button>
-    );
-  };
-
   switch (appointmentStatus) {
     case 'scheduled':
       return (
         <div class="flex w-full max-w-md flex-row items-center justify-between gap-x-3">
-          {rescheduleButton('Re-schedule', 'w-1/2')}
-          {cancelButton('Cancel', 'w-1/2')}
+          {patientButton('Re-schedule', 'w-1/2', handleRescheduleAppointment)}
+          {patientButton('Cancel', 'w-1/2', handleCancelAppointment)}
         </div>
       );
     case 'requested':
-      return <div class="flex w-full max-w-md flex-row items-center justify-between gap-x-3">{cancelButton('Cancel request', 'w-full')}</div>;
+      return (
+        <div class="flex w-full max-w-md flex-row items-center justify-between gap-x-3">
+          {patientButton('Cancel request', 'w-full', handleCancelAppointment)}
+        </div>
+      );
+    default:
+      return null;
+  }
+};
+
+const doctorButton = (
+  displayTitle: string,
+  widthClass: string,
+  onClick: (appointment: PatientAppointment | DoctorAppointment, resources?: {
+    facilities: Array<Facility>,
+    equipment: Array<Equipment>,
+    medicine: Array<Medicine>,
+  }) => void,
+) => {
+  return (
+    <md-filled-button class={`${widthClass} rounded-full bg-[#7357be]`} onClick={onClick}>
+      {displayTitle}
+    </md-filled-button>
+  );
+};
+
+export const getDoctorAppointmentActions = (
+  appointmentStatus: AppointmentStatus,
+  handleCancelAppointment: (appointment: PatientAppointment | DoctorAppointment) => void,
+  handleAcceptAppointment: (appointment: PatientAppointment | DoctorAppointment) => void,
+  handleDenyAppointment: (appointment: PatientAppointment | DoctorAppointment) => void,
+  handleSaveResourcesOnAppointment: (appointment: PatientAppointment | DoctorAppointment, resources: {
+    facilities: Array<Facility>,
+    equipment: Array<Equipment>,
+    medicine: Array<Medicine>,
+  }) => void,
+) => {
+  switch (appointmentStatus) {
+    case 'scheduled':
+      return (
+        <div class="flex w-full max-w-md flex-row items-center justify-between gap-x-3">
+          {doctorButton('Save', 'w-1/2', handleSaveResourcesOnAppointment)}
+          {doctorButton('Cancel', 'w-1/2', handleCancelAppointment)}
+        </div>
+      );
+    case 'requested':
+      return (
+        <div class="flex w-full max-w-md flex-row items-center justify-between gap-x-3">
+          {doctorButton('Accept', 'w-1/2', handleAcceptAppointment)}
+          {doctorButton('Deny', 'w-1/2', handleDenyAppointment)}
+        </div>
+      );
     default:
       return null;
   }

@@ -2,20 +2,20 @@ import {
   AppointmentDisplay, AppointmentStatus,
   Condition,
   ConditionDisplay,
-  DoctorAppointment,
+  DoctorAppointment, Equipment, Facility, Medicine,
   PatientAppointment,
   PrescriptionDisplay,
-  UserRole,
+  User,
 } from '../../api/generated';
 import { formatDate } from '../../utils/utils';
-import { Component, h, Prop, State } from '@stencil/core';
+import { Component, h, Prop } from '@stencil/core';
 
 @Component({
   tag: 'xcastven-xkilian-project-drawer',
   shadow: false,
 })
 export class Drawer {
-  @Prop() user: { email: string, role: UserRole };
+  @Prop() user: User;
   @Prop() isDoctor: boolean;
 
   @Prop() isDrawerOpen: boolean;
@@ -25,6 +25,9 @@ export class Drawer {
   @Prop() selectedPrescription: PrescriptionDisplay;
   @Prop() selectedAppointmentStatusGroup: AppointmentStatus;
   @Prop() showLegend: boolean;
+
+  @Prop() activeTab: number;
+  @Prop() handleTabChange: (event: Event) => void;
 
   @Prop() handleResetSelection: () => void;
   @Prop() getAppointmentsForDate: (date: Date) => Array<AppointmentDisplay>;
@@ -37,17 +40,27 @@ export class Drawer {
 
   @Prop() handleRescheduleAppointment: (appointment: PatientAppointment | DoctorAppointment) => void;
   @Prop() handleCancelAppointment: (appointment: PatientAppointment | DoctorAppointment) => void;
+
+  @Prop() handleAcceptAppointment: (appointment: PatientAppointment | DoctorAppointment) => void;
+  @Prop() handleDenyAppointment: (appointment: PatientAppointment | DoctorAppointment) => void;
+  @Prop() handleSaveResourcesOnAppointment: (appointment: PatientAppointment | DoctorAppointment, resources: {
+    facility: Facility,
+    equipment: Equipment,
+    medicine: Medicine,
+  }) => void;
+
   @Prop() handleScheduleAppointmentFromCondition: (condition: Condition) => void;
-  @Prop() handleToggleConditionStatus: () => void;
-
-  @State() activeTab: number = 0;
-
-  private handleTabChange = event => {
-    const tabBar = event.target;
-    this.activeTab = tabBar.activeTabIndex;
-  };
+  @Prop() handleToggleConditionStatus: (condition: Condition) => void;
 
   render() {
+    const displayStatus: AppointmentStatus = (
+      this.activeTab === 0 ? "scheduled" :
+        this.activeTab === 1 ? "requested" :
+          this.activeTab === 2 ? "denied" :
+            this.activeTab === 3 ? "completed" :
+              this.activeTab === 4 ? "cancelled" :
+                "scheduled") as AppointmentStatus;
+
     return (
       <div
         class={`fixed top-0 right-0 z-100 h-full max-w-md min-w-md transform bg-white shadow-lg transition-transform duration-300 ${
@@ -55,7 +68,7 @@ export class Drawer {
         }`}
         onClick={(e: MouseEvent) => e.stopPropagation()}
       >
-        <div class="flex h-full flex-col p-4">
+        <div class="flex h-full flex-col p-4 overflow-y-auto">
           {/* Selected date */}
           {this.selectedDate && !this.isDoctor ? (
             <div class="w-full">
@@ -82,6 +95,7 @@ export class Drawer {
                   <xcastven-xkilian-project-appointments-list
                     appointments={this.getAppointmentsForDate(this.selectedDate)}
                     handleSelectAppointment={this.handleSelectAppointment}
+                    noDataMessage="No appointments for this date"
                   />
                 </div>
 
@@ -107,7 +121,7 @@ export class Drawer {
               <div class="flex w-full flex-col items-center justify-center gap-y-2">
                 {/* Tabs */}
                 <div class="w-full max-w-md overflow-hidden rounded-lg bg-gray-100">
-                  <md-tabs class="w-full" onchange={e => this.handleTabChange(e)}>
+                  <md-tabs class="w-full" activeTabIndex={this.activeTab} onchange={this.handleTabChange}>
                     <md-primary-tab class="w-1/5 px-4">
                       <span class="w-full">Scheduled</span>
                     </md-primary-tab>
@@ -127,20 +141,30 @@ export class Drawer {
                 </div>
 
                 {/* Appointments Tab Content */}
-                <div class={`w-full max-w-md ${this.activeTab === 0 ? 'block' : 'hidden'}`}>
+                <div class={`w-full max-w-md`}>
                   <xcastven-xkilian-project-appointments-list
-                    appointments={this.getAppointmentsForDateByStatus(this.selectedDate, this.selectedAppointmentStatusGroup)}
+                    user={this.user}
+                    isDoctor={this.isDoctor}
+                    appointments={
+                      this.getAppointmentsForDateByStatus(this.selectedDate, displayStatus)
+                    }
                     handleSelectAppointment={this.handleSelectAppointment}
+                    noDataMessage={"No " + displayStatus + " appointments for this date"}
                   />
                 </div>
               </div>
             </div>
           ) : this.selectedAppointment ? (
             <xcastven-xkilian-project-appointment-detail
+              user={this.user}
+              isDoctor={this.isDoctor}
               appointmentId={this.selectedAppointment.id}
               handleResetSelection={this.handleResetSelection}
               handleRescheduleAppointment={this.handleRescheduleAppointment}
               handleCancelAppointment={this.handleCancelAppointment}
+              handleAcceptAppointment={this.handleAcceptAppointment}
+              handleDenyAppointment={this.handleDenyAppointment}
+              handleSaveResourcesOnAppointment={this.handleSaveResourcesOnAppointment}
             />
           ) : this.selectedCondition ? (
             <xcastven-xkilian-project-condition-detail
@@ -151,8 +175,10 @@ export class Drawer {
               handleToggleConditionStatus={this.handleToggleConditionStatus}
             />
           ) : this.selectedPrescription ? (
-            <xcastven-xkilian-project-prescription-detail prescriptionId={this.selectedPrescription.id}
-                                                          handleResetSelection={this.handleResetSelection} />
+            <xcastven-xkilian-project-prescription-detail
+              prescriptionId={this.selectedPrescription.id}
+              handleResetSelection={this.handleResetSelection}
+            />
           ) : (
             this.showLegend && <xcastven-xkilian-project-legend handleResetSelection={this.handleResetSelection} />
           )}

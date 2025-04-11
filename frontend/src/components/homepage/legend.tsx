@@ -74,7 +74,7 @@ export class Legend {
             slot="headline"
             class="z-98 flex w-full flex-row items-center justify-between gap-x-2 rounded-md border-2 border-transparent px-2 py-1 text-sm hover:border-[#9d83c6]"
           >
-            <span class="font-medium text-gray-600">Canceled appointment</span>
+            <span class="font-medium text-gray-600">Cancelled appointment</span>
             <div class="h-6 w-6 rounded-full border-2 border-white bg-[#F08080]" />
           </div>
 

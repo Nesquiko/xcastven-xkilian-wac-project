@@ -5,8 +5,6 @@ import { Component, h, Prop } from '@stencil/core';
   shadow: false,
 })
 export class Footer {
-  @Prop() handleScheduleAppointment: () => void;
-  @Prop() handleRegisterCondition: () => void;
   @Prop() handleToggleLegendMenu: () => void;
 
   render() {
@@ -15,7 +13,11 @@ export class Footer {
         <div class="w-10"></div>
 
         <div class="flex w-full flex-row items-center justify-center gap-x-3">
-          <md-text-button class="relative w-18 pr-3 text-sm text-[#7357be] sm:w-56" onClick={this.handleScheduleAppointment} title="Schedule an appointment">
+          <md-text-button
+            class="relative w-18 pr-3 text-sm text-[#7357be] sm:w-56"
+            onClick={() => window.navigation.navigate('scheduleAppointment')}
+            title="Schedule an appointment"
+          >
             <md-icon class="absolute top-[10px] left-4" style={{ fontSize: '20px' }}>
               event
             </md-icon>
@@ -25,7 +27,11 @@ export class Footer {
             <span class="hidden pl-8 text-center sm:inline">Schedule an appointment</span>
           </md-text-button>
 
-          <md-text-button class="relative w-18 pr-3 text-sm text-[#7357be] sm:w-48" onClick={this.handleRegisterCondition} title="Register a condition">
+          <md-text-button
+            class="relative w-18 pr-3 text-sm text-[#7357be] sm:w-48"
+            onClick={() => window.navigation.navigate('registerCondition')}
+            title="Register a condition"
+          >
             <md-icon class="absolute top-[10px] left-4" style={{ fontSize: '20px' }}>
               coronavirus
             </md-icon>

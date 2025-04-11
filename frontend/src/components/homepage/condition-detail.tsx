@@ -12,7 +12,7 @@ export class ConditionDetail {
   @Prop() handleResetSelection: () => void;
   @Prop() handleSelectAppointment: (appointment: AppointmentDisplay) => void;
   @Prop() handleScheduleAppointmentFromCondition: (condition: Condition) => void;
-  @Prop() handleToggleConditionStatus: () => void;
+  @Prop() handleToggleConditionStatus: (condition: Condition) => void;
 
   @State() condition: Condition = ConditionDetailExample;
   @State() expandedConditionId: string;
@@ -124,11 +124,17 @@ export class ConditionDetail {
         </div>
 
         <div class="flex w-full max-w-md flex-row items-center justify-between gap-x-3">
-          <md-filled-button class="w-1/2 rounded-full bg-[#7357be]" onClick={this.handleScheduleAppointmentFromCondition}>
+          <md-filled-button
+            class="w-1/2 rounded-full bg-[#7357be]"
+            onClick={() => this.handleScheduleAppointmentFromCondition(this.condition)}
+          >
             Schedule
           </md-filled-button>
 
-          <md-filled-button class="w-1/2 rounded-full bg-[#7357be]" onClick={this.handleToggleConditionStatus}>
+          <md-filled-button
+            class="w-1/2 rounded-full bg-[#7357be]"
+            onClick={() => this.handleToggleConditionStatus(this.condition)}
+          >
             {this.condition.end ? 'Reset as ongoing' : 'Set as gone'}
           </md-filled-button>
         </div>

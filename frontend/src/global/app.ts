@@ -19,6 +19,7 @@ import '@material/web/tabs/secondary-tab';
 import '@material/web/tabs/tabs';
 import '@material/web/textfield/filled-text-field';
 import '@material/web/textfield/outlined-text-field';
+import '@material/web/switch/switch';
 
 export default function () {
   // or export default async function()

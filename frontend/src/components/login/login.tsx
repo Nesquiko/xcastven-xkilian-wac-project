@@ -1,5 +1,5 @@
 import { Api, ApiError } from '../../api/api';
-import { UserRole } from '../../api/generated';
+import { User, UserRole } from '../../api/generated';
 import { StyledHost } from '../StyledHost';
 import { Component, h, Prop, State } from '@stencil/core';
 
@@ -35,7 +35,7 @@ export class Login {
     }
 
     try {
-      const user = await this.api.auth.loginUser({ loginRequest: { email: this.email, role } });
+      const user: User = await this.api.auth.loginUser({ loginRequest: { email: this.email, role } });
       sessionStorage.setItem('user', JSON.stringify(user));
       window.navigation.navigate('homepage');
     } catch (err) {
@@ -44,7 +44,8 @@ export class Login {
       }
 
       if (err.errDetail.status === 404) {
-        // TODO kili email not found
+        this.emailError = "Email not found"
+        return;
       }
     }
   };

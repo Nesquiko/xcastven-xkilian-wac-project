@@ -1,25 +1,9 @@
 import { AppointmentType, Doctor, TimeSlot } from '../../api/generated';
 import { DAYS_OF_WEEK, getDateAndTimeTitle, MONTHS, TODAY } from '../../utils/utils';
 import { Component, h, State } from '@stencil/core';
-
-const data = {
-  availableTimes: [
-    { time: '7:00', status: 'available' },
-    { time: '8:00', status: 'unavailable' },
-    { time: '9:00', status: 'available' },
-    { time: '10:00', status: 'available' },
-    { time: '11:00', status: 'unavailable' },
-    { time: '12:00', status: 'available' },
-    { time: '13:00', status: 'unavailable' },
-    { time: '14:00', status: 'unavailable' },
-  ] satisfies Array<TimeSlot>,
-  appointmentTypes: ['regular_check'] satisfies Array<AppointmentType>,
-  doctors: [
-    { id: '1', firstName: 'John', lastName: 'Doe', email: 'email@email.sk', specialization: 'cardiologist', role: 'doctor' },
-    { id: '2', firstName: 'Jane', lastName: 'Smith', email: 'email@gmail.com', specialization: 'endocrinologist', role: 'doctor' },
-    { id: '3', firstName: 'Samuel', lastName: 'Johnson', email: 'g@g.sk', specialization: 'dermatologist', role: 'doctor' },
-  ] satisfies Array<Doctor>,
-};
+import { AvailableDoctorsExample } from '../../data-examples/available-doctors';
+import { AppointmentTimesExample } from '../../data-examples/appointment-times';
+import { AppointmentTypesExample } from '../../data-examples/appointment-types';
 
 @Component({
   tag: 'xcastven-xkilian-project-appointment-scheduler',
@@ -34,9 +18,9 @@ export class AppointmentScheduler {
   @State() currentViewMonth: number = TODAY.getMonth();
   @State() currentViewYear: number = TODAY.getFullYear();
 
-  private availableTimes: Array<TimeSlot> = data.availableTimes;
-  private appointmentTypes: Array<AppointmentType> = data.appointmentTypes;
-  private doctors: Array<Doctor> = data.doctors;
+  private availableTimes: Array<TimeSlot> = AppointmentTimesExample;
+  private appointmentTypes: Array<AppointmentType> = AppointmentTypesExample;
+  private doctors: Array<Doctor> = AvailableDoctorsExample;
 
   private getDaysInMonth = (year: number, month: number) => {
     return new Date(year, month + 1, 0).getDate();

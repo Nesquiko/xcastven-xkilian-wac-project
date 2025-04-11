@@ -1,21 +1,50 @@
-import { AppointmentStatus, DoctorAppointment, instanceOfDoctorAppointment, PatientAppointment } from '../../api/generated';
-import { PatientAppointmentDetailExample } from '../../data-examples/patient-appointment-detail';
-import { formatDate, formatTime, getAppointmentActions } from '../../utils/utils';
+import {
+  AppointmentStatus,
+  DoctorAppointment,
+  Equipment,
+  Facility,
+  instanceOfDoctorAppointment,
+  instanceOfPatientAppointment,
+  Medicine,
+  PatientAppointment,
+  User,
+} from '../../api/generated';
+import { formatDate, formatTime, getDoctorAppointmentActions, getPatientAppointmentActions } from '../../utils/utils';
 import { Component, h, Prop, State } from '@stencil/core';
+import { DoctorAppointmentDetailExample } from '../../data-examples/doctor-appointment-detail';
+import { AvailableResourcesExample } from '../../data-examples/available-resources';
 
 @Component({
   tag: 'xcastven-xkilian-project-appointment-detail',
   shadow: false,
 })
 export class AppointmentDetail {
+  @Prop() user: User;
+  @Prop() isDoctor: boolean;
   @Prop() appointmentId: string;
   @Prop() handleResetSelection: () => void;
+
   @Prop() handleRescheduleAppointment: (appointment: PatientAppointment | DoctorAppointment) => void;
   @Prop() handleCancelAppointment: (appointment: PatientAppointment | DoctorAppointment) => void;
 
-  @State() appointment: PatientAppointment | DoctorAppointment = PatientAppointmentDetailExample;
+  @Prop() handleAcceptAppointment: (appointment: PatientAppointment | DoctorAppointment) => void;
+  @Prop() handleDenyAppointment: (appointment: PatientAppointment | DoctorAppointment) => void;
+  @Prop() handleSaveResourcesOnAppointment: (appointment: PatientAppointment | DoctorAppointment, resources: {
+    facility: Facility,
+    equipment: Equipment,
+    medicine: Medicine,
+  }) => void;
 
-  private getAppointmentStatusMessage = (appointmentStatus: AppointmentStatus) => {
+  @State() appointment: PatientAppointment | DoctorAppointment = DoctorAppointmentDetailExample;
+
+  @State() availableEquipment: Array<Equipment> = AvailableResourcesExample.equipment;
+  @State() availableFacilities: Array<Facility> = AvailableResourcesExample.facilities;
+  @State() availableMedicine: Array<Medicine> = AvailableResourcesExample.medicine;
+  @State() selectedEquipment: Equipment = null;
+  @State() selectedFacility: Facility = null;
+  @State() selectedMedicine: Medicine = null;
+
+  private getPatientAppointmentStatusMessage = (appointmentStatus: AppointmentStatus) => {
     switch (appointmentStatus) {
       case 'requested':
         return "This appointment is waiting for a reaction from the Doctor's office.";
@@ -24,16 +53,50 @@ export class AppointmentDetail {
       case 'completed':
         return 'This appointment has already been completed.';
       case 'denied':
-        return "This appointment has been denied by the Doctor's office.";
+        return "This appointment has already been denied by the Doctor's office.";
       case 'cancelled':
-        return 'This appointment has been canceled by you.';
+        return 'This appointment has already been cancelled.';
       default:
         return '';
     }
   };
 
+  private getDoctorAppointmentStatusMessage = (appointmentStatus: AppointmentStatus) => {
+    switch (appointmentStatus) {
+      case 'requested':
+        return "";
+      case 'scheduled':
+        return '';
+      case 'completed':
+        return 'This appointment has already been completed.';
+      case 'denied':
+        return "This appointment has already been denied.";
+      case 'cancelled':
+        return 'This appointment has already been cancelled.';
+      default:
+        return '';
+    }
+  };
+
+  private handleSelectFacility = (event: Event) => {
+    const newFacilityId: string = (event.target as HTMLSelectElement).value;
+    this.selectedFacility = this.availableFacilities.find((facility: Facility): boolean => facility.id === newFacilityId);
+  };
+
+  private handleSelectEquipment = (event: Event) => {
+    const newEquipmentId: string = (event.target as HTMLSelectElement).value;
+    this.selectedEquipment = this.availableEquipment.find((equipment: Equipment): boolean => equipment.id === newEquipmentId);
+  };
+
+  private handleSelectMedicine = (event: Event) => {
+    const newMedicineId: string = (event.target as HTMLSelectElement).value;
+    this.selectedMedicine = this.availableMedicine.find((medicine: Medicine): boolean => medicine.id === newMedicineId);
+  };
+
   render() {
     if (!this.appointment) return null;
+
+    console.log(this.isDoctor, instanceOfDoctorAppointment(this.appointment));
 
     return (
       <div class="w-full max-w-md">
@@ -72,18 +135,19 @@ export class AppointmentDetail {
             <span class="font-medium text-gray-600">{this.appointment.type}</span>
           </div>
 
-          {instanceOfDoctorAppointment(this.appointment) ? (
-            <div class="flex w-full flex-row items-center justify-between">
+          {this.isDoctor && instanceOfDoctorAppointment(this.appointment) && (
+            <div class="mb-1 flex w-full flex-row items-center justify-between">
               <div class="flex flex-row items-center gap-x-2 text-gray-500">
                 <md-icon style={{ fontSize: '16px' }}>person</md-icon>
                 Patient
               </div>
               <span class="font-medium text-gray-600">
-                Dr. {this.appointment.patient.firstName} {this.appointment.patient.lastName}
+                {this.appointment.patient.firstName} {this.appointment.patient.lastName}
               </span>
             </div>
-          ) : (
-            <div class="flex w-full flex-row items-center justify-between">
+          )}
+          {!this.isDoctor && instanceOfPatientAppointment(this.appointment) && (
+            <div class="mb-1 flex w-full flex-row items-center justify-between">
               <div class="flex flex-row items-center gap-x-2 text-gray-500">
                 <md-icon style={{ fontSize: '16px' }}>person</md-icon>
                 Doctor
@@ -111,10 +175,83 @@ export class AppointmentDetail {
           <p class="ml-1 text-sm font-medium text-wrap text-gray-600">{this.appointment.reason}</p>
         </div>
 
-        {this.appointment.status !== 'scheduled' && <p class="mb-6 text-center text-sm text-wrap text-gray-600">{this.getAppointmentStatusMessage(this.appointment.status)}</p>}
+        {this.isDoctor && instanceOfDoctorAppointment(this.appointment) && this.appointment.status === "scheduled" && (
+          <div class="mb-6 w-full max-w-md rounded-md bg-gray-200 px-4 py-3">
+            <div class="mb-3 w-full text-center text-gray-500">
+              Resources
+            </div>
+            <div class="mb-1 flex w-full flex-col gap-y-3">
+              <md-outlined-select
+                label="Facility"
+                class="w-full"
+                value={this.selectedFacility}
+                onInput={(e: Event) => this.handleSelectFacility(e)}
+              >
+                {this.availableFacilities.map((facility: Facility) => (
+                  <md-select-option value={facility.id}>
+                    <div slot="headline">{facility.name}</div>
+                  </md-select-option>
+                ))}
+              </md-outlined-select>
 
-        {getAppointmentActions(this.appointment.status, this.handleRescheduleAppointment, this.handleCancelAppointment)}
+              <md-outlined-select
+                label="Equipment"
+                class="w-full"
+                value={this.selectedEquipment}
+                onInput={(e: Event) => this.handleSelectEquipment(e)}
+              >
+                {this.availableEquipment.map((equipment: Equipment) => (
+                  <md-select-option value={equipment.id}>
+                    <div slot="headline">{equipment.name}</div>
+                  </md-select-option>
+                ))}
+              </md-outlined-select>
+
+              <md-outlined-select
+                label="Medicine"
+                class="w-full"
+                value={this.selectedMedicine}
+                onInput={(e: Event) => this.handleSelectMedicine(e)}
+              >
+                {this.availableMedicine.map((medicine: Medicine) => (
+                  <md-select-option value={medicine.id}>
+                    <div slot="headline">{medicine.name}</div>
+                  </md-select-option>
+                ))}
+              </md-outlined-select>
+            </div>
+          </div>
+        )}
+
+        {this.isDoctor && !(this.appointment.status in ['scheduled', 'requested']) && (
+          <p class="mb-6 text-center text-sm text-wrap text-gray-600">
+            {this.getDoctorAppointmentStatusMessage(this.appointment.status)}
+          </p>
+        )}
+        {!this.isDoctor && !(this.appointment.status in ['scheduled']) && (
+          <p class="mb-6 text-center text-sm text-wrap text-gray-600">
+            {this.getPatientAppointmentStatusMessage(this.appointment.status)}
+          </p>
+        )}
+
+        {this.isDoctor ? (
+          getDoctorAppointmentActions(
+            this.appointment.status,
+            () => this.handleCancelAppointment(this.appointment),
+            () => this.handleAcceptAppointment(this.appointment),
+            () => this.handleDenyAppointment(this.appointment),
+            () => this.handleSaveResourcesOnAppointment(this.appointment, {
+              facility: this.selectedFacility,
+              equipment: this.selectedEquipment,
+              medicine: this.selectedMedicine
+            }),
+          )) : (
+          getPatientAppointmentActions(
+            this.appointment.status,
+            () => this.handleRescheduleAppointment(this.appointment),
+            () => this.handleCancelAppointment(this.appointment)
+          ))}
       </div>
     );
-  }
+  };
 }

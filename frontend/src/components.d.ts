@@ -5,28 +5,40 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { AppointmentDisplay, AppointmentStatus, Condition, ConditionDisplay, DoctorAppointment, PatientAppointment, PrescriptionDisplay, UserRole } from "./api/generated";
+import { AppointmentDisplay, AppointmentStatus, Condition, ConditionDisplay, DoctorAppointment, Equipment, Facility, Medicine, PatientAppointment, PrescriptionDisplay, User, UserRole } from "./api/generated";
 import { Api } from "./api/api";
-import { Api as Api1 } from "./components";
-export { AppointmentDisplay, AppointmentStatus, Condition, ConditionDisplay, DoctorAppointment, PatientAppointment, PrescriptionDisplay, UserRole } from "./api/generated";
+export { AppointmentDisplay, AppointmentStatus, Condition, ConditionDisplay, DoctorAppointment, Equipment, Facility, Medicine, PatientAppointment, PrescriptionDisplay, User, UserRole } from "./api/generated";
 export { Api } from "./api/api";
-export { Api as Api1 } from "./components";
 export namespace Components {
+    interface XcastvenXkilianProjectAccount {
+    }
     interface XcastvenXkilianProjectApp {
         "apiBase": string;
         "basePath": string;
     }
     interface XcastvenXkilianProjectAppointmentDetail {
         "appointmentId": string;
+        "handleAcceptAppointment": (appointment: PatientAppointment | DoctorAppointment) => void;
         "handleCancelAppointment": (appointment: PatientAppointment | DoctorAppointment) => void;
+        "handleDenyAppointment": (appointment: PatientAppointment | DoctorAppointment) => void;
         "handleRescheduleAppointment": (appointment: PatientAppointment | DoctorAppointment) => void;
         "handleResetSelection": () => void;
+        "handleSaveResourcesOnAppointment": (appointment: PatientAppointment | DoctorAppointment, resources: {
+    facility: Facility,
+    equipment: Equipment,
+    medicine: Medicine,
+  }) => void;
+        "isDoctor": boolean;
+        "user": User;
     }
     interface XcastvenXkilianProjectAppointmentScheduler {
     }
     interface XcastvenXkilianProjectAppointmentsList {
         "appointments": Array<AppointmentDisplay>;
         "handleSelectAppointment": (appointment: AppointmentDisplay) => void;
+        "isDoctor": boolean;
+        "noDataMessage": string;
+        "user": User;
     }
     interface XcastvenXkilianProjectCalendar {
         "appointments": Array<AppointmentDisplay>;
@@ -55,25 +67,36 @@ export namespace Components {
         "handleResetSelection": () => void;
         "handleScheduleAppointmentFromCondition": (condition: Condition) => void;
         "handleSelectAppointment": (appointment: AppointmentDisplay) => void;
-        "handleToggleConditionStatus": () => void;
+        "handleToggleConditionStatus": (condition: Condition) => void;
+    }
+    interface XcastvenXkilianProjectConditionRegisterer {
     }
     interface XcastvenXkilianProjectConditionsList {
         "conditions": Array<ConditionDisplay>;
         "handleSelectCondition": (condition: ConditionDisplay) => void;
     }
     interface XcastvenXkilianProjectDrawer {
+        "activeTab": number;
         "getAppointmentsForDate": (date: Date) => Array<AppointmentDisplay>;
         "getAppointmentsForDateByStatus": (date: Date, appointmentStatus: AppointmentStatus) => Array<AppointmentDisplay>;
         "getConditionsForDate": (date: Date) => Array<ConditionDisplay>;
         "getPrescriptionsForDate": (date: Date) => Array<PrescriptionDisplay>;
+        "handleAcceptAppointment": (appointment: PatientAppointment | DoctorAppointment) => void;
         "handleCancelAppointment": (appointment: PatientAppointment | DoctorAppointment) => void;
+        "handleDenyAppointment": (appointment: PatientAppointment | DoctorAppointment) => void;
         "handleRescheduleAppointment": (appointment: PatientAppointment | DoctorAppointment) => void;
         "handleResetSelection": () => void;
+        "handleSaveResourcesOnAppointment": (appointment: PatientAppointment | DoctorAppointment, resources: {
+    facility: Facility,
+    equipment: Equipment,
+    medicine: Medicine,
+  }) => void;
         "handleScheduleAppointmentFromCondition": (condition: Condition) => void;
         "handleSelectAppointment": (appointment: AppointmentDisplay) => void;
         "handleSelectCondition": (condition: ConditionDisplay) => void;
         "handleSelectPrescription": (prescription: PrescriptionDisplay) => void;
-        "handleToggleConditionStatus": () => void;
+        "handleTabChange": (event: Event) => void;
+        "handleToggleConditionStatus": (condition: Condition) => void;
         "isDoctor": boolean;
         "isDrawerOpen": boolean;
         "selectedAppointment": AppointmentDisplay;
@@ -82,19 +105,18 @@ export namespace Components {
         "selectedDate": Date;
         "selectedPrescription": PrescriptionDisplay;
         "showLegend": boolean;
-        "user": { email: string, role: UserRole };
+        "user": User;
     }
     interface XcastvenXkilianProjectFooter {
-        "handleRegisterCondition": () => void;
-        "handleScheduleAppointment": () => void;
         "handleToggleLegendMenu": () => void;
     }
     interface XcastvenXkilianProjectHeader {
-        "currentViewMonth": number;
-        "currentViewYear": number;
-        "handleNextMonth": () => void;
-        "handlePreviousMonth": () => void;
-        "handleYearChange": (event: Event) => void;
+        "currentViewMonth"?: number;
+        "currentViewYear"?: number;
+        "handleNextMonth"?: () => void;
+        "handlePreviousMonth"?: () => void;
+        "handleYearChange"?: (event: Event) => void;
+        "type": "calendar" | "account" | "scheduleAppointment" | "registerCondition";
     }
     interface XcastvenXkilianProjectHomePage {
     }
@@ -113,10 +135,16 @@ export namespace Components {
         "prescriptions": Array<PrescriptionDisplay>;
     }
     interface XcastvenXkilianProjectRegister {
-        "api": Api1;
+        "api": Api;
     }
 }
 declare global {
+    interface HTMLXcastvenXkilianProjectAccountElement extends Components.XcastvenXkilianProjectAccount, HTMLStencilElement {
+    }
+    var HTMLXcastvenXkilianProjectAccountElement: {
+        prototype: HTMLXcastvenXkilianProjectAccountElement;
+        new (): HTMLXcastvenXkilianProjectAccountElement;
+    };
     interface HTMLXcastvenXkilianProjectAppElement extends Components.XcastvenXkilianProjectApp, HTMLStencilElement {
     }
     var HTMLXcastvenXkilianProjectAppElement: {
@@ -152,6 +180,12 @@ declare global {
     var HTMLXcastvenXkilianProjectConditionDetailElement: {
         prototype: HTMLXcastvenXkilianProjectConditionDetailElement;
         new (): HTMLXcastvenXkilianProjectConditionDetailElement;
+    };
+    interface HTMLXcastvenXkilianProjectConditionRegistererElement extends Components.XcastvenXkilianProjectConditionRegisterer, HTMLStencilElement {
+    }
+    var HTMLXcastvenXkilianProjectConditionRegistererElement: {
+        prototype: HTMLXcastvenXkilianProjectConditionRegistererElement;
+        new (): HTMLXcastvenXkilianProjectConditionRegistererElement;
     };
     interface HTMLXcastvenXkilianProjectConditionsListElement extends Components.XcastvenXkilianProjectConditionsList, HTMLStencilElement {
     }
@@ -214,12 +248,14 @@ declare global {
         new (): HTMLXcastvenXkilianProjectRegisterElement;
     };
     interface HTMLElementTagNameMap {
+        "xcastven-xkilian-project-account": HTMLXcastvenXkilianProjectAccountElement;
         "xcastven-xkilian-project-app": HTMLXcastvenXkilianProjectAppElement;
         "xcastven-xkilian-project-appointment-detail": HTMLXcastvenXkilianProjectAppointmentDetailElement;
         "xcastven-xkilian-project-appointment-scheduler": HTMLXcastvenXkilianProjectAppointmentSchedulerElement;
         "xcastven-xkilian-project-appointments-list": HTMLXcastvenXkilianProjectAppointmentsListElement;
         "xcastven-xkilian-project-calendar": HTMLXcastvenXkilianProjectCalendarElement;
         "xcastven-xkilian-project-condition-detail": HTMLXcastvenXkilianProjectConditionDetailElement;
+        "xcastven-xkilian-project-condition-registerer": HTMLXcastvenXkilianProjectConditionRegistererElement;
         "xcastven-xkilian-project-conditions-list": HTMLXcastvenXkilianProjectConditionsListElement;
         "xcastven-xkilian-project-drawer": HTMLXcastvenXkilianProjectDrawerElement;
         "xcastven-xkilian-project-footer": HTMLXcastvenXkilianProjectFooterElement;
@@ -233,21 +269,35 @@ declare global {
     }
 }
 declare namespace LocalJSX {
+    interface XcastvenXkilianProjectAccount {
+    }
     interface XcastvenXkilianProjectApp {
         "apiBase"?: string;
         "basePath"?: string;
     }
     interface XcastvenXkilianProjectAppointmentDetail {
         "appointmentId"?: string;
+        "handleAcceptAppointment"?: (appointment: PatientAppointment | DoctorAppointment) => void;
         "handleCancelAppointment"?: (appointment: PatientAppointment | DoctorAppointment) => void;
+        "handleDenyAppointment"?: (appointment: PatientAppointment | DoctorAppointment) => void;
         "handleRescheduleAppointment"?: (appointment: PatientAppointment | DoctorAppointment) => void;
         "handleResetSelection"?: () => void;
+        "handleSaveResourcesOnAppointment"?: (appointment: PatientAppointment | DoctorAppointment, resources: {
+    facility: Facility,
+    equipment: Equipment,
+    medicine: Medicine,
+  }) => void;
+        "isDoctor"?: boolean;
+        "user"?: User;
     }
     interface XcastvenXkilianProjectAppointmentScheduler {
     }
     interface XcastvenXkilianProjectAppointmentsList {
         "appointments"?: Array<AppointmentDisplay>;
         "handleSelectAppointment"?: (appointment: AppointmentDisplay) => void;
+        "isDoctor"?: boolean;
+        "noDataMessage"?: string;
+        "user"?: User;
     }
     interface XcastvenXkilianProjectCalendar {
         "appointments"?: Array<AppointmentDisplay>;
@@ -276,25 +326,36 @@ declare namespace LocalJSX {
         "handleResetSelection"?: () => void;
         "handleScheduleAppointmentFromCondition"?: (condition: Condition) => void;
         "handleSelectAppointment"?: (appointment: AppointmentDisplay) => void;
-        "handleToggleConditionStatus"?: () => void;
+        "handleToggleConditionStatus"?: (condition: Condition) => void;
+    }
+    interface XcastvenXkilianProjectConditionRegisterer {
     }
     interface XcastvenXkilianProjectConditionsList {
         "conditions"?: Array<ConditionDisplay>;
         "handleSelectCondition"?: (condition: ConditionDisplay) => void;
     }
     interface XcastvenXkilianProjectDrawer {
+        "activeTab"?: number;
         "getAppointmentsForDate"?: (date: Date) => Array<AppointmentDisplay>;
         "getAppointmentsForDateByStatus"?: (date: Date, appointmentStatus: AppointmentStatus) => Array<AppointmentDisplay>;
         "getConditionsForDate"?: (date: Date) => Array<ConditionDisplay>;
         "getPrescriptionsForDate"?: (date: Date) => Array<PrescriptionDisplay>;
+        "handleAcceptAppointment"?: (appointment: PatientAppointment | DoctorAppointment) => void;
         "handleCancelAppointment"?: (appointment: PatientAppointment | DoctorAppointment) => void;
+        "handleDenyAppointment"?: (appointment: PatientAppointment | DoctorAppointment) => void;
         "handleRescheduleAppointment"?: (appointment: PatientAppointment | DoctorAppointment) => void;
         "handleResetSelection"?: () => void;
+        "handleSaveResourcesOnAppointment"?: (appointment: PatientAppointment | DoctorAppointment, resources: {
+    facility: Facility,
+    equipment: Equipment,
+    medicine: Medicine,
+  }) => void;
         "handleScheduleAppointmentFromCondition"?: (condition: Condition) => void;
         "handleSelectAppointment"?: (appointment: AppointmentDisplay) => void;
         "handleSelectCondition"?: (condition: ConditionDisplay) => void;
         "handleSelectPrescription"?: (prescription: PrescriptionDisplay) => void;
-        "handleToggleConditionStatus"?: () => void;
+        "handleTabChange"?: (event: Event) => void;
+        "handleToggleConditionStatus"?: (condition: Condition) => void;
         "isDoctor"?: boolean;
         "isDrawerOpen"?: boolean;
         "selectedAppointment"?: AppointmentDisplay;
@@ -303,11 +364,9 @@ declare namespace LocalJSX {
         "selectedDate"?: Date;
         "selectedPrescription"?: PrescriptionDisplay;
         "showLegend"?: boolean;
-        "user"?: { email: string, role: UserRole };
+        "user"?: User;
     }
     interface XcastvenXkilianProjectFooter {
-        "handleRegisterCondition"?: () => void;
-        "handleScheduleAppointment"?: () => void;
         "handleToggleLegendMenu"?: () => void;
     }
     interface XcastvenXkilianProjectHeader {
@@ -316,6 +375,7 @@ declare namespace LocalJSX {
         "handleNextMonth"?: () => void;
         "handlePreviousMonth"?: () => void;
         "handleYearChange"?: (event: Event) => void;
+        "type"?: "calendar" | "account" | "scheduleAppointment" | "registerCondition";
     }
     interface XcastvenXkilianProjectHomePage {
     }
@@ -334,15 +394,17 @@ declare namespace LocalJSX {
         "prescriptions"?: Array<PrescriptionDisplay>;
     }
     interface XcastvenXkilianProjectRegister {
-        "api"?: Api1;
+        "api"?: Api;
     }
     interface IntrinsicElements {
+        "xcastven-xkilian-project-account": XcastvenXkilianProjectAccount;
         "xcastven-xkilian-project-app": XcastvenXkilianProjectApp;
         "xcastven-xkilian-project-appointment-detail": XcastvenXkilianProjectAppointmentDetail;
         "xcastven-xkilian-project-appointment-scheduler": XcastvenXkilianProjectAppointmentScheduler;
         "xcastven-xkilian-project-appointments-list": XcastvenXkilianProjectAppointmentsList;
         "xcastven-xkilian-project-calendar": XcastvenXkilianProjectCalendar;
         "xcastven-xkilian-project-condition-detail": XcastvenXkilianProjectConditionDetail;
+        "xcastven-xkilian-project-condition-registerer": XcastvenXkilianProjectConditionRegisterer;
         "xcastven-xkilian-project-conditions-list": XcastvenXkilianProjectConditionsList;
         "xcastven-xkilian-project-drawer": XcastvenXkilianProjectDrawer;
         "xcastven-xkilian-project-footer": XcastvenXkilianProjectFooter;
@@ -359,12 +421,14 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
     export namespace JSX {
         interface IntrinsicElements {
+            "xcastven-xkilian-project-account": LocalJSX.XcastvenXkilianProjectAccount & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectAccountElement>;
             "xcastven-xkilian-project-app": LocalJSX.XcastvenXkilianProjectApp & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectAppElement>;
             "xcastven-xkilian-project-appointment-detail": LocalJSX.XcastvenXkilianProjectAppointmentDetail & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectAppointmentDetailElement>;
             "xcastven-xkilian-project-appointment-scheduler": LocalJSX.XcastvenXkilianProjectAppointmentScheduler & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectAppointmentSchedulerElement>;
             "xcastven-xkilian-project-appointments-list": LocalJSX.XcastvenXkilianProjectAppointmentsList & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectAppointmentsListElement>;
             "xcastven-xkilian-project-calendar": LocalJSX.XcastvenXkilianProjectCalendar & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectCalendarElement>;
             "xcastven-xkilian-project-condition-detail": LocalJSX.XcastvenXkilianProjectConditionDetail & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectConditionDetailElement>;
+            "xcastven-xkilian-project-condition-registerer": LocalJSX.XcastvenXkilianProjectConditionRegisterer & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectConditionRegistererElement>;
             "xcastven-xkilian-project-conditions-list": LocalJSX.XcastvenXkilianProjectConditionsList & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectConditionsListElement>;
             "xcastven-xkilian-project-drawer": LocalJSX.XcastvenXkilianProjectDrawer & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectDrawerElement>;
             "xcastven-xkilian-project-footer": LocalJSX.XcastvenXkilianProjectFooter & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectFooterElement>;

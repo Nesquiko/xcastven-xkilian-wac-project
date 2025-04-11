@@ -263,7 +263,7 @@ export class Calendar {
             this.handleSelectDate(currentDate);
           }}
         >
-          <div class={`relative flex w-full flex-row items-center justify-between py-1 ${isToday && 'bg-[#7357be] text-white'}`}>
+          <div class={`relative flex w-full flex-row items-center justify-between py-1 mb-[1px] ${isToday && 'bg-[#7357be] text-white'}`}>
             <div class="h-full w-full text-center">{i}</div>
             {prescriptionsForDate.length > 0 &&
               prescriptionsForDate.reverse().map((prescription: PrescriptionDisplay, index: number) => {
@@ -474,23 +474,26 @@ export class Calendar {
       }
 
       const isToday: boolean = i === today.getDate() && this.currentViewMonth === today.getMonth() && this.currentViewYear === today.getFullYear();
-      // const isPastDate: boolean = currentDate < today;
+      const isPastDate: boolean = currentDate.getTime() >= today.getTime();
 
       currentMonthDays.push(
         <div
           role="button"
-          class={`relative flex w-full flex-col items-center justify-start text-sm cursor-pointer`}
+          class={`relative flex w-full flex-col items-center justify-start text-sm cursor-pointer hover:border-2 hover:border-[#9d83c6]`}
           onClick={(event: MouseEvent) => {
             event.stopPropagation();
             this.handleSelectDate(currentDate);
           }}
         >
-          <div class={`relative flex w-full flex-col items-center py-1 ${isToday && 'bg-[#7357be] text-white'}`}>
+          <div class={`relative flex w-full flex-col items-center py-1 mb-[1px] ${isToday && 'bg-[#7357be] text-white'}`}>
             <div class="h-full w-full text-center">{i}</div>
           </div>
 
           <div class="flex h-full w-full flex-row flex-wrap items-start justify-center gap-1">
-            {appointmentsForDay && ["scheduled", "requested"].map((appointmentStatus: AppointmentStatus) => (
+            {appointmentsForDay && isPastDate && ["scheduled", "requested"].map((appointmentStatus: AppointmentStatus) => {
+              if (appointmentsForDay.get(appointmentStatus).length === 0) return;
+
+              return (
                 <button
                   class="circle-container group relative"
                   onClick={(event: MouseEvent) => {
@@ -515,8 +518,37 @@ export class Calendar {
 
                   {this.getAppointmentStatusGroupTooltipContent(appointmentStatus, appointmentsForDay.get(appointmentStatus).length)}
                 </button>
-              )
-            )}
+            )})}
+
+            {appointmentsForDay && !isPastDate && ["completed", "cancelled"].map((appointmentStatus: AppointmentStatus) => {
+              if (appointmentsForDay.get(appointmentStatus).length === 0) return;
+
+              return (
+                <button
+                  class="circle-container group relative"
+                  onClick={(event: MouseEvent) => {
+                    event.stopPropagation();
+                    this.handleSelectAppointmentStatusGroup(currentDate, appointmentStatus);
+                  }}
+                >
+                  <div
+                    class={`circle cursor-pointer rounded-full transition-all duration-200
+                      h-5 w-5 hover:h-6 hover:w-6
+                      sm:h-6 sm:w-6 sm:hover:h-7 sm:hover:w-7
+                      md:h-7 md:w-7 md:hover:h-8 md:hover:w-8
+                      lg:h-8 lg:w-8 lg:hover:h-9 lg:hover:w-9
+                      flex items-center justify-center text-white
+                    `}
+                    style={{
+                      backgroundColor: AppointmentStatusColor[appointmentStatus].background,
+                    }}
+                  >
+                    {appointmentsForDay.get(appointmentStatus).length}
+                  </div>
+
+                  {this.getAppointmentStatusGroupTooltipContent(appointmentStatus, appointmentsForDay.get(appointmentStatus).length)}
+                </button>
+            )})}
           </div>
         </div>,
       );

@@ -1,5 +1,5 @@
-import { AppointmentDisplay } from '../../api/generated';
-import { getDateAndTimeTitle } from '../../utils/utils';
+import { AppointmentDisplay, User } from '../../api/generated';
+import { formatTime, getDateAndTimeTitle } from '../../utils/utils';
 import { Component, h, Prop } from '@stencil/core';
 
 @Component({
@@ -7,10 +7,11 @@ import { Component, h, Prop } from '@stencil/core';
   shadow: false,
 })
 export class AppointmentsList {
-  private isDoctor: boolean = false /* sessionStorage.getItem("role") */;
-
+  @Prop() user: User;
+  @Prop() isDoctor: boolean;
   @Prop() appointments: Array<AppointmentDisplay>;
   @Prop() handleSelectAppointment: (appointment: AppointmentDisplay) => void;
+  @Prop() noDataMessage: string;
 
   render() {
     return (
@@ -24,7 +25,10 @@ export class AppointmentsList {
                 onClick={() => this.handleSelectAppointment(appointment)}
               >
                 <div class="flex flex-row items-center justify-between">
-                  {getDateAndTimeTitle(appointment.appointmentDateTime, 'medium')}
+                  {this.isDoctor ?
+                    <span class="font-medium text-[#7357be]">{formatTime(appointment.appointmentDateTime)}</span> :
+                    getDateAndTimeTitle(appointment.appointmentDateTime, 'medium')
+                  }
                   <div class="text-sm font-medium text-gray-600">{appointment.type}</div>
                 </div>
                 {this.isDoctor ? (
@@ -37,7 +41,7 @@ export class AppointmentsList {
           })
         ) : (
           <div class={`flex h-16 w-full flex-col justify-center border-2 border-transparent bg-gray-200 px-4 py-2 text-center text-sm font-medium text-gray-600`}>
-            No appointments for this date
+            {this.noDataMessage}
           </div>
         )}
 

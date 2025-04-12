@@ -32,6 +32,7 @@ patch:
     - $ref: "../components/parameters/path/appointmentId.yaml"
   requestBody:
     description: Reason for cancelling the appointment.
+    required: true
     content:
       application/json:
         schema:

@@ -190,10 +190,11 @@ function generateStoredAppointment(
     appointmentDateTime.getTime() + faker.number.int({ min: 15, max: 60 }) * 60000,
   );
   const status = faker.helpers.arrayElement(appointmentStatuses);
-  const conditionId =
-    patientConditions.length > 0 && faker.datatype.boolean(0.4)
-      ? faker.helpers.arrayElement(patientConditions)._id
-      : undefined;
+
+  let conditionId: Binary | undefined = undefined;
+  if (patientConditions.length > 0 && faker.datatype.boolean(0.9)) {
+    conditionId = faker.helpers.arrayElement(patientConditions)._id;
+  }
 
   const appointment: StoredAppointment = {
     _id: generateUUIDBinary(),

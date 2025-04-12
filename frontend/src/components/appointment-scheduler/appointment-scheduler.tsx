@@ -1,6 +1,6 @@
-import { AppointmentType, Doctor, TimeSlot } from '../../api/generated';
+import { Api } from '../../api/api';
+import { AppointmentType, Doctor, TimeSlot, User } from '../../api/generated';
 import { AppointmentTimesExample } from '../../data-examples/appointment-times';
-import { AppointmentTypesExample } from '../../data-examples/appointment-types';
 import { AvailableDoctorsExample } from '../../data-examples/available-doctors';
 import { DAYS_OF_WEEK, getDateAndTimeTitle, MONTHS, TODAY } from '../../utils/utils';
 import { Component, h, Prop, State } from '@stencil/core';
@@ -10,18 +10,20 @@ import { Component, h, Prop, State } from '@stencil/core';
   shadow: false,
 })
 export class AppointmentScheduler {
+  @Prop() api: Api;
+  @Prop() user: User;
   @Prop() initialDate: Date = null;
 
   @State() selectedDate: Date = null;
   @State() selectedTime: string = null;
-  @State() selectedAppointmentType: string;
+  @State() selectedAppointmentType: AppointmentType;
   @State() selectedDoctor: string;
   @State() appointmentReason: string = '';
   @State() currentViewMonth: number = TODAY.getMonth();
   @State() currentViewYear: number = TODAY.getFullYear();
 
   private availableTimes: Array<TimeSlot> = AppointmentTimesExample;
-  private appointmentTypes: Array<AppointmentType> = AppointmentTypesExample;
+  private appointmentTypes: Array<AppointmentType> = Object.values(AppointmentType);
   private doctors: Array<Doctor> = AvailableDoctorsExample;
 
   componentWillLoad() {
@@ -131,7 +133,7 @@ export class AppointmentScheduler {
   };
 
   private handleAppointmentTypeChange = (event: Event) => {
-    this.selectedAppointmentType = (event.target as HTMLSelectElement).value;
+    this.selectedAppointmentType = (event.target as HTMLSelectElement).value as AppointmentType;
   };
 
   private handleDoctorChange = (event: Event) => {
@@ -143,6 +145,17 @@ export class AppointmentScheduler {
   };
 
   private handleScheduleAppointment = () => {
+    // TODO kili is selectedDoctor id? and can you, pretty please, create one date object from selectDate and selectedTime, please?
+    // this.api.appointments.requestAppointment({
+    //   newAppointmentRequest: {
+    //     patientId: this.user.id,
+    //     doctorId: this.selectedDoctor,
+    //     // appointmentDateTime: ???
+    //     type: this.selectedAppointmentType,
+    //     reason: this.appointmentReason,
+    //   },
+    // });
+    //
     console.log(
       'Schedule an appointment:' +
         '\nDate: ' +

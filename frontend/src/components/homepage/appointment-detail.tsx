@@ -1,29 +1,29 @@
+import { Api, ApiError } from '../../api/api';
 import {
-  AppointmentStatus,
-  DoctorAppointment,
-  Equipment,
+  User,
   Facility,
+  Equipment,
+  Medicine,
+  AppointmentStatus,
   instanceOfDoctorAppointment,
   instanceOfPatientAppointment,
-  Medicine,
+  DoctorAppointment,
   PatientAppointment,
-  User,
 } from '../../api/generated';
-import { AvailableResourcesExample } from '../../data-examples/available-resources';
-import { DoctorAppointmentDetailExample } from '../../data-examples/doctor-appointment-detail';
 import {
   formatDate,
   formatTime,
   getDoctorAppointmentActions,
   getPatientAppointmentActions,
 } from '../../utils/utils';
-import { Component, h, Prop, State } from '@stencil/core';
+import { h, Component, Prop, State } from '@stencil/core';
 
 @Component({
   tag: 'xcastven-xkilian-project-appointment-detail',
   shadow: false,
 })
 export class AppointmentDetail {
+  @Prop() api: Api;
   @Prop() user: User;
   @Prop() isDoctor: boolean;
   @Prop() appointmentId: string;
@@ -45,20 +45,51 @@ export class AppointmentDetail {
     },
   ) => void;
 
-  @State() appointment: PatientAppointment | DoctorAppointment = DoctorAppointmentDetailExample;
+  @State() appointment: PatientAppointment | DoctorAppointment = undefined;
+  @State() availableEquipment: Array<Equipment> = [];
+  @State() availableFacilities: Array<Facility> = [];
+  @State() availableMedicine: Array<Medicine> = [];
 
-  @State() availableEquipment: Array<Equipment> = AvailableResourcesExample.equipment;
-  @State() availableFacilities: Array<Facility> = AvailableResourcesExample.facilities;
-  @State() availableMedicine: Array<Medicine> = AvailableResourcesExample.medicine;
-  @State() selectedEquipment: Equipment = instanceOfDoctorAppointment(this.appointment)
-    ? this.appointment.equipment[0]
-    : null;
-  @State() selectedFacility: Facility = instanceOfDoctorAppointment(this.appointment)
-    ? this.appointment.facilities[0]
-    : null;
-  @State() selectedMedicine: Medicine = instanceOfDoctorAppointment(this.appointment)
-    ? this.appointment.medicine[0]
-    : null;
+  @State() selectedEquipment: Equipment =
+    this.appointment && instanceOfDoctorAppointment(this.appointment)
+      ? this.appointment.equipment[0]
+      : null;
+  @State() selectedFacility: Facility =
+    this.appointment && instanceOfDoctorAppointment(this.appointment)
+      ? this.appointment.facilities[0]
+      : null;
+  @State() selectedMedicine: Medicine =
+    this.appointment && instanceOfDoctorAppointment(this.appointment)
+      ? this.appointment.medicine[0]
+      : null;
+
+  async componentWillLoad() {
+    try {
+      if (this.isDoctor) {
+        const appt = await this.api.appointments.doctorsAppointment({
+          doctorId: this.user.id,
+          appointmentId: this.appointmentId,
+        });
+        this.appointment = appt;
+        this.selectedEquipment = appt.equipment?.[0] ?? null;
+        this.selectedFacility = appt.facilities?.[0] ?? null;
+        this.selectedMedicine = appt.medicine?.[0] ?? null;
+      } else {
+        const appt = await this.api.appointments.patientsAppointment({
+          patientId: this.user.id,
+          appointmentId: this.appointmentId,
+        });
+        this.appointment = appt;
+      }
+    } catch (err) {
+      if (!(err instanceof ApiError)) {
+        // TODO kili some generic error
+        return;
+      }
+
+      // TODO kili some internal server error, i think there is no other error I'm returing
+    }
+  }
 
   private getPatientAppointmentStatusMessage = (appointmentStatus: AppointmentStatus) => {
     switch (appointmentStatus) {
@@ -117,8 +148,6 @@ export class AppointmentDetail {
 
   render() {
     if (!this.appointment) return null;
-
-    console.log(this.isDoctor, instanceOfDoctorAppointment(this.appointment));
 
     return (
       <div class="w-full max-w-md">

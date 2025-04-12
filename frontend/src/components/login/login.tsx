@@ -42,6 +42,7 @@ export class Login {
       window.navigation.navigate('homepage');
     } catch (err) {
       if (!(err instanceof ApiError)) {
+        // TODO kili some generic error
         return;
       }
 

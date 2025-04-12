@@ -1,5 +1,5 @@
+import { Api, ApiError } from '../../api/api';
 import { AppointmentDisplay, Condition } from '../../api/generated';
-import { ConditionDetailExample } from '../../data-examples/condition-detail';
 import { formatDate, formatDateDelta, getDateAndTimeTitle } from '../../utils/utils';
 import { Component, h, Prop, State } from '@stencil/core';
 
@@ -8,14 +8,28 @@ import { Component, h, Prop, State } from '@stencil/core';
   shadow: false,
 })
 export class ConditionDetail {
+  @Prop() api: Api;
   @Prop() conditionId: string;
   @Prop() handleResetSelection: () => void;
   @Prop() handleSelectAppointment: (appointment: AppointmentDisplay) => void;
   @Prop() handleScheduleAppointmentFromCondition: (condition: Condition) => void;
   @Prop() handleToggleConditionStatus: (condition: Condition) => void;
 
-  @State() condition: Condition = ConditionDetailExample;
+  @State() condition: Condition;
   @State() expandedConditionId: string;
+
+  async componentWillLoad() {
+    try {
+      this.condition = await this.api.conditions.conditionDetail({ conditionId: this.conditionId });
+    } catch (err) {
+      if (!(err instanceof ApiError)) {
+        // TODO kili some generic error
+        return;
+      }
+
+      // TODO this should only return 404 and internal server error, but dont handle the 404, it came in the calendar, so it must be there
+    }
+  }
 
   private toggleConditionAppointments = (conditionId: string) => {
     this.expandedConditionId = this.expandedConditionId === conditionId ? null : conditionId;

@@ -1,5 +1,5 @@
 import { newApi } from '../../api/api';
-import { LoginRequest } from '../../api/generated';
+import { User } from '../../api/generated';
 import { StyledHost } from '../StyledHost';
 import { Component, h, Prop, State } from '@stencil/core';
 
@@ -38,13 +38,13 @@ export class App {
 
   render() {
     let element: string;
-    const user: LoginRequest | null = JSON.parse(sessionStorage.getItem('user'));
+    const user: User | null = JSON.parse(sessionStorage.getItem('user'));
 
     if (!user && !this.relativePath.startsWith('register')) {
       element = <xcastven-xkilian-project-login api={this.api} />;
     } else {
       if (this.relativePath === '' || this.relativePath.startsWith('homepage')) {
-        element = <xcastven-xkilian-project-home-page />;
+        element = <xcastven-xkilian-project-home-page api={this.api} />;
       } else if (this.relativePath.startsWith('login')) {
         element = <xcastven-xkilian-project-login api={this.api} />;
       } else if (this.relativePath.startsWith('registerCondition')) {
@@ -53,6 +53,8 @@ export class App {
         element = (
           <xcastven-xkilian-project-condition-registerer
             startDate={start ? new Date(start) : null}
+            api={this.api}
+            user={user}
           />
         );
       } else if (this.relativePath.startsWith('register')) {
@@ -63,6 +65,8 @@ export class App {
         element = (
           <xcastven-xkilian-project-appointment-scheduler
             initialDate={date ? new Date(date) : null}
+            api={this.api}
+            user={user}
           />
         );
       } else if (this.relativePath.startsWith('account')) {

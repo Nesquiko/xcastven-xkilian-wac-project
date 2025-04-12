@@ -1,3 +1,4 @@
+import { Api } from '../../api/api';
 import {
   AppointmentDisplay,
   AppointmentStatus,
@@ -19,6 +20,7 @@ import { Component, h, Prop } from '@stencil/core';
   shadow: false,
 })
 export class Drawer {
+  @Prop() api: Api;
   @Prop() user: User;
   @Prop() isDoctor: boolean;
 
@@ -188,6 +190,7 @@ export class Drawer {
             </div>
           ) : this.selectedAppointment ? (
             <xcastven-xkilian-project-appointment-detail
+              api={this.api}
               user={this.user}
               isDoctor={this.isDoctor}
               appointmentId={this.selectedAppointment.id}
@@ -200,6 +203,7 @@ export class Drawer {
             />
           ) : this.selectedCondition ? (
             <xcastven-xkilian-project-condition-detail
+              api={this.api}
               conditionId={this.selectedCondition.id}
               handleResetSelection={this.handleResetSelection}
               handleSelectAppointment={this.handleSelectAppointment}

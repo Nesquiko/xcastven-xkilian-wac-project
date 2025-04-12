@@ -84,6 +84,12 @@ export namespace Components {
         "currentDate": Date;
         "handleSelectCondition": (condition: ConditionDisplay) => void;
     }
+    interface XcastvenXkilianProjectDatePicker {
+        "currentViewMonth": number;
+        "currentViewYear": number;
+        "selectDate": (day: number) => void;
+        "selectedDate": Date;
+    }
     interface XcastvenXkilianProjectDrawer {
         "activeTab": number;
         "getAppointmentsForDate": (date: Date) => Array<AppointmentDisplay>;
@@ -210,6 +216,12 @@ declare global {
         prototype: HTMLXcastvenXkilianProjectConditionsListElement;
         new (): HTMLXcastvenXkilianProjectConditionsListElement;
     };
+    interface HTMLXcastvenXkilianProjectDatePickerElement extends Components.XcastvenXkilianProjectDatePicker, HTMLStencilElement {
+    }
+    var HTMLXcastvenXkilianProjectDatePickerElement: {
+        prototype: HTMLXcastvenXkilianProjectDatePickerElement;
+        new (): HTMLXcastvenXkilianProjectDatePickerElement;
+    };
     interface HTMLXcastvenXkilianProjectDrawerElement extends Components.XcastvenXkilianProjectDrawer, HTMLStencilElement {
     }
     var HTMLXcastvenXkilianProjectDrawerElement: {
@@ -274,6 +286,7 @@ declare global {
         "xcastven-xkilian-project-condition-detail": HTMLXcastvenXkilianProjectConditionDetailElement;
         "xcastven-xkilian-project-condition-registerer": HTMLXcastvenXkilianProjectConditionRegistererElement;
         "xcastven-xkilian-project-conditions-list": HTMLXcastvenXkilianProjectConditionsListElement;
+        "xcastven-xkilian-project-date-picker": HTMLXcastvenXkilianProjectDatePickerElement;
         "xcastven-xkilian-project-drawer": HTMLXcastvenXkilianProjectDrawerElement;
         "xcastven-xkilian-project-footer": HTMLXcastvenXkilianProjectFooterElement;
         "xcastven-xkilian-project-header": HTMLXcastvenXkilianProjectHeaderElement;
@@ -360,6 +373,12 @@ declare namespace LocalJSX {
         "currentDate"?: Date;
         "handleSelectCondition"?: (condition: ConditionDisplay) => void;
     }
+    interface XcastvenXkilianProjectDatePicker {
+        "currentViewMonth"?: number;
+        "currentViewYear"?: number;
+        "selectDate"?: (day: number) => void;
+        "selectedDate"?: Date;
+    }
     interface XcastvenXkilianProjectDrawer {
         "activeTab"?: number;
         "getAppointmentsForDate"?: (date: Date) => Array<AppointmentDisplay>;
@@ -440,6 +459,7 @@ declare namespace LocalJSX {
         "xcastven-xkilian-project-condition-detail": XcastvenXkilianProjectConditionDetail;
         "xcastven-xkilian-project-condition-registerer": XcastvenXkilianProjectConditionRegisterer;
         "xcastven-xkilian-project-conditions-list": XcastvenXkilianProjectConditionsList;
+        "xcastven-xkilian-project-date-picker": XcastvenXkilianProjectDatePicker;
         "xcastven-xkilian-project-drawer": XcastvenXkilianProjectDrawer;
         "xcastven-xkilian-project-footer": XcastvenXkilianProjectFooter;
         "xcastven-xkilian-project-header": XcastvenXkilianProjectHeader;
@@ -464,6 +484,7 @@ declare module "@stencil/core" {
             "xcastven-xkilian-project-condition-detail": LocalJSX.XcastvenXkilianProjectConditionDetail & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectConditionDetailElement>;
             "xcastven-xkilian-project-condition-registerer": LocalJSX.XcastvenXkilianProjectConditionRegisterer & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectConditionRegistererElement>;
             "xcastven-xkilian-project-conditions-list": LocalJSX.XcastvenXkilianProjectConditionsList & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectConditionsListElement>;
+            "xcastven-xkilian-project-date-picker": LocalJSX.XcastvenXkilianProjectDatePicker & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectDatePickerElement>;
             "xcastven-xkilian-project-drawer": LocalJSX.XcastvenXkilianProjectDrawer & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectDrawerElement>;
             "xcastven-xkilian-project-footer": LocalJSX.XcastvenXkilianProjectFooter & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectFooterElement>;
             "xcastven-xkilian-project-header": LocalJSX.XcastvenXkilianProjectHeader & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectHeaderElement>;

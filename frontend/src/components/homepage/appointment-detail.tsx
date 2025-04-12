@@ -118,8 +118,6 @@ export class AppointmentDetail {
   render() {
     if (!this.appointment) return null;
 
-    console.log(this.isDoctor, instanceOfDoctorAppointment(this.appointment));
-
     return (
       <div class="w-full max-w-md">
         <div class="relative w-full max-w-md">

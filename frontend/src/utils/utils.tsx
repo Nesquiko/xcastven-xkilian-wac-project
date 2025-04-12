@@ -1,10 +1,10 @@
 import {
-  AppointmentStatus,
+  AppointmentStatus, AppointmentType,
   DoctorAppointment,
   Equipment,
   Facility,
   Medicine,
-  PatientAppointment,
+  PatientAppointment, SpecializationEnum,
 } from '../api/generated';
 import { h } from '@stencil/core';
 
@@ -49,18 +49,28 @@ export const formatTime = (date: Date): string => {
   return `${hours}:${minutes}`;
 };
 
-export const getDateAndTimeTitle = (dateTime: Date, fontWeight: string, className?: string) => {
+export const getDateAndTimeTitle = (dateTime: Date, className?: string) => {
   return (
     <h2 class={'text-center text-2xl' + className && ' ' + className}>
-      {dateTime && <span class={'font- text-[#7357be]' + fontWeight}>{formatDate(dateTime)}</span>}
+      {dateTime && <span class={`text-[#7357be] font-medium`}>{formatDate(dateTime)}</span>}
       {dateTime.getHours() !== null && (
         <span class="text-gray-600">
           {' '}
-          at <span class={'font- text-[#7357be]' + fontWeight}>{formatTime(dateTime)}</span>
+          at <span class={`text-[#7357be] font-medium`}>{formatTime(dateTime)}</span>
         </span>
       )}
     </h2>
   );
+};
+
+export const getSelectedDateTimeObject = (
+  date: Date,
+  time: string,
+): Date => {
+  const [hours, minutes] = time.split(':').map(Number);
+  date.setHours(hours);
+  date.setMinutes(minutes);
+  return date;
 };
 
 export const formatDateDelta = (startDate: Date, endDate: Date = new Date()) => {
@@ -239,4 +249,18 @@ export const getDoctorAppointmentActions = (
     default:
       return null;
   }
+};
+
+export const formatSpecialization = (
+  specialization: SpecializationEnum,
+) => {
+  const withSpaces: string = specialization.replace("_", " ");
+  return withSpaces[0].toUpperCase() + withSpaces.slice(1);
+};
+
+export const formatAppointmentType = (
+  appointmentType: AppointmentType
+) => {
+  const withSpaces: string = appointmentType.replace("_", " ");
+  return withSpaces[0].toUpperCase() + withSpaces.slice(1);
 };

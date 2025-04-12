@@ -20,8 +20,6 @@ export class Account {
   };
 
   render() {
-    console.log(this.user);
-
     if (!this.user) return;
 
     return (

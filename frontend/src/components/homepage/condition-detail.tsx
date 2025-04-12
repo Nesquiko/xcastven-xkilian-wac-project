@@ -120,7 +120,7 @@ export class ConditionDetail {
                     <md-icon class="mr-2 text-gray-500" style={{ fontSize: '14px' }}>
                       calendar_month
                     </md-icon>
-                    {getDateAndTimeTitle(appointment.appointmentDateTime, 'medium', 'text-sm')}
+                    {getDateAndTimeTitle(appointment.appointmentDateTime, 'text-sm')}
                   </div>
                   <div class="text-xs font-medium text-gray-600">{appointment.type}</div>
                 </div>

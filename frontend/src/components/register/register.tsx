@@ -1,8 +1,9 @@
 import { ApiError } from '../../api/api';
 import { Api } from '../../api/api';
-import { Registration, UserRole } from '../../api/generated';
+import { Registration, SpecializationEnum, UserRole } from '../../api/generated';
 import { StyledHost } from '../StyledHost';
 import { Component, h, Prop, State } from '@stencil/core';
+import { formatSpecialization } from '../../utils/utils';
 
 @Component({
   tag: 'xcastven-xkilian-project-register',
@@ -11,13 +12,16 @@ import { Component, h, Prop, State } from '@stencil/core';
 export class Register {
   @Prop() api: Api;
 
-  @State() email: string;
-  @State() firstName: string;
-  @State() lastName: string;
+  @State() email: string = "";
+  @State() firstName: string = "";
+  @State() lastName: string = "";
+  @State() isDoctor: boolean = false;
+  @State() specialization: SpecializationEnum = null;
 
   @State() emailError: string = null;
   @State() firstNameError: string = null;
   @State() lastNameError: string = null;
+  @State() specializationError: string = null;
 
   private handleEmailChange = (event: Event) => {
     this.email = (event.target as HTMLTextAreaElement).value;
@@ -31,10 +35,19 @@ export class Register {
     this.lastName = (event.target as HTMLTextAreaElement).value;
   };
 
-  private handleRegister = async (role: UserRole) => {
+  private handleRoleChange = () => {
+    this.isDoctor = !this.isDoctor;
+  };
+
+  private handleSpecializationChange = (event: Event) => {
+    this.specialization = ((event.target as HTMLSelectElement).value) as SpecializationEnum;
+  };
+
+  private handleRegister = async () => {
     this.emailError = null;
     this.firstNameError = null;
     this.lastNameError = null;
+    this.specializationError = null;
 
     if (!this.email) {
       this.emailError = 'Email is required';
@@ -53,18 +66,22 @@ export class Register {
       this.emailError = 'Invalid email format';
     }
 
-    if (this.emailError || this.firstNameError || this.lastNameError) {
+    if (!this.specialization) {
+      this.specializationError = 'Specialization is required';
+    }
+
+    if (this.emailError || this.firstNameError || this.lastNameError || this.specializationError) {
       return;
     }
 
     let request: Registration;
-    if (role === UserRole.Doctor) {
+    if (this.isDoctor) {
       request = {
         role: 'doctor',
         email: this.email,
         firstName: this.firstName,
         lastName: this.lastName,
-        specialization: 'urologist',
+        specialization: this.specialization,
       };
     } else {
       request = {
@@ -116,49 +133,70 @@ export class Register {
             <div class="flex flex-row items-center justify-between gap-x-3">
               <md-filled-text-field
                 label="First Name"
-                class="mb-3 w-full"
+                class="mb-6 w-full"
                 value={this.firstName}
                 onInput={(e: Event) => this.handleFirstNameChange(e)}
               />
               <md-filled-text-field
                 label="Last Name"
-                class="mb-3 w-full"
+                class="mb-6 w-full"
                 value={this.lastName}
                 onInput={(e: Event) => this.handleLastNameChange(e)}
               />
             </div>
 
             {this.emailError ? (
-              <div class="mb-3 w-full text-center text-sm text-red-500">{this.emailError}</div>
+              <div class="mb-6 w-full text-center text-sm text-red-500">{this.emailError}</div>
             ) : this.firstNameError ? (
-              <div class="mb-3 w-full text-center text-sm text-red-500">{this.firstNameError}</div>
+              <div class="mb-6 w-full text-center text-sm text-red-500">{this.firstNameError}</div>
             ) : (
               this.lastNameError && (
-                <div class="mb-3 w-full text-center text-sm text-red-500">{this.lastNameError}</div>
+                <div class="mb-6 w-full text-center text-sm text-red-500">{this.lastNameError}</div>
               )
             )}
 
+            <div
+              class="mb-6 flex max-w-md min-w-md flex-row items-center justify-center gap-x-3">
+              <label htmlFor="doctor-switch" class="font-medium text-gray-600">
+                {this.isDoctor ? "I'm a doctor" : "I'm a patient"}
+              </label>
+              <md-switch
+                id="doctor-switch"
+                checked={this.isDoctor}
+                onChange={this.handleRoleChange}
+              />
+            </div>
+
+            {this.isDoctor && (
+              <div class="mb-6 w-full animate-[slideInFromRight_0.5s_ease-out]">
+                <md-filled-select
+                  label="Specialization"
+                  class="w-full"
+                  value={this.specialization}
+                  onInput={(e: Event) => this.handleSpecializationChange(e)}
+                >
+                  {Object.values(SpecializationEnum).map((specialization: SpecializationEnum) => (
+                    <md-select-option value={specialization}>
+                      <div slot="headline">{formatSpecialization(specialization)}</div>
+                    </md-select-option>
+                  ))}
+                </md-filled-select>
+              </div>
+            )}
+
             <md-text-button
-              class="mb-3 w-full rounded-full"
+              class="mb-6 w-full rounded-full"
               onClick={() => window.navigation.navigate('login')}
             >
               Already have an account?
             </md-text-button>
 
-            <div class="flex flex-row items-center justify-between gap-x-3">
-              <md-text-button
-                class="w-1/2 rounded-full px-4 py-3"
-                onClick={() => this.handleRegister(UserRole.Doctor)}
-              >
-                Register as doctor
-              </md-text-button>
-              <md-filled-button
-                class="w-1/2 rounded-full bg-[#9d83c6] px-4 py-3"
-                onClick={() => this.handleRegister(UserRole.Patient)}
-              >
-                Register
-              </md-filled-button>
-            </div>
+            <md-filled-button
+              class="w-full rounded-full bg-[#9d83c6] px-4 py-3"
+              onClick={this.handleRegister}
+            >
+              Register
+            </md-filled-button>
           </div>
         </div>
 

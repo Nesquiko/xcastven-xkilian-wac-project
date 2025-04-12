@@ -54,6 +54,7 @@ type Db interface {
 		appointmentId uuid.UUID,
 		newDateTime time.Time,
 	) (Appointment, error)
+	AppointmentsByConditionId(ctx context.Context, conditionId uuid.UUID) ([]Appointment, error)
 
 	CreatePatient(ctx context.Context, patient Patient) (Patient, error)
 	PatientById(ctx context.Context, id uuid.UUID) (Patient, error)

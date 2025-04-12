@@ -1,5 +1,5 @@
-import { Component, h, Prop } from '@stencil/core';
 import { DAYS_OF_WEEK, MONTHS, TODAY } from '../../utils/utils';
+import { Component, h, Prop } from '@stencil/core';
 
 @Component({
   tag: 'xcastven-xkilian-project-date-picker',
@@ -137,13 +137,11 @@ export class DatePicker {
 
         <div class="grid grid-cols-7 gap-1">
           {DAYS_OF_WEEK.map(day => (
-            <div class="px-3 py-2 text-center text-sm font-medium text-gray-600">
-              {day.short}
-            </div>
+            <div class="px-3 py-2 text-center text-sm font-medium text-gray-600">{day.short}</div>
           ))}
           {this.renderCalendar()}
         </div>
       </div>
     );
-  };
+  }
 }

@@ -54,21 +54,18 @@ export const formatTime = (date: Date): string => {
 export const getDateAndTimeTitle = (dateTime: Date, className?: string) => {
   return (
     <h2 class={'text-center text-2xl' + className && ' ' + className}>
-      {dateTime && <span class={`text-[#7357be] font-medium`}>{formatDate(dateTime)}</span>}
+      {dateTime && <span class={`font-medium text-[#7357be]`}>{formatDate(dateTime)}</span>}
       {dateTime.getHours() !== null && (
         <span class="text-gray-600">
           {' '}
-          at <span class={`text-[#7357be] font-medium`}>{formatTime(dateTime)}</span>
+          at <span class={`font-medium text-[#7357be]`}>{formatTime(dateTime)}</span>
         </span>
       )}
     </h2>
   );
 };
 
-export const getSelectedDateTimeObject = (
-  date: Date,
-  time: string,
-): Date => {
+export const getSelectedDateTimeObject = (date: Date, time: string): Date => {
   const [hours, minutes] = time.split(':').map(Number);
   date.setHours(hours);
   date.setMinutes(minutes);
@@ -162,12 +159,7 @@ export const ConditionOrderColors: Array<string> = [
   '#FBC02D',
 ];
 
-export const PrescriptionOrderColors: Array<string> = [
-  '#FF8080',
-  '#FF0000',
-  '#800000',
-  '#1A0000'
-];
+export const PrescriptionOrderColors: Array<string> = ['#FF8080', '#FF0000', '#800000', '#1A0000'];
 
 const patientButton = (
   displayTitle: string,
@@ -249,16 +241,12 @@ export const getDoctorAppointmentActions = (
   }
 };
 
-export const formatSpecialization = (
-  specialization: SpecializationEnum,
-) => {
-  const withSpaces: string = specialization.replace("_", " ");
+export const formatSpecialization = (specialization: SpecializationEnum) => {
+  const withSpaces: string = specialization.replace('_', ' ');
   return withSpaces[0].toUpperCase() + withSpaces.slice(1);
 };
 
-export const formatAppointmentType = (
-  appointmentType: AppointmentType
-) => {
-  const withSpaces: string = appointmentType.replace("_", " ");
+export const formatAppointmentType = (appointmentType: AppointmentType) => {
+  const withSpaces: string = appointmentType.replace('_', ' ');
   return withSpaces[0].toUpperCase() + withSpaces.slice(1);
 };

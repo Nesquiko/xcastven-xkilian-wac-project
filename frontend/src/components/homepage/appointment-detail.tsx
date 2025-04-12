@@ -103,16 +103,16 @@ export class AppointmentDetail {
   @State() showEditResources: boolean = false;
 
   @State() addingPrescription: boolean = false;
-  @State() addingPrescriptionName: string = "";
+  @State() addingPrescriptionName: string = '';
   @State() addingPrescriptionStart: Date = null;
   @State() addingPrescriptionEnd: Date = null;
-  @State() addingPrescriptionDoctorsNote: string = "";
+  @State() addingPrescriptionDoctorsNote: string = '';
 
   @State() editingPrescription: PrescriptionDisplay = null;
-  @State() editingPrescriptionNewName: string = "";
+  @State() editingPrescriptionNewName: string = '';
   @State() editingPrescriptionNewStart: Date = null;
   @State() editingPrescriptionNewEnd: Date = null;
-  @State() editingPrescriptionNewDoctorsNote: string = "";
+  @State() editingPrescriptionNewDoctorsNote: string = '';
 
   private getPatientAppointmentStatusMessage = (appointmentStatus: AppointmentStatus) => {
     switch (appointmentStatus) {
@@ -244,7 +244,9 @@ export class AppointmentDetail {
               <md-icon style={{ fontSize: '16px' }}>format_list_bulleted</md-icon>
               Type
             </div>
-            <span class="font-medium text-gray-600">{formatAppointmentType(this.appointment.type)}</span>
+            <span class="font-medium text-gray-600">
+              {formatAppointmentType(this.appointment.type)}
+            </span>
           </div>
 
           {this.isDoctor && instanceOfDoctorAppointment(this.appointment) && (
@@ -290,7 +292,7 @@ export class AppointmentDetail {
         </div>
 
         {this.isDoctor && instanceOfDoctorAppointment(this.appointment) && (
-          <div class="mb-6 w-full max-w-md rounded-md bg-gray-200 px-4 py-3 relative">
+          <div class="relative mb-6 w-full max-w-md rounded-md bg-gray-200 px-4 py-3">
             <div class="mb-1 flex flex-row items-center justify-start gap-x-2 text-gray-500">
               <md-icon style={{ fontSize: '16px' }}>library_add</md-icon>
               Resources
@@ -300,7 +302,7 @@ export class AppointmentDetail {
               <md-icon-button
                 title="Edit resources"
                 class="absolute top-1 left-32"
-                onClick={() => this.showEditResources = !this.showEditResources}
+                onClick={() => (this.showEditResources = !this.showEditResources)}
               >
                 <md-icon style={{ fontSize: '16px' }}>edit</md-icon>
               </md-icon-button>
@@ -311,32 +313,27 @@ export class AppointmentDetail {
                 <md-icon style={{ fontSize: '16px' }}>meeting_room</md-icon>
                 Facility
               </div>
-              <span class="font-medium text-gray-600">
-                {this.appointment.facilities[0].name}
-              </span>
+              <span class="font-medium text-gray-600">{this.appointment.facilities[0].name}</span>
             </div>
             <div class="flex w-full flex-row items-center justify-between">
               <div class="flex flex-row items-center gap-x-2 text-gray-500">
                 <md-icon style={{ fontSize: '16px' }}>service_toolbox</md-icon>
                 Equipment
               </div>
-              <span class="font-medium text-gray-600">
-                {this.appointment.equipment[0].name}
-              </span>
+              <span class="font-medium text-gray-600">{this.appointment.equipment[0].name}</span>
             </div>
             <div class="flex w-full flex-row items-center justify-between">
               <div class="flex flex-row items-center gap-x-2 text-gray-500">
                 <md-icon style={{ fontSize: '16px' }}>vaccines</md-icon>
                 Medicine
               </div>
-              <span class="font-medium text-gray-600">
-                {this.appointment.medicine[0].name}
-              </span>
+              <span class="font-medium text-gray-600">{this.appointment.medicine[0].name}</span>
             </div>
 
             {this.isDoctor &&
               instanceOfDoctorAppointment(this.appointment) &&
-              this.appointment.status === 'scheduled' && this.showEditResources && (
+              this.appointment.status === 'scheduled' &&
+              this.showEditResources && (
                 <div class="mt-3 w-full">
                   <div class="mb-3 flex w-full flex-col gap-y-3">
                     <md-outlined-select
@@ -384,9 +381,9 @@ export class AppointmentDetail {
                     onClick={() => {
                       this.showEditResources = false;
                       const newResources: {
-                        facility: Facility,
-                        equipment: Equipment,
-                        medicine: Medicine,
+                        facility: Facility;
+                        equipment: Equipment;
+                        medicine: Medicine;
                       } = {
                         facility: this.selectedFacility,
                         equipment: this.selectedEquipment,
@@ -403,7 +400,7 @@ export class AppointmentDetail {
           </div>
         )}
 
-        <div class="mb-6 w-full max-w-md rounded-md bg-gray-200 px-4 py-3 relative">
+        <div class="relative mb-6 w-full max-w-md rounded-md bg-gray-200 px-4 py-3">
           <div class="mb-2 flex flex-row items-center justify-between">
             <div class="flex flex-row items-center gap-x-2 text-gray-500">
               <md-icon style={{ fontSize: '16px' }}>medication</md-icon>
@@ -411,8 +408,8 @@ export class AppointmentDetail {
             </div>
             {this.appointment.prescriptions && this.appointment.prescriptions.length > 0 && (
               <md-icon-button
-                title={this.prescriptionsExpanded ? "Expand" : "Close"}
-                onClick={() => this.prescriptionsExpanded = !this.prescriptionsExpanded}
+                title={this.prescriptionsExpanded ? 'Expand' : 'Close'}
+                onClick={() => (this.prescriptionsExpanded = !this.prescriptionsExpanded)}
                 style={{ width: '24px', height: '24px' }}
               >
                 <md-icon style={{ fontSize: '16px' }}>
@@ -424,25 +421,29 @@ export class AppointmentDetail {
               <md-icon-button
                 title="Add a prescription"
                 class="absolute top-1 left-36"
-                onClick={() => this.addingPrescription = !this.addingPrescription}
+                onClick={() => (this.addingPrescription = !this.addingPrescription)}
               >
                 <md-icon style={{ fontSize: '16px' }}>add</md-icon>
               </md-icon-button>
             )}
           </div>
 
-          {(this.appointment.prescriptions && this.appointment.prescriptions.length <= 0) ? (
-            <div class="text-sm font-medium text-gray-600">No prescriptions for this appointments</div>
+          {this.appointment.prescriptions && this.appointment.prescriptions.length <= 0 ? (
+            <div class="text-sm font-medium text-gray-600">
+              No prescriptions for this appointments
+            </div>
           ) : this.prescriptionsExpanded ? (
             <div class="max-h-28 w-full overflow-y-auto rounded-md bg-gray-200">
               {this.appointment.prescriptions.map((prescription: PrescriptionDisplay) => (
                 <div
                   key={prescription.id}
-                  class="flex mr-2 cursor-pointer items-center justify-between rounded px-2 py-1 hover:bg-gray-300"
+                  class="mr-2 flex cursor-pointer items-center justify-between rounded px-2 py-1 hover:bg-gray-300"
                   onClick={() => this.handleSelectPrescription(prescription)}
                 >
-                  <div class="flex items-center text-gray-600 font-medium">
-                    <md-icon class="mr-2" style={{ fontSize: '14px' }}>medication</md-icon>
+                  <div class="flex items-center font-medium text-gray-600">
+                    <md-icon class="mr-2" style={{ fontSize: '14px' }}>
+                      medication
+                    </md-icon>
                     {prescription.name}
                   </div>
                   {instanceOfDoctorAppointment(this.appointment) && (
@@ -466,12 +467,16 @@ export class AppointmentDetail {
             </div>
           ) : (
             <div class="ml-2 text-sm font-medium text-gray-600">
-              {this.appointment.prescriptions ? this.appointment.prescriptions.length : 0} prescription
-              {this.appointment.prescriptions ? this.appointment.prescriptions.length !== 1 && 's' : 's'}
+              {this.appointment.prescriptions ? this.appointment.prescriptions.length : 0}{' '}
+              prescription
+              {this.appointment.prescriptions
+                ? this.appointment.prescriptions.length !== 1 && 's'
+                : 's'}
             </div>
           )}
 
-          {this.isDoctor && instanceOfDoctorAppointment(this.appointment) &&
+          {this.isDoctor &&
+            instanceOfDoctorAppointment(this.appointment) &&
             this.editingPrescription && (
               <div class="mt-3 w-full">
                 <div class="mb-3 flex w-full flex-col gap-y-3">
@@ -522,7 +527,7 @@ export class AppointmentDetail {
                     );
 
                     this.editingPrescription = null;
-                    this.editingPrescriptionNewName = "";
+                    this.editingPrescriptionNewName = '';
                     this.editingPrescriptionNewStart = null;
                     this.editingPrescriptionNewEnd = null;
                   }}
@@ -532,7 +537,8 @@ export class AppointmentDetail {
               </div>
             )}
 
-          {this.isDoctor && instanceOfDoctorAppointment(this.appointment) &&
+          {this.isDoctor &&
+            instanceOfDoctorAppointment(this.appointment) &&
             this.addingPrescription && (
               <div class="mt-3 w-full">
                 <div class="mb-3 flex w-full flex-col gap-y-3">
@@ -569,7 +575,7 @@ export class AppointmentDetail {
                   class={`w-full rounded-full bg-[#7357be]`}
                   onClick={() => {
                     const newPrescription: Prescription = {
-                      id: "new-prescription",
+                      id: 'new-prescription',
                       name: this.addingPrescriptionName,
                       start: this.addingPrescriptionStart,
                       end: this.addingPrescriptionEnd,
@@ -582,7 +588,7 @@ export class AppointmentDetail {
                     );*/
 
                     this.addingPrescriptionDoctorsNote = null;
-                    this.addingPrescriptionName = "";
+                    this.addingPrescriptionName = '';
                     this.addingPrescriptionStart = null;
                     this.addingPrescriptionEnd = null;
                   }}
@@ -606,16 +612,16 @@ export class AppointmentDetail {
 
         {this.isDoctor
           ? getDoctorAppointmentActions(
-            this.appointment.status,
-            () => this.handleCancelAppointment(this.appointment),
-            () => this.handleAcceptAppointment(this.appointment),
-            () => this.handleDenyAppointment(this.appointment),
-          )
+              this.appointment.status,
+              () => this.handleCancelAppointment(this.appointment),
+              () => this.handleAcceptAppointment(this.appointment),
+              () => this.handleDenyAppointment(this.appointment),
+            )
           : getPatientAppointmentActions(
-            this.appointment.status,
-            () => this.handleRescheduleAppointment(this.appointment),
-            () => this.handleCancelAppointment(this.appointment),
-        )}
+              this.appointment.status,
+              () => this.handleRescheduleAppointment(this.appointment),
+              () => this.handleCancelAppointment(this.appointment),
+            )}
       </div>
     );
   }

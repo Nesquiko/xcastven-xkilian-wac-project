@@ -206,9 +206,12 @@ export class Homepage {
     updatedPrescription: PrescriptionDisplay,
   ) => {
     console.log(
-      "Update prescription with ID:", prescriptionId,
-      "on appointment", appointment,
-      "with values", updatedPrescription,
+      'Update prescription with ID:',
+      prescriptionId,
+      'on appointment',
+      appointment,
+      'with values',
+      updatedPrescription,
     );
   };
 

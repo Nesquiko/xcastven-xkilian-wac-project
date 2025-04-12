@@ -122,7 +122,7 @@ export class ConditionRegisterer {
                 : isInRange
                   ? 'bg-[#d8c7ed] text-black'
                   : isHoveredInRange
-                    ? 'bg-gray-200 cursor-pointer'
+                    ? 'cursor-pointer bg-gray-200'
                     : isPastDate
                       ? 'cursor-not-allowed text-gray-400'
                       : 'cursor-pointer hover:bg-gray-200'

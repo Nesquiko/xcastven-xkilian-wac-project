@@ -41,7 +41,9 @@ export class AppointmentsList {
                   ) : (
                     getDateAndTimeTitle(appointment.appointmentDateTime, 'medium')
                   )}
-                  <div class="text-sm font-medium text-gray-600">{formatAppointmentType(appointment.type)}</div>
+                  <div class="text-sm font-medium text-gray-600">
+                    {formatAppointmentType(appointment.type)}
+                  </div>
                 </div>
                 {this.isDoctor ? (
                   <div class="text-sm font-medium text-gray-600">{appointment.patientName}</div>

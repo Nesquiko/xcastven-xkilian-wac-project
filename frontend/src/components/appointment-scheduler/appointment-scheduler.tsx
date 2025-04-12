@@ -4,8 +4,10 @@ import {
   ConditionDisplay,
   Doctor,
   PatientAppointment,
-  TimeSlot, User,
+  TimeSlot,
+  User,
 } from '../../api/generated';
+import { ActiveConditionsExample } from '../../data-examples/active-conditions';
 import { AppointmentTimesExample } from '../../data-examples/appointment-times';
 import { AvailableDoctorsExample } from '../../data-examples/available-doctors';
 import {
@@ -16,7 +18,6 @@ import {
   TODAY,
 } from '../../utils/utils';
 import { Component, h, Prop, State } from '@stencil/core';
-import { ActiveConditionsExample } from '../../data-examples/active-conditions';
 
 @Component({
   tag: 'xcastven-xkilian-project-appointment-scheduler',
@@ -32,7 +33,7 @@ export class AppointmentScheduler {
   @State() selectedAppointmentType: AppointmentType = null;
   @State() selectedDoctor: Doctor = null;
   @State() selectedCondition: ConditionDisplay = null;
-  @State() appointmentReason: string = "";
+  @State() appointmentReason: string = '';
   @State() currentViewMonth: number = TODAY.getMonth();
   @State() currentViewYear: number = TODAY.getFullYear();
 
@@ -55,7 +56,7 @@ export class AppointmentScheduler {
   };
 
   private handleAppointmentTypeChange = (event: Event) => {
-    this.selectedAppointmentType = ((event.target as HTMLSelectElement).value) as AppointmentType;
+    this.selectedAppointmentType = (event.target as HTMLSelectElement).value as AppointmentType;
   };
 
   private handleDoctorChange = (event: Event) => {
@@ -65,7 +66,9 @@ export class AppointmentScheduler {
 
   private handleConditionChange = (event: Event) => {
     const conditionId: string = (event.target as HTMLSelectElement).value;
-    this.selectedCondition = this.activeConditions.find((condition: ConditionDisplay) => condition.id === conditionId);
+    this.selectedCondition = this.activeConditions.find(
+      (condition: ConditionDisplay) => condition.id === conditionId,
+    );
   };
 
   private handleAppointmentReasonChange = (event: Event) => {
@@ -73,19 +76,22 @@ export class AppointmentScheduler {
   };
 
   private handleScheduleAppointment = () => {
-    const appointmentDateTime: Date = getSelectedDateTimeObject(this.selectedDate, this.selectedTime);
+    const appointmentDateTime: Date = getSelectedDateTimeObject(
+      this.selectedDate,
+      this.selectedTime,
+    );
 
     const newAppointment: PatientAppointment = {
-      id: "new-appointment",
+      id: 'new-appointment',
       appointmentDateTime: appointmentDateTime,
       type: this.selectedAppointmentType,
       condition: this.selectedCondition,
-      status: "requested",
+      status: 'requested',
       reason: this.appointmentReason,
       doctor: this.selectedDoctor,
     };
 
-    console.log("Request to schedule an appointment:", newAppointment);
+    console.log('Request to schedule an appointment:', newAppointment);
     // TODO kili is selectedDoctor id? and can you, pretty please, create one date object from selectDate and selectedTime, please?
     // this.api.appointments.requestAppointment({
     //   newAppointmentRequest: {
@@ -178,7 +184,9 @@ export class AppointmentScheduler {
               class={`m-auto flex w-full max-w-lg transform animate-[slideInFromBottom_0.5s_ease-out] flex-col justify-center p-6 opacity-100 transition-all duration-500 ease-in-out md:w-1/2 md:animate-[slideInFromRight_0.5s_ease-out]`}
             >
               <div class="mb-6">
-                {getDateAndTimeTitle(getSelectedDateTimeObject(this.selectedDate, this.selectedTime))}
+                {getDateAndTimeTitle(
+                  getSelectedDateTimeObject(this.selectedDate, this.selectedTime),
+                )}
               </div>
 
               <div class="mb-6">

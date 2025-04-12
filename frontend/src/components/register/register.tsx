@@ -1,9 +1,9 @@
 import { ApiError } from '../../api/api';
 import { Api } from '../../api/api';
 import { Registration, SpecializationEnum } from '../../api/generated';
+import { formatSpecialization } from '../../utils/utils';
 import { StyledHost } from '../StyledHost';
 import { Component, h, Prop, State } from '@stencil/core';
-import { formatSpecialization } from '../../utils/utils';
 
 @Component({
   tag: 'xcastven-xkilian-project-register',
@@ -12,9 +12,9 @@ import { formatSpecialization } from '../../utils/utils';
 export class Register {
   @Prop() api: Api;
 
-  @State() email: string = "";
-  @State() firstName: string = "";
-  @State() lastName: string = "";
+  @State() email: string = '';
+  @State() firstName: string = '';
+  @State() lastName: string = '';
   @State() isDoctor: boolean = false;
   @State() specialization: SpecializationEnum = null;
 
@@ -40,7 +40,7 @@ export class Register {
   };
 
   private handleSpecializationChange = (event: Event) => {
-    this.specialization = ((event.target as HTMLSelectElement).value) as SpecializationEnum;
+    this.specialization = (event.target as HTMLSelectElement).value as SpecializationEnum;
   };
 
   private handleRegister = async () => {
@@ -156,8 +156,7 @@ export class Register {
               )
             )}
 
-            <div
-              class="mb-6 flex max-w-md min-w-md flex-row items-center justify-center gap-x-3">
+            <div class="mb-6 flex max-w-md min-w-md flex-row items-center justify-center gap-x-3">
               <label htmlFor="doctor-switch" class="font-medium text-gray-600">
                 {this.isDoctor ? "I'm a doctor" : "I'm a patient"}
               </label>

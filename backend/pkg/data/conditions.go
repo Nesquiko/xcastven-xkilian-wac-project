@@ -62,13 +62,11 @@ func (m *MongoDb) FindConditionsByPatientId(
 	collection := m.Database.Collection(conditionsCollection)
 	conditions := make([]Condition, 0)
 
-	filter := bson.M{
-		"patientId": patientId,
-		"end":       bson.M{"$gte": from},
-	}
+	filter := bson.M{"patientId": patientId}
 	if to != nil {
 		filter["start"] = bson.M{"$lte": *to}
 	}
+	filter["$or"] = []bson.M{{"end": bson.M{"$gte": from}}, {"end": nil}}
 
 	opts := options.Find().SetSort(bson.D{{Key: "start", Value: 1}})
 	cursor, err := collection.Find(ctx, filter, opts)

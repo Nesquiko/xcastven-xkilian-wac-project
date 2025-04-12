@@ -1,3 +1,4 @@
+import { Api, ApiError } from '../../api/api';
 import {
   AppointmentDisplay,
   AppointmentStatus,
@@ -11,8 +12,6 @@ import {
   PrescriptionDisplay,
   User,
 } from '../../api/generated';
-import { DoctorsCalendarExample } from '../../data-examples/doctors-calendar';
-import { PatientsCalendarExample } from '../../data-examples/patients-calendar';
 import { TODAY } from '../../utils/utils';
 import { StyledHost } from '../StyledHost';
 import { Component, h, State } from '@stencil/core';
@@ -25,9 +24,11 @@ export class Homepage {
   private user: User = JSON.parse(sessionStorage.getItem('user'));
   private isDoctor: boolean = this.user.role === 'doctor';
 
-  @State() appointments: Array<AppointmentDisplay> = DoctorsCalendarExample.appointments;
-  @State() conditions: Array<ConditionDisplay> = PatientsCalendarExample.conditions;
-  @State() prescriptions: Array<PrescriptionDisplay> = PatientsCalendarExample.prescriptions;
+  @Prop() api: Api;
+
+  @State() appointments: Array<AppointmentDisplay> = [];
+  @State() conditions: Array<ConditionDisplay> = [];
+  @State() prescriptions: Array<PrescriptionDisplay> = [];
 
   @State() selectedDate: Date = null;
   @State() selectedAppointment: AppointmentDisplay = null;
@@ -46,6 +47,42 @@ export class Homepage {
 
   @State() activeTab: number = 0;
 
+  async componentWillLoad() {
+    this.loadCalendar();
+  }
+
+  private async loadCalendar() {
+    const fromDate = new Date(this.currentViewYear, this.currentViewMonth, 1);
+    const toDate = new Date(this.currentViewYear, this.currentViewMonth + 1, 0);
+
+    try {
+      if (this.isDoctor) {
+        const calendar = await this.api.doctors.doctorsCalendar({
+          doctorId: this.user.id,
+          from: fromDate,
+          to: toDate,
+        });
+        this.appointments = calendar.appointments ?? [];
+      } else {
+        const calendar = await this.api.patients.patientsCalendar({
+          patientId: this.user.id,
+          from: fromDate,
+          to: toDate,
+        });
+        this.appointments = calendar.appointments ?? [];
+        this.conditions = calendar.conditions ?? [];
+        this.prescriptions = calendar.prescriptions ?? [];
+      }
+    } catch (err) {
+      if (!(err instanceof ApiError)) {
+        // TODO kili some generic error
+        return;
+      }
+
+      // TODO kili some internal server error, i think there is no other error I'm returing
+    }
+  }
+
   private handlePreviousMonth = () => {
     if (this.currentViewMonth === 0) {
       this.currentViewMonth = 11;
@@ -53,6 +90,7 @@ export class Homepage {
     } else {
       this.currentViewMonth--;
     }
+    this.loadCalendar();
   };
 
   private handleNextMonth = () => {
@@ -62,10 +100,12 @@ export class Homepage {
     } else {
       this.currentViewMonth++;
     }
+    this.loadCalendar();
   };
 
   private handleYearChange = (event: Event) => {
     this.currentViewYear = parseInt((event.target as HTMLSelectElement).value);
+    this.loadCalendar();
   };
 
   private handleToggleLegendMenu = () => {
@@ -76,20 +116,77 @@ export class Homepage {
     this.isDrawerOpen = true;
   };
 
-  private handleRescheduleAppointment = (appointment: PatientAppointment | DoctorAppointment) => {
-    console.log('Re-schedule appointment:', appointment);
+  private handleRescheduleAppointment = async (
+    appointment: PatientAppointment | DoctorAppointment,
+  ) => {
+    try {
+      await this.api.appointments.rescheduleAppointment({
+        appointmentId: appointment.id,
+        appointmentReschedule: {
+          // TODO kili I don't know if the appointment has rescheduled appointmentDateTime, if yes, then delete this commend, otherwise get it here
+          newAppointmentDateTime: appointment.appointmentDateTime,
+          // TODO kili there can be reason
+          reason: 'TODO kili reason',
+        },
+      });
+    } catch (err) {
+      if (!(err instanceof ApiError)) {
+        // TODO kili some generic error
+        return;
+      }
+      // TODO kili 409 when the doctor is unavailable in rescheduled time and internal server error, i think there is no other error I'm returing
+    }
   };
 
-  private handleCancelAppointment = (appointment: PatientAppointment | DoctorAppointment) => {
-    console.log('Cancel appointment:', appointment);
+  private handleCancelAppointment = async (appointment: PatientAppointment | DoctorAppointment) => {
+    try {
+      await this.api.appointments.cancelAppointment({
+        appointmentId: appointment.id,
+        appointmentCancellation: { reason: 'TODO kili reason' },
+      });
+      // TODO kili this doesn't return anything, it is up to you how will you change the appointment status
+    } catch (err) {
+      if (!(err instanceof ApiError)) {
+        // TODO kili some generic error
+        return;
+      }
+      // TODO kili some internal server error, i think there is no other error I'm returing
+    }
   };
 
-  private handleAcceptAppointment = (appointment: PatientAppointment | DoctorAppointment) => {
-    console.log('Accept appointment:', appointment);
+  private handleAcceptAppointment = async (appointment: PatientAppointment | DoctorAppointment) => {
+    // TODO kili when accepting an appointment, you can also pass resources
+    try {
+      await this.api.appointments.decideAppointment({
+        appointmentId: appointment.id,
+        appointmentDecision: { action: 'accept', medicine: [], facilities: [], equipment: [] },
+      });
+      // TODO kili this returns DoctorAppointment, it is up to you how will you change the appointment status
+    } catch (err) {
+      if (!(err instanceof ApiError)) {
+        // TODO kili some generic error
+        return;
+      }
+      // TODO kili handle 409 conflict if resources are unavailable, or internal server error, i think there is no other error I'm returing
+    }
   };
 
-  private handleDenyAppointment = (appointment: PatientAppointment | DoctorAppointment) => {
-    console.log('Deny appointment', appointment);
+  private handleDenyAppointment = async (appointment: PatientAppointment | DoctorAppointment) => {
+    // TODO kili when denying an appointment there can be reason
+    try {
+      // TODO kili when rejecting there can also be a reason
+      await this.api.appointments.decideAppointment({
+        appointmentId: appointment.id,
+        appointmentDecision: { action: 'reject', reason: 'TODO kili reason' },
+      });
+      // TODO kili this returns DoctorAppointment, it is up to you how will you change the appointment status
+    } catch (err) {
+      if (!(err instanceof ApiError)) {
+        // TODO kili some generic error
+        return;
+      }
+      // TODO kili some internal server error, i think there is no other error I'm returing
+    }
   };
 
   private handleSaveResourcesOnAppointment = (
@@ -159,6 +256,7 @@ export class Homepage {
   };
 
   private handleScheduleAppointmentFromCondition = (condition: Condition) => {
+    // TODO kili i need NewAppointmentRequest with conditionId set
     console.log('Schedule an appointment for condition:', condition);
   };
 
@@ -255,6 +353,7 @@ export class Homepage {
         )}
 
         <xcastven-xkilian-project-drawer
+          api={this.api}
           user={this.user}
           isDoctor={this.isDoctor}
           isDrawerOpen={this.isDrawerOpen}
@@ -285,4 +384,7 @@ export class Homepage {
       </StyledHost>
     );
   }
+}
+function Prop(): (target: Homepage, propertyKey: 'api') => void {
+  throw new Error('Function not implemented.');
 }

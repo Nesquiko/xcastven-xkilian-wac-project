@@ -5,6 +5,7 @@ post:
   operationId: requestAppointment
   requestBody:
     description: Basic info about the appointment request
+    required: true
     content:
       application/json:
         schema:

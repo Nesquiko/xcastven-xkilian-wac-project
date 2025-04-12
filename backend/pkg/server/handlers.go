@@ -62,6 +62,18 @@ func (s Server) DecideAppointment(
 
 	doctorAppt, err := s.app.DecideAppointment(r.Context(), appointmentId, req)
 	if err != nil {
+		if errors.Is(err, app.ErrResourceUnavailable) {
+			apiErr := &ApiError{
+				ErrorDetail: api.ErrorDetail{
+					Code:   "resources.unavailable",
+					Title:  "Conflict",
+					Detail: "Requested resources are unavailable",
+					Status: http.StatusConflict,
+				},
+			}
+			encodeError(w, apiErr)
+			return
+		}
 		slog.Error(UnexpectedError, "error", err.Error(), "where", "DecideAppointment")
 		encodeError(w, internalServerError())
 		return
@@ -253,6 +265,18 @@ func (s Server) RescheduleAppointment(
 
 	appt, err := s.app.RescheduleAppointment(r.Context(), appointmentId, req.NewAppointmentDateTime)
 	if err != nil {
+		if errors.Is(err, app.ErrDoctorUnavailable) {
+			apiErr := &ApiError{
+				ErrorDetail: api.ErrorDetail{
+					Code:   "doctor.unavailable",
+					Title:  "Conflict",
+					Detail: "Doctor is unavailable in requested reschedule time",
+					Status: http.StatusConflict,
+				},
+			}
+			encodeError(w, apiErr)
+			return
+		}
 		slog.Error(UnexpectedError, "error", err.Error(), "where", "RescheduleAppointment")
 		encodeError(w, internalServerError())
 		return

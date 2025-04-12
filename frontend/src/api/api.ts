@@ -1,8 +1,19 @@
-import { AuthApi, ErrorDetail } from './generated';
+import {
+  AppointmentsApi,
+  AuthApi,
+  ConditionsApi,
+  DoctorsApi,
+  ErrorDetail,
+  PatientsApi,
+} from './generated';
 import { Configuration, FetchAPI, ResponseError } from './generated';
 
 export interface Api {
   auth: AuthApi;
+  appointments: AppointmentsApi;
+  conditions: ConditionsApi;
+  doctors: DoctorsApi;
+  patients: PatientsApi;
 }
 
 const fetchApi: FetchAPI = async (input, init): Promise<Response> => {
@@ -31,6 +42,10 @@ export function newApi(apiBase: string): Api {
   const config = new Configuration({ basePath: apiBase, fetchApi });
   return {
     auth: new AuthApi(config),
+    appointments: new AppointmentsApi(config),
+    conditions: new ConditionsApi(config),
+    doctors: new DoctorsApi(config),
+    patients: new PatientsApi(config),
   };
 }
 

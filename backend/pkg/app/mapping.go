@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/oapi-codegen/runtime/types"
 
 	"github.com/Nesquiko/wac/pkg/api"
@@ -65,6 +66,19 @@ func dataCondToCondDisplay(c data.Condition) api.ConditionDisplay {
 		Name:  c.Name,
 		Start: c.Start,
 		End:   c.End,
+	}
+}
+
+func dataCondToCond(c data.Condition, appts []api.AppointmentDisplay) api.Condition {
+	return api.Condition{
+		Id:           &c.Id,
+		Name:         c.Name,
+		Start:        c.Start,
+		End:          c.End,
+		Appointments: appts,
+		AppointmentsIds: asPtr(
+			Map(appts, func(appt api.AppointmentDisplay) uuid.UUID { return appt.Id }),
+		),
 	}
 }
 

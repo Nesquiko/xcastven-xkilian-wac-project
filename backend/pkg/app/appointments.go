@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -172,6 +173,12 @@ func (a monolithApp) DecideAppointment(
 		resources,
 	)
 	if err != nil {
+		if errors.Is(err, data.ErrResourceUnavailable) {
+			return api.DoctorAppointment{}, fmt.Errorf(
+				"DecideAppointment: %w",
+				ErrResourceUnavailable,
+			)
+		}
 		return api.DoctorAppointment{}, fmt.Errorf("DecideAppointment: %w", err)
 	}
 
@@ -254,6 +261,12 @@ func (a monolithApp) RescheduleAppointment(
 ) (api.PatientAppointment, error) {
 	appt, err := a.db.RescheduleAppointment(ctx, appointmentId, newDateTime)
 	if err != nil {
+		if errors.Is(err, data.ErrDoctorUnavailable) {
+			return api.PatientAppointment{}, fmt.Errorf(
+				"RescheduleAppointment: %w",
+				ErrDoctorUnavailable,
+			)
+		}
 		return api.PatientAppointment{}, fmt.Errorf("RescheduleAppointment: %w", err)
 	}
 

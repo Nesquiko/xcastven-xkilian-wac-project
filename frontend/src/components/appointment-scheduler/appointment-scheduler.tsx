@@ -1,5 +1,5 @@
+import { Api } from '../../api/api';
 import {
-  AppointmentDisplay,
   AppointmentType,
   ConditionDisplay,
   Doctor,
@@ -23,6 +23,8 @@ import { ActiveConditionsExample } from '../../data-examples/active-conditions';
   shadow: false,
 })
 export class AppointmentScheduler {
+  @Prop() api: Api;
+  @Prop() user: User;
   @Prop() initialDate: Date = null;
 
   @State() selectedDate: Date = null;
@@ -84,6 +86,17 @@ export class AppointmentScheduler {
     };
 
     console.log("Request to schedule an appointment:", newAppointment);
+    // TODO kili is selectedDoctor id? and can you, pretty please, create one date object from selectDate and selectedTime, please?
+    // this.api.appointments.requestAppointment({
+    //   newAppointmentRequest: {
+    //     patientId: this.user.id,
+    //     doctorId: this.selectedDoctor,
+    //     // appointmentDateTime: ???
+    //     type: this.selectedAppointmentType,
+    //     reason: this.appointmentReason,
+    //   },
+    // });
+    //
   };
 
   private resetSelection = () => {

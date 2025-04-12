@@ -316,6 +316,38 @@ func (m *MongoDb) RescheduleAppointment(
 	return m.AppointmentById(ctx, appointmentId)
 }
 
+func (m *MongoDb) AppointmentsByConditionId(
+	ctx context.Context,
+	conditionId uuid.UUID,
+) ([]Appointment, error) {
+	appointmentsColl := m.Database.Collection(appointmentsCollection)
+	appointments := make([]Appointment, 0)
+	filter := bson.M{"conditionId": conditionId}
+
+	opts := options.Find().SetSort(bson.D{{Key: "appointmentDateTime", Value: -1}})
+
+	cursor, err := appointmentsColl.Find(ctx, filter, opts)
+	if err != nil {
+		return nil, fmt.Errorf("AppointmentsByConditionId find failed: %w", err)
+	}
+
+	defer func() {
+		if cerr := cursor.Close(ctx); cerr != nil {
+			slog.Warn("Failed to close cursor in AppointmentsByConditionId", "error", cerr.Error())
+		}
+	}()
+
+	if err = cursor.All(ctx, &appointments); err != nil {
+		return nil, fmt.Errorf("AppointmentsByConditionId decode failed: %w", err)
+	}
+
+	if err = cursor.Err(); err != nil {
+		return nil, fmt.Errorf("AppointmentsByConditionId cursor error: %w", err)
+	}
+
+	return appointments, nil
+}
+
 func (m *MongoDb) appointmentsByIdFieldAndDateRange(
 	ctx context.Context,
 	idField string,

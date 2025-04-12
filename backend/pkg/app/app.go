@@ -12,8 +12,10 @@ import (
 )
 
 var (
-	ErrDuplicateEmail = errors.New("email address already exists")
-	ErrNotFound       = errors.New("resource not found")
+	ErrDuplicateEmail      = errors.New("email address already exists")
+	ErrNotFound            = errors.New("resource not found")
+	ErrDoctorUnavailable   = errors.New("doctor unavailable at the specified time")
+	ErrResourceUnavailable = errors.New("resource is unavailable during the requested time slot")
 )
 
 type App interface {
@@ -75,7 +77,7 @@ type App interface {
 	) (api.DoctorTimeslots, error)
 
 	CreatePatientCondition(ctx context.Context, cond api.NewCondition) (api.ConditionDisplay, error)
-	ConditionById(ctx context.Context, id uuid.UUID) (api.ConditionDisplay, error)
+	ConditionById(ctx context.Context, id uuid.UUID) (api.Condition, error)
 
 	CreatePatientPrescription(
 		ctx context.Context,

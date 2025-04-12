@@ -5,10 +5,12 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { AppointmentDisplay, AppointmentStatus, Condition, ConditionDisplay, DoctorAppointment, Equipment, Facility, Medicine, PatientAppointment, PrescriptionDisplay, User, UserRole } from "./api/generated";
 import { Api } from "./api/api";
-export { AppointmentDisplay, AppointmentStatus, Condition, ConditionDisplay, DoctorAppointment, Equipment, Facility, Medicine, PatientAppointment, PrescriptionDisplay, User, UserRole } from "./api/generated";
+import { AppointmentDisplay, AppointmentStatus, Condition, ConditionDisplay, DoctorAppointment, Equipment, Facility, Medicine, PatientAppointment, PrescriptionDisplay, User, UserRole } from "./api/generated";
+import { User as User1 } from "./components";
 export { Api } from "./api/api";
+export { AppointmentDisplay, AppointmentStatus, Condition, ConditionDisplay, DoctorAppointment, Equipment, Facility, Medicine, PatientAppointment, PrescriptionDisplay, User, UserRole } from "./api/generated";
+export { User as User1 } from "./components";
 export namespace Components {
     interface XcastvenXkilianProjectAccount {
     }
@@ -17,6 +19,7 @@ export namespace Components {
         "basePath": string;
     }
     interface XcastvenXkilianProjectAppointmentDetail {
+        "api": Api;
         "appointmentId": string;
         "handleAcceptAppointment": (appointment: PatientAppointment | DoctorAppointment) => void;
         "handleCancelAppointment": (appointment: PatientAppointment | DoctorAppointment) => void;
@@ -37,7 +40,9 @@ export namespace Components {
         "user": User;
     }
     interface XcastvenXkilianProjectAppointmentScheduler {
+        "api": Api;
         "initialDate": Date;
+        "user": User;
     }
     interface XcastvenXkilianProjectAppointmentsList {
         "appointments": Array<AppointmentDisplay>;
@@ -70,6 +75,7 @@ export namespace Components {
         "user": { email: string; role: UserRole };
     }
     interface XcastvenXkilianProjectConditionDetail {
+        "api": Api;
         "conditionId": string;
         "handleResetSelection": () => void;
         "handleScheduleAppointmentFromCondition": (condition: Condition) => void;
@@ -77,7 +83,9 @@ export namespace Components {
         "handleToggleConditionStatus": (condition: Condition) => void;
     }
     interface XcastvenXkilianProjectConditionRegisterer {
+        "api": Api;
         "startDate": Date;
+        "user": User1;
     }
     interface XcastvenXkilianProjectConditionsList {
         "conditions": Array<ConditionDisplay>;
@@ -92,6 +100,7 @@ export namespace Components {
     }
     interface XcastvenXkilianProjectDrawer {
         "activeTab": number;
+        "api": Api;
         "getAppointmentsForDate": (date: Date) => Array<AppointmentDisplay>;
         "getAppointmentsForDateByStatus": (
     date: Date,
@@ -142,6 +151,7 @@ export namespace Components {
         "type": 'calendar' | 'account' | 'scheduleAppointment' | 'registerCondition';
     }
     interface XcastvenXkilianProjectHomePage {
+        "api": Api;
     }
     interface XcastvenXkilianProjectLegend {
         "handleResetSelection": () => void;
@@ -306,6 +316,7 @@ declare namespace LocalJSX {
         "basePath"?: string;
     }
     interface XcastvenXkilianProjectAppointmentDetail {
+        "api"?: Api;
         "appointmentId"?: string;
         "handleAcceptAppointment"?: (appointment: PatientAppointment | DoctorAppointment) => void;
         "handleCancelAppointment"?: (appointment: PatientAppointment | DoctorAppointment) => void;
@@ -326,7 +337,9 @@ declare namespace LocalJSX {
         "user"?: User;
     }
     interface XcastvenXkilianProjectAppointmentScheduler {
+        "api"?: Api;
         "initialDate"?: Date;
+        "user"?: User;
     }
     interface XcastvenXkilianProjectAppointmentsList {
         "appointments"?: Array<AppointmentDisplay>;
@@ -359,6 +372,7 @@ declare namespace LocalJSX {
         "user"?: { email: string; role: UserRole };
     }
     interface XcastvenXkilianProjectConditionDetail {
+        "api"?: Api;
         "conditionId"?: string;
         "handleResetSelection"?: () => void;
         "handleScheduleAppointmentFromCondition"?: (condition: Condition) => void;
@@ -366,7 +380,9 @@ declare namespace LocalJSX {
         "handleToggleConditionStatus"?: (condition: Condition) => void;
     }
     interface XcastvenXkilianProjectConditionRegisterer {
+        "api"?: Api;
         "startDate"?: Date;
+        "user"?: User1;
     }
     interface XcastvenXkilianProjectConditionsList {
         "conditions"?: Array<ConditionDisplay>;
@@ -381,6 +397,7 @@ declare namespace LocalJSX {
     }
     interface XcastvenXkilianProjectDrawer {
         "activeTab"?: number;
+        "api"?: Api;
         "getAppointmentsForDate"?: (date: Date) => Array<AppointmentDisplay>;
         "getAppointmentsForDateByStatus"?: (
     date: Date,
@@ -431,6 +448,7 @@ declare namespace LocalJSX {
         "type"?: 'calendar' | 'account' | 'scheduleAppointment' | 'registerCondition';
     }
     interface XcastvenXkilianProjectHomePage {
+        "api"?: Api;
     }
     interface XcastvenXkilianProjectLegend {
         "handleResetSelection"?: () => void;

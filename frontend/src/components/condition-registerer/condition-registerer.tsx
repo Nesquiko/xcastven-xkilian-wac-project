@@ -1,3 +1,6 @@
+import { Api, ApiError } from '../../api/api';
+import { NewCondition } from '../../api/generated';
+import { User } from '../../components';
 import { DAYS_OF_WEEK, formatDate, formatDateDelta, MONTHS, TODAY } from '../../utils/utils';
 import { Component, h, Prop, State } from '@stencil/core';
 
@@ -6,6 +9,8 @@ import { Component, h, Prop, State } from '@stencil/core';
   shadow: false,
 })
 export class ConditionRegisterer {
+  @Prop() api: Api;
+  @Prop() user: User;
   @Prop() startDate: Date = null;
 
   @State() selectedStart: Date = null;
@@ -166,7 +171,7 @@ export class ConditionRegisterer {
     this.currentViewYear = parseInt((event.target as HTMLSelectElement).value);
   };
 
-  private handleRegisterCondition = () => {
+  private handleRegisterCondition = async () => {
     this.startError = null;
     this.endError = null;
     this.nameError = null;
@@ -183,16 +188,24 @@ export class ConditionRegisterer {
       return;
     }
 
-    console.log(
-      'Register a condition:' +
-        '\nStart: ' +
-        this.selectedStart.toLocaleDateString() +
-        (this.selectedEnd ? '\nEnd: ' + this.selectedEnd.toLocaleDateString() : '') +
-        '\nName: ' +
-        this.conditionName +
-        '\nStatus: ' +
-        (this.selectedEnd ? 'Gone' : 'Ongoing'),
-    );
+    try {
+      const request: NewCondition = {
+        id: '',
+        name: this.conditionName,
+        patientId: this.user.id,
+        start: this.selectedStart,
+        end: this.selectedEnd || undefined,
+      };
+      await this.api.conditions.createPatientCondition({ newCondition: request });
+      window.navigation.navigate('/homepage');
+    } catch (err) {
+      if (!(err instanceof ApiError)) {
+        // TODO kili some generic error
+        return;
+      }
+
+      // TODO kili some internal server error, i think there is no other error I'm returing
+    }
   };
 
   private resetSelection = () => {

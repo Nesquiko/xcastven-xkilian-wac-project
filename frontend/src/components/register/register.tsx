@@ -97,6 +97,7 @@ export class Register {
       window.navigation.navigate('login');
     } catch (err) {
       if (!(err instanceof ApiError)) {
+        // TODO kili some generic error
         return;
       }
 

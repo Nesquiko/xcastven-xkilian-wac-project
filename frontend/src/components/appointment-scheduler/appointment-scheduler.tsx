@@ -4,7 +4,7 @@ import {
   ConditionDisplay,
   Doctor,
   PatientAppointment,
-  TimeSlot,
+  TimeSlot, User,
 } from '../../api/generated';
 import { AppointmentTimesExample } from '../../data-examples/appointment-times';
 import { AvailableDoctorsExample } from '../../data-examples/available-doctors';

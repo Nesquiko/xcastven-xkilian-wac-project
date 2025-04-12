@@ -1,10 +1,12 @@
 import {
-  AppointmentStatus, AppointmentType,
+  AppointmentStatus,
+  AppointmentType,
   DoctorAppointment,
   Equipment,
   Facility,
   Medicine,
-  PatientAppointment, SpecializationEnum,
+  PatientAppointment,
+  SpecializationEnum,
 } from '../api/generated';
 import { h } from '@stencil/core';
 
@@ -160,7 +162,12 @@ export const ConditionOrderColors: Array<string> = [
   '#FBC02D',
 ];
 
-export const PrescriptionOrderColors: Array<string> = ['#FF8080', '#FF0000', '#800000', '#1A0000'];
+export const PrescriptionOrderColors: Array<string> = [
+  '#FF8080',
+  '#FF0000',
+  '#800000',
+  '#1A0000'
+];
 
 const patientButton = (
   displayTitle: string,
@@ -222,21 +229,12 @@ export const getDoctorAppointmentActions = (
   handleCancelAppointment: (appointment: PatientAppointment | DoctorAppointment) => void,
   handleAcceptAppointment: (appointment: PatientAppointment | DoctorAppointment) => void,
   handleDenyAppointment: (appointment: PatientAppointment | DoctorAppointment) => void,
-  handleSaveResourcesOnAppointment: (
-    appointment: PatientAppointment | DoctorAppointment,
-    resources: {
-      facilities: Array<Facility>;
-      equipment: Array<Equipment>;
-      medicine: Array<Medicine>;
-    },
-  ) => void,
 ) => {
   switch (appointmentStatus) {
     case 'scheduled':
       return (
         <div class="flex w-full max-w-md flex-row items-center justify-between gap-x-3">
-          {doctorButton('Save', 'w-1/2', handleSaveResourcesOnAppointment)}
-          {doctorButton('Cancel', 'w-1/2', handleCancelAppointment)}
+          {doctorButton('Cancel', 'w-full', handleCancelAppointment)}
         </div>
       );
     case 'requested':

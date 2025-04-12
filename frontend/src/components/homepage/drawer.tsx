@@ -62,6 +62,11 @@ export class Drawer {
       medicine: Medicine;
     },
   ) => void;
+  @Prop() handleUpdatePrescriptionForAppointment: (
+    appointment: PatientAppointment | DoctorAppointment,
+    prescriptionId: string,
+    updatedPrescription: PrescriptionDisplay,
+  ) => void;
 
   @Prop() handleScheduleAppointmentFromCondition: (condition: Condition) => void;
   @Prop() handleToggleConditionStatus: (condition: Condition) => void;
@@ -200,6 +205,8 @@ export class Drawer {
               handleAcceptAppointment={this.handleAcceptAppointment}
               handleDenyAppointment={this.handleDenyAppointment}
               handleSaveResourcesOnAppointment={this.handleSaveResourcesOnAppointment}
+              handleSelectPrescription={this.handleSelectPrescription}
+              handleUpdatePrescriptionForAppointment={this.handleUpdatePrescriptionForAppointment}
             />
           ) : this.selectedCondition ? (
             <xcastven-xkilian-project-condition-detail

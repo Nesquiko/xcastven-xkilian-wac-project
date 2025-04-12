@@ -4,7 +4,7 @@ import {
   Equipment,
   Facility,
   Medicine,
-  Patient,
+  Patient, PrescriptionDisplay,
 } from '../api/generated';
 
 export const DoctorAppointmentDetailExample: DoctorAppointment = {
@@ -29,4 +29,36 @@ export const DoctorAppointmentDetailExample: DoctorAppointment = {
   facilities: [{ id: 'facility-1', name: 'Facility 1' }] satisfies Array<Facility>,
   equipment: [{ id: 'equipment-1', name: 'Equipment 1' }] satisfies Array<Equipment>,
   medicine: [{ id: 'medicine-1', name: 'Medicine 1' }] satisfies Array<Medicine>,
+  prescriptions: [
+    {
+      id: "prescription-1",
+      name: "Stanazol",
+      start: new Date(2025, 3, 12, 0, 0, 0, 0),
+      end: new Date(2025, 3, 15, 0, 0, 0, 0),
+    } satisfies PrescriptionDisplay,
+    {
+      id: "prescription-2",
+      name: "Trenbolon",
+      start: new Date(2025, 3, 11, 0, 0, 0, 0),
+      end: new Date(2025, 3, 12, 0, 0, 0, 0),
+    } satisfies PrescriptionDisplay,
+    {
+      id: "prescription-3",
+      name: "Magnesium",
+      start: new Date(2025, 3, 9, 0, 0, 0, 0),
+      end: new Date(2025, 3, 10, 0, 0, 0, 0),
+    } satisfies PrescriptionDisplay,
+    {
+      id: "prescription-4",
+      name: "Rohypnol",
+      start: new Date(2025, 3, 14, 0, 0, 0, 0),
+      end: new Date(2025, 3, 18, 0, 0, 0, 0),
+    } satisfies PrescriptionDisplay,
+    {
+      id: "prescription-5",
+      name: "Coca-Cola",
+      start: new Date(2025, 3, 20, 0, 0, 0, 0),
+      end: new Date(2025, 3, 21, 0, 0, 0, 0),
+    } satisfies PrescriptionDisplay,
+  ] satisfies Array<PrescriptionDisplay>,
 } satisfies DoctorAppointment;

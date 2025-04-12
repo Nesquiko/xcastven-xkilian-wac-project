@@ -200,6 +200,18 @@ export class Homepage {
     console.log('Save resources on appointment', appointment, resources);
   };
 
+  private handleUpdatePrescriptionForAppointment = (
+    appointment: PatientAppointment | DoctorAppointment,
+    prescriptionId: string,
+    updatedPrescription: PrescriptionDisplay,
+  ) => {
+    console.log(
+      "Update prescription with ID:", prescriptionId,
+      "on appointment", appointment,
+      "with values", updatedPrescription,
+    );
+  };
+
   private handleResetSelection = () => {
     this.isDrawerOpen = false;
     this.selectedAppointment = null;
@@ -346,7 +358,10 @@ export class Homepage {
           handleNextMonth={this.handleNextMonth}
         />
 
-        <xcastven-xkilian-project-footer handleToggleLegendMenu={this.handleToggleLegendMenu} />
+        <xcastven-xkilian-project-footer
+          isDoctor={this.isDoctor}
+          handleToggleLegendMenu={this.handleToggleLegendMenu}
+        />
 
         {this.isDrawerOpen && (
           <div class="fixed inset-0 z-99 bg-black/50" onClick={() => this.handleResetSelection()} />
@@ -378,6 +393,7 @@ export class Homepage {
           handleAcceptAppointment={this.handleAcceptAppointment}
           handleDenyAppointment={this.handleDenyAppointment}
           handleSaveResourcesOnAppointment={this.handleSaveResourcesOnAppointment}
+          handleUpdatePrescriptionForAppointment={this.handleUpdatePrescriptionForAppointment}
           handleScheduleAppointmentFromCondition={this.handleScheduleAppointmentFromCondition}
           handleToggleConditionStatus={this.handleToggleConditionStatus}
         />

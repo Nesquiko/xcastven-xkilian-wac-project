@@ -1,6 +1,6 @@
 import { ApiError } from '../../api/api';
 import { Api } from '../../api/api';
-import { Registration, SpecializationEnum, UserRole } from '../../api/generated';
+import { Registration, SpecializationEnum } from '../../api/generated';
 import { StyledHost } from '../StyledHost';
 import { Component, h, Prop, State } from '@stencil/core';
 import { formatSpecialization } from '../../utils/utils';

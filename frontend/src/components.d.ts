@@ -36,6 +36,12 @@ export namespace Components {
       medicine: Medicine;
     },
   ) => void;
+        "handleSelectPrescription": (prescription: PrescriptionDisplay) => void;
+        "handleUpdatePrescriptionForAppointment": (
+    appointment: PatientAppointment | DoctorAppointment,
+    prescriptionId: string,
+    updatedPrescription: PrescriptionDisplay,
+  ) => void;
         "isDoctor": boolean;
         "user": User;
     }
@@ -129,6 +135,11 @@ export namespace Components {
         "handleSelectPrescription": (prescription: PrescriptionDisplay) => void;
         "handleTabChange": (event: Event) => void;
         "handleToggleConditionStatus": (condition: Condition) => void;
+        "handleUpdatePrescriptionForAppointment": (
+    appointment: PatientAppointment | DoctorAppointment,
+    prescriptionId: string,
+    updatedPrescription: PrescriptionDisplay,
+  ) => void;
         "isDoctor": boolean;
         "isDrawerOpen": boolean;
         "selectedAppointment": AppointmentDisplay;
@@ -141,6 +152,7 @@ export namespace Components {
     }
     interface XcastvenXkilianProjectFooter {
         "handleToggleLegendMenu": () => void;
+        "isDoctor": boolean;
     }
     interface XcastvenXkilianProjectHeader {
         "currentViewMonth"?: number;
@@ -333,6 +345,12 @@ declare namespace LocalJSX {
       medicine: Medicine;
     },
   ) => void;
+        "handleSelectPrescription"?: (prescription: PrescriptionDisplay) => void;
+        "handleUpdatePrescriptionForAppointment"?: (
+    appointment: PatientAppointment | DoctorAppointment,
+    prescriptionId: string,
+    updatedPrescription: PrescriptionDisplay,
+  ) => void;
         "isDoctor"?: boolean;
         "user"?: User;
     }
@@ -426,6 +444,11 @@ declare namespace LocalJSX {
         "handleSelectPrescription"?: (prescription: PrescriptionDisplay) => void;
         "handleTabChange"?: (event: Event) => void;
         "handleToggleConditionStatus"?: (condition: Condition) => void;
+        "handleUpdatePrescriptionForAppointment"?: (
+    appointment: PatientAppointment | DoctorAppointment,
+    prescriptionId: string,
+    updatedPrescription: PrescriptionDisplay,
+  ) => void;
         "isDoctor"?: boolean;
         "isDrawerOpen"?: boolean;
         "selectedAppointment"?: AppointmentDisplay;
@@ -438,6 +461,7 @@ declare namespace LocalJSX {
     }
     interface XcastvenXkilianProjectFooter {
         "handleToggleLegendMenu"?: () => void;
+        "isDoctor"?: boolean;
     }
     interface XcastvenXkilianProjectHeader {
         "currentViewMonth"?: number;

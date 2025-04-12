@@ -34,7 +34,7 @@ export const PatientAppointmentDetailExample: PatientAppointment = {
     } satisfies PrescriptionDisplay,
     {
       id: 'prescription-2',
-      name: 'Stanazole',
+      name: 'Stanazol',
       start: new Date(2025, 3, 25, 0, 0, 0, 0),
       end: new Date(2025, 3, 26, 0, 0, 0, 0),
       appointmentId: 'patient-appointment-detail-1',

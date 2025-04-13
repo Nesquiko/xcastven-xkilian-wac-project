@@ -8,6 +8,8 @@ spec:
   attributes:
     - name: base-path
       value: /xcastven-xkilian-project/
+    - name: api-base
+      value: http://localhost:30081/api
 
   displayRules:
     - allOf:

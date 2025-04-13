@@ -374,3 +374,48 @@ func (s Server) ReserveResource(w http.ResponseWriter, r *http.Request, resource
 
 	w.WriteHeader(http.StatusNoContent)
 }
+
+// AvailableDoctors implements api.ServerInterface.
+func (s Server) AvailableDoctors(
+	w http.ResponseWriter,
+	r *http.Request,
+	params api.AvailableDoctorsParams,
+) {
+	panic("unimplemented")
+}
+
+// PrescriptionDetail implements api.ServerInterface.
+func (s Server) PrescriptionDetail(
+	w http.ResponseWriter,
+	r *http.Request,
+	prescriptionId api.PrescriptionId,
+) {
+	panic("unimplemented")
+}
+
+// ReserveAppointmentResources implements api.ServerInterface.
+func (s Server) ReserveAppointmentResources(
+	w http.ResponseWriter,
+	r *http.Request,
+	appointmentId api.AppointmentId,
+) {
+	panic("unimplemented")
+}
+
+// UpdateCondition implements api.ServerInterface.
+func (s Server) UpdateCondition(
+	w http.ResponseWriter,
+	r *http.Request,
+	conditionId api.ConditionId,
+) {
+	panic("unimplemented")
+}
+
+// UpdatePrescription implements api.ServerInterface.
+func (s Server) UpdatePrescription(
+	w http.ResponseWriter,
+	r *http.Request,
+	prescriptionId api.PrescriptionId,
+) {
+	panic("unimplemented")
+}

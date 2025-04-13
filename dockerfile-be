@@ -1,0 +1,56 @@
+FROM oven/bun:latest AS openapi-bundler
+
+WORKDIR /api
+
+COPY ./api/package.json ./api/bun.lock /api
+
+RUN bun install --frozen-lockfile
+
+COPY ./api/api.yaml /api
+COPY ./api/components /api/components
+COPY ./api/paths /api/paths
+
+RUN bun run bundle
+
+FROM golang:1.24.2 AS build
+
+WORKDIR /app
+
+COPY ./backend/go.mod ./backend/go.sum ./
+
+RUN go mod download
+
+COPY ./backend .
+
+RUN mkdir /api
+
+COPY --from=openapi-bundler ./api/api.bundled.yaml /api
+
+RUN go generate ./pkg/api
+
+RUN CGO_ENABLED=0 GOOS=linux \
+      go build \
+      -ldflags="-w -s" \
+      -installsuffix 'static' \
+      -o ./xcastven-xkilian-project-srv .
+
+FROM scratch
+
+# see https://github.com/opencontainers/image-spec/blob/main/annotations.md for details
+LABEL org.opencontainers.image.authors="Lukas Castven, Michal Kilian"
+LABEL org.opencontainers.image.title="Castven Kilian project WebAPI Service"
+LABEL org.opencontainers.image.description="WEBAPI for managing patient and doctors calendars"
+
+ENV AMBULANCE_API_ENVIRONMENT=production
+ENV AMBULANCE_API_PORT=8080
+ENV AMBULANCE_API_MONGODB_HOST=mongo
+ENV AMBULANCE_API_MONGODB_PORT=27017
+ENV AMBULANCE_API_MONGODB_DATABASE=xcastven-xkilian-db
+ENV AMBULANCE_API_MONGODB_USERNAME=root
+# ENV AMBULANCE_API_MONGODB_PASSWORD=
+ENV AMBULANCE_API_MONGODB_TIMEOUT_SECONDS=5
+
+COPY --from=build /app/xcastven-xkilian-project-srv ./
+
+EXPOSE 8080
+ENTRYPOINT ["./xcastven-xkilian-project-srv"]

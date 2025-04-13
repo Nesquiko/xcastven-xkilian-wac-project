@@ -13,11 +13,12 @@ import {
   User,
 } from '../../api/generated';
 import {
+  days,
   formatAppointmentType,
   formatDate,
-  formatTime,
+  formatTime, getDatePart,
   getDoctorAppointmentActions,
-  getPatientAppointmentActions,
+  getPatientAppointmentActions, months, updateDatePart, years,
 } from '../../utils/utils';
 import { Component, h, Prop, State } from '@stencil/core';
 
@@ -53,11 +54,15 @@ export class AppointmentDetail {
     prescriptionId: string,
     updatedPrescription: PrescriptionDisplay,
   ) => void;
+  @Prop() handleAddPrescriptionForAppointment: (
+    appointment: PatientAppointment | DoctorAppointment,
+    newPrescription: Prescription,
+  ) => void;
 
   @State() appointment: PatientAppointment | DoctorAppointment = undefined;
-  @State() availableEquipment: Array<Equipment> = [];
-  @State() availableFacilities: Array<Facility> = [];
-  @State() availableMedicine: Array<Medicine> = [];
+  @State() availableEquipment: Array<Equipment> = [{ id: "equipment-1", name: "Equipment 1" }];
+  @State() availableFacilities: Array<Facility> = [{ id: "facility-1", name: "Facility 1" }];
+  @State() availableMedicine: Array<Medicine> = [{ id: "medicine-1", name: "Medicine 1" }];
 
   @State() selectedEquipment: Equipment =
     this.appointment && instanceOfDoctorAppointment(this.appointment)
@@ -92,10 +97,12 @@ export class AppointmentDetail {
     } catch (err) {
       if (!(err instanceof ApiError)) {
         // TODO kili some generic error
+        console.log("Generic error:", err);
         return;
       }
 
       // TODO kili some internal server error, i think there is no other error I'm returing
+      console.log("ApiError:", err);
     }
   }
 
@@ -104,8 +111,8 @@ export class AppointmentDetail {
 
   @State() addingPrescription: boolean = false;
   @State() addingPrescriptionName: string = '';
-  @State() addingPrescriptionStart: Date = null;
-  @State() addingPrescriptionEnd: Date = null;
+  @State() addingPrescriptionStart: Date = new Date();
+  @State() addingPrescriptionEnd: Date = new Date(new Date().setDate(new Date().getDate() + 7));
   @State() addingPrescriptionDoctorsNote: string = '';
 
   @State() editingPrescription: PrescriptionDisplay = null;
@@ -173,12 +180,25 @@ export class AppointmentDetail {
     this.editingPrescriptionNewName = (event.target as HTMLSelectElement).value;
   };
 
-  private handleUpdatePrescriptionStartChange = (event: Event) => {
-    this.editingPrescriptionNewStart = new Date((event.target as HTMLSelectElement).value);
-  };
-
-  private handleUpdatePrescriptionEndChange = (event: Event) => {
-    this.editingPrescriptionNewEnd = new Date((event.target as HTMLSelectElement).value);
+  private handleUpdatePrescriptionDateChange = (
+    type: 'start' | 'end',
+    part: 'day' | 'month' | 'year',
+    event: Event,
+  ) => {
+    const value: number = parseInt((event.target as HTMLSelectElement).value, 10);
+    if (type === 'start') {
+      this.editingPrescriptionNewStart = updateDatePart(
+        this.editingPrescriptionNewStart,
+        part,
+        value,
+      );
+    } else {
+      this.editingPrescriptionNewEnd = updateDatePart(
+        this.editingPrescriptionNewEnd,
+        part,
+        value,
+      );
+    }
   };
 
   private handleUpdatePrescriptionDoctorsNoteChange = (event: Event) => {
@@ -189,17 +209,87 @@ export class AppointmentDetail {
     this.addingPrescriptionName = (event.target as HTMLSelectElement).value;
   };
 
-  private handleAddPrescriptionStartChange = (event: Event) => {
-    this.addingPrescriptionStart = new Date((event.target as HTMLSelectElement).value);
-  };
-
-  private handleAddPrescriptionEndChange = (event: Event) => {
-    this.addingPrescriptionEnd = new Date((event.target as HTMLSelectElement).value);
+  private handleAddPrescriptionDateChange = (
+    type: 'start' | 'end',
+    part: 'day' | 'month' | 'year',
+    event: Event,
+  ) => {
+    const value: number = parseInt((event.target as HTMLSelectElement).value, 10);
+    if (type === 'start') {
+      this.addingPrescriptionStart = updateDatePart(
+        this.addingPrescriptionStart,
+        part,
+        value,
+      );
+    } else {
+      this.addingPrescriptionEnd = updateDatePart(
+        this.addingPrescriptionEnd,
+        part,
+        value
+      );
+    }
   };
 
   private handleAddPrescriptionDoctorsNoteChange = (event: Event) => {
     this.addingPrescriptionDoctorsNote = (event.target as HTMLSelectElement).value;
   };
+
+  private renderDateSelects(
+    dateType: 'start' | 'end',
+    dateValue: Date | null,
+    changeHandler: (
+      type: 'start' | 'end',
+      part: 'day' | 'month' | 'year',
+      event: Event,
+    ) => void,
+  ) {
+    const prefix: 'Start' | 'End' = dateType === 'start' ? 'Start' : 'End';
+    return (
+      <div class="flex w-full max-w-md flex-row justify-between gap-x-3">
+        <md-outlined-select
+          required={true}
+          label={`${prefix} Day`}
+          class="flex-1 min-w-0"
+          value={getDatePart(dateValue, 'day')}
+          onInput={(e: Event) => changeHandler(dateType, 'day', e)}
+        >
+          {days.map((day: number) => (
+            <md-select-option value={day.toString()} key={`${dateType}-day-${day}`}>
+              <div slot="headline">{day}</div>
+            </md-select-option>
+          ))}
+        </md-outlined-select>
+
+        <md-outlined-select
+          required={true}
+          label={`${prefix} Month`}
+          class="flex-1 min-w-0"
+          value={getDatePart(dateValue, 'month')}
+          onInput={(e: Event) => changeHandler(dateType, 'month', e)}
+        >
+          {months.map((month: { value: number, name: string }) => (
+            <md-select-option value={month.value.toString()} key={`${dateType}-month-${month.value}`}>
+              <div slot="headline">{month.name}</div>
+            </md-select-option>
+          ))}
+        </md-outlined-select>
+
+        <md-outlined-select
+          required={true}
+          label={`${prefix} Year`}
+          class="flex-1 min-w-0"
+          value={getDatePart(dateValue, 'year')}
+          onInput={(e: Event) => changeHandler(dateType, 'year', e)}
+        >
+          {years.map((year: number) => (
+            <md-select-option value={year.toString()} key={`${dateType}-year-${year}`}>
+              <div slot="headline">{year}</div>
+            </md-select-option>
+          ))}
+        </md-outlined-select>
+      </div>
+    );
+  }
 
   render() {
     if (!this.appointment) return null;
@@ -313,21 +403,21 @@ export class AppointmentDetail {
                 <md-icon style={{ fontSize: '16px' }}>meeting_room</md-icon>
                 Facility
               </div>
-              <span class="font-medium text-gray-600">{this.appointment.facilities[0].name}</span>
+              <span class="font-medium text-gray-600">{this.appointment.facilities?.[0].name ?? ""}</span>
             </div>
             <div class="flex w-full flex-row items-center justify-between">
               <div class="flex flex-row items-center gap-x-2 text-gray-500">
                 <md-icon style={{ fontSize: '16px' }}>service_toolbox</md-icon>
                 Equipment
               </div>
-              <span class="font-medium text-gray-600">{this.appointment.equipment[0].name}</span>
+              <span class="font-medium text-gray-600">{this.appointment.equipment?.[0].name ?? ""}</span>
             </div>
             <div class="flex w-full flex-row items-center justify-between">
               <div class="flex flex-row items-center gap-x-2 text-gray-500">
                 <md-icon style={{ fontSize: '16px' }}>vaccines</md-icon>
                 Medicine
               </div>
-              <span class="font-medium text-gray-600">{this.appointment.medicine[0].name}</span>
+              <span class="font-medium text-gray-600">{this.appointment.medicine?.[0].name ?? ""}</span>
             </div>
 
             {this.isDoctor &&
@@ -376,39 +466,73 @@ export class AppointmentDetail {
                     </md-outlined-select>
                   </div>
 
-                  <md-filled-button
-                    class={`w-full rounded-full bg-[#7357be]`}
-                    onClick={() => {
-                      this.showEditResources = false;
-                      const newResources: {
-                        facility: Facility;
-                        equipment: Equipment;
-                        medicine: Medicine;
-                      } = {
-                        facility: this.selectedFacility,
-                        equipment: this.selectedEquipment,
-                        medicine: this.selectedMedicine,
-                      };
+                  <div class="flex flex-row justify-between items-center gap-x-2">
+                    <md-filled-button
+                      class={`w-1/2 rounded-full bg-[#7357be]`}
+                      onClick={() => {
+                        this.showEditResources = false;
+                        const newResources: {
+                          facility: Facility;
+                          equipment: Equipment;
+                          medicine: Medicine;
+                        } = {
+                          facility: this.selectedFacility,
+                          equipment: this.selectedEquipment,
+                          medicine: this.selectedMedicine,
+                        };
 
-                      this.handleSaveResourcesOnAppointment(this.appointment, newResources);
-                    }}
-                  >
-                    Save resources
-                  </md-filled-button>
+                        this.handleSaveResourcesOnAppointment(this.appointment, newResources);
+
+                        if (instanceOfDoctorAppointment(this.appointment)) {
+                          this.appointment.facilities = [newResources.facility];
+                          this.appointment.equipment = [newResources.equipment];
+                          this.appointment.medicine = [newResources.medicine];
+                          this.showEditResources = false;
+                        }
+                      }}
+                    >
+                      Save resources
+                    </md-filled-button>
+
+                    <md-outlined-button
+                      class={`w-1/2 rounded-full`}
+                      onClick={() => this.showEditResources = false}
+                    >
+                      Cancel
+                    </md-outlined-button>
+                  </div>
                 </div>
               )}
           </div>
         )}
 
+        {/* Prescriptions Box */}
         <div class="relative mb-6 w-full max-w-md rounded-md bg-gray-200 px-4 py-3">
+          {/* Header with Add/Expand buttons */}
           <div class="mb-2 flex flex-row items-center justify-between">
+            {/* ... (unchanged) */}
             <div class="flex flex-row items-center gap-x-2 text-gray-500">
               <md-icon style={{ fontSize: '16px' }}>medication</md-icon>
               Prescriptions
+              {instanceOfDoctorAppointment(this.appointment) &&
+                (this.appointment.status === AppointmentStatus.Completed ||
+                  this.appointment.status === AppointmentStatus.Scheduled) && (
+                  <md-icon-button
+                    title="Add a prescription"
+                    class="ml-2"
+                    style={{ width: '24px', height: '24px' }}
+                    onClick={() => {
+                      this.addingPrescription = !this.addingPrescription;
+                      this.editingPrescription = null;
+                    }}
+                  >
+                    <md-icon style={{ fontSize: '16px' }}>add</md-icon>
+                  </md-icon-button>
+                )}
             </div>
             {this.appointment.prescriptions && this.appointment.prescriptions.length > 0 && (
               <md-icon-button
-                title={this.prescriptionsExpanded ? 'Expand' : 'Close'}
+                title={this.prescriptionsExpanded ? 'Collapse' : 'Expand'}
                 onClick={() => (this.prescriptionsExpanded = !this.prescriptionsExpanded)}
                 style={{ width: '24px', height: '24px' }}
               >
@@ -417,23 +541,18 @@ export class AppointmentDetail {
                 </md-icon>
               </md-icon-button>
             )}
-            {instanceOfDoctorAppointment(this.appointment) && (
-              <md-icon-button
-                title="Add a prescription"
-                class="absolute top-1 left-36"
-                onClick={() => (this.addingPrescription = !this.addingPrescription)}
-              >
-                <md-icon style={{ fontSize: '16px' }}>add</md-icon>
-              </md-icon-button>
-            )}
           </div>
 
-          {this.appointment.prescriptions && this.appointment.prescriptions.length <= 0 ? (
+          {/* Prescription List or Message */}
+          {(!this.appointment.prescriptions || this.appointment.prescriptions.length <= 0) &&
+          !this.addingPrescription &&
+          !this.editingPrescription ? (
             <div class="text-sm font-medium text-gray-600">
-              No prescriptions for this appointments
+              No prescriptions for this appointment.
             </div>
           ) : this.prescriptionsExpanded ? (
             <div class="max-h-28 w-full overflow-y-auto rounded-md bg-gray-200">
+              {/* ... Prescription list mapping ... (unchanged) */}
               {this.appointment.prescriptions.map((prescription: PrescriptionDisplay) => (
                 <div
                   key={prescription.id}
@@ -446,155 +565,204 @@ export class AppointmentDetail {
                     </md-icon>
                     {prescription.name}
                   </div>
-                  {instanceOfDoctorAppointment(this.appointment) && (
-                    <md-icon-button
-                      title="Edit prescription"
-                      onClick={(event: Event) => {
-                        event.stopPropagation();
-
-                        this.editingPrescriptionNewName = prescription.name;
-                        this.editingPrescriptionNewStart = prescription.start;
-                        this.editingPrescriptionNewEnd = prescription.end;
-                        this.editingPrescription = prescription;
-                      }}
-                      style={{ width: '24px', height: '24px' }}
-                    >
-                      <md-icon style={{ fontSize: '16px' }}>edit</md-icon>
-                    </md-icon-button>
-                  )}
+                  {instanceOfDoctorAppointment(this.appointment) &&
+                    (this.appointment.status === AppointmentStatus.Completed ||
+                      this.appointment.status === AppointmentStatus.Scheduled) && (
+                      <md-icon-button
+                        title="Edit prescription"
+                        onClick={(event: Event) => {
+                          event.stopPropagation();
+                          this.editingPrescriptionNewName = prescription.name;
+                          this.editingPrescriptionNewStart = prescription.start
+                            ? new Date(prescription.start)
+                            : null;
+                          this.editingPrescriptionNewEnd = prescription.end
+                            ? new Date(prescription.end)
+                            : null;
+                          // this.editingPrescriptionNewDoctorsNote = prescription.doctorsNote ?? '';
+                          this.editingPrescription = prescription;
+                          this.addingPrescription = false;
+                        }}
+                        style={{ width: '24px', height: '24px' }}
+                      >
+                        <md-icon style={{ fontSize: '16px' }}>edit</md-icon>
+                      </md-icon-button>
+                    )}
                 </div>
               ))}
             </div>
           ) : (
-            <div class="ml-2 text-sm font-medium text-gray-600">
-              {this.appointment.prescriptions ? this.appointment.prescriptions.length : 0}{' '}
-              prescription
-              {this.appointment.prescriptions
-                ? this.appointment.prescriptions.length !== 1 && 's'
-                : 's'}
-            </div>
+            !this.addingPrescription &&
+            !this.editingPrescription && (
+              <div class="ml-2 text-sm font-medium text-gray-600">
+                {this.appointment.prescriptions?.length ?? 0} prescription
+                {this.appointment.prescriptions?.length !== 1 ? 's' : ''}
+              </div>
+            )
           )}
 
+          {/* Edit Prescription Form */}
           {this.isDoctor &&
             instanceOfDoctorAppointment(this.appointment) &&
             this.editingPrescription && (
-              <div class="mt-3 w-full">
+              <div class="mt-3 w-full pt-3">
+                <h4 class="mb-2 text-sm font-medium text-[#7357be]">Edit prescription</h4>
                 <div class="mb-3 flex w-full flex-col gap-y-3">
-                  <md-filled-text-field
+                <md-outlined-text-field
+                    required={true}
                     label="Prescription name"
                     class="w-full"
                     value={this.editingPrescriptionNewName}
                     onInput={(e: Event) => this.handleUpdatePrescriptionNameChange(e)}
                   />
 
-                  <md-filled-text-field
-                    label="Prescription start date"
-                    class="w-full"
-                    value={this.editingPrescriptionNewStart}
-                    onInput={(e: Event) => this.handleUpdatePrescriptionStartChange(e)}
-                  />
+                  {this.renderDateSelects(
+                    'start',
+                    this.editingPrescriptionNewStart,
+                    this.handleUpdatePrescriptionDateChange,
+                  )}
 
-                  <md-filled-text-field
-                    label="Prescription end date"
-                    class="w-full"
-                    value={this.editingPrescriptionNewEnd}
-                    onInput={(e: Event) => this.handleUpdatePrescriptionEndChange(e)}
-                  />
+                  {this.renderDateSelects(
+                    'end',
+                    this.editingPrescriptionNewEnd,
+                    this.handleUpdatePrescriptionDateChange,
+                  )}
 
-                  <md-filled-text-field
-                    label="Prescription doctor's note"
+                  <md-outlined-text-field
+                    type="textarea"
+                    rows={2}
+                    label="Doctor's note (optional)"
                     class="w-full"
                     value={this.editingPrescriptionNewDoctorsNote}
                     onInput={(e: Event) => this.handleUpdatePrescriptionDoctorsNoteChange(e)}
                   />
                 </div>
 
-                <md-filled-button
-                  class={`w-full rounded-full bg-[#7357be]`}
-                  onClick={() => {
-                    const updatedPrescription: Prescription = {
-                      ...this.editingPrescription,
-                      name: this.editingPrescriptionNewName,
-                      start: this.editingPrescriptionNewStart,
-                      end: this.editingPrescriptionNewEnd,
-                      doctorsNote: this.editingPrescriptionNewDoctorsNote,
-                    };
+                {/* Save/Cancel Buttons */}
+                <div class="flex gap-x-2">
+                  <md-filled-button
+                    class={`flex-1 rounded-full bg-[#7357be]`}
+                    disabled={
+                      !this.editingPrescriptionNewName ||
+                      !this.editingPrescriptionNewStart ||
+                      !this.editingPrescriptionNewEnd
+                    }
+                    onClick={() => {
+                      const updatedPrescription: PrescriptionDisplay & { doctorsNote?: string } = {
+                        id: this.editingPrescription.id,
+                        name: this.editingPrescriptionNewName,
+                        start: this.editingPrescriptionNewStart,
+                        end: this.editingPrescriptionNewEnd,
+                        appointmentId: this.editingPrescription.appointmentId,
+                        doctorsNote: this.editingPrescriptionNewDoctorsNote,
+                      };
 
-                    this.handleUpdatePrescriptionForAppointment(
-                      this.appointment,
-                      this.editingPrescription.id,
-                      updatedPrescription,
-                    );
+                      this.handleUpdatePrescriptionForAppointment(
+                        this.appointment,
+                        this.editingPrescription.id,
+                        updatedPrescription,
+                      );
 
-                    this.editingPrescription = null;
-                    this.editingPrescriptionNewName = '';
-                    this.editingPrescriptionNewStart = null;
-                    this.editingPrescriptionNewEnd = null;
-                  }}
-                >
-                  Save prescription
-                </md-filled-button>
+                      const index: number = this.appointment.prescriptions.findIndex(
+                        (prescription: PrescriptionDisplay) => prescription.id === this.editingPrescription.id,
+                      );
+                      if (index !== -1) {
+                        this.appointment.prescriptions[index] = updatedPrescription;
+                      }
+                      this.editingPrescription = null;
+                    }}
+                  >
+                    Save Changes
+                  </md-filled-button>
+                  <md-outlined-button
+                    class="flex-1 rounded-full"
+                    onClick={() => (this.editingPrescription = null)}
+                  >
+                    Cancel
+                  </md-outlined-button>
+                </div>
               </div>
             )}
 
+          {/* Add Prescription Form */}
           {this.isDoctor &&
             instanceOfDoctorAppointment(this.appointment) &&
             this.addingPrescription && (
-              <div class="mt-3 w-full">
+              <div class="mt-3 w-full pt-3">
+                <h4 class="mb-2 text-sm font-medium text-[#7357be]">Add a new prescription</h4>
                 <div class="mb-3 flex w-full flex-col gap-y-3">
-                  <md-filled-text-field
+                  <md-outlined-text-field
+                    required={true}
                     label="Prescription name"
                     class="w-full"
                     value={this.addingPrescriptionName}
                     onInput={(e: Event) => this.handleAddPrescriptionNameChange(e)}
                   />
 
-                  <md-filled-text-field
-                    label="Prescription start date"
-                    class="w-full"
-                    value={this.addingPrescriptionStart}
-                    onInput={(e: Event) => this.handleAddPrescriptionStartChange(e)}
-                  />
+                  {this.renderDateSelects(
+                    'start',
+                    this.addingPrescriptionStart,
+                    this.handleAddPrescriptionDateChange,
+                  )}
 
-                  <md-filled-text-field
-                    label="Prescription end date"
-                    class="w-full"
-                    value={this.addingPrescriptionEnd}
-                    onInput={(e: Event) => this.handleAddPrescriptionEndChange(e)}
-                  />
+                  {this.renderDateSelects(
+                    'end',
+                    this.addingPrescriptionEnd,
+                    this.handleAddPrescriptionDateChange,
+                  )}
 
-                  <md-filled-text-field
-                    label="Prescription doctor's note"
+                  <md-outlined-text-field
+                    type="textarea"
+                    rows={2}
+                    label="Doctor's note (optional)"
                     class="w-full"
                     value={this.addingPrescriptionDoctorsNote}
                     onInput={(e: Event) => this.handleAddPrescriptionDoctorsNoteChange(e)}
                   />
                 </div>
 
-                <md-filled-button
-                  class={`w-full rounded-full bg-[#7357be]`}
-                  onClick={() => {
-                    const newPrescription: Prescription = {
-                      id: 'new-prescription',
-                      name: this.addingPrescriptionName,
-                      start: this.addingPrescriptionStart,
-                      end: this.addingPrescriptionEnd,
-                      doctorsNote: this.addingPrescriptionDoctorsNote,
-                    };
+                <div class="flex gap-x-2">
+                  <md-filled-button
+                    class={`flex-1 rounded-full bg-[#7357be]`}
+                    disabled={
+                      !this.addingPrescriptionName ||
+                      !this.addingPrescriptionStart ||
+                      !this.addingPrescriptionEnd
+                    }
+                    onClick={() => {
+                      const newPrescription: Prescription = {
+                        id: "new-prescription",
+                        name: this.addingPrescriptionName,
+                        start: this.addingPrescriptionStart,
+                        end: this.addingPrescriptionEnd,
+                        doctorsNote: this.addingPrescriptionDoctorsNote,
+                      };
+                      console.log('Adding prescription:', newPrescription);
 
-                    /*this.handleAddPrescriptionForAppointment(
-                      this.appointment,
-                      newPrescription,
-                    );*/
+                      this.handleAddPrescriptionForAppointment(this.appointment, newPrescription);
 
-                    this.addingPrescriptionDoctorsNote = null;
-                    this.addingPrescriptionName = '';
-                    this.addingPrescriptionStart = null;
-                    this.addingPrescriptionEnd = null;
-                  }}
-                >
-                  Add prescription
-                </md-filled-button>
+                      if (!this.appointment.prescriptions) {
+                        this.appointment.prescriptions = [newPrescription];
+                      } else {
+                        this.appointment.prescriptions.push(newPrescription);
+                      }
+
+                      this.addingPrescription = false;
+                      this.addingPrescriptionName = '';
+                      this.addingPrescriptionStart = new Date();
+                      this.addingPrescriptionEnd = new Date(new Date().setDate(new Date().getDate() + 7));
+                      this.addingPrescriptionDoctorsNote = '';
+                    }}
+                  >
+                    Add Prescription
+                  </md-filled-button>
+                  <md-outlined-button
+                    class="flex-1 rounded-full"
+                    onClick={() => (this.addingPrescription = false)}
+                  >
+                    Cancel
+                  </md-outlined-button>
+                </div>
               </div>
             )}
         </div>

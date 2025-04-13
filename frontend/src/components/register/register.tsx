@@ -66,7 +66,7 @@ export class Register {
       this.emailError = 'Invalid email format';
     }
 
-    if (!this.specialization) {
+    if (this.isDoctor && !this.specialization) {
       this.specializationError = 'Specialization is required';
     }
 
@@ -98,6 +98,7 @@ export class Register {
     } catch (err) {
       if (!(err instanceof ApiError)) {
         // TODO kili some generic error
+        console.log(err);
         return;
       }
 

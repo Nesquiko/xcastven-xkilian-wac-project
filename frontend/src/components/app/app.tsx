@@ -79,6 +79,10 @@ export class App {
       window.navigation.navigate(absolute)
     };*/
 
-    return <StyledHost>{element}</StyledHost>;
+    return (
+      <StyledHost>
+        {element}
+      </StyledHost>
+    );
   }
 }

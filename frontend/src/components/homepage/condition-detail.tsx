@@ -24,10 +24,13 @@ export class ConditionDetail {
     } catch (err) {
       if (!(err instanceof ApiError)) {
         // TODO kili some generic error
+        console.log("Generic error:", err);
         return;
       }
 
       // TODO this should only return 404 and internal server error, but dont handle the 404, it came in the calendar, so it must be there
+      console.log("ApiError:", err);
+      console.log("404? or 500");
     }
   }
 

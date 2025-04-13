@@ -250,3 +250,63 @@ export const formatAppointmentType = (appointmentType: AppointmentType) => {
   const withSpaces: string = appointmentType.replace('_', ' ');
   return withSpaces[0].toUpperCase() + withSpaces.slice(1);
 };
+
+export const days: Array<number> = Array.from({ length: 31 }, (_, i) => i + 1);
+export const months: Array<{ value: number, name: string }> = [
+  { value: 0, name: 'January' },
+  { value: 1, name: 'February' },
+  { value: 2, name: 'March' },
+  { value: 3, name: 'April' },
+  { value: 4, name: 'May' },
+  { value: 5, name: 'June' },
+  { value: 6, name: 'July' },
+  { value: 7, name: 'August' },
+  { value: 8, name: 'September' },
+  { value: 9, name: 'October' },
+  { value: 10, name: 'November' },
+  { value: 11, name: 'December' },
+];
+export const currentYear: number = new Date().getFullYear();
+export const years: Array<number> = Array.from({ length: 11 }, (_, i) => currentYear - 5 + i); // Range: current year +/- 5 years
+
+export const updateDatePart = (
+  currentDate: Date | null,
+  part: 'day' | 'month' | 'year',
+  value: number,
+): Date => {
+  const date: Date = currentDate ? new Date(currentDate) : new Date();
+  if (isNaN(value)) return date;
+
+  let day: number = date.getDate();
+  let month: number = date.getMonth();
+  let year: number = date.getFullYear();
+
+  switch (part) {
+    case 'day':
+      day = value;
+      break;
+    case 'month':
+      month = value;
+      break;
+    case 'year':
+      year = value;
+      break;
+  }
+
+  return new Date(year, month, day);
+}
+
+export const getDatePart = (
+  date: Date | null,
+  part: 'day' | 'month' | 'year'
+): number | '' => {
+  if (!date || isNaN(date.getTime())) return '';
+  switch (part) {
+    case 'day':
+      return date.getDate();
+    case 'month':
+      return date.getMonth();
+    case 'year':
+      return date.getFullYear();
+  }
+}

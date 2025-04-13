@@ -8,7 +8,7 @@ import {
   Equipment,
   Facility,
   Medicine,
-  PatientAppointment,
+  PatientAppointment, Prescription,
   PrescriptionDisplay,
   User,
 } from '../../api/generated';
@@ -66,6 +66,10 @@ export class Drawer {
     appointment: PatientAppointment | DoctorAppointment,
     prescriptionId: string,
     updatedPrescription: PrescriptionDisplay,
+  ) => void;
+  @Prop() handleAddPrescriptionForAppointment: (
+    appointment: PatientAppointment | DoctorAppointment,
+    newPrescription: Prescription,
   ) => void;
 
   @Prop() handleScheduleAppointmentFromCondition: (condition: Condition) => void;
@@ -207,6 +211,7 @@ export class Drawer {
               handleSaveResourcesOnAppointment={this.handleSaveResourcesOnAppointment}
               handleSelectPrescription={this.handleSelectPrescription}
               handleUpdatePrescriptionForAppointment={this.handleUpdatePrescriptionForAppointment}
+              handleAddPrescriptionForAppointment={this.handleAddPrescriptionForAppointment}
             />
           ) : this.selectedCondition ? (
             <xcastven-xkilian-project-condition-detail

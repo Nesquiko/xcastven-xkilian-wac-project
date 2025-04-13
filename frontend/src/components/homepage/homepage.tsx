@@ -8,7 +8,7 @@ import {
   Equipment,
   Facility,
   Medicine,
-  PatientAppointment,
+  PatientAppointment, Prescription,
   PrescriptionDisplay,
   User,
 } from '../../api/generated';
@@ -48,7 +48,7 @@ export class Homepage {
   @State() activeTab: number = 0;
 
   async componentWillLoad() {
-    this.loadCalendar();
+    await this.loadCalendar();
   }
 
   private async loadCalendar() {
@@ -76,10 +76,14 @@ export class Homepage {
     } catch (err) {
       if (!(err instanceof ApiError)) {
         // TODO kili some generic error
+        console.log("Generic error:", err);
         return;
       }
 
       // TODO kili some internal server error, i think there is no other error I'm returing
+      if (err.errDetail.status === 500) {
+        console.log("ApiError:", err);
+      }
     }
   }
 
@@ -132,6 +136,7 @@ export class Homepage {
     } catch (err) {
       if (!(err instanceof ApiError)) {
         // TODO kili some generic error
+        console.log("Generic error:", err);
         return;
       }
       // TODO kili 409 when the doctor is unavailable in rescheduled time and internal server error, i think there is no other error I'm returing
@@ -148,9 +153,11 @@ export class Homepage {
     } catch (err) {
       if (!(err instanceof ApiError)) {
         // TODO kili some generic error
+        console.log("Generic error:", err);
         return;
       }
       // TODO kili some internal server error, i think there is no other error I'm returing
+      console.log("ApiError:", err);
     }
   };
 
@@ -162,30 +169,35 @@ export class Homepage {
         appointmentDecision: { action: 'accept', medicine: [], facilities: [], equipment: [] },
       });
       // TODO kili this returns DoctorAppointment, it is up to you how will you change the appointment status
+      console.log("update state");
     } catch (err) {
       if (!(err instanceof ApiError)) {
         // TODO kili some generic error
+        console.log("Generic error:", err);
         return;
       }
       // TODO kili handle 409 conflict if resources are unavailable, or internal server error, i think there is no other error I'm returing
+      console.log("ApiError:", err);
     }
   };
 
   private handleDenyAppointment = async (appointment: PatientAppointment | DoctorAppointment) => {
     // TODO kili when denying an appointment there can be reason
     try {
-      // TODO kili when rejecting there can also be a reason
       await this.api.appointments.decideAppointment({
         appointmentId: appointment.id,
         appointmentDecision: { action: 'reject', reason: 'TODO kili reason' },
       });
       // TODO kili this returns DoctorAppointment, it is up to you how will you change the appointment status
+      console.log("update state");
     } catch (err) {
       if (!(err instanceof ApiError)) {
         // TODO kili some generic error
+        console.log("Generic error:", err);
         return;
       }
       // TODO kili some internal server error, i think there is no other error I'm returing
+      console.log("ApiError:", err);
     }
   };
 
@@ -204,6 +216,7 @@ export class Homepage {
     appointment: PatientAppointment | DoctorAppointment,
     prescriptionId: string,
     updatedPrescription: PrescriptionDisplay,
+    /* TODO: type Prescription */
   ) => {
     console.log(
       'Update prescription with ID:',
@@ -212,6 +225,18 @@ export class Homepage {
       appointment,
       'with values',
       updatedPrescription,
+    );
+  };
+
+  private handleAddPrescriptionForAppointment = (
+    appointment: PatientAppointment | DoctorAppointment,
+    newPrescription: Prescription,
+  ) => {
+    console.log(
+      'Add a new prescription to appointment:',
+      appointment,
+      'with values',
+      newPrescription,
     );
   };
 
@@ -397,6 +422,7 @@ export class Homepage {
           handleDenyAppointment={this.handleDenyAppointment}
           handleSaveResourcesOnAppointment={this.handleSaveResourcesOnAppointment}
           handleUpdatePrescriptionForAppointment={this.handleUpdatePrescriptionForAppointment}
+          handleAddPrescriptionForAppointment={this.handleAddPrescriptionForAppointment}
           handleScheduleAppointmentFromCondition={this.handleScheduleAppointmentFromCondition}
           handleToggleConditionStatus={this.handleToggleConditionStatus}
         />

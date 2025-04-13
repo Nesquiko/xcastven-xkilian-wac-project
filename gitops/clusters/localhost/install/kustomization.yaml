@@ -14,6 +14,7 @@ resources:
 
 patches:
   - path: patches/webapi.service.yaml
+
 components:
   - ../../../components/version-developers
-# - "https://github.com/Nesquiko/xcastven-xkilian-wac-project//backend/deployments/kustomize/components/mongodb" # ?ref=v1.0.1
+  - "https://github.com/Nesquiko/xcastven-xkilian-wac-project//backend/deployments/kustomize/components/mongodb" # ?ref=v1.0.1

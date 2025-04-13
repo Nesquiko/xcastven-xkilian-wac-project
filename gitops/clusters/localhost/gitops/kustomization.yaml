@@ -15,3 +15,5 @@ resources:
   - image-repository.yaml
   - image-policy.yaml
   - image-update-automation.yaml
+  - webapi.image-repository.yaml
+  - webapi.image-policy.yaml

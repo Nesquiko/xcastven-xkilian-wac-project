@@ -2,5 +2,8 @@ apiVersion: kustomize.config.k8s.io/v1alpha1
 kind: Component
 images:
   - name: nesquiko/xcastven-xkilian-wac-fe
-    newName: nesquiko/xcastven-xkilian-wac-fe
-    newTag: main
+    newName: nesquiko/xcastven-xkilian-wac-fe # {"$imagepolicy":  "wac-hospital:ambulance-webapi:name"}
+    newTag: main # {"$imagepolicy": "wac-hospital:ambulance-webapi:tag"}
+  - name: nesquiko/xcastven-xkilian-wac-be
+    newName: nesquiko/xcastven-xkilian-wac-be # {"$imagepolicy":  "wac-hospital:ambulance-webapi:name"}
+    newTag: main # {"$imagepolicy": "wac-hospital:ambulance-webapi:tag"}

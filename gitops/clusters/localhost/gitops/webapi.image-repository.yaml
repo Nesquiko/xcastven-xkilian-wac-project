@@ -1,7 +1,7 @@
 apiVersion: image.toolkit.fluxcd.io/v1beta2
 kind: ImageRepository
 metadata:
-  name: ambulance-webapi
+  name: xcastven-xkilian-project-webapi
   namespace: wac-hospital
 spec:
   image: nesquiko/xcastven-xkilian-wac-be

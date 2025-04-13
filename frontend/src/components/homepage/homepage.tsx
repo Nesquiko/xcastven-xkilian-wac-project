@@ -8,7 +8,8 @@ import {
   Equipment,
   Facility,
   Medicine,
-  PatientAppointment, Prescription,
+  PatientAppointment,
+  Prescription,
   PrescriptionDisplay,
   User,
 } from '../../api/generated';
@@ -76,13 +77,13 @@ export class Homepage {
     } catch (err) {
       if (!(err instanceof ApiError)) {
         // TODO kili some generic error
-        console.log("Generic error:", err);
+        console.log('Generic error:', err);
         return;
       }
 
       // TODO kili some internal server error, i think there is no other error I'm returing
       if (err.errDetail.status === 500) {
-        console.log("ApiError:", err);
+        console.log('ApiError:', err);
       }
     }
   }
@@ -136,7 +137,7 @@ export class Homepage {
     } catch (err) {
       if (!(err instanceof ApiError)) {
         // TODO kili some generic error
-        console.log("Generic error:", err);
+        console.log('Generic error:', err);
         return;
       }
       // TODO kili 409 when the doctor is unavailable in rescheduled time and internal server error, i think there is no other error I'm returing
@@ -153,11 +154,11 @@ export class Homepage {
     } catch (err) {
       if (!(err instanceof ApiError)) {
         // TODO kili some generic error
-        console.log("Generic error:", err);
+        console.log('Generic error:', err);
         return;
       }
       // TODO kili some internal server error, i think there is no other error I'm returing
-      console.log("ApiError:", err);
+      console.log('ApiError:', err);
     }
   };
 
@@ -169,15 +170,15 @@ export class Homepage {
         appointmentDecision: { action: 'accept', medicine: [], facilities: [], equipment: [] },
       });
       // TODO kili this returns DoctorAppointment, it is up to you how will you change the appointment status
-      console.log("update state");
+      console.log('update state');
     } catch (err) {
       if (!(err instanceof ApiError)) {
         // TODO kili some generic error
-        console.log("Generic error:", err);
+        console.log('Generic error:', err);
         return;
       }
       // TODO kili handle 409 conflict if resources are unavailable, or internal server error, i think there is no other error I'm returing
-      console.log("ApiError:", err);
+      console.log('ApiError:', err);
     }
   };
 
@@ -189,15 +190,15 @@ export class Homepage {
         appointmentDecision: { action: 'reject', reason: 'TODO kili reason' },
       });
       // TODO kili this returns DoctorAppointment, it is up to you how will you change the appointment status
-      console.log("update state");
+      console.log('update state');
     } catch (err) {
       if (!(err instanceof ApiError)) {
         // TODO kili some generic error
-        console.log("Generic error:", err);
+        console.log('Generic error:', err);
         return;
       }
       // TODO kili some internal server error, i think there is no other error I'm returing
-      console.log("ApiError:", err);
+      console.log('ApiError:', err);
     }
   };
 
@@ -209,6 +210,7 @@ export class Homepage {
       medicine: Medicine;
     },
   ) => {
+    // TODO luky handle with /resources/{appointmentId}
     console.log('Save resources on appointment', appointment, resources);
   };
 
@@ -216,8 +218,9 @@ export class Homepage {
     appointment: PatientAppointment | DoctorAppointment,
     prescriptionId: string,
     updatedPrescription: PrescriptionDisplay,
-    /* TODO: type Prescription */
+    /* TODO kili: type Prescription */
   ) => {
+    // TODO luky /prescriptions/{prescriptionId}
     console.log(
       'Update prescription with ID:',
       prescriptionId,
@@ -232,6 +235,7 @@ export class Homepage {
     appointment: PatientAppointment | DoctorAppointment,
     newPrescription: Prescription,
   ) => {
+    // TODO luky handle with /prescriptions
     console.log(
       'Add a new prescription to appointment:',
       appointment,
@@ -301,6 +305,7 @@ export class Homepage {
   };
 
   private handleToggleConditionStatus = (condition: Condition) => {
+    // TODO luky handle with /conditions/{conditionId}
     console.log('Toggle status of condition:', condition);
   };
 

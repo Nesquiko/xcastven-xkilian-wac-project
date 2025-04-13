@@ -3,6 +3,7 @@ import {
   AppointmentType,
   ConditionDisplay,
   Doctor,
+  NewAppointmentRequest,
   PatientAppointment,
   TimeSlot,
   User,
@@ -81,18 +82,27 @@ export class AppointmentScheduler {
       this.selectedTime,
     );
 
-    const newAppointment: PatientAppointment = {
-      id: 'new-appointment',
+    const newAppointment: NewAppointmentRequest = {
+      patientId: this.user.id,
       appointmentDateTime: appointmentDateTime,
       type: this.selectedAppointmentType,
-      condition: this.selectedCondition,
-      status: 'requested',
+      conditionId: this.selectedCondition?.id,
       reason: this.appointmentReason,
-      doctor: this.selectedDoctor,
+      doctorId: this.selectedDoctor.id,
     };
 
     console.log('Request to schedule an appointment:', newAppointment);
-    // TODO kili is selectedDoctor id? and can you, pretty please, create one date object from selectDate and selectedTime, please?
+    // TODO luky just call this
+    // this.api.appointments.requestAppointment({
+    //   newAppointmentRequest: {
+    //     patientId: this.user.id,
+    //     doctorId: this.selectedDoctor,
+    //     // appointmentDateTime: ???
+    //     type: this.selectedAppointmentType,
+    //     reason: this.appointmentReason,
+    //   },
+    // });
+    //
   };
 
   private resetSelection = () => {

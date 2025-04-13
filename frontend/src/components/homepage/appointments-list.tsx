@@ -65,7 +65,10 @@ export class AppointmentsList {
           <md-icon-button
             title="View older appointments"
             class="m-1"
-            onClick={() => console.log('view older appointments clicked')}
+            onClick={() => {
+              // TODO luky handle with /patients/{patientId}/calendar with from and to the same date and take only appointments
+              console.log('view older appointments clicked');
+            }}
           >
             <md-icon class="text-gray-600">arrow_back</md-icon>
           </md-icon-button>
@@ -81,7 +84,10 @@ export class AppointmentsList {
           <md-icon-button
             title="View newer appointments"
             class="m-1"
-            onClick={() => console.log('view newer appointments clicked')}
+            onClick={() => {
+              // TODO luky handle with /patients/{patientId}/calendar with from and to the same date and take only appointments
+              console.log('view newer appointments clicked');
+            }}
           >
             <md-icon class="text-gray-600">arrow_forward</md-icon>
           </md-icon-button>

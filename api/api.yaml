@@ -13,6 +13,9 @@ tags:
   - name: Patients
   - name: Resources
   - name: Medical History
+servers:
+  - description: Cluster Endpoint
+    url: /api
 
 paths:
   /auth/register:

@@ -1,20 +1,23 @@
-import { newApi } from '../../api/api';
+import { Api, newApi } from '../../api/api';
 import { User } from '../../api/generated';
 import { StyledHost } from '../StyledHost';
 import { Component, h, Prop, State } from '@stencil/core';
 
-@Component({
-  tag: 'xcastven-xkilian-project-app',
-})
+@Component({ tag: 'xcastven-xkilian-project-app' })
 export class App {
-  @Prop() apiBase: string = 'http://localhost:42069';
+  @Prop() apiBase: string;
   @Prop() basePath: string = '';
 
   @State() private relativePath: string = '';
 
-  private api = newApi(this.apiBase);
+  private api: Api;
+
+  constructor() {
+    this.api = newApi(this.apiBase);
+  }
 
   componentWillLoad() {
+    console.log('apiBase', this.apiBase);
     const baseUri = new URL(this.basePath, document.baseURI || '/').pathname;
 
     const toRelative = (path: string) => {
@@ -25,11 +28,11 @@ export class App {
       }
     };
 
-    window.navigation?.addEventListener('navigate', (ev: Event) => {
-      if ((ev as any).canIntercept) {
-        (ev as any).intercept();
+    window.navigation?.addEventListener('navigate', (ev: NavigateEvent) => {
+      if (ev.canIntercept) {
+        ev.intercept();
       }
-      const path = new URL((ev as any).destination.url).pathname;
+      const path = new URL(ev.destination.url).pathname;
       toRelative(path);
     });
 
@@ -79,10 +82,6 @@ export class App {
       window.navigation.navigate(absolute)
     };*/
 
-    return (
-      <StyledHost>
-        {element}
-      </StyledHost>
-    );
+    return <StyledHost>{element}</StyledHost>;
   }
 }

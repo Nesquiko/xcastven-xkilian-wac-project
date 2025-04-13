@@ -1,6 +1,6 @@
 import { Api, ApiError } from '../../api/api';
 import {
-  AppointmentStatus,
+  AppointmentStatus, Doctor,
   DoctorAppointment,
   Equipment,
   Facility,
@@ -9,7 +9,7 @@ import {
   Medicine,
   PatientAppointment,
   Prescription,
-  PrescriptionDisplay,
+  PrescriptionDisplay, TimeSlot,
   User,
 } from '../../api/generated';
 import {
@@ -35,8 +35,14 @@ export class AppointmentDetail {
 
   @Prop() handleRescheduleAppointment: (
     appointment: PatientAppointment | DoctorAppointment,
+    newAppointmentDateTime: Date,
+    newAppointmentDoctor: Doctor,
+    reason: string,
   ) => void;
-  @Prop() handleCancelAppointment: (appointment: PatientAppointment | DoctorAppointment) => void;
+  @Prop() handleCancelAppointment: (
+    appointment: PatientAppointment | DoctorAppointment,
+    cancellationReason: string,
+  ) => void;
 
   @Prop() handleAcceptAppointment: (appointment: PatientAppointment | DoctorAppointment) => void;
   @Prop() handleDenyAppointment: (appointment: PatientAppointment | DoctorAppointment) => void;
@@ -120,6 +126,33 @@ export class AppointmentDetail {
   @State() editingPrescriptionNewStart: Date = null;
   @State() editingPrescriptionNewEnd: Date = null;
   @State() editingPrescriptionNewDoctorsNote: string = '';
+
+  @State() rescheduling: boolean = false;
+  @State() reschedulingAppointmentDate: Date = null;
+  @State() reschedulingAppointmentTime: string = '';
+  @State() reschedulingAppointmentDoctor: Doctor = null;
+  @State() reschedulingAppointmentReason: string = '';
+
+  @State() cancelling: boolean = false;
+  @State() cancellingAppointmentReason: string = '';
+
+  @State() availableTimes: Array<TimeSlot> = [
+    { time: "7:00", status: "unavailable" } satisfies TimeSlot,
+    { time: "8:00", status: "available" } satisfies TimeSlot,
+    { time: "9:00", status: "unavailable" } satisfies TimeSlot,
+    { time: "10:00", status: "unavailable" } satisfies TimeSlot,
+    { time: "11:00", status: "available" } satisfies TimeSlot,
+  ] satisfies Array<TimeSlot>;
+  @State() availableDoctors: Array<Doctor> = [
+    {
+      id: "available-doctor-1",
+      firstName: "Available",
+      lastName: "Doctor",
+      email: "available@doctor.sk",
+      role: "doctor",
+      specialization: "urologist",
+    } satisfies Doctor,
+  ] satisfies Array<Doctor>;
 
   private getPatientAppointmentStatusMessage = (appointmentStatus: AppointmentStatus) => {
     switch (appointmentStatus) {
@@ -232,6 +265,39 @@ export class AppointmentDetail {
 
   private handleAddPrescriptionDoctorsNoteChange = (event: Event) => {
     this.addingPrescriptionDoctorsNote = (event.target as HTMLSelectElement).value;
+  };
+
+  private handleReschedule = () => {
+    if (this.reschedulingAppointmentDate && this.reschedulingAppointmentTime && this.reschedulingAppointmentDoctor) {
+      const newDateTime = new Date(this.reschedulingAppointmentDate);
+      const [hours, minutes] = this.reschedulingAppointmentTime.split(':').map(Number);
+      newDateTime.setHours(hours);
+      newDateTime.setMinutes(minutes);
+
+      this.handleRescheduleAppointment(
+        this.appointment,
+        newDateTime,
+        this.reschedulingAppointmentDoctor,
+        this.reschedulingAppointmentReason,
+      );
+
+      this.appointment = {
+        ...this.appointment,
+        status: "requested",
+        facilities: [],
+        equipment: [],
+        medicine: [],
+        appointmentDateTime: newDateTime,
+        doctor: this.reschedulingAppointmentDoctor,
+      };
+
+      this.rescheduling = false;
+    }
+  };
+
+  private handleCancel = () => {
+    this.handleCancelAppointment(this.appointment, this.cancellingAppointmentReason);
+    this.cancelling = false;
   };
 
   private renderDateSelects(
@@ -374,12 +440,26 @@ export class AppointmentDetail {
         </div>
 
         <div class="mb-6 max-h-32 w-full max-w-md overflow-y-auto rounded-md bg-gray-200 px-4 py-3">
-          <div class="mb-1 flex flex-row items-center gap-x-2 text-gray-500">
+          <div class="flex flex-row items-center gap-x-2 text-gray-500">
             <md-icon style={{ fontSize: '16px' }}>description</md-icon>
             Reason
           </div>
-          <p class="ml-1 text-sm font-medium text-wrap text-gray-600">{this.appointment.reason}</p>
+          {this.appointment.reason && (
+            <p class="mt-1 ml-1 text-sm font-medium text-wrap text-gray-600">{this.appointment.reason}</p>
+          )}
         </div>
+
+        {this.appointment.status === 'cancelled' && (
+          <div class="mb-6 max-h-32 w-full max-w-md overflow-y-auto rounded-md bg-gray-200 px-4 py-3">
+            <div class="flex flex-row items-center gap-x-2 text-gray-500">
+              <md-icon style={{ fontSize: '16px' }}>description</md-icon>
+              Cancellation reason
+            </div>
+            {this.appointment.cancellationReason && (
+              <p class="mt-1 ml-1 text-sm font-medium text-wrap text-gray-600">{this.appointment.cancellationReason}</p>
+            )}
+          </div>
+        )}
 
         {this.isDoctor && instanceOfDoctorAppointment(this.appointment) && (
           <div class="relative mb-6 w-full max-w-md rounded-md bg-gray-200 px-4 py-3">
@@ -508,9 +588,7 @@ export class AppointmentDetail {
 
         {/* Prescriptions Box */}
         <div class="relative mb-6 w-full max-w-md rounded-md bg-gray-200 px-4 py-3">
-          {/* Header with Add/Expand buttons */}
           <div class="mb-2 flex flex-row items-center justify-between">
-            {/* ... (unchanged) */}
             <div class="flex flex-row items-center gap-x-2 text-gray-500">
               <md-icon style={{ fontSize: '16px' }}>medication</md-icon>
               Prescriptions
@@ -781,15 +859,141 @@ export class AppointmentDetail {
         {this.isDoctor
           ? getDoctorAppointmentActions(
               this.appointment.status,
-              () => this.handleCancelAppointment(this.appointment),
+              () => {
+                this.cancelling = !this.cancelling;
+                this.rescheduling = false;
+              },
               () => this.handleAcceptAppointment(this.appointment),
               () => this.handleDenyAppointment(this.appointment),
             )
           : getPatientAppointmentActions(
               this.appointment.status,
-              () => this.handleRescheduleAppointment(this.appointment),
-              () => this.handleCancelAppointment(this.appointment),
+              () => {
+                this.rescheduling = !this.rescheduling;
+                this.cancelling = false;
+              },
+              () => {
+                this.cancelling = !this.cancelling;
+                this.rescheduling = false;
+              },
             )}
+
+        {this.rescheduling && !this.isDoctor && (
+          <div class="my-6 w-full max-w-md rounded-md bg-gray-200 px-4 py-3">
+            <h4 class="mb-2 text-sm font-medium text-[#7357be]">Re-schedule appointment</h4>
+            <div class="mb-3 flex w-full flex-col gap-y-3">
+              {this.renderDateSelects(
+                'start',
+                this.reschedulingAppointmentDate,
+                (type: 'start' | 'end', part: 'day' | 'month' | 'year', event: Event) => {
+                  const value: number = parseInt((event.target as HTMLSelectElement).value, 10);
+                  this.reschedulingAppointmentDate = updateDatePart(
+                    this.reschedulingAppointmentDate,
+                    part,
+                    value,
+                  );
+                },
+              )}
+
+              <md-outlined-select
+                label="Time"
+                class="w-full"
+                value={this.reschedulingAppointmentTime}
+                onInput={(e: Event) => this.reschedulingAppointmentTime = (e.target as HTMLSelectElement).value}
+              >
+                {this.availableTimes.map((timeSlot: TimeSlot) => (
+                  <md-select-option value={timeSlot.time} disabled={timeSlot.status !== "available"}>
+                    <div slot="headline">
+                      {timeSlot.time}
+                    </div>
+                  </md-select-option>
+                ))}
+              </md-outlined-select>
+
+              <md-outlined-select
+                label="Doctor"
+                class="w-full"
+                value={this.reschedulingAppointmentDoctor?.id}
+                onInput={(e: Event) => {
+                  const newDoctorId: string = (e.target as HTMLSelectElement).value;
+                  this.reschedulingAppointmentDoctor = this.availableDoctors.find(
+                    (doctor: Doctor) => doctor.id === newDoctorId,
+                  );
+                }}
+              >
+                {this.availableDoctors.map((doctor: Doctor) => (
+                  <md-select-option value={doctor.id}>
+                    <div slot="headline">
+                      Dr. {doctor.firstName} {doctor.lastName}
+                    </div>
+                  </md-select-option>
+                ))}
+              </md-outlined-select>
+
+              <md-outlined-text-field
+                label="Rescheduling reason (optional)"
+                class="w-full"
+                value={this.reschedulingAppointmentReason}
+                onInput={(e: Event) => {
+                  this.reschedulingAppointmentReason = (e.target as HTMLInputElement).value;
+                }}
+              />
+            </div>
+
+            <div class="flex gap-x-2">
+              <md-filled-button
+                class={`flex-1 rounded-full bg-[#7357be]`}
+                disabled={
+                  !this.reschedulingAppointmentDate ||
+                  !this.reschedulingAppointmentTime ||
+                  !this.reschedulingAppointmentDoctor
+                }
+                onClick={this.handleReschedule}
+              >
+                Re-schedule
+              </md-filled-button>
+              <md-outlined-button
+                class="flex-1 rounded-full"
+                onClick={() => (this.rescheduling = false)}
+              >
+                Cancel
+              </md-outlined-button>
+            </div>
+          </div>
+        )}
+
+        {this.cancelling && (
+          <div class="my-6 w-full max-w-md rounded-md bg-gray-200 px-4 py-3">
+            <h4 class="mb-2 text-sm font-medium text-[#7357be]">Cancel appointment</h4>
+            <div class="mb-3 flex w-full flex-col gap-y-3">
+              <md-outlined-text-field
+                required={true}
+                label="Cancellation reason"
+                class="w-full"
+                value={this.cancellingAppointmentReason}
+                onInput={(e: Event) => {
+                  this.cancellingAppointmentReason = (e.target as HTMLInputElement).value;
+                }}
+              />
+            </div>
+
+            <div class="flex flex-row items-center justify-between gap-x-2">
+              <md-filled-button
+                class={`w-1/2 rounded-full bg-[#7357be]`}
+                onClick={this.handleCancel}
+                disabled={this.cancellingAppointmentReason === ""}
+              >
+                Confirm cancel
+              </md-filled-button>
+              <md-outlined-button
+                class="w-1/2 rounded-full"
+                onClick={() => (this.cancelling = false)}
+              >
+                Back
+              </md-outlined-button>
+            </div>
+          </div>
+        )}
       </div>
     );
   }

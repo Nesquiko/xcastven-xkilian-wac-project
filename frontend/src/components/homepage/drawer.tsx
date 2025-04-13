@@ -3,7 +3,7 @@ import {
   AppointmentDisplay,
   AppointmentStatus,
   Condition,
-  ConditionDisplay,
+  ConditionDisplay, Doctor,
   DoctorAppointment,
   Equipment,
   Facility,
@@ -49,8 +49,14 @@ export class Drawer {
 
   @Prop() handleRescheduleAppointment: (
     appointment: PatientAppointment | DoctorAppointment,
+    newAppointmentDateTime: Date,
+    newAppointmentDoctor: Doctor,
+    reason: string,
   ) => void;
-  @Prop() handleCancelAppointment: (appointment: PatientAppointment | DoctorAppointment) => void;
+  @Prop() handleCancelAppointment: (
+    appointment: PatientAppointment | DoctorAppointment,
+    cancellationReason: string,
+  ) => void;
 
   @Prop() handleAcceptAppointment: (appointment: PatientAppointment | DoctorAppointment) => void;
   @Prop() handleDenyAppointment: (appointment: PatientAppointment | DoctorAppointment) => void;

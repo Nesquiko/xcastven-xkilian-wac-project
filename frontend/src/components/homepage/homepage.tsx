@@ -3,7 +3,7 @@ import {
   AppointmentDisplay,
   AppointmentStatus,
   Condition,
-  ConditionDisplay,
+  ConditionDisplay, Doctor,
   DoctorAppointment,
   Equipment,
   Facility,
@@ -122,7 +122,17 @@ export class Homepage {
 
   private handleRescheduleAppointment = async (
     appointment: PatientAppointment | DoctorAppointment,
+    newAppointmentDateTime: Date,
+    newAppointmentDoctor: Doctor,
+    reason: string,
   ) => {
+    console.log(
+      "Re-schedule appointment:", appointment,
+      "to new dateTime", newAppointmentDateTime,
+      "with a doctor", newAppointmentDoctor,
+      "with a reason", reason,
+    );
+
     try {
       await this.api.appointments.rescheduleAppointment({
         appointmentId: appointment.id,
@@ -143,11 +153,14 @@ export class Homepage {
     }
   };
 
-  private handleCancelAppointment = async (appointment: PatientAppointment | DoctorAppointment) => {
+  private handleCancelAppointment = async (
+    appointment: PatientAppointment | DoctorAppointment,
+    cancellationReason: string,
+  ) => {
     try {
       await this.api.appointments.cancelAppointment({
         appointmentId: appointment.id,
-        appointmentCancellation: { reason: 'TODO kili reason' },
+        appointmentCancellation: { reason: cancellationReason },
       });
       // TODO kili this doesn't return anything, it is up to you how will you change the appointment status
     } catch (err) {

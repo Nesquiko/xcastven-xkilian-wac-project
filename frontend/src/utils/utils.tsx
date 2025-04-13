@@ -175,7 +175,7 @@ const patientButton = (
 
 export const getPatientAppointmentActions = (
   appointmentStatus: AppointmentStatus,
-  handleRescheduleAppointment: (appointment: PatientAppointment) => void,
+  handleRescheduleAppointment: () => void,
   handleCancelAppointment: (appointment: PatientAppointment) => void,
 ) => {
   switch (appointmentStatus) {

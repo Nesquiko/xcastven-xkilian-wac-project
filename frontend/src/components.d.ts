@@ -6,10 +6,10 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { Api } from "./api/api";
-import { AppointmentDisplay, AppointmentStatus, Condition, ConditionDisplay, DoctorAppointment, Equipment, Facility, Medicine, PatientAppointment, Prescription, PrescriptionDisplay, User, UserRole } from "./api/generated";
+import { AppointmentDisplay, AppointmentStatus, Condition, ConditionDisplay, Doctor, DoctorAppointment, Equipment, Facility, Medicine, PatientAppointment, Prescription, PrescriptionDisplay, User, UserRole } from "./api/generated";
 import { User as User1 } from "./components";
 export { Api } from "./api/api";
-export { AppointmentDisplay, AppointmentStatus, Condition, ConditionDisplay, DoctorAppointment, Equipment, Facility, Medicine, PatientAppointment, Prescription, PrescriptionDisplay, User, UserRole } from "./api/generated";
+export { AppointmentDisplay, AppointmentStatus, Condition, ConditionDisplay, Doctor, DoctorAppointment, Equipment, Facility, Medicine, PatientAppointment, Prescription, PrescriptionDisplay, User, UserRole } from "./api/generated";
 export { User as User1 } from "./components";
 export namespace Components {
     interface XcastvenXkilianProjectAccount {
@@ -26,10 +26,16 @@ export namespace Components {
     appointment: PatientAppointment | DoctorAppointment,
     newPrescription: Prescription,
   ) => void;
-        "handleCancelAppointment": (appointment: PatientAppointment | DoctorAppointment) => void;
+        "handleCancelAppointment": (
+    appointment: PatientAppointment | DoctorAppointment,
+    cancellationReason: string,
+  ) => void;
         "handleDenyAppointment": (appointment: PatientAppointment | DoctorAppointment) => void;
         "handleRescheduleAppointment": (
     appointment: PatientAppointment | DoctorAppointment,
+    newAppointmentDateTime: Date,
+    newAppointmentDoctor: Doctor,
+    reason: string,
   ) => void;
         "handleResetSelection": () => void;
         "handleSaveResourcesOnAppointment": (
@@ -123,10 +129,16 @@ export namespace Components {
     appointment: PatientAppointment | DoctorAppointment,
     newPrescription: Prescription,
   ) => void;
-        "handleCancelAppointment": (appointment: PatientAppointment | DoctorAppointment) => void;
+        "handleCancelAppointment": (
+    appointment: PatientAppointment | DoctorAppointment,
+    cancellationReason: string,
+  ) => void;
         "handleDenyAppointment": (appointment: PatientAppointment | DoctorAppointment) => void;
         "handleRescheduleAppointment": (
     appointment: PatientAppointment | DoctorAppointment,
+    newAppointmentDateTime: Date,
+    newAppointmentDoctor: Doctor,
+    reason: string,
   ) => void;
         "handleResetSelection": () => void;
         "handleSaveResourcesOnAppointment": (
@@ -343,10 +355,16 @@ declare namespace LocalJSX {
     appointment: PatientAppointment | DoctorAppointment,
     newPrescription: Prescription,
   ) => void;
-        "handleCancelAppointment"?: (appointment: PatientAppointment | DoctorAppointment) => void;
+        "handleCancelAppointment"?: (
+    appointment: PatientAppointment | DoctorAppointment,
+    cancellationReason: string,
+  ) => void;
         "handleDenyAppointment"?: (appointment: PatientAppointment | DoctorAppointment) => void;
         "handleRescheduleAppointment"?: (
     appointment: PatientAppointment | DoctorAppointment,
+    newAppointmentDateTime: Date,
+    newAppointmentDoctor: Doctor,
+    reason: string,
   ) => void;
         "handleResetSelection"?: () => void;
         "handleSaveResourcesOnAppointment"?: (
@@ -440,10 +458,16 @@ declare namespace LocalJSX {
     appointment: PatientAppointment | DoctorAppointment,
     newPrescription: Prescription,
   ) => void;
-        "handleCancelAppointment"?: (appointment: PatientAppointment | DoctorAppointment) => void;
+        "handleCancelAppointment"?: (
+    appointment: PatientAppointment | DoctorAppointment,
+    cancellationReason: string,
+  ) => void;
         "handleDenyAppointment"?: (appointment: PatientAppointment | DoctorAppointment) => void;
         "handleRescheduleAppointment"?: (
     appointment: PatientAppointment | DoctorAppointment,
+    newAppointmentDateTime: Date,
+    newAppointmentDoctor: Doctor,
+    reason: string,
   ) => void;
         "handleResetSelection"?: () => void;
         "handleSaveResourcesOnAppointment"?: (

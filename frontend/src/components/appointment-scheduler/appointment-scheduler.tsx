@@ -8,8 +8,6 @@ import {
   User,
 } from '../../api/generated';
 import { ActiveConditionsExample } from '../../data-examples/active-conditions';
-import { AppointmentTimesExample } from '../../data-examples/appointment-times';
-import { AvailableDoctorsExample } from '../../data-examples/available-doctors';
 import {
   formatAppointmentType,
   formatDate,
@@ -38,18 +36,63 @@ export class AppointmentScheduler {
   @State() currentViewMonth: number = TODAY.getMonth();
   @State() currentViewYear: number = TODAY.getFullYear();
 
-  private availableTimes: Array<TimeSlot> = AppointmentTimesExample;
-  private availableDoctors: Array<Doctor> = AvailableDoctorsExample;
-  private activeConditions: Array<ConditionDisplay> = ActiveConditionsExample;
+  @State() private availableTimes: Array<TimeSlot> = [];
+  @State() private availableDoctors: Array<Doctor> = [];
+  @State() private activeConditions: Array<ConditionDisplay> = [];
 
-  componentWillLoad() {
+  async componentWillLoad() {
     if (this.initialDate) {
       this.selectedDate = this.initialDate;
+    }
+
+    try {
+      const docs = await this.api.doctors.getDoctors();
+      this.availableDoctors = docs.doctors ?? [];
+    } catch (err) {
+      if (!(err instanceof ApiError)) {
+        toastService.showError('Unknown server error');
+        return;
+      }
+      toastService.showError(err.message);
+    }
+  }
+
+  private async loadAvailableTimes(doc: Doctor, d: Date) {
+    try {
+      const slots = await this.api.doctors.doctorsTimeslots({
+        doctorId: doc.id,
+        date: d,
+      });
+      this.availableTimes = slots.slots;
+    } catch (err) {
+      if (!(err instanceof ApiError)) {
+        toastService.showError('Unknown server error');
+        return;
+      }
+      toastService.showError(err.message);
+    }
+  }
+
+  private async loadAciveConditions(date: Date, patientId: string) {
+    try {
+      const conds = await this.api.conditions.conditionsInDate({ date, patientId });
+      this.activeConditions = conds.conditions;
+    } catch (err) {
+      if (!(err instanceof ApiError)) {
+        toastService.showError('Unknown server error');
+        return;
+      }
+      toastService.showError(err.message);
     }
   }
 
   private selectDate = (day: number) => {
     this.selectedDate = new Date(this.currentViewYear, this.currentViewMonth, day);
+
+    this.loadAciveConditions(this.selectedDate, this.user.id);
+    if (this.selectedDoctor) {
+      this.loadAvailableTimes(this.selectedDoctor, this.selectedDate);
+    }
   };
 
   private handleTimeChange = (event: Event) => {
@@ -63,6 +106,10 @@ export class AppointmentScheduler {
   private handleDoctorChange = (event: Event) => {
     const doctorId: string = (event.target as HTMLSelectElement).value;
     this.selectedDoctor = this.availableDoctors.find((doctor: Doctor) => doctor.id === doctorId);
+
+    if (this.selectedDate) {
+      this.loadAvailableTimes(this.selectedDoctor, this.selectedDate);
+    }
   };
 
   private handleConditionChange = (event: Event) => {
@@ -92,7 +139,6 @@ export class AppointmentScheduler {
     };
 
     try {
-      // TODO luky test this
       await this.api.appointments.requestAppointment({ newAppointmentRequest: newAppointment });
       window.navigation.navigate('homepage');
     } catch (err) {

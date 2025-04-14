@@ -186,3 +186,40 @@ func (m *MongoDb) doctorExists(ctx context.Context, id uuid.UUID) error {
 
 	return nil
 }
+
+func (m *MongoDb) GetAllDoctors(ctx context.Context) ([]Doctor, error) {
+	collection := m.Database.Collection(doctorsCollection)
+	doctors := make([]Doctor, 0)
+
+	filter := bson.M{}
+
+	findOptions := options.Find().SetSort(
+		bson.D{{Key: "lastName", Value: 1}, {Key: "firstName", Value: 1}},
+	)
+
+	cursor, err := collection.Find(ctx, filter, findOptions)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return doctors, nil
+		}
+		return nil, fmt.Errorf("GetAllDoctors find failed: %w", err)
+	}
+
+	defer func() {
+		if cerr := cursor.Close(ctx); cerr != nil {
+			slog.Warn("Failed to close doctors cursor", "error", cerr.Error())
+		}
+	}()
+
+	if err = cursor.All(ctx, &doctors); err != nil {
+		slog.Error("Failed to decode doctor documents from cursor", "error", err)
+		return nil, fmt.Errorf("GetAllDoctors decode failed: %w", err)
+	}
+
+	if err = cursor.Err(); err != nil {
+		slog.Error("Doctors cursor iteration error", "error", err)
+		return nil, fmt.Errorf("GetAllDoctors cursor error: %w", err)
+	}
+
+	return doctors, nil
+}

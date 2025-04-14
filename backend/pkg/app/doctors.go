@@ -100,3 +100,13 @@ func (a monolithApp) AvailableDoctors(
 	availableApiDoctors := Map(availableDataDoctors, dataDoctorToApiDoctor)
 	return availableApiDoctors, nil
 }
+
+func (a monolithApp) GetAllDoctors(ctx context.Context) ([]api.Doctor, error) {
+	allDataDoctors, err := a.db.GetAllDoctors(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("GetAllDoctors failed: %w", err)
+	}
+
+	allApiDoctors := Map(allDataDoctors, dataDoctorToApiDoctor)
+	return allApiDoctors, nil
+}

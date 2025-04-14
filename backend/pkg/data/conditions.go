@@ -124,6 +124,64 @@ func (m *MongoDb) UpdateCondition(
 	return updatedCondition, nil
 }
 
+func (m *MongoDb) FindConditionsByPatientIdAndDate(
+	ctx context.Context,
+	patientId uuid.UUID,
+	date time.Time,
+) ([]Condition, error) {
+	collection := m.Database.Collection(conditionsCollection)
+	conditions := make([]Condition, 0)
+
+	// Calculate the start and end of the target day in the local timezone
+	year, month, day := date.Date()
+	startOfDay := time.Date(year, month, day, 0, 0, 0, 0, date.Location())
+	// End of day is exclusive, so start of the next day
+	endOfDayExclusive := startOfDay.AddDate(0, 0, 1)
+
+	// Filter for conditions where:
+	// - The patientId matches
+	// - The condition's start time is *before* the end of the target day (exclusive)
+	// - The condition's end time is *on or after* the start of the target day
+	filter := bson.M{
+		"patientId": patientId,
+		"start": bson.M{
+			"$lt": endOfDayExclusive,
+		}, // Condition must start before the next day begins
+		"end": bson.M{
+			"$gte": startOfDay,
+		}, // Condition must end on or after the target day begins
+	}
+
+	findOptions := options.Find().SetSort(bson.D{{Key: "start", Value: 1}})
+
+	cursor, err := collection.Find(ctx, filter, findOptions)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return conditions, nil
+		}
+		return nil, fmt.Errorf("FindConditionsByPatientIdAndDate find failed: %w", err)
+	}
+
+	defer func() {
+		if cerr := cursor.Close(ctx); cerr != nil {
+			slog.Warn("Failed to close conditions cursor", "error", cerr.Error())
+		}
+	}()
+
+	if err = cursor.All(ctx, &conditions); err != nil {
+		slog.Error("Failed to decode condition documents from cursor", "error", err)
+		return nil, fmt.Errorf("FindConditionsByPatientIdAndDate decode failed: %w", err)
+	}
+
+	// Check for cursor errors after iteration
+	if err = cursor.Err(); err != nil {
+		slog.Error("Conditions cursor iteration error", "error", err)
+		return nil, fmt.Errorf("FindConditionsByPatientIdAndDate cursor error: %w", err)
+	}
+
+	return conditions, nil
+}
+
 func (m *MongoDb) conditionExists(ctx context.Context, id uuid.UUID) error {
 	conditionsColl := m.Database.Collection(conditionsCollection)
 	filter := bson.M{"_id": id}

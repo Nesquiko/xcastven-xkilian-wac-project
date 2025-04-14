@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"github.com/google/uuid"
 
@@ -153,4 +154,18 @@ func (a monolithApp) UpdatePatientCondition(
 
 	apiResponse := dataCondToCond(finalConditionData, apiAppointments)
 	return apiResponse, nil
+}
+
+func (a monolithApp) PatientConditionsOnDate(
+	ctx context.Context,
+	patientId uuid.UUID,
+	date time.Time,
+) ([]api.ConditionDisplay, error) {
+	dataConditions, err := a.db.FindConditionsByPatientIdAndDate(ctx, patientId, date)
+	if err != nil {
+		return nil, fmt.Errorf("PatientConditionsOnDate failed: %w", err)
+	}
+
+	apiConditions := Map(dataConditions, dataCondToCondDisplay)
+	return apiConditions, nil
 }

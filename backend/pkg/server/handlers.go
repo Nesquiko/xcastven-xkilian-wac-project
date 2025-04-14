@@ -558,3 +558,52 @@ func (s Server) UpdatePrescription(
 
 	encode(w, http.StatusOK, updatedPrescription)
 }
+
+// GetDoctors implements api.ServerInterface.
+func (s Server) GetDoctors(w http.ResponseWriter, r *http.Request) {
+	doctors, err := s.app.GetAllDoctors(r.Context())
+	if err != nil {
+		slog.Error(
+			UnexpectedError,
+			"error",
+			err.Error(),
+			"where",
+			"GetAllDoctors",
+		)
+		encodeError(w, internalServerError())
+		return
+	}
+
+	encode(w, http.StatusOK, api.Doctors{Doctors: doctors})
+}
+
+// ConditionsInDate implements api.ServerInterface.
+func (s Server) ConditionsInDate(
+	w http.ResponseWriter,
+	r *http.Request,
+	patientId api.PatientId,
+	params api.ConditionsInDateParams,
+) {
+	conditions, err := s.app.PatientConditionsOnDate(
+		r.Context(),
+		patientId,
+		params.Date.Time,
+	)
+	if err != nil {
+		slog.Error(
+			UnexpectedError,
+			"error",
+			err.Error(),
+			"where",
+			"ConditionsInDate",
+			"patientId",
+			patientId.String(),
+			"date",
+			params.Date.String(),
+		)
+		encodeError(w, internalServerError())
+		return
+	}
+
+	encode(w, http.StatusOK, api.Conditions{Conditions: conditions})
+}

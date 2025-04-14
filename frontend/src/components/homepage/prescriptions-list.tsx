@@ -67,14 +67,20 @@ export class PrescriptionsList {
           <md-icon-button
             title="View older prescriptions"
             class="m-1"
-            onClick={() => console.log('view older prescriptions clicked')}
+            onClick={() => {
+              // TODO luky handle with /patients/{patientId}/calendar with from and to the same date and take only prescriptions
+              console.log('view older prescriptions clicked');
+            }}
           >
             <md-icon class="text-gray-600">arrow_back</md-icon>
           </md-icon-button>
           <md-icon-button
             title="View newer prescriptions"
             class="m-1"
-            onClick={() => console.log('view newer prescriptions clicked')}
+            onClick={() => {
+              // TODO luky handle with /patients/{patientId}/calendar with from and to the same date and take only prescriptions
+              console.log('view newer prescriptions clicked');
+            }}
           >
             <md-icon class="text-gray-600">arrow_forward</md-icon>
           </md-icon-button>

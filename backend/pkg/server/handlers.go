@@ -427,13 +427,61 @@ func (s Server) PrescriptionDetail(
 	encode(w, http.StatusOK, prescription)
 }
 
-// ReserveAppointmentResources implements api.ServerInterface.
 func (s Server) ReserveAppointmentResources(
 	w http.ResponseWriter,
 	r *http.Request,
-	appointmentId api.AppointmentId,
+	appointmentId api.AppointmentId, // Parsed from the path
 ) {
-	panic("unimplemented")
+	req, decodeErr := Decode[api.ReserveAppointmentResourcesJSONBody](w, r)
+	if decodeErr != nil {
+		encodeError(w, decodeErr)
+		return
+	}
+
+	updatedAppointment, err := s.app.ReserveAppointmentResources(
+		r.Context(),
+		appointmentId,
+		req,
+	)
+	if err != nil {
+		if errors.Is(err, app.ErrNotFound) {
+			apiErr := &ApiError{
+				ErrorDetail: api.ErrorDetail{
+					Code:   "resource.or.appointment.not-found",
+					Title:  "Not Found",
+					Detail: err.Error(),
+					Status: http.StatusNotFound,
+				},
+			}
+			encodeError(w, apiErr)
+			return
+		} else if errors.Is(err, app.ErrResourceUnavailable) {
+			apiErr := &ApiError{
+				ErrorDetail: api.ErrorDetail{
+					Code:   "resource.unavailable",
+					Title:  "Conflict",
+					Detail: err.Error(),
+					Status: http.StatusConflict,
+				},
+			}
+			encodeError(w, apiErr)
+			return
+		}
+
+		slog.Error(
+			UnexpectedError,
+			"error",
+			err.Error(),
+			"where",
+			"ReserveAppointmentResources",
+			"appointmentId",
+			appointmentId.String(),
+		)
+		encodeError(w, internalServerError())
+		return
+	}
+
+	encode(w, http.StatusOK, updatedAppointment)
 }
 
 // UpdateCondition implements api.ServerInterface.

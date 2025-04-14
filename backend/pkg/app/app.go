@@ -103,6 +103,11 @@ type App interface {
 		reservation api.ResourceReservation,
 	) error
 	AvailableResources(ctx context.Context, dateTime time.Time) (api.AvailableResources, error)
+	ReserveAppointmentResources(
+		ctx context.Context,
+		appointmentId uuid.UUID,
+		payload api.ReserveAppointmentResourcesJSONBody,
+	) (api.DoctorAppointment, error)
 }
 
 func New(db data.Db) App {

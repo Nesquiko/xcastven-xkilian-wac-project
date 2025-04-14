@@ -16,9 +16,13 @@ import {
   days,
   formatAppointmentType,
   formatDate,
-  formatTime, getDatePart,
+  formatTime,
+  getDatePart,
   getDoctorAppointmentActions,
-  getPatientAppointmentActions, months, updateDatePart, years,
+  getPatientAppointmentActions,
+  months,
+  updateDatePart,
+  years,
 } from '../../utils/utils';
 import { Component, h, Prop, State } from '@stencil/core';
 import { toastService } from '../services/toast-service';
@@ -67,9 +71,9 @@ export class AppointmentDetail {
   ) => void;
 
   @State() appointment: PatientAppointment | DoctorAppointment = undefined;
-  @State() availableEquipment: Array<Equipment> = [{ id: "equipment-1", name: "Equipment 1" }];
-  @State() availableFacilities: Array<Facility> = [{ id: "facility-1", name: "Facility 1" }];
-  @State() availableMedicine: Array<Medicine> = [{ id: "medicine-1", name: "Medicine 1" }];
+  @State() availableEquipment: Array<Equipment> = [{ id: 'equipment-1', name: 'Equipment 1' }];
+  @State() availableFacilities: Array<Facility> = [{ id: 'facility-1', name: 'Facility 1' }];
+  @State() availableMedicine: Array<Medicine> = [{ id: 'medicine-1', name: 'Medicine 1' }];
 
   @State() selectedEquipment: Equipment =
     this.appointment && instanceOfDoctorAppointment(this.appointment)
@@ -224,11 +228,7 @@ export class AppointmentDetail {
         value,
       );
     } else {
-      this.editingPrescriptionNewEnd = updateDatePart(
-        this.editingPrescriptionNewEnd,
-        part,
-        value,
-      );
+      this.editingPrescriptionNewEnd = updateDatePart(this.editingPrescriptionNewEnd, part, value);
     }
   };
 
@@ -247,17 +247,9 @@ export class AppointmentDetail {
   ) => {
     const value: number = parseInt((event.target as HTMLSelectElement).value, 10);
     if (type === 'start') {
-      this.addingPrescriptionStart = updateDatePart(
-        this.addingPrescriptionStart,
-        part,
-        value,
-      );
+      this.addingPrescriptionStart = updateDatePart(this.addingPrescriptionStart, part, value);
     } else {
-      this.addingPrescriptionEnd = updateDatePart(
-        this.addingPrescriptionEnd,
-        part,
-        value
-      );
+      this.addingPrescriptionEnd = updateDatePart(this.addingPrescriptionEnd, part, value);
     }
   };
 
@@ -301,11 +293,7 @@ export class AppointmentDetail {
   private renderDateSelects(
     dateType: 'start' | 'end',
     dateValue: Date | null,
-    changeHandler: (
-      type: 'start' | 'end',
-      part: 'day' | 'month' | 'year',
-      event: Event,
-    ) => void,
+    changeHandler: (type: 'start' | 'end', part: 'day' | 'month' | 'year', event: Event) => void,
   ) {
     const prefix: 'Start' | 'End' = dateType === 'start' ? 'Start' : 'End';
     return (
@@ -313,7 +301,7 @@ export class AppointmentDetail {
         <md-outlined-select
           required={true}
           label={`${prefix} Day`}
-          class="flex-1 min-w-0"
+          class="min-w-0 flex-1"
           value={getDatePart(dateValue, 'day')}
           onInput={(e: Event) => changeHandler(dateType, 'day', e)}
         >
@@ -327,12 +315,15 @@ export class AppointmentDetail {
         <md-outlined-select
           required={true}
           label={`${prefix} Month`}
-          class="flex-1 min-w-0"
+          class="min-w-0 flex-1"
           value={getDatePart(dateValue, 'month')}
           onInput={(e: Event) => changeHandler(dateType, 'month', e)}
         >
-          {months.map((month: { value: number, name: string }) => (
-            <md-select-option value={month.value.toString()} key={`${dateType}-month-${month.value}`}>
+          {months.map((month: { value: number; name: string }) => (
+            <md-select-option
+              value={month.value.toString()}
+              key={`${dateType}-month-${month.value}`}
+            >
               <div slot="headline">{month.name}</div>
             </md-select-option>
           ))}
@@ -341,7 +332,7 @@ export class AppointmentDetail {
         <md-outlined-select
           required={true}
           label={`${prefix} Year`}
-          class="flex-1 min-w-0"
+          class="min-w-0 flex-1"
           value={getDatePart(dateValue, 'year')}
           onInput={(e: Event) => changeHandler(dateType, 'year', e)}
         >
@@ -494,21 +485,27 @@ export class AppointmentDetail {
                 <md-icon style={{ fontSize: '16px' }}>meeting_room</md-icon>
                 Facility
               </div>
-              <span class="font-medium text-gray-600">{this.appointment.facilities?.[0].name ?? ""}</span>
+              <span class="font-medium text-gray-600">
+                {this.appointment.facilities?.[0].name ?? ''}
+              </span>
             </div>
             <div class="flex w-full flex-row items-center justify-between">
               <div class="flex flex-row items-center gap-x-2 text-gray-500">
                 <md-icon style={{ fontSize: '16px' }}>service_toolbox</md-icon>
                 Equipment
               </div>
-              <span class="font-medium text-gray-600">{this.appointment.equipment?.[0].name ?? ""}</span>
+              <span class="font-medium text-gray-600">
+                {this.appointment.equipment?.[0].name ?? ''}
+              </span>
             </div>
             <div class="flex w-full flex-row items-center justify-between">
               <div class="flex flex-row items-center gap-x-2 text-gray-500">
                 <md-icon style={{ fontSize: '16px' }}>vaccines</md-icon>
                 Medicine
               </div>
-              <span class="font-medium text-gray-600">{this.appointment.medicine?.[0].name ?? ""}</span>
+              <span class="font-medium text-gray-600">
+                {this.appointment.medicine?.[0].name ?? ''}
+              </span>
             </div>
 
             {this.isDoctor &&
@@ -557,7 +554,7 @@ export class AppointmentDetail {
                     </md-outlined-select>
                   </div>
 
-                  <div class="flex flex-row justify-between items-center gap-x-2">
+                  <div class="flex flex-row items-center justify-between gap-x-2">
                     <md-filled-button
                       class={`w-1/2 rounded-full bg-[#7357be]`}
                       onClick={() => {
@@ -587,7 +584,7 @@ export class AppointmentDetail {
 
                     <md-outlined-button
                       class={`w-1/2 rounded-full`}
-                      onClick={() => this.showEditResources = false}
+                      onClick={() => (this.showEditResources = false)}
                     >
                       Cancel
                     </md-outlined-button>
@@ -697,7 +694,7 @@ export class AppointmentDetail {
               <div class="mt-3 w-full pt-3">
                 <h4 class="mb-2 text-sm font-medium text-[#7357be]">Edit prescription</h4>
                 <div class="mb-3 flex w-full flex-col gap-y-3">
-                <md-outlined-text-field
+                  <md-outlined-text-field
                     required={true}
                     label="Prescription name"
                     class="w-full"
@@ -753,7 +750,8 @@ export class AppointmentDetail {
                       );
 
                       const index: number = this.appointment.prescriptions.findIndex(
-                        (prescription: PrescriptionDisplay) => prescription.id === this.editingPrescription.id,
+                        (prescription: PrescriptionDisplay) =>
+                          prescription.id === this.editingPrescription.id,
                       );
                       if (index !== -1) {
                         this.appointment.prescriptions[index] = updatedPrescription;
@@ -820,13 +818,12 @@ export class AppointmentDetail {
                     }
                     onClick={() => {
                       const newPrescription: Prescription = {
-                        id: "new-prescription",
+                        id: 'new-prescription',
                         name: this.addingPrescriptionName,
                         start: this.addingPrescriptionStart,
                         end: this.addingPrescriptionEnd,
                         doctorsNote: this.addingPrescriptionDoctorsNote,
                       };
-                      console.log('Adding prescription:', newPrescription);
 
                       this.handleAddPrescriptionForAppointment(this.appointment, newPrescription);
 
@@ -839,7 +836,9 @@ export class AppointmentDetail {
                       this.addingPrescription = false;
                       this.addingPrescriptionName = '';
                       this.addingPrescriptionStart = new Date();
-                      this.addingPrescriptionEnd = new Date(new Date().setDate(new Date().getDate() + 7));
+                      this.addingPrescriptionEnd = new Date(
+                        new Date().setDate(new Date().getDate() + 7),
+                      );
                       this.addingPrescriptionDoctorsNote = '';
                     }}
                   >

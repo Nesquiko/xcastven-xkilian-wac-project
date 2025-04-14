@@ -81,7 +81,10 @@ export class ConditionsList {
           <md-icon-button
             title="View older conditions"
             class="m-1"
-            onClick={() => console.log('view older conditions clicked')}
+            onClick={() => {
+              // TODO luky handle with /patients/{patientId}/calendar with from and to the same date and take only conditions
+              console.log('view older conditions clicked');
+            }}
           >
             <md-icon class="text-gray-600">arrow_back</md-icon>
           </md-icon-button>
@@ -97,7 +100,10 @@ export class ConditionsList {
           <md-icon-button
             title="View newer conditions"
             class="m-1"
-            onClick={() => console.log('view newer conditions clicked')}
+            onClick={() => {
+              // TODO luky handle with /patients/{patientId}/calendar with from and to the same date and take only conditions
+              console.log('view newer conditions clicked');
+            }}
           >
             <md-icon class="text-gray-600">arrow_forward</md-icon>
           </md-icon-button>

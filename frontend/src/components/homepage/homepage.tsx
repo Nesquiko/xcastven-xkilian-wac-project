@@ -3,12 +3,16 @@ import {
   AppointmentDisplay,
   AppointmentStatus,
   Condition,
-  ConditionDisplay, Doctor,
-  DoctorAppointment, DoctorCalendar,
+  ConditionDisplay,
+  Doctor,
+  DoctorAppointment,
+  DoctorCalendar,
   Equipment,
   Facility,
   Medicine,
-  PatientAppointment, PatientsCalendar, Prescription,
+  PatientAppointment,
+  PatientsCalendar,
+  Prescription,
   PrescriptionDisplay,
   User,
 } from '../../api/generated';
@@ -176,7 +180,6 @@ export class Homepage {
         appointmentDecision: { action: 'accept', medicine: [], facilities: [], equipment: [] },
       });
       // TODO kili this returns DoctorAppointment, it is up to you how will you change the appointment status
-      console.log("update state");
     } catch (err) {
       if (!(err instanceof ApiError)) {
         toastService.showError(err);
@@ -197,7 +200,6 @@ export class Homepage {
         appointmentDecision: { action: 'reject', reason: 'TODO kili reason' },
       });
       // TODO kili this returns DoctorAppointment, it is up to you how will you change the appointment status
-      console.log("update state");
     } catch (err) {
       if (!(err instanceof ApiError)) {
         toastService.showError(err);
@@ -215,6 +217,7 @@ export class Homepage {
       medicine: Medicine;
     },
   ) => {
+    // TODO luky handle with /resources/{appointmentId}
     console.log('Save resources on appointment', appointment, resources);
   };
 
@@ -223,6 +226,7 @@ export class Homepage {
     prescriptionId: string,
     updatedPrescription: PrescriptionDisplay,
   ) => {
+    // TODO luky /prescriptions/{prescriptionId}
     console.log(
       'Update prescription with ID:',
       prescriptionId,
@@ -237,6 +241,7 @@ export class Homepage {
     appointment: PatientAppointment | DoctorAppointment,
     newPrescription: Prescription,
   ) => {
+    // TODO luky handle with /prescriptions
     console.log(
       'Add a new prescription to appointment:',
       appointment,
@@ -306,6 +311,7 @@ export class Homepage {
   };
 
   private handleToggleConditionStatus = (condition: Condition) => {
+    // TODO luky handle with /conditions/{conditionId}
     console.log('Toggle status of condition:', condition);
   };
 

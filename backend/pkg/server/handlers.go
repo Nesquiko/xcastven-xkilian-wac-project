@@ -390,7 +390,26 @@ func (s Server) PrescriptionDetail(
 	r *http.Request,
 	prescriptionId api.PrescriptionId,
 ) {
-	panic("unimplemented")
+	prescription, err := s.app.PrescriptionById(r.Context(), prescriptionId)
+	if err != nil {
+		if errors.Is(err, app.ErrNotFound) {
+			encodeError(w, notFoundId("Prescription", prescriptionId))
+			return
+		}
+		slog.Error(
+			UnexpectedError,
+			"error",
+			err.Error(),
+			"where",
+			"PrescriptionDetail",
+			"prescriptionId",
+			prescriptionId.String(),
+		)
+		encodeError(w, internalServerError())
+		return
+	}
+
+	encode(w, http.StatusOK, prescription)
 }
 
 // ReserveAppointmentResources implements api.ServerInterface.
@@ -411,11 +430,39 @@ func (s Server) UpdateCondition(
 	panic("unimplemented")
 }
 
-// UpdatePrescription implements api.ServerInterface.
 func (s Server) UpdatePrescription(
 	w http.ResponseWriter,
 	r *http.Request,
 	prescriptionId api.PrescriptionId,
 ) {
-	panic("unimplemented")
+	req, decodeErr := Decode[api.UpdatePrescription](w, r)
+	if decodeErr != nil {
+		encodeError(w, decodeErr)
+		return
+	}
+
+	updatedPrescription, err := s.app.UpdatePatientPrescription(
+		r.Context(),
+		prescriptionId,
+		req,
+	)
+	if err != nil {
+		if errors.Is(err, app.ErrNotFound) {
+			encodeError(w, notFoundId("Prescription", prescriptionId))
+			return
+		}
+		slog.Error(
+			UnexpectedError,
+			"error",
+			err.Error(),
+			"where",
+			"UpdatePrescription",
+			"prescriptionId",
+			prescriptionId.String(),
+		)
+		encodeError(w, internalServerError())
+		return
+	}
+
+	encode(w, http.StatusOK, updatedPrescription)
 }

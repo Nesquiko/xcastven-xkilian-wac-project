@@ -83,6 +83,12 @@ type App interface {
 		ctx context.Context,
 		pres api.NewPrescription,
 	) (api.Prescription, error)
+	UpdatePatientPrescription(
+		ctx context.Context,
+		prescriptionId uuid.UUID,
+		updateData api.UpdatePrescription,
+	) (api.Prescription, error)
+	PrescriptionById(ctx context.Context, prescriptionId uuid.UUID) (api.Prescription, error)
 
 	CreateResource(ctx context.Context, resource api.NewResource) (api.NewResource, error)
 	ReserveResource(

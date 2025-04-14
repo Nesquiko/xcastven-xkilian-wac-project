@@ -81,6 +81,11 @@ type Db interface {
 		from time.Time,
 		to *time.Time,
 	) ([]Prescription, error)
+	UpdatePrescription(
+		ctx context.Context,
+		id uuid.UUID,
+		prescription Prescription,
+	) (Prescription, error)
 
 	CreateResource(ctx context.Context, name string, typ ResourceType) (Resource, error)
 	ResourceById(ctx context.Context, id uuid.UUID) (Resource, error)

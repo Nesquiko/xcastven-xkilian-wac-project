@@ -102,3 +102,43 @@ func (m *MongoDb) FindPrescriptionsByPatientId(
 
 	return prescriptions, nil
 }
+
+func (m *MongoDb) UpdatePrescription(
+	ctx context.Context,
+	id uuid.UUID,
+	prescription Prescription,
+) (Prescription, error) {
+	if err := m.patientExists(ctx, prescription.PatientId); err != nil {
+		return Prescription{}, fmt.Errorf(
+			"UpdatePrescription patient check error: %w",
+			err,
+		)
+	}
+
+	collection := m.Database.Collection(prescriptionsCollection)
+	filter := bson.M{"_id": id}
+
+	updatePayload := bson.M{
+		"patientId":     prescription.PatientId,
+		"appointmentId": prescription.AppointmentId,
+		"name":          prescription.Name,
+		"start":         prescription.Start,
+		"end":           prescription.End,
+		"doctorsNote":   prescription.DoctorsNote,
+	}
+	update := bson.M{"$set": updatePayload}
+
+	opts := options.FindOneAndUpdate().SetReturnDocument(options.After)
+
+	var updatedPrescription Prescription
+	err := collection.FindOneAndUpdate(ctx, filter, update, opts).
+		Decode(&updatedPrescription)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return Prescription{}, ErrNotFound
+		}
+		return Prescription{}, fmt.Errorf("UpdatePrescription failed: %w", err)
+	}
+
+	return updatedPrescription, nil
+}

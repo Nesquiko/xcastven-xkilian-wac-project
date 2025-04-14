@@ -1,11 +1,23 @@
-allOf:
-  - $ref: "./PrescriptionDisplay.yaml"
-  - type: object
-    properties:
-      patientId:
-        type: string
-        format: uuid
-      doctorsNote:
-        type: string
-    required:
-      - patientId
+type: object
+properties:
+  patientId:
+    type: string
+    format: uuid
+  doctorsNote:
+    type: string
+  name:
+    type: string
+  start:
+    type: string
+    format: date-time
+  end:
+    type: string
+    format: date-time
+  appointmentId:
+    type: string
+    format: uuid
+required:
+  - name
+  - start
+  - end
+  - patientId

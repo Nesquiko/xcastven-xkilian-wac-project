@@ -9,6 +9,7 @@ import {
   Equipment,
   Facility,
   Medicine,
+  NewPrescription,
   PatientAppointment,
   Prescription,
   PrescriptionDisplay,
@@ -61,10 +62,10 @@ export class Drawer {
   ) => Promise<void>;
 
   @Prop() handleAcceptAppointment: (
-    appointment: PatientAppointment | DoctorAppointment
+    appointment: PatientAppointment | DoctorAppointment,
   ) => Promise<void>;
   @Prop() handleDenyAppointment: (
-    appointment: PatientAppointment | DoctorAppointment
+    appointment: PatientAppointment | DoctorAppointment,
   ) => Promise<void>;
   @Prop() handleSaveResourcesOnAppointment: (
     appointment: PatientAppointment | DoctorAppointment,
@@ -80,9 +81,9 @@ export class Drawer {
     updatedPrescription: PrescriptionDisplay,
   ) => Promise<void>;
   @Prop() handleAddPrescriptionForAppointment: (
-    appointment: PatientAppointment | DoctorAppointment,
-    newPrescription: Prescription,
-  ) => Promise<void>;
+    appointment: DoctorAppointment,
+    newPrescription: NewPrescription,
+  ) => Promise<Prescription | undefined>;
 
   @Prop() handleScheduleAppointmentFromCondition: (condition: Condition) => void;
   @Prop() handleToggleConditionStatus: (condition: Condition) => void;

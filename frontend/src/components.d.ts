@@ -6,10 +6,10 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { Api } from "./api/api";
-import { AppointmentDisplay, AppointmentStatus, Condition, ConditionDisplay, Doctor, DoctorAppointment, Equipment, Facility, Medicine, PatientAppointment, Prescription, PrescriptionDisplay, User, UserRole } from "./api/generated";
+import { AppointmentDisplay, AppointmentStatus, Condition, ConditionDisplay, Doctor, DoctorAppointment, Equipment, Facility, Medicine, NewPrescription, PatientAppointment, Prescription, PrescriptionDisplay, User, UserRole } from "./api/generated";
 import { User as User1 } from "./components";
 export { Api } from "./api/api";
-export { AppointmentDisplay, AppointmentStatus, Condition, ConditionDisplay, Doctor, DoctorAppointment, Equipment, Facility, Medicine, PatientAppointment, Prescription, PrescriptionDisplay, User, UserRole } from "./api/generated";
+export { AppointmentDisplay, AppointmentStatus, Condition, ConditionDisplay, Doctor, DoctorAppointment, Equipment, Facility, Medicine, NewPrescription, PatientAppointment, Prescription, PrescriptionDisplay, User, UserRole } from "./api/generated";
 export { User as User1 } from "./components";
 export namespace Components {
     interface XcastvenXkilianProjectAccount {
@@ -22,12 +22,12 @@ export namespace Components {
         "api": Api;
         "appointmentId": string;
         "handleAcceptAppointment": (
-    appointment: PatientAppointment | DoctorAppointment
+    appointment: PatientAppointment | DoctorAppointment,
   ) => Promise<void>;
         "handleAddPrescriptionForAppointment": (
-    appointment: PatientAppointment | DoctorAppointment,
-    newPrescription: Prescription,
-  ) => Promise<void>;
+    appointment: DoctorAppointment,
+    newPrescription: NewPrescription,
+  ) => Promise<Prescription | undefined>;
         "handleCancelAppointment": (
     appointment: PatientAppointment | DoctorAppointment,
     cancellationReason: string,
@@ -130,18 +130,18 @@ export namespace Components {
         "getConditionsForDate": (date: Date) => Array<ConditionDisplay>;
         "getPrescriptionsForDate": (date: Date) => Array<PrescriptionDisplay>;
         "handleAcceptAppointment": (
-    appointment: PatientAppointment | DoctorAppointment
+    appointment: PatientAppointment | DoctorAppointment,
   ) => Promise<void>;
         "handleAddPrescriptionForAppointment": (
-    appointment: PatientAppointment | DoctorAppointment,
-    newPrescription: Prescription,
-  ) => Promise<void>;
+    appointment: DoctorAppointment,
+    newPrescription: NewPrescription,
+  ) => Promise<Prescription | undefined>;
         "handleCancelAppointment": (
     appointment: PatientAppointment | DoctorAppointment,
     cancellationReason: string,
   ) => Promise<void>;
         "handleDenyAppointment": (
-    appointment: PatientAppointment | DoctorAppointment
+    appointment: PatientAppointment | DoctorAppointment,
   ) => Promise<void>;
         "handleRescheduleAppointment": (
     appointment: PatientAppointment | DoctorAppointment,
@@ -383,12 +383,12 @@ declare namespace LocalJSX {
         "api"?: Api;
         "appointmentId"?: string;
         "handleAcceptAppointment"?: (
-    appointment: PatientAppointment | DoctorAppointment
+    appointment: PatientAppointment | DoctorAppointment,
   ) => Promise<void>;
         "handleAddPrescriptionForAppointment"?: (
-    appointment: PatientAppointment | DoctorAppointment,
-    newPrescription: Prescription,
-  ) => Promise<void>;
+    appointment: DoctorAppointment,
+    newPrescription: NewPrescription,
+  ) => Promise<Prescription | undefined>;
         "handleCancelAppointment"?: (
     appointment: PatientAppointment | DoctorAppointment,
     cancellationReason: string,
@@ -491,18 +491,18 @@ declare namespace LocalJSX {
         "getConditionsForDate"?: (date: Date) => Array<ConditionDisplay>;
         "getPrescriptionsForDate"?: (date: Date) => Array<PrescriptionDisplay>;
         "handleAcceptAppointment"?: (
-    appointment: PatientAppointment | DoctorAppointment
+    appointment: PatientAppointment | DoctorAppointment,
   ) => Promise<void>;
         "handleAddPrescriptionForAppointment"?: (
-    appointment: PatientAppointment | DoctorAppointment,
-    newPrescription: Prescription,
-  ) => Promise<void>;
+    appointment: DoctorAppointment,
+    newPrescription: NewPrescription,
+  ) => Promise<Prescription | undefined>;
         "handleCancelAppointment"?: (
     appointment: PatientAppointment | DoctorAppointment,
     cancellationReason: string,
   ) => Promise<void>;
         "handleDenyAppointment"?: (
-    appointment: PatientAppointment | DoctorAppointment
+    appointment: PatientAppointment | DoctorAppointment,
   ) => Promise<void>;
         "handleRescheduleAppointment"?: (
     appointment: PatientAppointment | DoctorAppointment,

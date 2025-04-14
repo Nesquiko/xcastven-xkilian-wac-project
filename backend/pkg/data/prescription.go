@@ -142,3 +142,41 @@ func (m *MongoDb) UpdatePrescription(
 
 	return updatedPrescription, nil
 }
+
+func (m *MongoDb) PrescriptionByAppointmentId(
+	ctx context.Context,
+	appointmentId uuid.UUID,
+) ([]Prescription, error) {
+	collection := m.Database.Collection(prescriptionsCollection)
+	prescriptions := make([]Prescription, 0)
+
+	filter := bson.M{"appointmentId": appointmentId}
+
+	findOptions := options.Find().SetSort(bson.D{{Key: "start", Value: 1}})
+
+	cursor, err := collection.Find(ctx, filter, findOptions)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return prescriptions, nil
+		}
+		return nil, fmt.Errorf("PrescriptionByAppointmentId find failed: %w", err)
+	}
+
+	defer func() {
+		if cerr := cursor.Close(ctx); cerr != nil {
+			slog.Warn("Failed to close prescriptions by appointment cursor", "error", cerr.Error())
+		}
+	}()
+
+	if err = cursor.All(ctx, &prescriptions); err != nil {
+		slog.Error("Failed to decode prescription documents from cursor", "error", err)
+		return nil, fmt.Errorf("PrescriptionByAppointmentId decode failed: %w", err)
+	}
+
+	if err = cursor.Err(); err != nil {
+		slog.Error("Prescriptions by appointment cursor iteration error", "error", err)
+		return nil, fmt.Errorf("PrescriptionByAppointmentId cursor error: %w", err)
+	}
+
+	return prescriptions, nil
+}

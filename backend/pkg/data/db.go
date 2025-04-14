@@ -94,6 +94,10 @@ type Db interface {
 		id uuid.UUID,
 		prescription Prescription,
 	) (Prescription, error)
+	PrescriptionByAppointmentId(
+		ctx context.Context,
+		appointmentId uuid.UUID,
+	) ([]Prescription, error)
 
 	CreateResource(ctx context.Context, name string, typ ResourceType) (Resource, error)
 	ResourceById(ctx context.Context, id uuid.UUID) (Resource, error)

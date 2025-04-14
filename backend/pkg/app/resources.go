@@ -293,6 +293,14 @@ func (a monolithApp) ReserveAppointmentResources(
 		}
 	}
 
+	prescriptions, err := a.db.PrescriptionByAppointmentId(ctx, appointmentId)
+	if err != nil {
+		return api.DoctorAppointment{}, fmt.Errorf(
+			"DoctorsAppointmentById fetch prescriptions: %w",
+			err,
+		)
+	}
+
 	doctorAppointment := dataApptToDoctorAppt(
 		appointment,
 		patient,
@@ -300,6 +308,7 @@ func (a monolithApp) ReserveAppointmentResources(
 		facilities,
 		equipment,
 		medicine,
+		prescriptions,
 	)
 
 	return doctorAppointment, nil

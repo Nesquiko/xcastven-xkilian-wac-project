@@ -84,11 +84,12 @@ func dataCondToCond(c data.Condition, appts []api.AppointmentDisplay) api.Condit
 
 func newPrescToDataPresc(p api.NewPrescription) data.Prescription {
 	return data.Prescription{
-		PatientId:   p.PatientId,
-		Name:        p.Name,
-		Start:       p.Start,
-		End:         p.End,
-		DoctorsNote: p.DoctorsNote,
+		PatientId:     p.PatientId,
+		Name:          p.Name,
+		Start:         p.Start,
+		End:           p.End,
+		DoctorsNote:   p.DoctorsNote,
+		AppointmentId: p.AppointmentId,
 	}
 }
 
@@ -197,6 +198,7 @@ func dataApptToDoctorAppt(
 	facilities []data.Resource,
 	equipment []data.Resource,
 	medicine []data.Resource,
+	prescriptions []data.Prescription,
 ) api.DoctorAppointment {
 	doctorAppt := api.DoctorAppointment{
 		Id:                  &appt.Id,
@@ -221,6 +223,8 @@ func dataApptToDoctorAppt(
 	if len(medicine) > 0 {
 		doctorAppt.Medicine = asPtr(Map(medicine, resourceToMedicine))
 	}
+
+	doctorAppt.Prescriptions = asPtr(Map(prescriptions, dataPrescToPrescDisplay))
 
 	return doctorAppt
 }

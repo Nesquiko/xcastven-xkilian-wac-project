@@ -128,7 +128,23 @@ func (a monolithApp) DoctorsAppointmentById(
 		}
 	}
 
-	return dataApptToDoctorAppt(appointment, patient, cond, facilities, equipment, medicine), nil
+	prescriptions, err := a.db.PrescriptionByAppointmentId(ctx, appointmentId)
+	if err != nil {
+		return api.DoctorAppointment{}, fmt.Errorf(
+			"DoctorsAppointmentById fetch prescriptions: %w",
+			err,
+		)
+	}
+
+	return dataApptToDoctorAppt(
+		appointment,
+		patient,
+		cond,
+		facilities,
+		equipment,
+		medicine,
+		prescriptions,
+	), nil
 }
 
 func (a monolithApp) DecideAppointment(
@@ -208,6 +224,14 @@ func (a monolithApp) DecideAppointment(
 		}
 	}
 
+	prescriptions, err := a.db.PrescriptionByAppointmentId(ctx, appointmentId)
+	if err != nil {
+		return api.DoctorAppointment{}, fmt.Errorf(
+			"DoctorsAppointmentById fetch prescriptions: %w",
+			err,
+		)
+	}
+
 	doctorAppointment := dataApptToDoctorAppt(
 		appointment,
 		patient,
@@ -215,6 +239,7 @@ func (a monolithApp) DecideAppointment(
 		facilities,
 		equipment,
 		medicine,
+		prescriptions,
 	)
 
 	return doctorAppointment, nil

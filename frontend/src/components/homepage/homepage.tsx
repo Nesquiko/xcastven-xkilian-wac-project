@@ -10,6 +10,7 @@ import {
   Equipment,
   Facility,
   Medicine,
+  NewPrescription,
   PatientAppointment,
   PatientsCalendar,
   Prescription,
@@ -18,8 +19,8 @@ import {
 } from '../../api/generated';
 import { TODAY } from '../../utils/utils';
 import { StyledHost } from '../StyledHost';
-import { Component, h, State } from '@stencil/core';
 import { toastService } from '../services/toast-service';
+import { Component, h, Prop, State } from '@stencil/core';
 
 @Component({
   tag: 'xcastven-xkilian-project-home-page',
@@ -130,10 +131,14 @@ export class Homepage {
     reason: string,
   ) => {
     console.log(
-      "Re-schedule appointment:", appointment,
-      "to new dateTime", newAppointmentDateTime,
-      "with a doctor", newAppointmentDoctor,
-      "with a reason", reason,
+      'Re-schedule appointment:',
+      appointment,
+      'to new dateTime',
+      newAppointmentDateTime,
+      'with a doctor',
+      newAppointmentDoctor,
+      'with a reason',
+      reason,
     );
 
     try {
@@ -238,16 +243,28 @@ export class Homepage {
   };
 
   private handleAddPrescriptionForAppointment = async (
-    appointment: PatientAppointment | DoctorAppointment,
-    newPrescription: Prescription,
-  ) => {
-    // TODO luky handle with /prescriptions
-    console.log(
-      'Add a new prescription to appointment:',
-      appointment,
-      'with values',
-      newPrescription,
-    );
+    appointment: DoctorAppointment,
+    newPrescription: NewPrescription,
+  ): Promise<Prescription | undefined> => {
+    try {
+      await this.api.medicalHistory.createPrescription({
+        newPrescription: {
+          name: newPrescription.name,
+          start: newPrescription.start,
+          end: newPrescription.end,
+          appointmentId: appointment.id,
+          patientId: appointment.patient.id,
+          doctorsNote: newPrescription.doctorsNote,
+        },
+      });
+    } catch (err) {
+      if (!(err instanceof ApiError)) {
+        toastService.showError('Unknown server error');
+        return;
+      }
+      toastService.showError(err.message);
+      return undefined;
+    }
   };
 
   private handleResetSelection = () => {
@@ -440,7 +457,4 @@ export class Homepage {
       </StyledHost>
     );
   }
-}
-function Prop(): (target: Homepage, propertyKey: 'api') => void {
-  throw new Error('Function not implemented.');
 }

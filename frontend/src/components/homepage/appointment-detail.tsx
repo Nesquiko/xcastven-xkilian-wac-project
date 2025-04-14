@@ -1,15 +1,18 @@
 import { Api, ApiError } from '../../api/api';
 import {
-  AppointmentStatus, Doctor,
+  AppointmentStatus,
+  Doctor,
   DoctorAppointment,
   Equipment,
   Facility,
   instanceOfDoctorAppointment,
   instanceOfPatientAppointment,
   Medicine,
+  NewPrescription,
   PatientAppointment,
   Prescription,
-  PrescriptionDisplay, TimeSlot,
+  PrescriptionDisplay,
+  TimeSlot,
   User,
 } from '../../api/generated';
 import {
@@ -24,8 +27,8 @@ import {
   updateDatePart,
   years,
 } from '../../utils/utils';
-import { Component, h, Prop, State } from '@stencil/core';
 import { toastService } from '../services/toast-service';
+import { Component, h, Prop, State } from '@stencil/core';
 
 @Component({
   tag: 'xcastven-xkilian-project-appointment-detail',
@@ -50,7 +53,7 @@ export class AppointmentDetail {
   ) => Promise<void>;
 
   @Prop() handleAcceptAppointment: (
-    appointment: PatientAppointment | DoctorAppointment
+    appointment: PatientAppointment | DoctorAppointment,
   ) => Promise<void>;
   @Prop() handleDenyAppointment: (
     appointment: PatientAppointment | DoctorAppointment,
@@ -71,9 +74,9 @@ export class AppointmentDetail {
     updatedPrescription: PrescriptionDisplay,
   ) => Promise<void>;
   @Prop() handleAddPrescriptionForAppointment: (
-    appointment: PatientAppointment | DoctorAppointment,
-    newPrescription: Prescription,
-  ) => Promise<void>;
+    appointment: DoctorAppointment,
+    newPrescription: NewPrescription,
+  ) => Promise<Prescription | undefined>;
 
   @State() appointment: PatientAppointment | DoctorAppointment = undefined;
   @State() availableEquipment: Array<Equipment> = [{ id: 'equipment-1', name: 'Equipment 1' }];
@@ -147,20 +150,20 @@ export class AppointmentDetail {
   @State() denyingAppointmentReason: string = '';
 
   @State() availableTimes: Array<TimeSlot> = [
-    { time: "7:00", status: "unavailable" } satisfies TimeSlot,
-    { time: "8:00", status: "available" } satisfies TimeSlot,
-    { time: "9:00", status: "unavailable" } satisfies TimeSlot,
-    { time: "10:00", status: "unavailable" } satisfies TimeSlot,
-    { time: "11:00", status: "available" } satisfies TimeSlot,
+    { time: '7:00', status: 'unavailable' } satisfies TimeSlot,
+    { time: '8:00', status: 'available' } satisfies TimeSlot,
+    { time: '9:00', status: 'unavailable' } satisfies TimeSlot,
+    { time: '10:00', status: 'unavailable' } satisfies TimeSlot,
+    { time: '11:00', status: 'available' } satisfies TimeSlot,
   ] satisfies Array<TimeSlot>;
   @State() availableDoctors: Array<Doctor> = [
     {
-      id: "available-doctor-1",
-      firstName: "Available",
-      lastName: "Doctor",
-      email: "available@doctor.sk",
-      role: "doctor",
-      specialization: "urologist",
+      id: 'available-doctor-1',
+      firstName: 'Available',
+      lastName: 'Doctor',
+      email: 'available@doctor.sk',
+      role: 'doctor',
+      specialization: 'urologist',
     } satisfies Doctor,
   ] satisfies Array<Doctor>;
 
@@ -266,7 +269,11 @@ export class AppointmentDetail {
   };
 
   private handleReschedule = () => {
-    if (this.reschedulingAppointmentDate && this.reschedulingAppointmentTime && this.reschedulingAppointmentDoctor) {
+    if (
+      this.reschedulingAppointmentDate &&
+      this.reschedulingAppointmentTime &&
+      this.reschedulingAppointmentDoctor
+    ) {
       const newDateTime = new Date(this.reschedulingAppointmentDate);
       const [hours, minutes] = this.reschedulingAppointmentTime.split(':').map(Number);
       newDateTime.setHours(hours);
@@ -280,7 +287,7 @@ export class AppointmentDetail {
       ).then(() => {
         this.appointment = {
           ...this.appointment,
-          status: "requested",
+          status: 'requested',
           facilities: [],
           equipment: [],
           medicine: [],
@@ -294,21 +301,20 @@ export class AppointmentDetail {
 
   private handleCancel = () => {
     this.handleCancelAppointment(this.appointment, this.cancellingAppointmentReason).then(() => {
-        this.appointment = {
-          ...this.appointment,
-          status: "cancelled",
-        };
-        this.cancelling = false;
-      }
-    );
+      this.appointment = {
+        ...this.appointment,
+        status: 'cancelled',
+      };
+      this.cancelling = false;
+    });
   };
 
   private handleAccept = () => {
     this.handleAcceptAppointment(this.appointment).then(() => {
       this.appointment = {
         ...this.appointment,
-        status: "scheduled",
-      }
+        status: 'scheduled',
+      };
     });
   };
 
@@ -316,7 +322,7 @@ export class AppointmentDetail {
     this.handleDenyAppointment(this.appointment, this.denyingAppointmentReason).then(() => {
       this.appointment = {
         ...this.appointment,
-        status: "denied",
+        status: 'denied',
       };
       this.denying = false;
     });
@@ -345,29 +351,35 @@ export class AppointmentDetail {
   };
 
   private handleAddPrescription = () => {
-    const newPrescription: Prescription = {
-      id: 'new-prescription',
+    if (!instanceOfDoctorAppointment(this.appointment)) {
+      throw new Error('unexpected state, appointment is not DoctorAppointment');
+    }
+
+    const newPrescription: NewPrescription = {
       name: this.addingPrescriptionName,
       start: this.addingPrescriptionStart,
       end: this.addingPrescriptionEnd,
       doctorsNote: this.addingPrescriptionDoctorsNote,
+      patientId: this.appointment.patient.id,
     };
 
-    this.handleAddPrescriptionForAppointment(this.appointment, newPrescription).then(() => {
-      if (!this.appointment.prescriptions) {
-        this.appointment.prescriptions = [newPrescription];
-      } else {
-        this.appointment.prescriptions.push(newPrescription);
-      }
+    this.handleAddPrescriptionForAppointment(this.appointment, newPrescription).then(
+      prescription => {
+        if (!prescription) return;
 
-      this.addingPrescription = false;
-      this.addingPrescriptionName = '';
-      this.addingPrescriptionStart = new Date();
-      this.addingPrescriptionEnd = new Date(
-        new Date().setDate(new Date().getDate() + 7),
-      );
-      this.addingPrescriptionDoctorsNote = '';
-    });
+        if (!this.appointment.prescriptions) {
+          this.appointment.prescriptions = [prescription];
+        } else {
+          this.appointment.prescriptions.push(prescription);
+        }
+
+        this.addingPrescription = false;
+        this.addingPrescriptionName = '';
+        this.addingPrescriptionStart = new Date();
+        this.addingPrescriptionEnd = new Date(new Date().setDate(new Date().getDate() + 7));
+        this.addingPrescriptionDoctorsNote = '';
+      },
+    );
   };
 
   private handleUpdatePrescription = () => {
@@ -386,8 +398,7 @@ export class AppointmentDetail {
       updatedPrescription,
     ).then(() => {
       const index: number = this.appointment.prescriptions.findIndex(
-        (prescription: PrescriptionDisplay) =>
-          prescription.id === this.editingPrescription.id,
+        (prescription: PrescriptionDisplay) => prescription.id === this.editingPrescription.id,
       );
       if (index !== -1) {
         this.appointment.prescriptions[index] = updatedPrescription;
@@ -540,7 +551,9 @@ export class AppointmentDetail {
             Reason
           </div>
           {this.appointment.reason && (
-            <p class="mt-1 ml-1 text-sm font-medium text-wrap text-gray-600">{this.appointment.reason}</p>
+            <p class="mt-1 ml-1 text-sm font-medium text-wrap text-gray-600">
+              {this.appointment.reason}
+            </p>
           )}
         </div>
 
@@ -551,7 +564,9 @@ export class AppointmentDetail {
               Cancellation reason
             </div>
             {this.appointment.cancellationReason && (
-              <p class="mt-1 ml-1 text-sm font-medium text-wrap text-gray-600">{this.appointment.cancellationReason}</p>
+              <p class="mt-1 ml-1 text-sm font-medium text-wrap text-gray-600">
+                {this.appointment.cancellationReason}
+              </p>
             )}
           </div>
         )}
@@ -563,7 +578,9 @@ export class AppointmentDetail {
               Denial reason
             </div>
             {this.appointment.cancellationReason && (
-              <p class="mt-1 ml-1 text-sm font-medium text-wrap text-gray-600">{this.appointment.cancellationReason}</p>
+              <p class="mt-1 ml-1 text-sm font-medium text-wrap text-gray-600">
+                {this.appointment.cancellationReason}
+              </p>
             )}
           </div>
         )}
@@ -905,19 +922,19 @@ export class AppointmentDetail {
 
         {this.isDoctor
           ? getDoctorAppointmentActions(
-            this.appointment.status,
-            () => {
-              this.cancelling = !this.cancelling;
-              this.rescheduling = false;
-              this.denying = false;
-            },
-            this.handleAccept,
-            () => {
-              this.denying = !this.denying;
-              this.cancelling = false;
-              this.rescheduling = false;
-            },
-          )
+              this.appointment.status,
+              () => {
+                this.cancelling = !this.cancelling;
+                this.rescheduling = false;
+                this.denying = false;
+              },
+              this.handleAccept,
+              () => {
+                this.denying = !this.denying;
+                this.cancelling = false;
+                this.rescheduling = false;
+              },
+            )
           : getPatientAppointmentActions(
               this.appointment.status,
               () => {
@@ -953,13 +970,16 @@ export class AppointmentDetail {
                 label="Time"
                 class="w-full"
                 value={this.reschedulingAppointmentTime}
-                onInput={(e: Event) => this.reschedulingAppointmentTime = (e.target as HTMLSelectElement).value}
+                onInput={(e: Event) =>
+                  (this.reschedulingAppointmentTime = (e.target as HTMLSelectElement).value)
+                }
               >
                 {this.availableTimes.map((timeSlot: TimeSlot) => (
-                  <md-select-option value={timeSlot.time} disabled={timeSlot.status !== "available"}>
-                    <div slot="headline">
-                      {timeSlot.time}
-                    </div>
+                  <md-select-option
+                    value={timeSlot.time}
+                    disabled={timeSlot.status !== 'available'}
+                  >
+                    <div slot="headline">{timeSlot.time}</div>
                   </md-select-option>
                 ))}
               </md-outlined-select>
@@ -1035,7 +1055,7 @@ export class AppointmentDetail {
               <md-filled-button
                 class={`w-1/2 rounded-full bg-[#7357be]`}
                 onClick={this.handleCancel}
-                disabled={this.cancellingAppointmentReason === ""}
+                disabled={this.cancellingAppointmentReason === ''}
               >
                 Confirm cancel
               </md-filled-button>
@@ -1068,20 +1088,16 @@ export class AppointmentDetail {
               <md-filled-button
                 class={`w-1/2 rounded-full bg-[#7357be]`}
                 onClick={this.handleDeny}
-                disabled={this.denyingAppointmentReason === ""}
+                disabled={this.denyingAppointmentReason === ''}
               >
                 Confirm deny
               </md-filled-button>
-              <md-outlined-button
-                class="w-1/2 rounded-full"
-                onClick={() => (this.denying = false)}
-              >
+              <md-outlined-button class="w-1/2 rounded-full" onClick={() => (this.denying = false)}>
                 Back
               </md-outlined-button>
             </div>
           </div>
         )}
-
       </div>
     );
   }

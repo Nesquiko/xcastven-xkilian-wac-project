@@ -48,6 +48,7 @@ func Run(ctx context.Context) error {
 		slog.Error("failed to load OpenApi spec", slog.String("error", err.Error()))
 		os.Exit(1)
 	}
+	spec.Servers = nil
 
 	app := app.New(db)
 	srv := NewServer(app, spec, httpLogger)

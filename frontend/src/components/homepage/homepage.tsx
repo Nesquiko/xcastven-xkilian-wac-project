@@ -209,7 +209,7 @@ export class Homepage {
     }
   };
 
-  private handleSaveResourcesOnAppointment = (
+  private handleSaveResourcesOnAppointment = async (
     appointment: PatientAppointment | DoctorAppointment,
     resources: {
       facility: Facility;
@@ -221,7 +221,7 @@ export class Homepage {
     console.log('Save resources on appointment', appointment, resources);
   };
 
-  private handleUpdatePrescriptionForAppointment = (
+  private handleUpdatePrescriptionForAppointment = async (
     appointment: PatientAppointment | DoctorAppointment,
     prescriptionId: string,
     updatedPrescription: PrescriptionDisplay,
@@ -237,7 +237,7 @@ export class Homepage {
     );
   };
 
-  private handleAddPrescriptionForAppointment = (
+  private handleAddPrescriptionForAppointment = async (
     appointment: PatientAppointment | DoctorAppointment,
     newPrescription: Prescription,
   ) => {

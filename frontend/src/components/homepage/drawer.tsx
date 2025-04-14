@@ -52,14 +52,18 @@ export class Drawer {
     newAppointmentDateTime: Date,
     newAppointmentDoctor: Doctor,
     reason: string,
-  ) => void;
+  ) => Promise<void>;
   @Prop() handleCancelAppointment: (
     appointment: PatientAppointment | DoctorAppointment,
     cancellationReason: string,
-  ) => void;
+  ) => Promise<void>;
 
-  @Prop() handleAcceptAppointment: (appointment: PatientAppointment | DoctorAppointment) => void;
-  @Prop() handleDenyAppointment: (appointment: PatientAppointment | DoctorAppointment) => void;
+  @Prop() handleAcceptAppointment: (
+    appointment: PatientAppointment | DoctorAppointment
+  ) => Promise<void>;
+  @Prop() handleDenyAppointment: (
+    appointment: PatientAppointment | DoctorAppointment
+  ) => Promise<void>;
   @Prop() handleSaveResourcesOnAppointment: (
     appointment: PatientAppointment | DoctorAppointment,
     resources: {
@@ -67,16 +71,16 @@ export class Drawer {
       equipment: Equipment;
       medicine: Medicine;
     },
-  ) => void;
+  ) => Promise<void>;
   @Prop() handleUpdatePrescriptionForAppointment: (
     appointment: PatientAppointment | DoctorAppointment,
     prescriptionId: string,
     updatedPrescription: PrescriptionDisplay,
-  ) => void;
+  ) => Promise<void>;
   @Prop() handleAddPrescriptionForAppointment: (
     appointment: PatientAppointment | DoctorAppointment,
     newPrescription: Prescription,
-  ) => void;
+  ) => Promise<void>;
 
   @Prop() handleScheduleAppointmentFromCondition: (condition: Condition) => void;
   @Prop() handleToggleConditionStatus: (condition: Condition) => void;

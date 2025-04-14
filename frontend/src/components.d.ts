@@ -21,22 +21,27 @@ export namespace Components {
     interface XcastvenXkilianProjectAppointmentDetail {
         "api": Api;
         "appointmentId": string;
-        "handleAcceptAppointment": (appointment: PatientAppointment | DoctorAppointment) => void;
+        "handleAcceptAppointment": (
+    appointment: PatientAppointment | DoctorAppointment
+  ) => Promise<void>;
         "handleAddPrescriptionForAppointment": (
     appointment: PatientAppointment | DoctorAppointment,
     newPrescription: Prescription,
-  ) => void;
+  ) => Promise<void>;
         "handleCancelAppointment": (
     appointment: PatientAppointment | DoctorAppointment,
     cancellationReason: string,
-  ) => void;
-        "handleDenyAppointment": (appointment: PatientAppointment | DoctorAppointment) => void;
+  ) => Promise<void>;
+        "handleDenyAppointment": (
+    appointment: PatientAppointment | DoctorAppointment,
+    denyReason: string,
+  ) => Promise<void>;
         "handleRescheduleAppointment": (
     appointment: PatientAppointment | DoctorAppointment,
     newAppointmentDateTime: Date,
     newAppointmentDoctor: Doctor,
     reason: string,
-  ) => void;
+  ) => Promise<void>;
         "handleResetSelection": () => void;
         "handleSaveResourcesOnAppointment": (
     appointment: PatientAppointment | DoctorAppointment,
@@ -45,13 +50,13 @@ export namespace Components {
       equipment: Equipment;
       medicine: Medicine;
     },
-  ) => void;
+  ) => Promise<void>;
         "handleSelectPrescription": (prescription: PrescriptionDisplay) => void;
         "handleUpdatePrescriptionForAppointment": (
     appointment: PatientAppointment | DoctorAppointment,
     prescriptionId: string,
     updatedPrescription: PrescriptionDisplay,
-  ) => void;
+  ) => Promise<void>;
         "isDoctor": boolean;
         "user": User;
     }
@@ -124,22 +129,26 @@ export namespace Components {
   ) => Array<AppointmentDisplay>;
         "getConditionsForDate": (date: Date) => Array<ConditionDisplay>;
         "getPrescriptionsForDate": (date: Date) => Array<PrescriptionDisplay>;
-        "handleAcceptAppointment": (appointment: PatientAppointment | DoctorAppointment) => void;
+        "handleAcceptAppointment": (
+    appointment: PatientAppointment | DoctorAppointment
+  ) => Promise<void>;
         "handleAddPrescriptionForAppointment": (
     appointment: PatientAppointment | DoctorAppointment,
     newPrescription: Prescription,
-  ) => void;
+  ) => Promise<void>;
         "handleCancelAppointment": (
     appointment: PatientAppointment | DoctorAppointment,
     cancellationReason: string,
-  ) => void;
-        "handleDenyAppointment": (appointment: PatientAppointment | DoctorAppointment) => void;
+  ) => Promise<void>;
+        "handleDenyAppointment": (
+    appointment: PatientAppointment | DoctorAppointment
+  ) => Promise<void>;
         "handleRescheduleAppointment": (
     appointment: PatientAppointment | DoctorAppointment,
     newAppointmentDateTime: Date,
     newAppointmentDoctor: Doctor,
     reason: string,
-  ) => void;
+  ) => Promise<void>;
         "handleResetSelection": () => void;
         "handleSaveResourcesOnAppointment": (
     appointment: PatientAppointment | DoctorAppointment,
@@ -148,7 +157,7 @@ export namespace Components {
       equipment: Equipment;
       medicine: Medicine;
     },
-  ) => void;
+  ) => Promise<void>;
         "handleScheduleAppointmentFromCondition": (condition: Condition) => void;
         "handleSelectAppointment": (appointment: AppointmentDisplay) => void;
         "handleSelectCondition": (condition: ConditionDisplay) => void;
@@ -159,7 +168,7 @@ export namespace Components {
     appointment: PatientAppointment | DoctorAppointment,
     prescriptionId: string,
     updatedPrescription: PrescriptionDisplay,
-  ) => void;
+  ) => Promise<void>;
         "isDoctor": boolean;
         "isDrawerOpen": boolean;
         "selectedAppointment": AppointmentDisplay;
@@ -372,22 +381,27 @@ declare namespace LocalJSX {
     interface XcastvenXkilianProjectAppointmentDetail {
         "api"?: Api;
         "appointmentId"?: string;
-        "handleAcceptAppointment"?: (appointment: PatientAppointment | DoctorAppointment) => void;
+        "handleAcceptAppointment"?: (
+    appointment: PatientAppointment | DoctorAppointment
+  ) => Promise<void>;
         "handleAddPrescriptionForAppointment"?: (
     appointment: PatientAppointment | DoctorAppointment,
     newPrescription: Prescription,
-  ) => void;
+  ) => Promise<void>;
         "handleCancelAppointment"?: (
     appointment: PatientAppointment | DoctorAppointment,
     cancellationReason: string,
-  ) => void;
-        "handleDenyAppointment"?: (appointment: PatientAppointment | DoctorAppointment) => void;
+  ) => Promise<void>;
+        "handleDenyAppointment"?: (
+    appointment: PatientAppointment | DoctorAppointment,
+    denyReason: string,
+  ) => Promise<void>;
         "handleRescheduleAppointment"?: (
     appointment: PatientAppointment | DoctorAppointment,
     newAppointmentDateTime: Date,
     newAppointmentDoctor: Doctor,
     reason: string,
-  ) => void;
+  ) => Promise<void>;
         "handleResetSelection"?: () => void;
         "handleSaveResourcesOnAppointment"?: (
     appointment: PatientAppointment | DoctorAppointment,
@@ -396,13 +410,13 @@ declare namespace LocalJSX {
       equipment: Equipment;
       medicine: Medicine;
     },
-  ) => void;
+  ) => Promise<void>;
         "handleSelectPrescription"?: (prescription: PrescriptionDisplay) => void;
         "handleUpdatePrescriptionForAppointment"?: (
     appointment: PatientAppointment | DoctorAppointment,
     prescriptionId: string,
     updatedPrescription: PrescriptionDisplay,
-  ) => void;
+  ) => Promise<void>;
         "isDoctor"?: boolean;
         "user"?: User;
     }
@@ -475,22 +489,26 @@ declare namespace LocalJSX {
   ) => Array<AppointmentDisplay>;
         "getConditionsForDate"?: (date: Date) => Array<ConditionDisplay>;
         "getPrescriptionsForDate"?: (date: Date) => Array<PrescriptionDisplay>;
-        "handleAcceptAppointment"?: (appointment: PatientAppointment | DoctorAppointment) => void;
+        "handleAcceptAppointment"?: (
+    appointment: PatientAppointment | DoctorAppointment
+  ) => Promise<void>;
         "handleAddPrescriptionForAppointment"?: (
     appointment: PatientAppointment | DoctorAppointment,
     newPrescription: Prescription,
-  ) => void;
+  ) => Promise<void>;
         "handleCancelAppointment"?: (
     appointment: PatientAppointment | DoctorAppointment,
     cancellationReason: string,
-  ) => void;
-        "handleDenyAppointment"?: (appointment: PatientAppointment | DoctorAppointment) => void;
+  ) => Promise<void>;
+        "handleDenyAppointment"?: (
+    appointment: PatientAppointment | DoctorAppointment
+  ) => Promise<void>;
         "handleRescheduleAppointment"?: (
     appointment: PatientAppointment | DoctorAppointment,
     newAppointmentDateTime: Date,
     newAppointmentDoctor: Doctor,
     reason: string,
-  ) => void;
+  ) => Promise<void>;
         "handleResetSelection"?: () => void;
         "handleSaveResourcesOnAppointment"?: (
     appointment: PatientAppointment | DoctorAppointment,
@@ -499,7 +517,7 @@ declare namespace LocalJSX {
       equipment: Equipment;
       medicine: Medicine;
     },
-  ) => void;
+  ) => Promise<void>;
         "handleScheduleAppointmentFromCondition"?: (condition: Condition) => void;
         "handleSelectAppointment"?: (appointment: AppointmentDisplay) => void;
         "handleSelectCondition"?: (condition: ConditionDisplay) => void;
@@ -510,7 +528,7 @@ declare namespace LocalJSX {
     appointment: PatientAppointment | DoctorAppointment,
     prescriptionId: string,
     updatedPrescription: PrescriptionDisplay,
-  ) => void;
+  ) => Promise<void>;
         "isDoctor"?: boolean;
         "isDrawerOpen"?: boolean;
         "selectedAppointment"?: AppointmentDisplay;

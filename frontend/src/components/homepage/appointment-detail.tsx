@@ -43,14 +43,19 @@ export class AppointmentDetail {
     newAppointmentDateTime: Date,
     newAppointmentDoctor: Doctor,
     reason: string,
-  ) => void;
+  ) => Promise<void>;
   @Prop() handleCancelAppointment: (
     appointment: PatientAppointment | DoctorAppointment,
     cancellationReason: string,
-  ) => void;
+  ) => Promise<void>;
 
-  @Prop() handleAcceptAppointment: (appointment: PatientAppointment | DoctorAppointment) => void;
-  @Prop() handleDenyAppointment: (appointment: PatientAppointment | DoctorAppointment) => void;
+  @Prop() handleAcceptAppointment: (
+    appointment: PatientAppointment | DoctorAppointment
+  ) => Promise<void>;
+  @Prop() handleDenyAppointment: (
+    appointment: PatientAppointment | DoctorAppointment,
+    denyReason: string,
+  ) => Promise<void>;
   @Prop() handleSaveResourcesOnAppointment: (
     appointment: PatientAppointment | DoctorAppointment,
     resources: {
@@ -58,17 +63,17 @@ export class AppointmentDetail {
       equipment: Equipment;
       medicine: Medicine;
     },
-  ) => void;
+  ) => Promise<void>;
   @Prop() handleSelectPrescription: (prescription: PrescriptionDisplay) => void;
   @Prop() handleUpdatePrescriptionForAppointment: (
     appointment: PatientAppointment | DoctorAppointment,
     prescriptionId: string,
     updatedPrescription: PrescriptionDisplay,
-  ) => void;
+  ) => Promise<void>;
   @Prop() handleAddPrescriptionForAppointment: (
     appointment: PatientAppointment | DoctorAppointment,
     newPrescription: Prescription,
-  ) => void;
+  ) => Promise<void>;
 
   @State() appointment: PatientAppointment | DoctorAppointment = undefined;
   @State() availableEquipment: Array<Equipment> = [{ id: 'equipment-1', name: 'Equipment 1' }];
@@ -137,6 +142,9 @@ export class AppointmentDetail {
 
   @State() cancelling: boolean = false;
   @State() cancellingAppointmentReason: string = '';
+
+  @State() denying: boolean = false;
+  @State() denyingAppointmentReason: string = '';
 
   @State() availableTimes: Array<TimeSlot> = [
     { time: "7:00", status: "unavailable" } satisfies TimeSlot,
@@ -269,25 +277,123 @@ export class AppointmentDetail {
         newDateTime,
         this.reschedulingAppointmentDoctor,
         this.reschedulingAppointmentReason,
-      );
-
-      this.appointment = {
-        ...this.appointment,
-        status: "requested",
-        facilities: [],
-        equipment: [],
-        medicine: [],
-        appointmentDateTime: newDateTime,
-        doctor: this.reschedulingAppointmentDoctor,
-      };
-
-      this.rescheduling = false;
+      ).then(() => {
+        this.appointment = {
+          ...this.appointment,
+          status: "requested",
+          facilities: [],
+          equipment: [],
+          medicine: [],
+          appointmentDateTime: newDateTime,
+          doctor: this.reschedulingAppointmentDoctor,
+        };
+        this.rescheduling = false;
+      });
     }
   };
 
   private handleCancel = () => {
-    this.handleCancelAppointment(this.appointment, this.cancellingAppointmentReason);
-    this.cancelling = false;
+    this.handleCancelAppointment(this.appointment, this.cancellingAppointmentReason).then(() => {
+        this.appointment = {
+          ...this.appointment,
+          status: "cancelled",
+        };
+        this.cancelling = false;
+      }
+    );
+  };
+
+  private handleAccept = () => {
+    this.handleAcceptAppointment(this.appointment).then(() => {
+      this.appointment = {
+        ...this.appointment,
+        status: "scheduled",
+      }
+    });
+  };
+
+  private handleDeny = () => {
+    this.handleDenyAppointment(this.appointment, this.denyingAppointmentReason).then(() => {
+      this.appointment = {
+        ...this.appointment,
+        status: "denied",
+      };
+      this.denying = false;
+    });
+  };
+
+  private handleSaveResources = () => {
+    const newResources: {
+      facility: Facility;
+      equipment: Equipment;
+      medicine: Medicine;
+    } = {
+      facility: this.selectedFacility,
+      equipment: this.selectedEquipment,
+      medicine: this.selectedMedicine,
+    };
+
+    this.handleSaveResourcesOnAppointment(this.appointment, newResources).then(() => {
+      this.appointment = {
+        ...this.appointment,
+        facilities: [newResources.facility],
+        equipment: [newResources.equipment],
+        medicine: [newResources.medicine],
+      };
+      this.showEditResources = false;
+    });
+  };
+
+  private handleAddPrescription = () => {
+    const newPrescription: Prescription = {
+      id: 'new-prescription',
+      name: this.addingPrescriptionName,
+      start: this.addingPrescriptionStart,
+      end: this.addingPrescriptionEnd,
+      doctorsNote: this.addingPrescriptionDoctorsNote,
+    };
+
+    this.handleAddPrescriptionForAppointment(this.appointment, newPrescription).then(() => {
+      if (!this.appointment.prescriptions) {
+        this.appointment.prescriptions = [newPrescription];
+      } else {
+        this.appointment.prescriptions.push(newPrescription);
+      }
+
+      this.addingPrescription = false;
+      this.addingPrescriptionName = '';
+      this.addingPrescriptionStart = new Date();
+      this.addingPrescriptionEnd = new Date(
+        new Date().setDate(new Date().getDate() + 7),
+      );
+      this.addingPrescriptionDoctorsNote = '';
+    });
+  };
+
+  private handleUpdatePrescription = () => {
+    const updatedPrescription: PrescriptionDisplay & { doctorsNote?: string } = {
+      id: this.editingPrescription.id,
+      name: this.editingPrescriptionNewName,
+      start: this.editingPrescriptionNewStart,
+      end: this.editingPrescriptionNewEnd,
+      appointmentId: this.editingPrescription.appointmentId,
+      doctorsNote: this.editingPrescriptionNewDoctorsNote,
+    };
+
+    this.handleUpdatePrescriptionForAppointment(
+      this.appointment,
+      this.editingPrescription.id,
+      updatedPrescription,
+    ).then(() => {
+      const index: number = this.appointment.prescriptions.findIndex(
+        (prescription: PrescriptionDisplay) =>
+          prescription.id === this.editingPrescription.id,
+      );
+      if (index !== -1) {
+        this.appointment.prescriptions[index] = updatedPrescription;
+      }
+      this.editingPrescription = null;
+    });
   };
 
   private renderDateSelects(
@@ -450,18 +556,17 @@ export class AppointmentDetail {
           </div>
         )}
 
-        {/* TODO luky: when denied, there is no reason in appt type for denyReason */}
-        {/*this.appointment.status === 'denied' && (
+        {this.appointment.status === 'denied' && (
           <div class="mb-6 max-h-32 w-full max-w-md overflow-y-auto rounded-md bg-gray-200 px-4 py-3">
             <div class="flex flex-row items-center gap-x-2 text-gray-500">
               <md-icon style={{ fontSize: '16px' }}>description</md-icon>
-              Cancellation reason
+              Denial reason
             </div>
-            {this.appointment && (
+            {this.appointment.cancellationReason && (
               <p class="mt-1 ml-1 text-sm font-medium text-wrap text-gray-600">{this.appointment.cancellationReason}</p>
             )}
           </div>
-        )*/}
+        )}
 
         {this.isDoctor && instanceOfDoctorAppointment(this.appointment) && (
           <div class="relative mb-6 w-full max-w-md rounded-md bg-gray-200 px-4 py-3">
@@ -557,27 +662,7 @@ export class AppointmentDetail {
                   <div class="flex flex-row items-center justify-between gap-x-2">
                     <md-filled-button
                       class={`w-1/2 rounded-full bg-[#7357be]`}
-                      onClick={() => {
-                        this.showEditResources = false;
-                        const newResources: {
-                          facility: Facility;
-                          equipment: Equipment;
-                          medicine: Medicine;
-                        } = {
-                          facility: this.selectedFacility,
-                          equipment: this.selectedEquipment,
-                          medicine: this.selectedMedicine,
-                        };
-
-                        this.handleSaveResourcesOnAppointment(this.appointment, newResources);
-
-                        if (instanceOfDoctorAppointment(this.appointment)) {
-                          this.appointment.facilities = [newResources.facility];
-                          this.appointment.equipment = [newResources.equipment];
-                          this.appointment.medicine = [newResources.medicine];
-                          this.showEditResources = false;
-                        }
-                      }}
+                      onClick={this.handleSaveResources}
                     >
                       Save resources
                     </md-filled-button>
@@ -733,31 +818,7 @@ export class AppointmentDetail {
                       !this.editingPrescriptionNewStart ||
                       !this.editingPrescriptionNewEnd
                     }
-                    onClick={() => {
-                      const updatedPrescription: PrescriptionDisplay & { doctorsNote?: string } = {
-                        id: this.editingPrescription.id,
-                        name: this.editingPrescriptionNewName,
-                        start: this.editingPrescriptionNewStart,
-                        end: this.editingPrescriptionNewEnd,
-                        appointmentId: this.editingPrescription.appointmentId,
-                        doctorsNote: this.editingPrescriptionNewDoctorsNote,
-                      };
-
-                      this.handleUpdatePrescriptionForAppointment(
-                        this.appointment,
-                        this.editingPrescription.id,
-                        updatedPrescription,
-                      );
-
-                      const index: number = this.appointment.prescriptions.findIndex(
-                        (prescription: PrescriptionDisplay) =>
-                          prescription.id === this.editingPrescription.id,
-                      );
-                      if (index !== -1) {
-                        this.appointment.prescriptions[index] = updatedPrescription;
-                      }
-                      this.editingPrescription = null;
-                    }}
+                    onClick={this.handleUpdatePrescription}
                   >
                     Save Changes
                   </md-filled-button>
@@ -816,31 +877,7 @@ export class AppointmentDetail {
                       !this.addingPrescriptionStart ||
                       !this.addingPrescriptionEnd
                     }
-                    onClick={() => {
-                      const newPrescription: Prescription = {
-                        id: 'new-prescription',
-                        name: this.addingPrescriptionName,
-                        start: this.addingPrescriptionStart,
-                        end: this.addingPrescriptionEnd,
-                        doctorsNote: this.addingPrescriptionDoctorsNote,
-                      };
-
-                      this.handleAddPrescriptionForAppointment(this.appointment, newPrescription);
-
-                      if (!this.appointment.prescriptions) {
-                        this.appointment.prescriptions = [newPrescription];
-                      } else {
-                        this.appointment.prescriptions.push(newPrescription);
-                      }
-
-                      this.addingPrescription = false;
-                      this.addingPrescriptionName = '';
-                      this.addingPrescriptionStart = new Date();
-                      this.addingPrescriptionEnd = new Date(
-                        new Date().setDate(new Date().getDate() + 7),
-                      );
-                      this.addingPrescriptionDoctorsNote = '';
-                    }}
+                    onClick={this.handleAddPrescription}
                   >
                     Add Prescription
                   </md-filled-button>
@@ -868,23 +905,30 @@ export class AppointmentDetail {
 
         {this.isDoctor
           ? getDoctorAppointmentActions(
-              this.appointment.status,
-              () => {
-                this.cancelling = !this.cancelling;
-                this.rescheduling = false;
-              },
-              () => this.handleAcceptAppointment(this.appointment),
-              () => this.handleDenyAppointment(this.appointment),
-            )
+            this.appointment.status,
+            () => {
+              this.cancelling = !this.cancelling;
+              this.rescheduling = false;
+              this.denying = false;
+            },
+            this.handleAccept,
+            () => {
+              this.denying = !this.denying;
+              this.cancelling = false;
+              this.rescheduling = false;
+            },
+          )
           : getPatientAppointmentActions(
               this.appointment.status,
               () => {
                 this.rescheduling = !this.rescheduling;
                 this.cancelling = false;
+                this.denying = false;
               },
               () => {
                 this.cancelling = !this.cancelling;
                 this.rescheduling = false;
+                this.denying = false;
               },
             )}
 
@@ -1004,6 +1048,40 @@ export class AppointmentDetail {
             </div>
           </div>
         )}
+
+        {this.denying && this.isDoctor && (
+          <div class="my-6 w-full max-w-md rounded-md bg-gray-200 px-4 py-3">
+            <h4 class="mb-2 text-sm font-medium text-[#7357be]">Deny appointment request</h4>
+            <div class="mb-3 flex w-full flex-col gap-y-3">
+              <md-outlined-text-field
+                required={true}
+                label="Reason for denying"
+                class="w-full"
+                value={this.denyingAppointmentReason}
+                onInput={(e: Event) => {
+                  this.denyingAppointmentReason = (e.target as HTMLInputElement).value;
+                }}
+              />
+            </div>
+
+            <div class="flex flex-row items-center justify-between gap-x-2">
+              <md-filled-button
+                class={`w-1/2 rounded-full bg-[#7357be]`}
+                onClick={this.handleDeny}
+                disabled={this.denyingAppointmentReason === ""}
+              >
+                Confirm deny
+              </md-filled-button>
+              <md-outlined-button
+                class="w-1/2 rounded-full"
+                onClick={() => (this.denying = false)}
+              >
+                Back
+              </md-outlined-button>
+            </div>
+          </div>
+        )}
+
       </div>
     );
   }

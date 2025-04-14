@@ -4,7 +4,6 @@ import {
   ConditionDisplay,
   Doctor,
   NewAppointmentRequest,
-  PatientAppointment,
   TimeSlot,
   User,
 } from '../../api/generated';
@@ -13,8 +12,7 @@ import { AppointmentTimesExample } from '../../data-examples/appointment-times';
 import { AvailableDoctorsExample } from '../../data-examples/available-doctors';
 import {
   formatAppointmentType,
-  formatDate,
-  getDateAndTimeTitle,
+  formatDate, formatSpecialization,
   getSelectedDateTimeObject,
   TODAY,
 } from '../../utils/utils';
@@ -30,9 +28,9 @@ export class AppointmentScheduler {
   @Prop() initialDate: Date = null;
 
   @State() selectedDate: Date = null;
-  @State() selectedTime: string = null;
-  @State() selectedAppointmentType: AppointmentType = null;
   @State() selectedDoctor: Doctor = null;
+  @State() selectedAppointmentType: AppointmentType = null;
+  @State() selectedTime: string = null;
   @State() selectedCondition: ConditionDisplay = null;
   @State() appointmentReason: string = '';
   @State() currentViewMonth: number = TODAY.getMonth();
@@ -91,6 +89,9 @@ export class AppointmentScheduler {
       doctorId: this.selectedDoctor.id,
     };
 
+    // on success:
+    // window.navigation.navigate("homepage");
+
     console.log('Request to schedule an appointment:', newAppointment);
     // TODO luky just call this
     // this.api.appointments.requestAppointment({
@@ -105,16 +106,16 @@ export class AppointmentScheduler {
     //
   };
 
-  private resetSelection = () => {
+  /*private resetSelection = () => {
     this.selectedDate = null;
     this.selectedTime = null;
     this.selectedAppointmentType = null;
     this.selectedDoctor = null;
     this.appointmentReason = '';
-  };
+  };*/
 
   private showDetailsPanel = () => {
-    return this.selectedDate !== null && this.selectedTime !== null;
+    return this.selectedDate !== null && this.selectedDoctor !== null;
   };
 
   render() {
@@ -127,7 +128,7 @@ export class AppointmentScheduler {
 
         {/* Content */}
         <div class="mx-auto flex w-full flex-1 flex-col md:flex-row">
-          {/* Left panel - Date & Time */}
+          {/* Left panel - Date & Doctor */}
           <div
             class={`flex flex-col items-center justify-center bg-gray-300 p-6 transition-all duration-600 ease-in-out ${showDetails ? 'w-full md:w-1/2' : 'w-full'}`}
           >
@@ -138,17 +139,18 @@ export class AppointmentScheduler {
               currentViewYear={this.currentViewYear}
             />
 
-            {/* Time selector */}
-            <div class="w-full max-w-lg px-4">
+            <div class="w-full max-w-md px-4">
               <md-filled-select
-                label="Select a time"
+                label="Doctor / Specialist"
                 class="w-full"
-                value={this.selectedTime}
-                onInput={(e: Event) => this.handleTimeChange(e)}
+                value={this.selectedDoctor}
+                onInput={(e: Event) => this.handleDoctorChange(e)}
               >
-                {this.availableTimes.map((time: TimeSlot) => (
-                  <md-select-option value={time.time} disabled={time.status !== 'available'}>
-                    <div slot="headline">{time.time}</div>
+                {this.availableDoctors.map((doctor: Doctor) => (
+                  <md-select-option value={doctor.id}>
+                    <div slot="headline">
+                      Dr. {doctor.firstName} {doctor.lastName} - {formatSpecialization(doctor.specialization)}
+                    </div>
                   </md-select-option>
                 ))}
               </md-filled-select>
@@ -160,10 +162,8 @@ export class AppointmentScheduler {
             <div
               class={`m-auto flex w-full max-w-lg transform animate-[slideInFromBottom_0.5s_ease-out] flex-col justify-center p-6 opacity-100 transition-all duration-500 ease-in-out md:w-1/2 md:animate-[slideInFromRight_0.5s_ease-out]`}
             >
-              <div class="mb-6">
-                {getDateAndTimeTitle(
-                  getSelectedDateTimeObject(this.selectedDate, this.selectedTime),
-                )}
+              <div class="mb-6 text-[#7357be] font-medium">
+                {formatDate(this.selectedDate)}
               </div>
 
               <div class="mb-6">
@@ -183,16 +183,14 @@ export class AppointmentScheduler {
 
               <div class="mb-6">
                 <md-filled-select
-                  label="Doctor / Specialist"
+                  label="Select a time"
                   class="w-full"
-                  value={this.selectedDoctor}
-                  onInput={(e: Event) => this.handleDoctorChange(e)}
+                  value={this.selectedTime}
+                  onInput={(e: Event) => this.handleTimeChange(e)}
                 >
-                  {this.availableDoctors.map((doctor: Doctor) => (
-                    <md-select-option value={doctor.id}>
-                      <div slot="headline">
-                        Dr. {doctor.firstName} {doctor.lastName}
-                      </div>
+                  {this.availableTimes.map((time: TimeSlot) => (
+                    <md-select-option value={time.time} disabled={time.status !== 'available'}>
+                      <div slot="headline">{time.time}</div>
                     </md-select-option>
                   ))}
                 </md-filled-select>

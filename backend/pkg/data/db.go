@@ -35,6 +35,7 @@ type Db interface {
 	CancelAppointment(
 		ctx context.Context,
 		appointmentId uuid.UUID,
+		by string,
 		cancellationReason *string,
 	) error
 	DecideAppointment(

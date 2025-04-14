@@ -23,7 +23,11 @@ type App interface {
 		ctx context.Context,
 		appt api.NewAppointmentRequest,
 	) (api.PatientAppointment, error)
-	CancelAppointment(ctx context.Context, appointmentId uuid.UUID, reason *string) error
+	CancelAppointment(
+		ctx context.Context,
+		appointmentId uuid.UUID,
+		req api.AppointmentCancellation,
+	) error
 	PatientsAppointmentById(
 		ctx context.Context,
 		patientId uuid.UUID,

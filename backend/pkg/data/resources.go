@@ -10,6 +10,7 @@ import (
 	"github.com/google/uuid"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"go.mongodb.org/mongo-driver/v2/mongo"
+	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
 
 type ResourceType string
@@ -89,31 +90,34 @@ func (m *MongoDb) CreateReservation(
 	if err := m.appointmentExists(ctx, appointmentId); err != nil {
 		return Reservation{}, fmt.Errorf("CreateReservation appointment check error: %w", err)
 	}
-
 	if err := m.resourceExists(ctx, resourceId); err != nil {
 		return Reservation{}, fmt.Errorf("CreateReservation resource check error: %w", err)
 	}
-
-	collection := m.Database.Collection(reservationsCollection)
-
 	if endTime.Before(startTime) || endTime.Equal(startTime) {
 		return Reservation{}, fmt.Errorf("CreateReservation: endTime must be after startTime")
 	}
 
+	collection := m.Database.Collection(reservationsCollection)
+
+	// --- Conflict Check (excluding self) ---
+	// This check MUST happen before the upsert to prevent overwriting a valid
+	// reservation from another appointment if the timing overlaps.
 	conflictFilter := bson.M{
-		"resourceId": resourceId,
-		"startTime":  bson.M{"$lt": endTime},
-		"endTime":    bson.M{"$gt": startTime},
+		"resourceId":    resourceId,
+		"appointmentId": bson.M{"$ne": appointmentId}, // Exclude the current appointment
+		"startTime":     bson.M{"$lt": endTime},
+		"endTime":       bson.M{"$gt": startTime},
 	}
 
 	count, err := collection.CountDocuments(ctx, conflictFilter)
-	if err != nil && !errors.Is(err, mongo.ErrNoDocuments) {
-		return Reservation{}, fmt.Errorf("CreateReservation check failed: %w", err)
+	if err != nil {
+		return Reservation{}, fmt.Errorf("CreateReservation conflict check failed: %w", err)
 	}
 
 	if count > 0 {
+		// Conflict found with a *different* appointment
 		return Reservation{}, fmt.Errorf(
-			"%w: resourceId %s from %s to %s",
+			"%w: resourceId %s from %s to %s (conflict with another appointment)",
 			ErrResourceUnavailable,
 			resourceId,
 			startTime.Format(time.RFC3339),
@@ -121,25 +125,50 @@ func (m *MongoDb) CreateReservation(
 		)
 	}
 
-	reservation := Reservation{
-		Id:            uuid.New(),
-		AppointmentId: appointmentId,
-		ResourceId:    resourceId,
-		ResourceName:  resourceName,
-		ResourceType:  resourceType,
-		StartTime:     startTime,
-		EndTime:       endTime,
+	// --- Upsert Reservation ---
+	// No conflict with other appointments found. Proceed to create or update
+	// the reservation for *this* specific appointment and resource.
+
+	// Filter to find the specific reservation for this appointment and resource
+	upsertFilter := bson.M{
+		"appointmentId": appointmentId,
+		"resourceId":    resourceId,
 	}
 
-	_, err = collection.InsertOne(ctx, reservation)
+	// Define the fields to set on update or initial insert
+	updateFields := bson.M{
+		"resourceName": resourceName, // Update these fields regardless
+		"resourceType": resourceType,
+		"startTime":    startTime,
+		"endTime":      endTime,
+	}
+
+	// Define the complete update operation using $set and $setOnInsert
+	// $setOnInsert ensures _id is only generated when the document is first created.
+	updateDefinition := bson.M{
+		"$set": updateFields,
+		"$setOnInsert": bson.M{
+			"_id":           uuid.New(),
+			"appointmentId": appointmentId,
+			"resourceId":    resourceId,
+		},
+	}
+
+	// Configure options for FindOneAndUpdate:
+	// - Upsert(true): Create the document if it doesn't exist.
+	// - ReturnDocument(options.After): Return the document state *after* the update/insert.
+	opts := options.FindOneAndUpdate().
+		SetUpsert(true).
+		SetReturnDocument(options.After)
+
+	var result Reservation
+	err = collection.FindOneAndUpdate(ctx, upsertFilter, updateDefinition, opts).
+		Decode(&result)
 	if err != nil {
-		return Reservation{}, fmt.Errorf(
-			"CreateReservation insert failed: %w",
-			err,
-		)
+		return Reservation{}, fmt.Errorf("CreateReservation upsert failed: %w", err)
 	}
 
-	return reservation, nil
+	return result, nil
 }
 
 func (m *MongoDb) FindAvailableResourcesAtTime(

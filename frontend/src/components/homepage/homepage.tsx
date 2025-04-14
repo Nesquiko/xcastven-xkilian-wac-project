@@ -16,6 +16,7 @@ import {
   Prescription,
   PrescriptionDisplay,
   User,
+  UserRole,
 } from '../../api/generated';
 import { TODAY } from '../../utils/utils';
 import { StyledHost } from '../StyledHost';
@@ -161,11 +162,12 @@ export class Homepage {
   private handleCancelAppointment = async (
     appointment: PatientAppointment | DoctorAppointment,
     cancellationReason: string,
+    by: UserRole,
   ) => {
     try {
       await this.api.appointments.cancelAppointment({
         appointmentId: appointment.id,
-        appointmentCancellation: { reason: cancellationReason },
+        appointmentCancellation: { reason: cancellationReason, by },
       });
       // TODO kili this doesn't return anything, it is up to you how will you change the appointment status
     } catch (err) {
@@ -216,14 +218,28 @@ export class Homepage {
 
   private handleSaveResourcesOnAppointment = async (
     appointment: PatientAppointment | DoctorAppointment,
-    resources: {
+    resources: Partial<{
       facility: Facility;
       equipment: Equipment;
       medicine: Medicine;
-    },
-  ) => {
-    // TODO luky handle with /resources/{appointmentId}
-    console.log('Save resources on appointment', appointment, resources);
+    }>,
+  ): Promise<DoctorAppointment | undefined> => {
+    try {
+      return this.api.resources.reserveAppointmentResources({
+        appointmentId: appointment.id,
+        reserveAppointmentResourcesRequest: {
+          start: appointment.appointmentDateTime,
+          facilityId: resources.facility?.id,
+          equipment: resources.equipment?.id,
+          medicine: resources.medicine?.id,
+        },
+      });
+    } catch (err) {
+      if (!(err instanceof ApiError)) {
+        toastService.showError(err);
+      }
+      toastService.showError(err.message);
+    }
   };
 
   private handleUpdatePrescriptionForAppointment = async (

@@ -172,6 +172,7 @@ func dataApptToPatientAppt(
 	a data.Appointment,
 	d data.Doctor,
 	c *data.Condition,
+	prescriptions []data.Prescription,
 ) api.PatientAppointment {
 	appt := api.PatientAppointment{
 		Id:                  &a.Id,
@@ -181,12 +182,16 @@ func dataApptToPatientAppt(
 		Status:              api.AppointmentStatus(a.Status),
 		Type:                api.AppointmentType(a.Type),
 		CancellationReason:  a.CancellationReason,
+		CanceledBy:          (*api.UserRole)(a.CancelledBy),
+		DenialReason:        a.DenialReason,
 	}
 
 	if c != nil {
 		cond := dataCondToCondDisplay(*c)
 		appt.Condition = &cond
 	}
+
+	appt.Prescriptions = asPtr(Map(prescriptions, dataPrescToPrescDisplay))
 
 	return appt
 }
@@ -204,10 +209,12 @@ func dataApptToDoctorAppt(
 		Id:                  &appt.Id,
 		AppointmentDateTime: appt.AppointmentDateTime,
 		CancellationReason:  appt.CancellationReason,
+		CanceledBy:          (*api.UserRole)(appt.CancelledBy),
 		Patient:             dataPatientToApiPatient(patient),
 		Reason:              appt.Reason,
 		Status:              api.AppointmentStatus(appt.Status),
 		Type:                api.AppointmentType(appt.Type),
+		DenialReason:        appt.DenialReason,
 	}
 
 	if cond != nil {

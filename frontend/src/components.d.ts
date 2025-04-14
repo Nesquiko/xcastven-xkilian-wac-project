@@ -31,6 +31,7 @@ export namespace Components {
         "handleCancelAppointment": (
     appointment: PatientAppointment | DoctorAppointment,
     cancellationReason: string,
+    by: UserRole,
   ) => Promise<void>;
         "handleDenyAppointment": (
     appointment: PatientAppointment | DoctorAppointment,
@@ -45,12 +46,12 @@ export namespace Components {
         "handleResetSelection": () => void;
         "handleSaveResourcesOnAppointment": (
     appointment: PatientAppointment | DoctorAppointment,
-    resources: {
+    resources: Partial<{
       facility: Facility;
       equipment: Equipment;
       medicine: Medicine;
-    },
-  ) => Promise<void>;
+    }>,
+  ) => Promise<DoctorAppointment | undefined>;
         "handleSelectPrescription": (prescription: PrescriptionDisplay) => void;
         "handleUpdatePrescriptionForAppointment": (
     appointment: PatientAppointment | DoctorAppointment,
@@ -141,6 +142,7 @@ export namespace Components {
         "handleCancelAppointment": (
     appointment: PatientAppointment | DoctorAppointment,
     cancellationReason: string,
+    by: UserRole,
   ) => Promise<void>;
         "handleDenyAppointment": (
     appointment: PatientAppointment | DoctorAppointment,
@@ -154,12 +156,12 @@ export namespace Components {
         "handleResetSelection": () => void;
         "handleSaveResourcesOnAppointment": (
     appointment: PatientAppointment | DoctorAppointment,
-    resources: {
+    resources: Partial<{
       facility: Facility;
       equipment: Equipment;
       medicine: Medicine;
-    },
-  ) => Promise<void>;
+    }>,
+  ) => Promise<DoctorAppointment | undefined>;
         "handleSelectAppointment": (appointment: AppointmentDisplay) => void;
         "handleSelectCondition": (condition: ConditionDisplay) => void;
         "handleSelectPrescription": (prescription: PrescriptionDisplay) => void;
@@ -410,6 +412,7 @@ declare namespace LocalJSX {
         "handleCancelAppointment"?: (
     appointment: PatientAppointment | DoctorAppointment,
     cancellationReason: string,
+    by: UserRole,
   ) => Promise<void>;
         "handleDenyAppointment"?: (
     appointment: PatientAppointment | DoctorAppointment,
@@ -424,12 +427,12 @@ declare namespace LocalJSX {
         "handleResetSelection"?: () => void;
         "handleSaveResourcesOnAppointment"?: (
     appointment: PatientAppointment | DoctorAppointment,
-    resources: {
+    resources: Partial<{
       facility: Facility;
       equipment: Equipment;
       medicine: Medicine;
-    },
-  ) => Promise<void>;
+    }>,
+  ) => Promise<DoctorAppointment | undefined>;
         "handleSelectPrescription"?: (prescription: PrescriptionDisplay) => void;
         "handleUpdatePrescriptionForAppointment"?: (
     appointment: PatientAppointment | DoctorAppointment,
@@ -520,6 +523,7 @@ declare namespace LocalJSX {
         "handleCancelAppointment"?: (
     appointment: PatientAppointment | DoctorAppointment,
     cancellationReason: string,
+    by: UserRole,
   ) => Promise<void>;
         "handleDenyAppointment"?: (
     appointment: PatientAppointment | DoctorAppointment,
@@ -533,12 +537,12 @@ declare namespace LocalJSX {
         "handleResetSelection"?: () => void;
         "handleSaveResourcesOnAppointment"?: (
     appointment: PatientAppointment | DoctorAppointment,
-    resources: {
+    resources: Partial<{
       facility: Facility;
       equipment: Equipment;
       medicine: Medicine;
-    },
-  ) => Promise<void>;
+    }>,
+  ) => Promise<DoctorAppointment | undefined>;
         "handleSelectAppointment"?: (appointment: AppointmentDisplay) => void;
         "handleSelectCondition"?: (condition: ConditionDisplay) => void;
         "handleSelectPrescription"?: (prescription: PrescriptionDisplay) => void;

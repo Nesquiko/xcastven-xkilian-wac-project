@@ -14,6 +14,7 @@ import {
   PrescriptionDisplay,
   TimeSlot,
   User,
+  UserRole,
 } from '../../api/generated';
 import {
   days,
@@ -50,6 +51,7 @@ export class AppointmentDetail {
   @Prop() handleCancelAppointment: (
     appointment: PatientAppointment | DoctorAppointment,
     cancellationReason: string,
+    by: UserRole,
   ) => Promise<void>;
 
   @Prop() handleAcceptAppointment: (
@@ -61,12 +63,12 @@ export class AppointmentDetail {
   ) => Promise<void>;
   @Prop() handleSaveResourcesOnAppointment: (
     appointment: PatientAppointment | DoctorAppointment,
-    resources: {
+    resources: Partial<{
       facility: Facility;
       equipment: Equipment;
       medicine: Medicine;
-    },
-  ) => Promise<void>;
+    }>,
+  ) => Promise<DoctorAppointment | undefined>;
   @Prop() handleSelectPrescription: (prescription: PrescriptionDisplay) => void;
   @Prop() handleUpdatePrescriptionForAppointment: (
     appointment: PatientAppointment | DoctorAppointment,
@@ -79,48 +81,22 @@ export class AppointmentDetail {
   ) => Promise<Prescription | undefined>;
 
   @State() appointment: PatientAppointment | DoctorAppointment = undefined;
-  @State() availableEquipment: Array<Equipment> = [{ id: 'equipment-1', name: 'Equipment 1' }];
-  @State() availableFacilities: Array<Facility> = [{ id: 'facility-1', name: 'Facility 1' }];
-  @State() availableMedicine: Array<Medicine> = [{ id: 'medicine-1', name: 'Medicine 1' }];
+  @State() availableEquipment: Array<Equipment> = [];
+  @State() availableFacilities: Array<Facility> = [];
+  @State() availableMedicine: Array<Medicine> = [];
 
-  @State() selectedEquipment: Equipment =
+  @State() selectedEquipment: Equipment | undefined =
     this.appointment && instanceOfDoctorAppointment(this.appointment)
       ? this.appointment.equipment[0]
-      : null;
-  @State() selectedFacility: Facility =
+      : undefined;
+  @State() selectedFacility: Facility | undefined =
     this.appointment && instanceOfDoctorAppointment(this.appointment)
       ? this.appointment.facilities[0]
-      : null;
-  @State() selectedMedicine: Medicine =
+      : undefined;
+  @State() selectedMedicine: Medicine | undefined =
     this.appointment && instanceOfDoctorAppointment(this.appointment)
       ? this.appointment.medicine[0]
-      : null;
-
-  async componentWillLoad() {
-    try {
-      if (this.isDoctor) {
-        const appointment: DoctorAppointment = await this.api.appointments.doctorsAppointment({
-          doctorId: this.user.id,
-          appointmentId: this.appointmentId,
-        });
-        this.appointment = appointment;
-        this.selectedEquipment = appointment.equipment?.[0] ?? null;
-        this.selectedFacility = appointment.facilities?.[0] ?? null;
-        this.selectedMedicine = appointment.medicine?.[0] ?? null;
-      } else {
-        this.appointment = await this.api.appointments.patientsAppointment({
-          patientId: this.user.id,
-          appointmentId: this.appointmentId,
-        });
-      }
-    } catch (err) {
-      if (!(err instanceof ApiError)) {
-        toastService.showError(err);
-        return;
-      }
-      toastService.showError(err.message);
-    }
-  }
+      : undefined;
 
   @State() prescriptionsExpanded: boolean = false;
   @State() showEditResources: boolean = false;
@@ -166,6 +142,58 @@ export class AppointmentDetail {
       specialization: 'urologist',
     } satisfies Doctor,
   ] satisfies Array<Doctor>;
+
+  async componentWillLoad() {
+    await this.loadAppt();
+
+    if (this.isDoctor) {
+      this.loadAvailableResources();
+    }
+  }
+
+  private async loadAppt() {
+    try {
+      if (this.isDoctor) {
+        const appointment: DoctorAppointment = await this.api.appointments.doctorsAppointment({
+          doctorId: this.user.id,
+          appointmentId: this.appointmentId,
+        });
+        this.appointment = appointment;
+        this.selectedEquipment = appointment.equipment?.[0] ?? undefined;
+        this.selectedFacility = appointment.facilities?.[0] ?? undefined;
+        this.selectedMedicine = appointment.medicine?.[0] ?? undefined;
+      } else {
+        this.appointment = await this.api.appointments.patientsAppointment({
+          patientId: this.user.id,
+          appointmentId: this.appointmentId,
+        });
+      }
+    } catch (err) {
+      if (!(err instanceof ApiError)) {
+        toastService.showError(err);
+        return;
+      }
+      toastService.showError(err.message);
+    }
+  }
+
+  private async loadAvailableResources() {
+    try {
+      const resources = await this.api.resources.getAvailableResources({
+        dateTime: this.appointment.appointmentDateTime,
+      });
+      this.availableMedicine = resources.medicine;
+      this.availableFacilities = resources.facilities;
+      this.availableEquipment = resources.equipment;
+    } catch (err) {
+      console.log(err);
+      if (!(err instanceof ApiError)) {
+        toastService.showError(err);
+        return;
+      }
+      toastService.showError(err.message);
+    }
+  }
 
   private getPatientAppointmentStatusMessage = (appointmentStatus: AppointmentStatus) => {
     switch (appointmentStatus) {
@@ -300,13 +328,16 @@ export class AppointmentDetail {
   };
 
   private handleCancel = () => {
-    this.handleCancelAppointment(this.appointment, this.cancellingAppointmentReason).then(() => {
-      this.appointment = {
-        ...this.appointment,
-        status: 'cancelled',
-      };
-      this.cancelling = false;
-    });
+    const by = this.isDoctor ? UserRole.Doctor : UserRole.Patient;
+    this.handleCancelAppointment(this.appointment, this.cancellingAppointmentReason, by).then(
+      () => {
+        this.appointment = {
+          ...this.appointment,
+          status: 'cancelled',
+        };
+        this.cancelling = false;
+      },
+    );
   };
 
   private handleAccept = () => {
@@ -329,22 +360,28 @@ export class AppointmentDetail {
   };
 
   private handleSaveResources = () => {
-    const newResources: {
+    if (!instanceOfDoctorAppointment(this.appointment)) {
+      throw new Error('unexpected state, appointment is not DoctorAppointment');
+    }
+
+    const newResources: Partial<{
       facility: Facility;
       equipment: Equipment;
       medicine: Medicine;
-    } = {
+    }> = {
       facility: this.selectedFacility,
       equipment: this.selectedEquipment,
       medicine: this.selectedMedicine,
     };
 
-    this.handleSaveResourcesOnAppointment(this.appointment, newResources).then(() => {
+    this.handleSaveResourcesOnAppointment(this.appointment, newResources).then(appt => {
+      if (!appt) return;
+
       this.appointment = {
         ...this.appointment,
-        facilities: [newResources.facility],
-        equipment: [newResources.equipment],
-        medicine: [newResources.medicine],
+        facilities: appt.facilities,
+        equipment: appt.equipment,
+        medicine: appt.medicine,
       };
       this.showEditResources = false;
     });
@@ -463,6 +500,11 @@ export class AppointmentDetail {
     );
   }
 
+  private cancelledByStatus = () => {
+    if (!this.appointment.canceledBy) return;
+    return this.appointment.canceledBy === 'doctor' ? ' by doctor' : ' by patient';
+  };
+
   render() {
     if (!this.appointment) return null;
 
@@ -541,6 +583,7 @@ export class AppointmentDetail {
             </div>
             <span class="font-medium text-gray-600">
               {this.appointment.status[0].toUpperCase() + this.appointment.status.slice(1)}
+              {this.appointment.status === 'cancelled' && this.cancelledByStatus()}
             </span>
           </div>
         </div>
@@ -577,9 +620,9 @@ export class AppointmentDetail {
               <md-icon style={{ fontSize: '16px' }}>description</md-icon>
               Denial reason
             </div>
-            {this.appointment.cancellationReason && (
+            {this.appointment.denialReason && (
               <p class="mt-1 ml-1 text-sm font-medium text-wrap text-gray-600">
-                {this.appointment.cancellationReason}
+                {this.appointment.denialReason}
               </p>
             )}
           </div>

@@ -6,6 +6,7 @@ import {
   ErrorDetail,
   MedicalHistoryApi,
   PatientsApi,
+  ResourcesApi,
 } from './generated';
 import { Configuration, FetchAPI, ResponseError } from './generated';
 
@@ -16,6 +17,7 @@ export interface Api {
   doctors: DoctorsApi;
   patients: PatientsApi;
   medicalHistory: MedicalHistoryApi;
+  resources: ResourcesApi;
 }
 
 const fetchApi: FetchAPI = async (input, init): Promise<Response> => {
@@ -49,6 +51,7 @@ export function newApi(apiBase: string): Api {
     doctors: new DoctorsApi(config),
     patients: new PatientsApi(config),
     medicalHistory: new MedicalHistoryApi(config),
+    resources: new ResourcesApi(config),
   };
 }
 

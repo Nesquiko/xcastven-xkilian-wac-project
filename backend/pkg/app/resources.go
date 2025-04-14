@@ -101,8 +101,8 @@ func (a monolithApp) ReserveAppointmentResources(
 		)
 	}
 
-	reservationStart := payload.Reservation.Start
-	reservationEnd := payload.Reservation.End
+	reservationStart := payload.Start
+	reservationEnd := appointment.EndTime
 
 	if payload.Equipment != nil {
 		resourceId := *payload.Equipment
@@ -296,7 +296,7 @@ func (a monolithApp) ReserveAppointmentResources(
 	prescriptions, err := a.db.PrescriptionByAppointmentId(ctx, appointmentId)
 	if err != nil {
 		return api.DoctorAppointment{}, fmt.Errorf(
-			"DoctorsAppointmentById fetch prescriptions: %w",
+			"ReserveAppointmentResources fetch prescriptions: %w",
 			err,
 		)
 	}

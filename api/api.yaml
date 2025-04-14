@@ -32,8 +32,8 @@ paths:
     $ref: "./paths/conditions.yaml"
   /conditions/{conditionId}:
     $ref: "./paths/conditions_conditionId.yaml"
-  /conditions/{patientId}:
-    $ref: "./paths/conditions_patientId.yaml"
+  /conditions/patient/{patientId}:
+    $ref: "./paths/conditions_patient_patientId.yaml"
 
   /prescriptions:
     $ref: "./paths/prescriptions.yaml"
@@ -68,5 +68,5 @@ paths:
     $ref: "./paths/resources_available.yaml"
   /resources/{resourceId}:
     $ref: "./paths/resources_resourceId.yaml"
-  /resources/{appointmentId}:
-    $ref: "./paths/resources_appointmentId.yaml"
+  /resources/reserve/{appointmentId}:
+    $ref: "./paths/resources_reserve_appointmentId.yaml"

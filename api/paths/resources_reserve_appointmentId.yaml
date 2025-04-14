@@ -12,10 +12,11 @@ post:
       application/json:
         schema:
           type: object
-          required: [reservation]
+          required: [start]
           properties:
-            reservation:
-              $ref: "../components/schemas/resources/ResourceReservation.yaml"
+            start:
+              type: string
+              format: date-time
             facilityId:
               type: string
               format: uuid

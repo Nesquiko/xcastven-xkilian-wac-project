@@ -26,6 +26,8 @@ type Appointment struct {
 	ConditionId *uuid.UUID `bson:"conditionId,omitempty" json:"conditionId,omitempty"`
 
 	CancellationReason *string `bson:"cancellationReason,omitempty" json:"cancellationReason,omitempty"`
+	CancelledBy        *string `bson:"cancelledBy,omitempty"        json:"cancelledBy,omitempty"`
+	DenialReason       *string `bson:"denialReason,omitempty"       json:"denialReason,omitempty"`
 
 	Medicines  []Resource `bson:"medicines,omitempty"  json:"medicines,omitempty"`
 	Facilities []Resource `bson:"facilities,omitempty" json:"facilities,omitempty"`
@@ -113,6 +115,7 @@ func (m *MongoDb) AppointmentById(ctx context.Context, id uuid.UUID) (Appointmen
 func (m *MongoDb) CancelAppointment(
 	ctx context.Context,
 	appointmentId uuid.UUID,
+	by string,
 	cancellationReason *string,
 ) error {
 	if err := m.appointmentExists(ctx, appointmentId); err != nil {
@@ -124,6 +127,7 @@ func (m *MongoDb) CancelAppointment(
 		"$set": bson.M{
 			"status":             "cancelled",
 			"cancellationReason": cancellationReason,
+			"cancelledBy":        by,
 		},
 	}
 	filter := bson.M{"_id": appointmentId}
@@ -461,7 +465,7 @@ func (m *MongoDb) denyAppointment(
 	reason *string,
 ) (Appointment, error) {
 	appointmentsColl := m.Database.Collection(appointmentsCollection)
-	update := bson.M{"$set": bson.M{"status": "denied", "reason": reason}}
+	update := bson.M{"$set": bson.M{"status": "denied", "denialReason": reason}}
 	filter := bson.M{"_id": appointmentId}
 
 	_, err := appointmentsColl.UpdateOne(ctx, filter, update)

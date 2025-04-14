@@ -25,6 +25,10 @@ properties:
     example: "Feeling unwell, general check-up needed."
   cancellationReason:
     type: string
+  canceledBy:
+    $ref: "../auth/UserRole.yaml"
+  denialReason:
+    type: string
   prescriptions:
     type: array
     items:

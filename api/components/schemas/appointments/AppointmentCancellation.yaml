@@ -1,6 +1,9 @@
 type: object
 description: Data required to cancel an appointment.
+required: [by]
 properties:
+  by:
+    $ref: "../auth/UserRole.yaml"
   reason:
     type: string
     description: Optional reason provided for the cancellation.

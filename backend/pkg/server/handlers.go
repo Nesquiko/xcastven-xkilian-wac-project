@@ -22,7 +22,7 @@ func (s Server) CancelAppointment(
 		return
 	}
 
-	err := s.app.CancelAppointment(r.Context(), appointmentId, req.Reason)
+	err := s.app.CancelAppointment(r.Context(), appointmentId, req)
 	if err != nil {
 		slog.Error(UnexpectedError, "error", err.Error(), "where", "CancelAppointment")
 		encodeError(w, internalServerError())

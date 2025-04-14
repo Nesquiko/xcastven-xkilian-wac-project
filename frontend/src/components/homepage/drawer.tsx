@@ -14,6 +14,7 @@ import {
   Prescription,
   PrescriptionDisplay,
   User,
+  UserRole,
 } from '../../api/generated';
 import { formatDate } from '../../utils/utils';
 import { Component, h, Prop } from '@stencil/core';
@@ -60,6 +61,7 @@ export class Drawer {
   @Prop() handleCancelAppointment: (
     appointment: PatientAppointment | DoctorAppointment,
     cancellationReason: string,
+    by: UserRole,
   ) => Promise<void>;
 
   @Prop() handleAcceptAppointment: (
@@ -70,12 +72,12 @@ export class Drawer {
   ) => Promise<void>;
   @Prop() handleSaveResourcesOnAppointment: (
     appointment: PatientAppointment | DoctorAppointment,
-    resources: {
+    resources: Partial<{
       facility: Facility;
       equipment: Equipment;
       medicine: Medicine;
-    },
-  ) => Promise<void>;
+    }>,
+  ) => Promise<DoctorAppointment | undefined>;
   @Prop() handleUpdatePrescriptionForAppointment: (
     appointment: PatientAppointment | DoctorAppointment,
     prescriptionId: string,

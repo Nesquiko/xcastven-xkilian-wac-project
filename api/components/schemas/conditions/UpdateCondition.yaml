@@ -1,0 +1,13 @@
+type: object
+properties:
+  name:
+    type: string
+  start:
+    type: string
+    format: date-time
+  end:
+    type: string
+    format: date-time
+  patientId:
+    type: string
+    format: uuid

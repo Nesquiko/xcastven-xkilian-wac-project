@@ -13,6 +13,9 @@ tags:
   - name: Patients
   - name: Resources
   - name: Medical History
+servers:
+  - description: Cluster Endpoint
+    url: /api
 
 paths:
   /auth/register:
@@ -32,6 +35,8 @@ paths:
 
   /prescriptions:
     $ref: "./paths/prescriptions.yaml"
+  /prescriptions/{prescriptionId}:
+    $ref: "./paths/prescriptions_prescriptionId.yaml"
 
   /patients/{patientId}:
     $ref: "./paths/patients_patientId.yaml"
@@ -42,6 +47,8 @@ paths:
   /patients/{patientId}/appointment/{appointmentId}:
     $ref: "./paths/patients_patientId_appointment_appointmentId.yaml"
 
+  /doctors:
+    $ref: "./paths/doctors.yaml"
   /doctors/{doctorId}:
     $ref: "./paths/doctors_doctorId.yaml"
   /doctors/{doctorId}/calendar:
@@ -57,3 +64,5 @@ paths:
     $ref: "./paths/resources_available.yaml"
   /resources/{resourceId}:
     $ref: "./paths/resources_resourceId.yaml"
+  /resources/{appointmentId}:
+    $ref: "./paths/resources_appointmentId.yaml"

@@ -4,7 +4,13 @@ metadata:
   name: xcastven-xkilian-project-content
 spec:
   microFrontend: xcastven-xkilian-project
-  element: xcastven-xkilian-project-home-page
+  element: xcastven-xkilian-project-app
+  attributes:
+    - name: base-path
+      value: /xcastven-xkilian-project/
+    - name: api-base
+      value: http://localhost:30081/api
+
   displayRules:
     - allOf:
         - context-name: main-content

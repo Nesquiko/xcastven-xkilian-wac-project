@@ -13,11 +13,10 @@ export class ConditionDetail {
   @Prop() conditionId: string;
   @Prop() handleResetSelection: () => void;
   @Prop() handleSelectAppointment: (appointment: AppointmentDisplay) => void;
-  @Prop() handleScheduleAppointmentFromCondition: (condition: Condition) => void;
-  @Prop() handleToggleConditionStatus: (condition: Condition) => void;
+  @Prop() handleToggleConditionStatus: (condition: Condition) => Promise<void>;
 
   @State() condition: Condition;
-  @State() expandedConditionId: string;
+  @State() expandedAppointments: boolean = false;
 
   async componentWillLoad() {
     try {
@@ -29,14 +28,29 @@ export class ConditionDetail {
       }
       toastService.showError(err.message);
     }
-  }
+  };
 
-  private toggleConditionAppointments = (conditionId: string) => {
-    this.expandedConditionId = this.expandedConditionId === conditionId ? null : conditionId;
+  private handleScheduleAppointmentFromCondition = () => {
+    window.navigation.navigate(`scheduleAppointment?conditionId=${this.conditionId}`);
+  };
+
+  private handleToggleStatus = () => {
+    this.handleToggleConditionStatus(this.condition).then(() => {
+      this.condition = {
+        ...this.condition,
+        end: new Date(),
+      };
+    });
   };
 
   render() {
-    if (!this.condition) return null;
+    if (!this.condition) return (
+      <xcastven-xkilian-project-no-data
+        displayTitle="No condition found"
+        icon="error"
+        iconSize={80}
+      />
+    );
 
     return (
       <div class="w-full max-w-md">
@@ -110,11 +124,11 @@ export class ConditionDetail {
             </div>
             {this.condition.appointments.length > 0 && (
               <md-icon-button
-                onClick={() => this.toggleConditionAppointments(this.condition.id)}
+                onClick={() => this.expandedAppointments = !this.expandedAppointments}
                 style={{ width: '24px', height: '24px' }}
               >
                 <md-icon>
-                  {this.expandedConditionId === this.condition.id ? 'expand_less' : 'expand_more'}
+                  {this.expandedAppointments ? 'expand_less' : 'expand_more'}
                 </md-icon>
               </md-icon-button>
             )}
@@ -122,7 +136,7 @@ export class ConditionDetail {
 
           {this.condition.appointments.length <= 0 ? (
             <div class="text-sm font-medium text-gray-600">No appointments for this condition</div>
-          ) : this.expandedConditionId === this.condition.id ? (
+          ) : this.expandedAppointments ? (
             <div class="max-h-28 w-full overflow-y-auto rounded-md bg-gray-200">
               {this.condition.appointments.map((appointment: AppointmentDisplay) => (
                 <div
@@ -151,14 +165,14 @@ export class ConditionDetail {
         <div class="flex w-full max-w-md flex-row items-center justify-between gap-x-3">
           <md-filled-button
             class="w-1/2 rounded-full bg-[#7357be]"
-            onClick={() => this.handleScheduleAppointmentFromCondition(this.condition)}
+            onClick={this.handleScheduleAppointmentFromCondition}
           >
             Schedule
           </md-filled-button>
 
           <md-filled-button
             class="w-1/2 rounded-full bg-[#7357be]"
-            onClick={() => this.handleToggleConditionStatus(this.condition)}
+            onClick={this.handleToggleStatus}
           >
             {this.condition.end ? 'Reset as ongoing' : 'Set as gone'}
           </md-filled-button>

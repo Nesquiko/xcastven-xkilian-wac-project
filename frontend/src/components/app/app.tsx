@@ -55,9 +55,9 @@ export class App {
         const start: string = urlParams.get('start');
         element = (
           <xcastven-xkilian-project-condition-registerer
-            startDate={start ? new Date(start) : null}
             api={this.api}
             user={user}
+            startDate={start ? new Date(start) : null}
           />
         );
       } else if (this.relativePath.startsWith('register')) {
@@ -65,11 +65,13 @@ export class App {
       } else if (this.relativePath.startsWith('scheduleAppointment')) {
         const urlParams = new URLSearchParams(window.location.search);
         const date: string = urlParams.get('date');
+        const conditionId: string = urlParams.get('conditionId');
         element = (
           <xcastven-xkilian-project-appointment-scheduler
-            initialDate={date ? new Date(date) : null}
             api={this.api}
             user={user}
+            initialDate={date ? new Date(date) : null}
+            conditionId={conditionId}
           />
         );
       } else if (this.relativePath.startsWith('account')) {

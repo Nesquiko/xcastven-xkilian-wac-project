@@ -9,6 +9,8 @@ import { Component, h, Prop } from '@stencil/core';
 export class PrescriptionsList {
   @Prop() prescriptions: Array<PrescriptionDisplay>;
   @Prop() handleSelectPrescription: (prescription: PrescriptionDisplay) => void;
+  @Prop() selectedDate: Date;
+  @Prop() setSelectedDate: (date: Date) => void;
 
   render() {
     return (
@@ -63,28 +65,7 @@ export class PrescriptionsList {
           </div>
         )}
 
-        <div class="flex h-12 w-full flex-row items-center justify-between">
-          <md-icon-button
-            title="View older prescriptions"
-            class="m-1"
-            onClick={() => {
-              // TODO kili, like in the conditions
-              console.log('view older prescriptions clicked');
-            }}
-          >
-            <md-icon class="text-gray-600">arrow_back</md-icon>
-          </md-icon-button>
-          <md-icon-button
-            title="View newer prescriptions"
-            class="m-1"
-            onClick={() => {
-              // TODO kili, like in the conditions
-              console.log('view newer prescriptions clicked');
-            }}
-          >
-            <md-icon class="text-gray-600">arrow_forward</md-icon>
-          </md-icon-button>
-        </div>
+        <div class="flex h-12 w-full flex-row items-center justify-center" />
       </div>
     );
   }

@@ -28,7 +28,8 @@ export class Drawer {
   @Prop() isDoctor: boolean;
 
   @Prop() isDrawerOpen: boolean;
-  @Prop({ mutable: true }) selectedDate: Date;
+  @Prop() selectedDate: Date;
+  @Prop() setSelectedDate: (date: Date) => void;
   @Prop() selectedAppointment: AppointmentDisplay;
   @Prop() selectedCondition: ConditionDisplay;
   @Prop() selectedPrescription: PrescriptionDisplay;
@@ -85,8 +86,7 @@ export class Drawer {
     newPrescription: NewPrescription,
   ) => Promise<Prescription | undefined>;
 
-  @Prop() handleScheduleAppointmentFromCondition: (condition: Condition) => void;
-  @Prop() handleToggleConditionStatus: (condition: Condition) => void;
+  @Prop() handleToggleConditionStatus: (condition: Condition) => Promise<void>;
 
   render() {
     const displayStatus: AppointmentStatus = (
@@ -119,7 +119,7 @@ export class Drawer {
               </h2>
 
               <div class="flex w-full flex-col items-center justify-center gap-y-2">
-                {/* Tabs */}
+                {/* Tabs - Appointments, Conditions, Prescriptions */}
                 <div class="w-full max-w-md overflow-hidden rounded-lg bg-gray-100">
                   <md-tabs class="w-full" onchange={e => this.handleTabChange(e)}>
                     <md-primary-tab class="w-1/3 px-4">
@@ -137,10 +137,13 @@ export class Drawer {
                 {/* Appointments Tab Content */}
                 <div class={`w-full max-w-md ${this.activeTab === 0 ? 'block' : 'hidden'}`}>
                   <xcastven-xkilian-project-appointments-list
+                    user={this.user}
+                    isDoctor={this.isDoctor}
                     appointments={this.getAppointmentsForDate(this.selectedDate)}
                     handleSelectAppointment={this.handleSelectAppointment}
                     noDataMessage="No appointments for this date"
-                    currentDate={this.selectedDate}
+                    selectedDate={this.selectedDate}
+                    setSelectedDate={this.setSelectedDate}
                   />
                 </div>
 
@@ -149,7 +152,8 @@ export class Drawer {
                   <xcastven-xkilian-project-conditions-list
                     conditions={this.getConditionsForDate(this.selectedDate)}
                     handleSelectCondition={this.handleSelectCondition}
-                    currentDate={this.selectedDate}
+                    selectedDate={this.selectedDate}
+                    setSelectedDate={this.setSelectedDate}
                   />
                 </div>
 
@@ -169,7 +173,7 @@ export class Drawer {
               </h2>
 
               <div class="flex w-full flex-col items-center justify-center gap-y-2">
-                {/* Tabs */}
+                {/* Tabs - Scheduled, Requested, Denied, Completed, Cancelled */}
                 <div class="w-full max-w-md overflow-hidden rounded-lg bg-gray-100">
                   <md-tabs
                     class="w-full"
@@ -205,7 +209,8 @@ export class Drawer {
                     )}
                     handleSelectAppointment={this.handleSelectAppointment}
                     noDataMessage={'No ' + displayStatus + ' appointments for this date'}
-                    currentDate={this.selectedDate}
+                    selectedDate={this.selectedDate}
+                    setSelectedDate={this.setSelectedDate}
                   />
                 </div>
               </div>
@@ -232,7 +237,6 @@ export class Drawer {
               conditionId={this.selectedCondition.id}
               handleResetSelection={this.handleResetSelection}
               handleSelectAppointment={this.handleSelectAppointment}
-              handleScheduleAppointmentFromCondition={this.handleScheduleAppointmentFromCondition}
               handleToggleConditionStatus={this.handleToggleConditionStatus}
             />
           ) : this.selectedPrescription ? (

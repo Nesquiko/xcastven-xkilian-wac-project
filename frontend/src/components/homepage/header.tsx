@@ -6,6 +6,7 @@ import { Component, h, Prop, State } from '@stencil/core';
   shadow: false,
 })
 export class Header {
+  @Prop() isDoctor: boolean;
   @Prop() type: 'calendar' | 'account' | 'scheduleAppointment' | 'registerCondition';
   @Prop() currentViewMonth?: number;
   @Prop() currentViewYear?: number;
@@ -57,6 +58,7 @@ export class Header {
         )}
 
         <xcastven-xkilian-project-menu
+          isDoctor={this.isDoctor}
           isMenuOpen={this.isMenuOpen}
           handleResetMenu={() => (this.isMenuOpen = false)}
         />

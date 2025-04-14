@@ -322,12 +322,9 @@ export class Homepage {
     }
   };
 
-  private handleScheduleAppointmentFromCondition = (condition: Condition) => {
-    // TODO kili i need NewAppointmentRequest with conditionId set
-    console.log('Schedule an appointment for condition:', condition);
-  };
-
-  private handleToggleConditionStatus = (condition: Condition) => {
+  private handleToggleConditionStatus = async (
+    condition: Condition,
+  ) => {
     // TODO luky handle with /conditions/{conditionId}
     console.log('Toggle status of condition:', condition);
   };
@@ -384,6 +381,7 @@ export class Homepage {
       <StyledHost class="flex h-screen w-full flex-col overflow-hidden">
         <xcastven-xkilian-project-header
           type="calendar"
+          isDoctor={this.isDoctor}
           currentViewMonth={this.currentViewMonth}
           currentViewYear={this.currentViewYear}
           handlePreviousMonth={this.handlePreviousMonth}
@@ -429,6 +427,7 @@ export class Homepage {
           isDoctor={this.isDoctor}
           isDrawerOpen={this.isDrawerOpen}
           selectedDate={this.selectedDate}
+          setSelectedDate={(date: Date) => this.selectedDate = date}
           selectedAppointment={this.selectedAppointment}
           selectedCondition={this.selectedCondition}
           selectedPrescription={this.selectedPrescription}
@@ -451,7 +450,6 @@ export class Homepage {
           handleSaveResourcesOnAppointment={this.handleSaveResourcesOnAppointment}
           handleUpdatePrescriptionForAppointment={this.handleUpdatePrescriptionForAppointment}
           handleAddPrescriptionForAppointment={this.handleAddPrescriptionForAppointment}
-          handleScheduleAppointmentFromCondition={this.handleScheduleAppointmentFromCondition}
           handleToggleConditionStatus={this.handleToggleConditionStatus}
         />
       </StyledHost>

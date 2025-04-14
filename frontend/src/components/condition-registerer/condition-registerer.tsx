@@ -234,7 +234,10 @@ export class ConditionRegisterer {
 
     return (
       <div class="flex h-screen w-full flex-1 flex-col overflow-auto">
-        <xcastven-xkilian-project-header type="registerCondition" />
+        <xcastven-xkilian-project-header
+          type="registerCondition"
+          isDoctor={false}
+        />
 
         {/* Content */}
         <div class="mx-auto flex w-full flex-1 flex-col md:flex-row">

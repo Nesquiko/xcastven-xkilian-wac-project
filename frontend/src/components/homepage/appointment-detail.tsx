@@ -409,15 +409,15 @@ export class AppointmentDetail {
 
   private renderDateSelects(
     dateType: 'start' | 'end',
+    labels: Array<string>,
     dateValue: Date | null,
     changeHandler: (type: 'start' | 'end', part: 'day' | 'month' | 'year', event: Event) => void,
   ) {
-    const prefix: 'Start' | 'End' = dateType === 'start' ? 'Start' : 'End';
     return (
       <div class="flex w-full max-w-md flex-row justify-between gap-x-3">
         <md-outlined-select
           required={true}
-          label={`${prefix} Day`}
+          label={labels[0]}
           class="min-w-0 flex-1"
           value={getDatePart(dateValue, 'day')}
           onInput={(e: Event) => changeHandler(dateType, 'day', e)}
@@ -431,7 +431,7 @@ export class AppointmentDetail {
 
         <md-outlined-select
           required={true}
-          label={`${prefix} Month`}
+          label={labels[1]}
           class="min-w-0 flex-1"
           value={getDatePart(dateValue, 'month')}
           onInput={(e: Event) => changeHandler(dateType, 'month', e)}
@@ -448,7 +448,7 @@ export class AppointmentDetail {
 
         <md-outlined-select
           required={true}
-          label={`${prefix} Year`}
+          label={labels[2]}
           class="min-w-0 flex-1"
           value={getDatePart(dateValue, 'year')}
           onInput={(e: Event) => changeHandler(dateType, 'year', e)}
@@ -806,12 +806,14 @@ export class AppointmentDetail {
 
                   {this.renderDateSelects(
                     'start',
+                    ["Day", "Month", "Year"],
                     this.editingPrescriptionNewStart,
                     this.handleUpdatePrescriptionDateChange,
                   )}
 
                   {this.renderDateSelects(
                     'end',
+                    ["Day", "Month", "Year"],
                     this.editingPrescriptionNewEnd,
                     this.handleUpdatePrescriptionDateChange,
                   )}
@@ -866,12 +868,14 @@ export class AppointmentDetail {
 
                   {this.renderDateSelects(
                     'start',
+                    ["Day", "Month", "Year"],
                     this.addingPrescriptionStart,
                     this.handleAddPrescriptionDateChange,
                   )}
 
                   {this.renderDateSelects(
                     'end',
+                    ["Day", "Month", "Year"],
                     this.addingPrescriptionEnd,
                     this.handleAddPrescriptionDateChange,
                   )}
@@ -955,6 +959,7 @@ export class AppointmentDetail {
             <div class="mb-3 flex w-full flex-col gap-y-3">
               {this.renderDateSelects(
                 'start',
+                ["Day", "Month", "Year"],
                 this.reschedulingAppointmentDate,
                 (type: 'start' | 'end', part: 'day' | 'month' | 'year', event: Event) => {
                   const value: number = parseInt((event.target as HTMLSelectElement).value, 10);

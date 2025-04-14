@@ -145,6 +145,7 @@ export class Register {
               )
             )}
 
+            {/* TODO kili: change to radio button or full width switch with labels */}
             <div class="mb-6 flex max-w-md min-w-md flex-row items-center justify-center gap-x-3">
               <label htmlFor="doctor-switch" class="font-medium text-gray-600">
                 {this.isDoctor ? "I'm a doctor" : "I'm a patient"}

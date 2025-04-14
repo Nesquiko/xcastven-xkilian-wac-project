@@ -12,13 +12,15 @@ export class AppointmentsList {
   @Prop() appointments: Array<AppointmentDisplay>;
   @Prop() handleSelectAppointment: (appointment: AppointmentDisplay) => void;
   @Prop() noDataMessage: string;
-  @Prop() currentDate: Date;
+  @Prop() selectedDate: Date;
+  @Prop() setSelectedDate: (date: Date) => void;
 
   private handleScheduleAppointmentFromDate = () => {
-    const year: number = this.currentDate.getFullYear();
-    const month: number = this.currentDate.getMonth() + 1;
-    const day: number = this.currentDate.getDate();
+    const year: number = this.selectedDate.getFullYear();
+    const month: number = this.selectedDate.getMonth() + 1;
+    const day: number = this.selectedDate.getDate();
     const date = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
     window.navigation.navigate(`scheduleAppointment?date=${date}`);
   };
 
@@ -61,36 +63,18 @@ export class AppointmentsList {
           </div>
         )}
 
-        <div class="flex h-12 w-full flex-row items-center justify-between">
-          <md-icon-button
-            title="View older appointments"
-            class="m-1"
-            onClick={() => {
-              // TODO kili, like in the conditions
-              console.log('view older appointments clicked');
-            }}
-          >
-            <md-icon class="text-gray-600">arrow_back</md-icon>
-          </md-icon-button>
-          <md-icon-button
-            title="Schedule an appointment"
-            class="m-1 w-20"
-            onClick={this.handleScheduleAppointmentFromDate}
-            disabled={this.currentDate < TODAY}
-          >
-            <md-icon class="text-gray-600">calendar_month</md-icon>
-            <md-icon class="text-gray-600">add</md-icon>
-          </md-icon-button>
-          <md-icon-button
-            title="View newer appointments"
-            class="m-1"
-            onClick={() => {
-              // TODO kili, like in the conditions
-              console.log('view newer appointments clicked');
-            }}
-          >
-            <md-icon class="text-gray-600">arrow_forward</md-icon>
-          </md-icon-button>
+        <div class="flex h-12 w-full flex-row items-center justify-center">
+          {!this.isDoctor && (
+            <md-icon-button
+              title="Schedule an appointment"
+              class="m-1 w-20"
+              onClick={this.handleScheduleAppointmentFromDate}
+              disabled={this.selectedDate < TODAY}
+            >
+              <md-icon class="text-gray-600">calendar_month</md-icon>
+              <md-icon class="text-gray-600">add</md-icon>
+            </md-icon-button>
+          )}
         </div>
       </div>
     );

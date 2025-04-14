@@ -9,25 +9,18 @@ import { Component, h, Prop, State } from '@stencil/core';
 export class ConditionsList {
   @Prop() conditions: Array<ConditionDisplay>;
   @Prop() handleSelectCondition: (condition: ConditionDisplay) => void;
-  @Prop({ mutable: true }) currentDate: Date;
+  @Prop() selectedDate: Date;
+  @Prop() setSelectedDate: (date: Date) => void;
 
   @State() expandedConditionId: string = null;
 
   private handleRegisterConditionFromDate = () => {
-    const year: number = this.currentDate.getFullYear();
-    const month: number = this.currentDate.getMonth() + 1;
-    const day: number = this.currentDate.getDate();
+    const year: number = this.selectedDate.getFullYear();
+    const month: number = this.selectedDate.getMonth() + 1;
+    const day: number = this.selectedDate.getDate();
     const start = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-    window.navigation.navigate(`registerCondition?start=${start}`);
-  };
 
-  private changeCurrentDate = async (delta: 1 | -1) => {
-    // TODO kili fix this
-    this.currentDate = new Date(
-      this.currentDate.getFullYear(),
-      this.currentDate.getMonth(),
-      this.currentDate.getDate() + delta,
-    );
+    window.navigation.navigate(`registerCondition?start=${start}`);
   };
 
   render() {
@@ -86,33 +79,15 @@ export class ConditionsList {
           </div>
         )}
 
-        <div class="flex h-12 w-full flex-row items-center justify-between">
-          <md-icon-button
-            title="View older conditions"
-            class="m-1"
-            onClick={() => {
-              this.changeCurrentDate(-1);
-            }}
-          >
-            <md-icon class="text-gray-600">arrow_back</md-icon>
-          </md-icon-button>
+        <div class="flex h-12 w-full flex-row items-center justify-center">
           <md-icon-button
             title="Register a condition"
             class="m-1 w-20"
             onClick={this.handleRegisterConditionFromDate}
-            disabled={this.currentDate > TODAY}
+            disabled={this.selectedDate > TODAY}
           >
             <md-icon class="text-gray-600">coronavirus</md-icon>
             <md-icon class="text-gray-600">add</md-icon>
-          </md-icon-button>
-          <md-icon-button
-            title="View newer conditions"
-            class="m-1"
-            onClick={() => {
-              this.changeCurrentDate(1);
-            }}
-          >
-            <md-icon class="text-gray-600">arrow_forward</md-icon>
           </md-icon-button>
         </div>
       </div>

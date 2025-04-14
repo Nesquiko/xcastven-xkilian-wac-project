@@ -11,54 +11,73 @@ type MenuButton = {
   shadow: false,
 })
 export class Menu {
+  @Prop() isDoctor: boolean;
   @Prop() isMenuOpen: boolean;
   @Prop() handleResetMenu: () => void;
 
-  private menuButtons: Array<MenuButton> = [
-    {
-      title: "Home",
-      icon: "home",
-      onClick: () => {
-        this.handleResetMenu();
-        window.navigation.navigate("homepage");
-      },
+  private homeButton: MenuButton = {
+    title: "Home",
+    icon: "home",
+    onClick: () => {
+      this.handleResetMenu();
+      window.navigation.navigate("homepage");
     },
-    {
-      title: "Schedule an appointment",
-      icon: "event",
-      onClick: () => {
-        this.handleResetMenu();
-        window.navigation.navigate("scheduleAppointment");
-      },
+  };
+
+  private scheduleAppointmentButton: MenuButton = {
+    title: "Schedule an appointment",
+    icon: "event",
+    onClick: () => {
+      this.handleResetMenu();
+      window.navigation.navigate("scheduleAppointment");
     },
-    {
-      title: "Register a condition",
-      icon: "coronavirus",
-      onClick: () => {
-        this.handleResetMenu();
-        window.navigation.navigate("registerCondition");
-      },
+  };
+
+  private registerConditionButton: MenuButton = {
+    title: "Register a condition",
+    icon: "coronavirus",
+    onClick: () => {
+      this.handleResetMenu();
+      window.navigation.navigate("registerCondition");
     },
-    {
-      title: "Account",
-      icon: "account_circle",
-      onClick: () => {
-        this.handleResetMenu();
-        window.navigation.navigate("account");
-      },
+  };
+
+  private accountButton: MenuButton = {
+    title: "Account",
+    icon: "account_circle",
+    onClick: () => {
+      this.handleResetMenu();
+      window.navigation.navigate("account");
     },
-    {
-      title: "Logout",
-      icon: "logout",
-      onClick: () => {
-        this.handleResetMenu();
-        sessionStorage.setItem("user", null);
-        window.navigation.navigate("login");
-      },
+  };
+
+  private logoutButton: MenuButton = {
+    title: "Logout",
+    icon: "logout",
+    onClick: () => {
+      this.handleResetMenu();
+      sessionStorage.setItem("user", null);
+      window.navigation.navigate("login");
     },
+  };
+
+  private patientMenuButtons: Array<MenuButton> = [
+    this.homeButton,
+    this.scheduleAppointmentButton,
+    this.registerConditionButton,
+    this.accountButton,
+    this.logoutButton,
+  ] satisfies Array<MenuButton>;
+
+  private doctorMenuButtons: Array<MenuButton> = [
+    this.homeButton,
+    this.accountButton,
+    this.logoutButton,
   ] satisfies Array<MenuButton>;
 
   render() {
+    const menuButtons: Array<MenuButton> = this.isDoctor ? this.doctorMenuButtons : this.patientMenuButtons;
+
     return (
       <div
         class={`fixed top-0 left-0 z-100 h-full max-w-xs min-w-xs transform bg-white shadow-lg transition-transform duration-300 ${
@@ -71,7 +90,7 @@ export class Menu {
             Menu
           </h2>
           <div class="flex w-full flex-col items-center justify-center p-3">
-            {this.menuButtons.map((menuButton: MenuButton) => (
+            {menuButtons.map((menuButton: MenuButton) => (
               <div
                 role="button"
                 class="cursor-pointer rounded-full px-4 py-3 w-full flex flex-row items-center justify-between border-2 border-transparent hover:border-[#d8c7ed]"

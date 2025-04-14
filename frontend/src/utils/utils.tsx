@@ -309,4 +309,13 @@ export const getDatePart = (
     case 'year':
       return date.getFullYear();
   }
-}
+};
+
+export const changeSelectedDate = (
+  date: Date,
+  updateDate: (date: Date) => void,
+  delta: 1 | -1
+) => {
+  const newDate: Date = new Date(date.getFullYear(), date.getMonth(), date.getDate() + delta);
+  updateDate(newDate);
+};

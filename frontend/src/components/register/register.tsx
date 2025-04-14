@@ -3,8 +3,8 @@ import { Api } from '../../api/api';
 import { Registration, SpecializationEnum } from '../../api/generated';
 import { formatSpecialization } from '../../utils/utils';
 import { StyledHost } from '../StyledHost';
-import { Component, h, Prop, State } from '@stencil/core';
 import { toastService } from '../services/toast-service';
+import { Component, h, Prop, State } from '@stencil/core';
 
 @Component({
   tag: 'xcastven-xkilian-project-register',
@@ -98,7 +98,7 @@ export class Register {
       window.navigation.navigate('login');
     } catch (err) {
       if (!(err instanceof ApiError)) {
-        toastService.showError(err);
+        toastService.showError('Unknown server error');
         return;
       }
       toastService.showError(err.message);

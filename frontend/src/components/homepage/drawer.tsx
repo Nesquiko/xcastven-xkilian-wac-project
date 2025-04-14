@@ -3,12 +3,14 @@ import {
   AppointmentDisplay,
   AppointmentStatus,
   Condition,
-  ConditionDisplay, Doctor,
+  ConditionDisplay,
+  Doctor,
   DoctorAppointment,
   Equipment,
   Facility,
   Medicine,
-  PatientAppointment, Prescription,
+  PatientAppointment,
+  Prescription,
   PrescriptionDisplay,
   User,
 } from '../../api/generated';
@@ -25,7 +27,7 @@ export class Drawer {
   @Prop() isDoctor: boolean;
 
   @Prop() isDrawerOpen: boolean;
-  @Prop() selectedDate: Date;
+  @Prop({ mutable: true }) selectedDate: Date;
   @Prop() selectedAppointment: AppointmentDisplay;
   @Prop() selectedCondition: ConditionDisplay;
   @Prop() selectedPrescription: PrescriptionDisplay;
@@ -234,6 +236,7 @@ export class Drawer {
             />
           ) : this.selectedPrescription ? (
             <xcastven-xkilian-project-prescription-detail
+              api={this.api}
               prescriptionId={this.selectedPrescription.id}
               handleResetSelection={this.handleResetSelection}
             />

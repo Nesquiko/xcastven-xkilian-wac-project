@@ -2,8 +2,8 @@ import { Api, ApiError } from '../../api/api';
 import { NewCondition } from '../../api/generated';
 import { User } from '../../components';
 import { DAYS_OF_WEEK, formatDate, formatDateDelta, MONTHS, TODAY } from '../../utils/utils';
-import { Component, h, Prop, State } from '@stencil/core';
 import { toastService } from '../services/toast-service';
+import { Component, h, Prop, State } from '@stencil/core';
 
 @Component({
   tag: 'xcastven-xkilian-project-condition-registerer',
@@ -201,7 +201,7 @@ export class ConditionRegisterer {
       window.navigation.navigate('/homepage');
     } catch (err) {
       if (!(err instanceof ApiError)) {
-        toastService.showError(err);
+        toastService.showError('Unknown server error');
         return;
       }
       toastService.showError(err.message);
@@ -268,7 +268,9 @@ export class ConditionRegisterer {
 
               <div class="mb-3 grid grid-cols-7 gap-1">
                 {DAYS_OF_WEEK.map(day => (
-                  <div class="px-3 py-2 text-center text-sm font-medium text-gray-600">{day.short}</div>
+                  <div class="px-3 py-2 text-center text-sm font-medium text-gray-600">
+                    {day.short}
+                  </div>
                 ))}
                 {this.renderCalendar()}
               </div>

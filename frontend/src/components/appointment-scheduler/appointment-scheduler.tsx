@@ -1,4 +1,4 @@
-import { Api } from '../../api/api';
+import { Api, ApiError } from '../../api/api';
 import {
   AppointmentType,
   ConditionDisplay,
@@ -12,10 +12,12 @@ import { AppointmentTimesExample } from '../../data-examples/appointment-times';
 import { AvailableDoctorsExample } from '../../data-examples/available-doctors';
 import {
   formatAppointmentType,
-  formatDate, formatSpecialization,
+  formatDate,
+  formatSpecialization,
   getSelectedDateTimeObject,
   TODAY,
 } from '../../utils/utils';
+import { toastService } from '../services/toast-service';
 import { Component, h, Prop, State } from '@stencil/core';
 
 @Component({
@@ -74,7 +76,7 @@ export class AppointmentScheduler {
     this.appointmentReason = (event.target as HTMLTextAreaElement).value;
   };
 
-  private handleScheduleAppointment = () => {
+  private handleScheduleAppointment = async () => {
     const appointmentDateTime: Date = getSelectedDateTimeObject(
       this.selectedDate,
       this.selectedTime,
@@ -89,21 +91,17 @@ export class AppointmentScheduler {
       doctorId: this.selectedDoctor.id,
     };
 
-    // on success:
-    // window.navigation.navigate("homepage");
-
-    console.log('Request to schedule an appointment:', newAppointment);
-    // TODO luky just call this
-    // this.api.appointments.requestAppointment({
-    //   newAppointmentRequest: {
-    //     patientId: this.user.id,
-    //     doctorId: this.selectedDoctor,
-    //     // appointmentDateTime: ???
-    //     type: this.selectedAppointmentType,
-    //     reason: this.appointmentReason,
-    //   },
-    // });
-    //
+    try {
+      // TODO luky test this
+      await this.api.appointments.requestAppointment({ newAppointmentRequest: newAppointment });
+      window.navigation.navigate('homepage');
+    } catch (err) {
+      if (!(err instanceof ApiError)) {
+        toastService.showError('Unknown server error');
+        return;
+      }
+      toastService.showError(err.message);
+    }
   };
 
   /*private resetSelection = () => {
@@ -149,7 +147,8 @@ export class AppointmentScheduler {
                 {this.availableDoctors.map((doctor: Doctor) => (
                   <md-select-option value={doctor.id}>
                     <div slot="headline">
-                      Dr. {doctor.firstName} {doctor.lastName} - {formatSpecialization(doctor.specialization)}
+                      Dr. {doctor.firstName} {doctor.lastName} -{' '}
+                      {formatSpecialization(doctor.specialization)}
                     </div>
                   </md-select-option>
                 ))}
@@ -162,9 +161,7 @@ export class AppointmentScheduler {
             <div
               class={`m-auto flex w-full max-w-lg transform animate-[slideInFromBottom_0.5s_ease-out] flex-col justify-center p-6 opacity-100 transition-all duration-500 ease-in-out md:w-1/2 md:animate-[slideInFromRight_0.5s_ease-out]`}
             >
-              <div class="mb-6 text-[#7357be] font-medium">
-                {formatDate(this.selectedDate)}
-              </div>
+              <div class="mb-6 font-medium text-[#7357be]">{formatDate(this.selectedDate)}</div>
 
               <div class="mb-6">
                 <md-filled-select

@@ -9,7 +9,7 @@ import { Component, h, Prop, State } from '@stencil/core';
 export class ConditionsList {
   @Prop() conditions: Array<ConditionDisplay>;
   @Prop() handleSelectCondition: (condition: ConditionDisplay) => void;
-  @Prop() currentDate: Date;
+  @Prop({ mutable: true }) currentDate: Date;
 
   @State() expandedConditionId: string = null;
 
@@ -19,6 +19,15 @@ export class ConditionsList {
     const day: number = this.currentDate.getDate();
     const start = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
     window.navigation.navigate(`registerCondition?start=${start}`);
+  };
+
+  private changeCurrentDate = async (delta: 1 | -1) => {
+    // TODO kili fix this
+    this.currentDate = new Date(
+      this.currentDate.getFullYear(),
+      this.currentDate.getMonth(),
+      this.currentDate.getDate() + delta,
+    );
   };
 
   render() {
@@ -82,8 +91,7 @@ export class ConditionsList {
             title="View older conditions"
             class="m-1"
             onClick={() => {
-              // TODO luky handle with /patients/{patientId}/calendar with from and to the same date and take only conditions
-              console.log('view older conditions clicked');
+              this.changeCurrentDate(-1);
             }}
           >
             <md-icon class="text-gray-600">arrow_back</md-icon>
@@ -101,8 +109,7 @@ export class ConditionsList {
             title="View newer conditions"
             class="m-1"
             onClick={() => {
-              // TODO luky handle with /patients/{patientId}/calendar with from and to the same date and take only conditions
-              console.log('view newer conditions clicked');
+              this.changeCurrentDate(1);
             }}
           >
             <md-icon class="text-gray-600">arrow_forward</md-icon>

@@ -1,5 +1,5 @@
+import { Api, ApiError } from '../../api/api';
 import { Prescription } from '../../api/generated';
-import { PrescriptionDetailExample } from '../../data-examples/prescription-detail';
 import { formatDate, formatDateDelta } from '../../utils/utils';
 import { Component, Prop, State, h } from '@stencil/core';
 
@@ -8,10 +8,26 @@ import { Component, Prop, State, h } from '@stencil/core';
   shadow: false,
 })
 export class PrescriptionDetail {
+  @Prop() api: Api;
   @Prop() prescriptionId: string;
   @Prop() handleResetSelection: () => void;
 
-  @State() prescription: Prescription = PrescriptionDetailExample;
+  @State() prescription: Prescription;
+
+  async componentWillLoad() {
+    try {
+      this.prescription = await this.api.medicalHistory.prescriptionDetail({
+        prescriptionId: this.prescriptionId,
+      });
+    } catch (err) {
+      console.log(err);
+      if (!(err instanceof ApiError)) {
+        // TODO kili handle generic non server error
+        return;
+      }
+      // TODO kili handle server failed error
+    }
+  }
 
   render() {
     return (

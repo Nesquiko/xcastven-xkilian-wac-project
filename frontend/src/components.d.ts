@@ -205,6 +205,7 @@ export namespace Components {
         "isMenuOpen": boolean;
     }
     interface XcastvenXkilianProjectPrescriptionDetail {
+        "api": Api;
         "handleResetSelection": () => void;
         "prescriptionId": string;
     }
@@ -565,6 +566,7 @@ declare namespace LocalJSX {
         "isMenuOpen"?: boolean;
     }
     interface XcastvenXkilianProjectPrescriptionDetail {
+        "api"?: Api;
         "handleResetSelection"?: () => void;
         "prescriptionId"?: string;
     }

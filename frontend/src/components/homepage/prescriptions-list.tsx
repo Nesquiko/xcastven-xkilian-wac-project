@@ -68,7 +68,7 @@ export class PrescriptionsList {
             title="View older prescriptions"
             class="m-1"
             onClick={() => {
-              // TODO luky handle with /patients/{patientId}/calendar with from and to the same date and take only prescriptions
+              // TODO kili, like in the conditions
               console.log('view older prescriptions clicked');
             }}
           >
@@ -78,7 +78,7 @@ export class PrescriptionsList {
             title="View newer prescriptions"
             class="m-1"
             onClick={() => {
-              // TODO luky handle with /patients/{patientId}/calendar with from and to the same date and take only prescriptions
+              // TODO kili, like in the conditions
               console.log('view newer prescriptions clicked');
             }}
           >

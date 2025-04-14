@@ -21,6 +21,7 @@ import {
   getPatientAppointmentActions, months, updateDatePart, years,
 } from '../../utils/utils';
 import { Component, h, Prop, State } from '@stencil/core';
+import { toastService } from '../services/toast-service';
 
 @Component({
   tag: 'xcastven-xkilian-project-appointment-detail',
@@ -86,14 +87,14 @@ export class AppointmentDetail {
   async componentWillLoad() {
     try {
       if (this.isDoctor) {
-        const appt = await this.api.appointments.doctorsAppointment({
+        const appointment: DoctorAppointment = await this.api.appointments.doctorsAppointment({
           doctorId: this.user.id,
           appointmentId: this.appointmentId,
         });
-        this.appointment = appt;
-        this.selectedEquipment = appt.equipment?.[0] ?? null;
-        this.selectedFacility = appt.facilities?.[0] ?? null;
-        this.selectedMedicine = appt.medicine?.[0] ?? null;
+        this.appointment = appointment;
+        this.selectedEquipment = appointment.equipment?.[0] ?? null;
+        this.selectedFacility = appointment.facilities?.[0] ?? null;
+        this.selectedMedicine = appointment.medicine?.[0] ?? null;
       } else {
         this.appointment = await this.api.appointments.patientsAppointment({
           patientId: this.user.id,
@@ -102,13 +103,10 @@ export class AppointmentDetail {
       }
     } catch (err) {
       if (!(err instanceof ApiError)) {
-        // TODO kili some generic error
-        console.log("Generic error:", err);
+        toastService.showError(err);
         return;
       }
-
-      // TODO kili some internal server error, i think there is no other error I'm returing
-      console.log("ApiError:", err);
+      toastService.showError(err.message);
     }
   }
 
@@ -460,6 +458,19 @@ export class AppointmentDetail {
             )}
           </div>
         )}
+
+        {/* TODO luky: when denied, there is no reason in appt type for denyReason */}
+        {/*this.appointment.status === 'denied' && (
+          <div class="mb-6 max-h-32 w-full max-w-md overflow-y-auto rounded-md bg-gray-200 px-4 py-3">
+            <div class="flex flex-row items-center gap-x-2 text-gray-500">
+              <md-icon style={{ fontSize: '16px' }}>description</md-icon>
+              Cancellation reason
+            </div>
+            {this.appointment && (
+              <p class="mt-1 ml-1 text-sm font-medium text-wrap text-gray-600">{this.appointment.cancellationReason}</p>
+            )}
+          </div>
+        )*/}
 
         {this.isDoctor && instanceOfDoctorAppointment(this.appointment) && (
           <div class="relative mb-6 w-full max-w-md rounded-md bg-gray-200 px-4 py-3">

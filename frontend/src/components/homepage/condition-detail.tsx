@@ -2,6 +2,7 @@ import { Api, ApiError } from '../../api/api';
 import { AppointmentDisplay, Condition } from '../../api/generated';
 import { formatDate, formatDateDelta, getDateAndTimeTitle } from '../../utils/utils';
 import { Component, h, Prop, State } from '@stencil/core';
+import { toastService } from '../services/toast-service';
 
 @Component({
   tag: 'xcastven-xkilian-project-condition-detail',
@@ -23,14 +24,10 @@ export class ConditionDetail {
       this.condition = await this.api.conditions.conditionDetail({ conditionId: this.conditionId });
     } catch (err) {
       if (!(err instanceof ApiError)) {
-        // TODO kili some generic error
-        console.log("Generic error:", err);
+        toastService.showError(err);
         return;
       }
-
-      // TODO this should only return 404 and internal server error, but dont handle the 404, it came in the calendar, so it must be there
-      console.log("ApiError:", err);
-      console.log("404? or 500");
+      toastService.showError(err.message);
     }
   }
 

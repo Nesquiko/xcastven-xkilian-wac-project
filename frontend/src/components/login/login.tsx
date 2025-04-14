@@ -2,6 +2,7 @@ import { Api, ApiError } from '../../api/api';
 import { User, UserRole } from '../../api/generated';
 import { StyledHost } from '../StyledHost';
 import { Component, h, Prop, State } from '@stencil/core';
+import { toastService } from '../services/toast-service';
 
 @Component({
   tag: 'xcastven-xkilian-project-login',
@@ -42,28 +43,16 @@ export class Login {
       window.navigation.navigate('homepage');
     } catch (err) {
       if (!(err instanceof ApiError)) {
-        // TODO kili some generic error
+        toastService.showError(err);
         return;
       }
-
-      if (err.errDetail.status === 404) {
-        this.emailError = 'Email not found';
-        return;
-      }
+      toastService.showError(err.message);
     }
   };
 
   render() {
     return (
       <StyledHost class="flex h-screen w-full flex-row items-center justify-center overflow-hidden bg-gray-300">
-        <div class="hidden h-full w-1/3 md:block">
-          <img
-            src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExa2s0aXUxZnRjeGUyZXZwYnk0N3M4ZHM0dDY4eWdrYmQ5a2VvcnFpdiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/7Y8heHVtaDehy/giphy.gif"
-            alt="Doctor Left"
-            class="h-full w-full object-cover"
-          />
-        </div>
-
         <div class="mx-6 w-full max-w-md rounded-md bg-white shadow-lg md:mx-0">
           <h1 class="mb-3 w-full rounded-t-lg bg-[#7357be] px-4 py-3 text-center text-2xl">
             <span class="font-normal text-gray-200">Login at </span>
@@ -107,14 +96,6 @@ export class Login {
               </md-filled-button>
             </div>
           </div>
-        </div>
-
-        <div class="hidden h-full w-1/3 md:block">
-          <img
-            src="https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExaHMzcm1idnlmZGd4Zzc3NngwZzk0eTRlbmJ5OHFmMDNwaHllZmd5cCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9cw/3ov9k3cUEZ7ZlOHQpW/giphy.gif"
-            alt="Doctor Right"
-            class="h-full w-full object-cover"
-          />
         </div>
       </StyledHost>
     );

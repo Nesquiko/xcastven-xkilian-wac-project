@@ -4,17 +4,18 @@ import {
   AppointmentStatus,
   Condition,
   ConditionDisplay, Doctor,
-  DoctorAppointment,
+  DoctorAppointment, DoctorCalendar,
   Equipment,
   Facility,
   Medicine,
-  PatientAppointment, Prescription,
+  PatientAppointment, PatientsCalendar, Prescription,
   PrescriptionDisplay,
   User,
 } from '../../api/generated';
 import { TODAY } from '../../utils/utils';
 import { StyledHost } from '../StyledHost';
 import { Component, h, State } from '@stencil/core';
+import { toastService } from '../services/toast-service';
 
 @Component({
   tag: 'xcastven-xkilian-project-home-page',
@@ -57,14 +58,14 @@ export class Homepage {
 
     try {
       if (this.isDoctor) {
-        const calendar = await this.api.doctors.doctorsCalendar({
+        const calendar: DoctorCalendar = await this.api.doctors.doctorsCalendar({
           doctorId: this.user.id,
           from: fromDate,
           to: toDate,
         });
         this.appointments = calendar.appointments ?? [];
       } else {
-        const calendar = await this.api.patients.patientsCalendar({
+        const calendar: PatientsCalendar = await this.api.patients.patientsCalendar({
           patientId: this.user.id,
           from: fromDate,
           to: toDate,
@@ -75,14 +76,12 @@ export class Homepage {
       }
     } catch (err) {
       if (!(err instanceof ApiError)) {
-        // TODO kili some generic error
-        console.log("Generic error:", err);
+        toastService.showError(err);
         return;
       }
 
-      // TODO kili some internal server error, i think there is no other error I'm returing
       if (err.errDetail.status === 500) {
-        console.log("ApiError:", err);
+        toastService.showError(err.message);
       }
     }
   }
@@ -137,19 +136,16 @@ export class Homepage {
       await this.api.appointments.rescheduleAppointment({
         appointmentId: appointment.id,
         appointmentReschedule: {
-          // TODO kili I don't know if the appointment has rescheduled appointmentDateTime, if yes, then delete this commend, otherwise get it here
-          newAppointmentDateTime: appointment.appointmentDateTime,
-          // TODO kili there can be reason
-          reason: 'TODO kili reason',
+          newAppointmentDateTime: newAppointmentDateTime,
+          reason: reason,
         },
       });
     } catch (err) {
       if (!(err instanceof ApiError)) {
-        // TODO kili some generic error
-        console.log("Generic error:", err);
+        toastService.showError(err);
         return;
       }
-      // TODO kili 409 when the doctor is unavailable in rescheduled time and internal server error, i think there is no other error I'm returing
+      toastService.showError(err.message);
     }
   };
 
@@ -165,12 +161,10 @@ export class Homepage {
       // TODO kili this doesn't return anything, it is up to you how will you change the appointment status
     } catch (err) {
       if (!(err instanceof ApiError)) {
-        // TODO kili some generic error
-        console.log("Generic error:", err);
+        toastService.showError(err);
         return;
       }
-      // TODO kili some internal server error, i think there is no other error I'm returing
-      console.log("ApiError:", err);
+      toastService.showError(err.message);
     }
   };
 
@@ -185,16 +179,17 @@ export class Homepage {
       console.log("update state");
     } catch (err) {
       if (!(err instanceof ApiError)) {
-        // TODO kili some generic error
-        console.log("Generic error:", err);
+        toastService.showError(err);
         return;
       }
-      // TODO kili handle 409 conflict if resources are unavailable, or internal server error, i think there is no other error I'm returing
-      console.log("ApiError:", err);
+      toastService.showError(err.message);
     }
   };
 
-  private handleDenyAppointment = async (appointment: PatientAppointment | DoctorAppointment) => {
+  private handleDenyAppointment = async (
+    appointment: PatientAppointment | DoctorAppointment,
+    // reason: string,
+  ) => {
     // TODO kili when denying an appointment there can be reason
     try {
       await this.api.appointments.decideAppointment({
@@ -205,12 +200,10 @@ export class Homepage {
       console.log("update state");
     } catch (err) {
       if (!(err instanceof ApiError)) {
-        // TODO kili some generic error
-        console.log("Generic error:", err);
+        toastService.showError(err);
         return;
       }
-      // TODO kili some internal server error, i think there is no other error I'm returing
-      console.log("ApiError:", err);
+      toastService.showError(err.message);
     }
   };
 
@@ -229,7 +222,6 @@ export class Homepage {
     appointment: PatientAppointment | DoctorAppointment,
     prescriptionId: string,
     updatedPrescription: PrescriptionDisplay,
-    /* TODO: type Prescription */
   ) => {
     console.log(
       'Update prescription with ID:',

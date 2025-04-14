@@ -3,6 +3,7 @@ import { NewCondition } from '../../api/generated';
 import { User } from '../../components';
 import { DAYS_OF_WEEK, formatDate, formatDateDelta, MONTHS, TODAY } from '../../utils/utils';
 import { Component, h, Prop, State } from '@stencil/core';
+import { toastService } from '../services/toast-service';
 
 @Component({
   tag: 'xcastven-xkilian-project-condition-registerer',
@@ -81,7 +82,7 @@ export class ConditionRegisterer {
     const daysInPrevMonth = this.getDaysInMonth(year, month - 1);
     for (let i = firstDayOfMonth - 1; i >= 0; i--) {
       prevMonthDays.unshift(
-        <div class="p-3 text-center text-sm text-gray-400">{daysInPrevMonth - i}</div>,
+        <div class="px-3 py-2 text-center text-sm text-gray-400">{daysInPrevMonth - i}</div>,
       );
     }
 
@@ -114,7 +115,7 @@ export class ConditionRegisterer {
 
       currentMonthDays.push(
         <div
-          class={`rounded-md p-3 text-center text-sm ${
+          class={`rounded-md px-3 py-2 text-center text-sm ${
             isSelectedStart || isSelectedEnd
               ? 'bg-[#7357be] text-white'
               : this.isOngoing && !isPastDate && this.selectedStart < currentDate
@@ -139,7 +140,7 @@ export class ConditionRegisterer {
     const totalCells = 42;
     const remainingCells = totalCells - (prevMonthDays.length + currentMonthDays.length);
     for (let i = 1; i <= remainingCells; i++) {
-      nextMonthDays.push(<div class="p-3 text-center text-sm text-gray-400">{i}</div>);
+      nextMonthDays.push(<div class="px-3 py-2 text-center text-sm text-gray-400">{i}</div>);
     }
 
     return [...prevMonthDays, ...currentMonthDays, ...nextMonthDays];
@@ -200,11 +201,10 @@ export class ConditionRegisterer {
       window.navigation.navigate('/homepage');
     } catch (err) {
       if (!(err instanceof ApiError)) {
-        // TODO kili some generic error
+        toastService.showError(err);
         return;
       }
-
-      // TODO kili some internal server error, i think there is no other error I'm returing
+      toastService.showError(err.message);
     }
   };
 
@@ -234,7 +234,6 @@ export class ConditionRegisterer {
 
     return (
       <div class="flex h-screen w-full flex-1 flex-col overflow-auto">
-        {/* Header */}
         <xcastven-xkilian-project-header type="registerCondition" />
 
         {/* Content */}
@@ -243,14 +242,6 @@ export class ConditionRegisterer {
           <div
             class={`flex flex-col items-center justify-center bg-gray-300 p-6 transition-all duration-600 ease-in-out ${showDetails ? 'w-full md:w-1/2' : 'w-full'}`}
           >
-            <h2 class="mb-3 w-full text-center font-medium text-gray-600">
-              {!this.selectedStart
-                ? 'Select the day your condition started:'
-                : this.selectedStart &&
-                  (!this.selectedEnd || !this.isOngoing) &&
-                  'Select the day your condition ended, if it ended:'}
-            </h2>
-
             <div class="mb-6 w-full max-w-md rounded-lg bg-white p-4 shadow-md">
               <div class="mb-4 flex items-center justify-between">
                 <md-icon-button onClick={() => this.prevMonth()}>
@@ -277,7 +268,7 @@ export class ConditionRegisterer {
 
               <div class="mb-3 grid grid-cols-7 gap-1">
                 {DAYS_OF_WEEK.map(day => (
-                  <div class="p-3 text-center text-sm font-medium text-gray-600">{day.short}</div>
+                  <div class="px-3 py-2 text-center text-sm font-medium text-gray-600">{day.short}</div>
                 ))}
                 {this.renderCalendar()}
               </div>

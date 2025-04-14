@@ -191,6 +191,10 @@ export namespace Components {
     interface XcastvenXkilianProjectLogin {
         "api": Api;
     }
+    interface XcastvenXkilianProjectMenu {
+        "handleResetMenu": () => void;
+        "isMenuOpen": boolean;
+    }
     interface XcastvenXkilianProjectPrescriptionDetail {
         "handleResetSelection": () => void;
         "prescriptionId": string;
@@ -201,6 +205,10 @@ export namespace Components {
     }
     interface XcastvenXkilianProjectRegister {
         "api": Api;
+    }
+    interface XcastvenXkilianProjectToast {
+        "duration": number;
+        "show": (message: string, type?: "success" | "error" | "info", duration?: number) => Promise<void>;
     }
 }
 declare global {
@@ -300,6 +308,12 @@ declare global {
         prototype: HTMLXcastvenXkilianProjectLoginElement;
         new (): HTMLXcastvenXkilianProjectLoginElement;
     };
+    interface HTMLXcastvenXkilianProjectMenuElement extends Components.XcastvenXkilianProjectMenu, HTMLStencilElement {
+    }
+    var HTMLXcastvenXkilianProjectMenuElement: {
+        prototype: HTMLXcastvenXkilianProjectMenuElement;
+        new (): HTMLXcastvenXkilianProjectMenuElement;
+    };
     interface HTMLXcastvenXkilianProjectPrescriptionDetailElement extends Components.XcastvenXkilianProjectPrescriptionDetail, HTMLStencilElement {
     }
     var HTMLXcastvenXkilianProjectPrescriptionDetailElement: {
@@ -318,6 +332,12 @@ declare global {
         prototype: HTMLXcastvenXkilianProjectRegisterElement;
         new (): HTMLXcastvenXkilianProjectRegisterElement;
     };
+    interface HTMLXcastvenXkilianProjectToastElement extends Components.XcastvenXkilianProjectToast, HTMLStencilElement {
+    }
+    var HTMLXcastvenXkilianProjectToastElement: {
+        prototype: HTMLXcastvenXkilianProjectToastElement;
+        new (): HTMLXcastvenXkilianProjectToastElement;
+    };
     interface HTMLElementTagNameMap {
         "xcastven-xkilian-project-account": HTMLXcastvenXkilianProjectAccountElement;
         "xcastven-xkilian-project-app": HTMLXcastvenXkilianProjectAppElement;
@@ -335,9 +355,11 @@ declare global {
         "xcastven-xkilian-project-home-page": HTMLXcastvenXkilianProjectHomePageElement;
         "xcastven-xkilian-project-legend": HTMLXcastvenXkilianProjectLegendElement;
         "xcastven-xkilian-project-login": HTMLXcastvenXkilianProjectLoginElement;
+        "xcastven-xkilian-project-menu": HTMLXcastvenXkilianProjectMenuElement;
         "xcastven-xkilian-project-prescription-detail": HTMLXcastvenXkilianProjectPrescriptionDetailElement;
         "xcastven-xkilian-project-prescriptions-list": HTMLXcastvenXkilianProjectPrescriptionsListElement;
         "xcastven-xkilian-project-register": HTMLXcastvenXkilianProjectRegisterElement;
+        "xcastven-xkilian-project-toast": HTMLXcastvenXkilianProjectToastElement;
     }
 }
 declare namespace LocalJSX {
@@ -520,6 +542,10 @@ declare namespace LocalJSX {
     interface XcastvenXkilianProjectLogin {
         "api"?: Api;
     }
+    interface XcastvenXkilianProjectMenu {
+        "handleResetMenu"?: () => void;
+        "isMenuOpen"?: boolean;
+    }
     interface XcastvenXkilianProjectPrescriptionDetail {
         "handleResetSelection"?: () => void;
         "prescriptionId"?: string;
@@ -530,6 +556,9 @@ declare namespace LocalJSX {
     }
     interface XcastvenXkilianProjectRegister {
         "api"?: Api;
+    }
+    interface XcastvenXkilianProjectToast {
+        "duration"?: number;
     }
     interface IntrinsicElements {
         "xcastven-xkilian-project-account": XcastvenXkilianProjectAccount;
@@ -548,9 +577,11 @@ declare namespace LocalJSX {
         "xcastven-xkilian-project-home-page": XcastvenXkilianProjectHomePage;
         "xcastven-xkilian-project-legend": XcastvenXkilianProjectLegend;
         "xcastven-xkilian-project-login": XcastvenXkilianProjectLogin;
+        "xcastven-xkilian-project-menu": XcastvenXkilianProjectMenu;
         "xcastven-xkilian-project-prescription-detail": XcastvenXkilianProjectPrescriptionDetail;
         "xcastven-xkilian-project-prescriptions-list": XcastvenXkilianProjectPrescriptionsList;
         "xcastven-xkilian-project-register": XcastvenXkilianProjectRegister;
+        "xcastven-xkilian-project-toast": XcastvenXkilianProjectToast;
     }
 }
 export { LocalJSX as JSX };
@@ -573,9 +604,11 @@ declare module "@stencil/core" {
             "xcastven-xkilian-project-home-page": LocalJSX.XcastvenXkilianProjectHomePage & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectHomePageElement>;
             "xcastven-xkilian-project-legend": LocalJSX.XcastvenXkilianProjectLegend & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectLegendElement>;
             "xcastven-xkilian-project-login": LocalJSX.XcastvenXkilianProjectLogin & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectLoginElement>;
+            "xcastven-xkilian-project-menu": LocalJSX.XcastvenXkilianProjectMenu & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectMenuElement>;
             "xcastven-xkilian-project-prescription-detail": LocalJSX.XcastvenXkilianProjectPrescriptionDetail & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectPrescriptionDetailElement>;
             "xcastven-xkilian-project-prescriptions-list": LocalJSX.XcastvenXkilianProjectPrescriptionsList & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectPrescriptionsListElement>;
             "xcastven-xkilian-project-register": LocalJSX.XcastvenXkilianProjectRegister & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectRegisterElement>;
+            "xcastven-xkilian-project-toast": LocalJSX.XcastvenXkilianProjectToast & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectToastElement>;
         }
     }
 }

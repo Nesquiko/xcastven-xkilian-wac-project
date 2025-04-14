@@ -92,7 +92,6 @@ export class AppointmentScheduler {
     };
 
     console.log('Request to schedule an appointment:', newAppointment);
-    // TODO kili is selectedDoctor id? and can you, pretty please, create one date object from selectDate and selectedTime, please?
   };
 
   private resetSelection = () => {
@@ -113,30 +112,7 @@ export class AppointmentScheduler {
     return (
       <div class="flex h-screen w-full flex-1 flex-col overflow-auto">
         {/* Header */}
-        <div class="flex items-center bg-gray-800 px-3 py-1 text-white">
-          <md-icon-button
-            class="mr-2"
-            onClick={showDetails ? () => this.resetSelection() : undefined}
-          >
-            <md-icon class="text-white">{showDetails ? 'arrow_back' : 'menu'}</md-icon>
-          </md-icon-button>
-          <h1 class="flex-1 text-center text-xl font-medium">
-            {showDetails ? 'Complete your appointment' : 'Schedule an appointment'}
-            <a
-              class="ml-5 text-sm text-gray-400 hover:underline"
-              target="_blank"
-              href="https://github.com/Nesquiko/xcastven-xkilian-wac-project"
-            >
-              Link to repo
-            </a>
-          </h1>
-          <md-icon-button
-            class="mr-2"
-            onClick={showDetails ? () => this.resetSelection() : undefined}
-          >
-            <md-icon class="text-white">account_circle</md-icon>
-          </md-icon-button>
-        </div>
+        <xcastven-xkilian-project-header type="scheduleAppointment" />
 
         {/* Content */}
         <div class="mx-auto flex w-full flex-1 flex-col md:flex-row">

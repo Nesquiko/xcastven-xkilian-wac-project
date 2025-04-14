@@ -1,6 +1,5 @@
 import { MONTHS, TODAY } from '../../utils/utils';
-import { MdMenu } from '@material/web/all';
-import { Component, h, Prop } from '@stencil/core';
+import { Component, h, Prop, State } from '@stencil/core';
 
 @Component({
   tag: 'xcastven-xkilian-project-header',
@@ -14,15 +13,14 @@ export class Header {
   @Prop() handleNextMonth?: () => void;
   @Prop() handleYearChange?: (event: Event) => void;
 
-  private getMonthName = () => {
-    return MONTHS[this.currentViewMonth];
+  @State() isMenuOpen: boolean = false;
+
+  private handleToggleMenu = () => {
+    this.isMenuOpen = !this.isMenuOpen;
   };
 
-  private handleToggleHeaderMenu = () => {
-    const menu: MdMenu = document.getElementById('header-md-menu') as MdMenu;
-    if (menu) {
-      menu.open = !menu.open;
-    }
+  private getMonthName = () => {
+    return MONTHS[this.currentViewMonth];
   };
 
   private getTitle = () => {
@@ -45,34 +43,25 @@ export class Header {
       yearOptions.push(currentYear + i);
     }
 
-    if (this.type === 'calendar') {
-      return (
-        <div class="z-10 flex h-[48px] items-center bg-gray-800 px-3 py-1 text-white">
-          <span class="relative">
-            <md-icon-button id="menu-button" class="mr-2" onClick={this.handleToggleHeaderMenu}>
-              <md-icon class="text-white">menu</md-icon>
-            </md-icon-button>
+    return (
+      <div class="z-10 flex h-[48px] items-center bg-gray-800 px-3 py-1 text-white">
+        <md-icon-button id="menu-button" class="mr-2" onClick={this.handleToggleMenu}>
+          <md-icon class="text-white">menu</md-icon>
+        </md-icon-button>
 
-            <md-menu
-              id="header-md-menu"
-              anchor="menu-button"
-              style={{ position: 'absolute', zIndex: 90 }}
-            >
-              <md-menu-item>
-                <div slot="headline" class="z-90 flex w-48 flex-row items-center gap-x-2 text-sm">
-                  <md-icon style={{ fontSize: '20px' }}>calendar_month</md-icon>
-                  <span>Schedule an appointment</span>
-                </div>
-              </md-menu-item>
-              <md-menu-item>
-                <div slot="headline" class="z-90 flex w-48 flex-row items-center gap-x-2 text-sm">
-                  <md-icon style={{ fontSize: '20px' }}>coronavirus</md-icon>
-                  <span>Register a condition</span>
-                </div>
-              </md-menu-item>
-            </md-menu>
-          </span>
+        {this.isMenuOpen && (
+          <div
+            class="fixed inset-0 z-99 bg-black/50"
+            onClick={() => (this.isMenuOpen = false)}
+          />
+        )}
 
+        <xcastven-xkilian-project-menu
+          isMenuOpen={this.isMenuOpen}
+          handleResetMenu={() => (this.isMenuOpen = false)}
+        />
+
+        {this.type === "calendar" ? (
           <div class="flex flex-1 items-center justify-center gap-x-10">
             <md-icon-button onClick={this.handlePreviousMonth} title="Previous month">
               <md-icon class="text-white">chevron_left</md-icon>
@@ -99,47 +88,14 @@ export class Header {
               <md-icon class="text-white">chevron_right</md-icon>
             </md-icon-button>
           </div>
-
-          <md-icon-button onClick={() => window.navigation.navigate('account')}>
-            <md-icon class="text-white">account_circle</md-icon>
-          </md-icon-button>
-        </div>
-      );
-    } else {
-      return (
-        <div class="z-10 flex h-[48px] items-center bg-gray-800 px-3 py-1 text-white">
-          <span class="relative">
-            <md-icon-button id="menu-button" class="mr-2" onClick={this.handleToggleHeaderMenu}>
-              <md-icon class="text-white">menu</md-icon>
-            </md-icon-button>
-
-            <md-menu
-              id="header-md-menu"
-              anchor="menu-button"
-              style={{ position: 'absolute', zIndex: 90 }}
-            >
-              <md-menu-item>
-                <div slot="headline" class="z-90 flex w-48 flex-row items-center gap-x-2 text-sm">
-                  <md-icon style={{ fontSize: '20px' }}>calendar_month</md-icon>
-                  <span>Schedule an appointment</span>
-                </div>
-              </md-menu-item>
-              <md-menu-item>
-                <div slot="headline" class="z-90 flex w-48 flex-row items-center gap-x-2 text-sm">
-                  <md-icon style={{ fontSize: '20px' }}>coronavirus</md-icon>
-                  <span>Register a condition</span>
-                </div>
-              </md-menu-item>
-            </md-menu>
-          </span>
-
+        ) : (
           <h1 class="w-full text-center text-xl font-medium text-white">{this.getTitle()}</h1>
+        )}
 
-          <md-icon-button onClick={() => window.navigation.navigate('account')}>
-            <md-icon class="text-white">account_circle</md-icon>
-          </md-icon-button>
-        </div>
-      );
-    }
-  }
+        <md-icon-button onClick={() => window.navigation.navigate('account')}>
+        <md-icon class="text-white">account_circle</md-icon>
+        </md-icon-button>
+      </div>
+    );
+  };
 }

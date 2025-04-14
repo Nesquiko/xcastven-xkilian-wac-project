@@ -87,3 +87,16 @@ func (a monolithApp) DoctorsCalendar(
 
 	return calendar, nil
 }
+
+func (a monolithApp) AvailableDoctors(
+	ctx context.Context,
+	dateTime time.Time,
+) ([]api.Doctor, error) {
+	availableDataDoctors, err := a.db.AvailableDoctors(ctx, dateTime)
+	if err != nil {
+		return nil, fmt.Errorf("AvailableDoctors failed: %w", err)
+	}
+
+	availableApiDoctors := Map(availableDataDoctors, dataDoctorToApiDoctor)
+	return availableApiDoctors, nil
+}

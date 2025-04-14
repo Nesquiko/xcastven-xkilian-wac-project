@@ -94,6 +94,36 @@ func (m *MongoDb) FindConditionsByPatientId(
 	return conditions, nil
 }
 
+func (m *MongoDb) UpdateCondition(
+	ctx context.Context,
+	id uuid.UUID,
+	condition Condition,
+) (Condition, error) {
+	if err := m.patientExists(ctx, condition.PatientId); err != nil {
+		return Condition{}, fmt.Errorf(
+			"UpdateCondition patient check error: %w",
+			err,
+		)
+	}
+
+	collection := m.Database.Collection(conditionsCollection)
+	filter := bson.M{"_id": id}
+
+	opts := options.FindOneAndReplace().SetReturnDocument(options.After)
+
+	var updatedCondition Condition
+	err := collection.FindOneAndReplace(ctx, filter, condition, opts).
+		Decode(&updatedCondition)
+	if err != nil {
+		if errors.Is(err, mongo.ErrNoDocuments) {
+			return Condition{}, ErrNotFound
+		}
+		return Condition{}, fmt.Errorf("UpdateCondition failed: %w", err)
+	}
+
+	return updatedCondition, nil
+}
+
 func (m *MongoDb) conditionExists(ctx context.Context, id uuid.UUID) error {
 	conditionsColl := m.Database.Collection(conditionsCollection)
 	filter := bson.M{"_id": id}

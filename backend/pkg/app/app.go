@@ -75,9 +75,15 @@ type App interface {
 		doctorId uuid.UUID,
 		date time.Time,
 	) (api.DoctorTimeslots, error)
+	AvailableDoctors(ctx context.Context, dateTime time.Time) ([]api.Doctor, error)
 
 	CreatePatientCondition(ctx context.Context, cond api.NewCondition) (api.ConditionDisplay, error)
 	ConditionById(ctx context.Context, id uuid.UUID) (api.Condition, error)
+	UpdatePatientCondition(
+		ctx context.Context,
+		conditionId uuid.UUID,
+		updateData api.UpdateCondition,
+	) (api.Condition, error)
 
 	CreatePatientPrescription(
 		ctx context.Context,

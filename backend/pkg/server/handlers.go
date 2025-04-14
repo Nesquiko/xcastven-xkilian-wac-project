@@ -381,7 +381,22 @@ func (s Server) AvailableDoctors(
 	r *http.Request,
 	params api.AvailableDoctorsParams,
 ) {
-	panic("unimplemented")
+	doctors, err := s.app.AvailableDoctors(r.Context(), params.DateTime)
+	if err != nil {
+		slog.Error(
+			UnexpectedError,
+			"error",
+			err.Error(),
+			"where",
+			"AvailableDoctors",
+			"dateTime",
+			params.DateTime.String(),
+		)
+		encodeError(w, internalServerError())
+		return
+	}
+
+	encode(w, http.StatusOK, doctors)
 }
 
 // PrescriptionDetail implements api.ServerInterface.
@@ -427,7 +442,36 @@ func (s Server) UpdateCondition(
 	r *http.Request,
 	conditionId api.ConditionId,
 ) {
-	panic("unimplemented")
+	req, decodeErr := Decode[api.UpdateCondition](w, r)
+	if decodeErr != nil {
+		encodeError(w, decodeErr)
+		return
+	}
+
+	updatedCondition, err := s.app.UpdatePatientCondition(
+		r.Context(),
+		conditionId,
+		req,
+	)
+	if err != nil {
+		if errors.Is(err, app.ErrNotFound) {
+			encodeError(w, notFoundId("Condition", conditionId))
+			return
+		}
+		slog.Error(
+			UnexpectedError,
+			"error",
+			err.Error(),
+			"where",
+			"UpdateCondition",
+			"conditionId",
+			conditionId.String(),
+		)
+		encodeError(w, internalServerError())
+		return
+	}
+
+	encode(w, http.StatusOK, updatedCondition)
 }
 
 func (s Server) UpdatePrescription(

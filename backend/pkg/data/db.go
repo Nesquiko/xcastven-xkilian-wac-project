@@ -63,6 +63,7 @@ type Db interface {
 	CreateDoctor(ctx context.Context, doctor Doctor) (Doctor, error)
 	DoctorById(ctx context.Context, id uuid.UUID) (Doctor, error)
 	DoctorByEmail(ctx context.Context, email string) (Doctor, error)
+	AvailableDoctors(ctx context.Context, dateTime time.Time) ([]Doctor, error)
 
 	CreateCondition(ctx context.Context, condition Condition) (Condition, error)
 	ConditionById(ctx context.Context, id uuid.UUID) (Condition, error)
@@ -72,6 +73,7 @@ type Db interface {
 		from time.Time,
 		to *time.Time,
 	) ([]Condition, error)
+	UpdateCondition(ctx context.Context, id uuid.UUID, condition Condition) (Condition, error)
 
 	CreatePrescription(ctx context.Context, prescription Prescription) (Prescription, error)
 	PrescriptionById(ctx context.Context, id uuid.UUID) (Prescription, error)

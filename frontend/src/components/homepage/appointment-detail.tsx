@@ -125,23 +125,8 @@ export class AppointmentDetail {
   @State() denying: boolean = false;
   @State() denyingAppointmentReason: string = '';
 
-  @State() availableTimes: Array<TimeSlot> = [
-    { time: '7:00', status: 'unavailable' } satisfies TimeSlot,
-    { time: '8:00', status: 'available' } satisfies TimeSlot,
-    { time: '9:00', status: 'unavailable' } satisfies TimeSlot,
-    { time: '10:00', status: 'unavailable' } satisfies TimeSlot,
-    { time: '11:00', status: 'available' } satisfies TimeSlot,
-  ] satisfies Array<TimeSlot>;
-  @State() availableDoctors: Array<Doctor> = [
-    {
-      id: 'available-doctor-1',
-      firstName: 'Available',
-      lastName: 'Doctor',
-      email: 'available@doctor.sk',
-      role: 'doctor',
-      specialization: 'urologist',
-    } satisfies Doctor,
-  ] satisfies Array<Doctor>;
+  @State() reschedulingAvailableDoctors: Array<Doctor> = [];
+  @State() reschedulingAvailableTimes: Array<TimeSlot> = [];
 
   async componentWillLoad() {
     await this.loadAppt();
@@ -189,6 +174,35 @@ export class AppointmentDetail {
       console.log(err);
       if (!(err instanceof ApiError)) {
         toastService.showError(err);
+        return;
+      }
+      toastService.showError(err.message);
+    }
+  }
+
+  private async loadReschedulingDoctors() {
+    try {
+      const docs = await this.api.doctors.getDoctors();
+      this.reschedulingAvailableDoctors = docs.doctors ?? [];
+    } catch (err) {
+      if (!(err instanceof ApiError)) {
+        toastService.showError('Unknown server error');
+        return;
+      }
+      toastService.showError(err.message);
+    }
+  }
+
+  private async loadReschedulingTimes(doc: Doctor, d: Date) {
+    try {
+      const slots = await this.api.doctors.doctorsTimeslots({
+        doctorId: doc.id,
+        date: d,
+      });
+      this.reschedulingAvailableTimes = slots.slots;
+    } catch (err) {
+      if (!(err instanceof ApiError)) {
+        toastService.showError('Unknown server error');
         return;
       }
       toastService.showError(err.message);
@@ -988,6 +1002,9 @@ export class AppointmentDetail {
                 this.rescheduling = !this.rescheduling;
                 this.cancelling = false;
                 this.denying = false;
+                if (this.rescheduling) {
+                  this.loadReschedulingDoctors();
+                }
               },
               () => {
                 this.cancelling = !this.cancelling;
@@ -1015,39 +1032,53 @@ export class AppointmentDetail {
               )}
 
               <md-outlined-select
-                label="Time"
-                class="w-full"
-                value={this.reschedulingAppointmentTime}
-                onInput={(e: Event) =>
-                  (this.reschedulingAppointmentTime = (e.target as HTMLSelectElement).value)
-                }
-              >
-                {this.availableTimes.map((timeSlot: TimeSlot) => (
-                  <md-select-option
-                    value={timeSlot.time}
-                    disabled={timeSlot.status !== 'available'}
-                  >
-                    <div slot="headline">{timeSlot.time}</div>
-                  </md-select-option>
-                ))}
-              </md-outlined-select>
-
-              <md-outlined-select
                 label="Doctor"
                 class="w-full"
                 value={this.reschedulingAppointmentDoctor?.id}
                 onInput={(e: Event) => {
                   const newDoctorId: string = (e.target as HTMLSelectElement).value;
-                  this.reschedulingAppointmentDoctor = this.availableDoctors.find(
+                  this.reschedulingAppointmentDoctor = this.reschedulingAvailableDoctors.find(
                     (doctor: Doctor) => doctor.id === newDoctorId,
                   );
+
+                  if (this.reschedulingAppointmentDoctor && this.reschedulingAppointmentDate) {
+                    this.loadReschedulingTimes(
+                      this.reschedulingAppointmentDoctor,
+                      this.reschedulingAppointmentDate,
+                    );
+                  }
                 }}
               >
-                {this.availableDoctors.map((doctor: Doctor) => (
+                {this.reschedulingAvailableDoctors.map((doctor: Doctor) => (
                   <md-select-option value={doctor.id}>
                     <div slot="headline">
                       Dr. {doctor.firstName} {doctor.lastName}
                     </div>
+                  </md-select-option>
+                ))}
+              </md-outlined-select>
+
+              <md-outlined-select
+                label="Time"
+                class="w-full"
+                value={this.reschedulingAppointmentTime}
+                onInput={(e: Event) => {
+                  this.reschedulingAppointmentTime = (e.target as HTMLSelectElement).value;
+
+                  if (this.reschedulingAppointmentDoctor && this.reschedulingAppointmentDate) {
+                    this.loadReschedulingTimes(
+                      this.reschedulingAppointmentDoctor,
+                      this.reschedulingAppointmentDate,
+                    );
+                  }
+                }}
+              >
+                {this.reschedulingAvailableTimes.map((timeSlot: TimeSlot) => (
+                  <md-select-option
+                    value={timeSlot.time}
+                    disabled={timeSlot.status !== 'available'}
+                  >
+                    <div slot="headline">{timeSlot.time}</div>
                   </md-select-option>
                 ))}
               </md-outlined-select>

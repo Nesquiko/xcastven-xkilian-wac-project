@@ -340,9 +340,22 @@ export class Homepage {
 
   private handleToggleConditionStatus = async (
     condition: Condition,
-  ) => {
-    // TODO luky handle with /conditions/{conditionId}
-    console.log('Toggle status of condition:', condition);
+  ): Promise<Condition | undefined> => {
+    // if there is an end on condition, toggle it to null, else toggle it to today
+    const end = condition.end ? null : new Date();
+    try {
+      return this.api.conditions.updateCondition({
+        conditionId: condition.id,
+        updateCondition: { end },
+      });
+    } catch (err) {
+      if (!(err instanceof ApiError)) {
+        toastService.showError(err);
+      } else {
+        toastService.showError(err.message);
+      }
+      return undefined;
+    }
   };
 
   private getAppointmentsForDate = (date: Date): Array<AppointmentDisplay> => {
@@ -443,7 +456,7 @@ export class Homepage {
           isDoctor={this.isDoctor}
           isDrawerOpen={this.isDrawerOpen}
           selectedDate={this.selectedDate}
-          setSelectedDate={(date: Date) => this.selectedDate = date}
+          setSelectedDate={(date: Date) => (this.selectedDate = date)}
           selectedAppointment={this.selectedAppointment}
           selectedCondition={this.selectedCondition}
           selectedPrescription={this.selectedPrescription}

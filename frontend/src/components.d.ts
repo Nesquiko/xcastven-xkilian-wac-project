@@ -103,7 +103,7 @@ export namespace Components {
         "conditionId": string;
         "handleResetSelection": () => void;
         "handleSelectAppointment": (appointment: AppointmentDisplay) => void;
-        "handleToggleConditionStatus": (condition: Condition) => Promise<void>;
+        "handleToggleConditionStatus": (condition: Condition) => Promise<Condition | undefined>;
     }
     interface XcastvenXkilianProjectConditionRegisterer {
         "api": Api;
@@ -166,7 +166,7 @@ export namespace Components {
         "handleSelectCondition": (condition: ConditionDisplay) => void;
         "handleSelectPrescription": (prescription: PrescriptionDisplay) => void;
         "handleTabChange": (event: Event) => void;
-        "handleToggleConditionStatus": (condition: Condition) => Promise<void>;
+        "handleToggleConditionStatus": (condition: Condition) => Promise<Condition | undefined>;
         "handleUpdatePrescriptionForAppointment": (
     appointment: PatientAppointment | DoctorAppointment,
     prescriptionId: string,
@@ -484,7 +484,7 @@ declare namespace LocalJSX {
         "conditionId"?: string;
         "handleResetSelection"?: () => void;
         "handleSelectAppointment"?: (appointment: AppointmentDisplay) => void;
-        "handleToggleConditionStatus"?: (condition: Condition) => Promise<void>;
+        "handleToggleConditionStatus"?: (condition: Condition) => Promise<Condition | undefined>;
     }
     interface XcastvenXkilianProjectConditionRegisterer {
         "api"?: Api;
@@ -547,7 +547,7 @@ declare namespace LocalJSX {
         "handleSelectCondition"?: (condition: ConditionDisplay) => void;
         "handleSelectPrescription"?: (prescription: PrescriptionDisplay) => void;
         "handleTabChange"?: (event: Event) => void;
-        "handleToggleConditionStatus"?: (condition: Condition) => Promise<void>;
+        "handleToggleConditionStatus"?: (condition: Condition) => Promise<Condition | undefined>;
         "handleUpdatePrescriptionForAppointment"?: (
     appointment: PatientAppointment | DoctorAppointment,
     prescriptionId: string,

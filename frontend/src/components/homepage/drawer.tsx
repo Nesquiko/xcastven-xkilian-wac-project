@@ -88,7 +88,7 @@ export class Drawer {
     newPrescription: NewPrescription,
   ) => Promise<Prescription | undefined>;
 
-  @Prop() handleToggleConditionStatus: (condition: Condition) => Promise<void>;
+  @Prop() handleToggleConditionStatus: (condition: Condition) => Promise<Condition | undefined>;
 
   render() {
     const displayStatus: AppointmentStatus = (

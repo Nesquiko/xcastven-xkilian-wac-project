@@ -1,8 +1,8 @@
 import { Api, ApiError } from '../../api/api';
 import { AppointmentDisplay, Condition } from '../../api/generated';
 import { formatDate, formatDateDelta, getDateAndTimeTitle } from '../../utils/utils';
-import { Component, h, Prop, State } from '@stencil/core';
 import { toastService } from '../services/toast-service';
+import { Component, h, Prop, State } from '@stencil/core';
 
 @Component({
   tag: 'xcastven-xkilian-project-condition-detail',
@@ -13,7 +13,7 @@ export class ConditionDetail {
   @Prop() conditionId: string;
   @Prop() handleResetSelection: () => void;
   @Prop() handleSelectAppointment: (appointment: AppointmentDisplay) => void;
-  @Prop() handleToggleConditionStatus: (condition: Condition) => Promise<void>;
+  @Prop() handleToggleConditionStatus: (condition: Condition) => Promise<Condition | undefined>;
 
   @State() condition: Condition;
   @State() expandedAppointments: boolean = false;
@@ -28,29 +28,28 @@ export class ConditionDetail {
       }
       toastService.showError(err.message);
     }
-  };
+  }
 
   private handleScheduleAppointmentFromCondition = () => {
     window.navigation.navigate(`scheduleAppointment?conditionId=${this.conditionId}`);
   };
 
   private handleToggleStatus = () => {
-    this.handleToggleConditionStatus(this.condition).then(() => {
-      this.condition = {
-        ...this.condition,
-        end: new Date(),
-      };
+    this.handleToggleConditionStatus(this.condition).then(cond => {
+      if (!cond) return;
+      this.condition = cond;
     });
   };
 
   render() {
-    if (!this.condition) return (
-      <xcastven-xkilian-project-no-data
-        displayTitle="No condition found"
-        icon="error"
-        iconSize={80}
-      />
-    );
+    if (!this.condition)
+      return (
+        <xcastven-xkilian-project-no-data
+          displayTitle="No condition found"
+          icon="error"
+          iconSize={80}
+        />
+      );
 
     return (
       <div class="w-full max-w-md">
@@ -124,12 +123,10 @@ export class ConditionDetail {
             </div>
             {this.condition.appointments.length > 0 && (
               <md-icon-button
-                onClick={() => this.expandedAppointments = !this.expandedAppointments}
+                onClick={() => (this.expandedAppointments = !this.expandedAppointments)}
                 style={{ width: '24px', height: '24px' }}
               >
-                <md-icon>
-                  {this.expandedAppointments ? 'expand_less' : 'expand_more'}
-                </md-icon>
+                <md-icon>{this.expandedAppointments ? 'expand_less' : 'expand_more'}</md-icon>
               </md-icon-button>
             )}
           </div>

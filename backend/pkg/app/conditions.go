@@ -66,8 +66,11 @@ func (a monolithApp) UpdatePatientCondition(
 
 	updated := false
 	if updateData.End != nil {
-		if !existingCondition.End.Equal(*updateData.End) {
-			existingCondition.End = updateData.End
+		if updateData.End.IsNull() && existingCondition.End != nil {
+			existingCondition.End = nil
+			updated = true
+		} else if updateData.End.IsSpecified() && (existingCondition.End == nil || !existingCondition.End.Equal(updateData.End.MustGet())) {
+			existingCondition.End = asPtr(updateData.End.MustGet())
 			updated = true
 		}
 	}

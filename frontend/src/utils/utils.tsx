@@ -311,11 +311,61 @@ export const getDatePart = (
   }
 };
 
-export const changeSelectedDate = (
-  date: Date,
-  updateDate: (date: Date) => void,
-  delta: 1 | -1
+export const renderDateSelects = (
+  dateType: 'start' | 'end',
+  label: string,
+  dateValue: Date | null,
+  changeHandler: (type: 'start' | 'end', part: 'day' | 'month' | 'year', event: Event) => void,
 ) => {
-  const newDate: Date = new Date(date.getFullYear(), date.getMonth(), date.getDate() + delta);
-  updateDate(newDate);
+  return (
+    <div class="flex w-full max-w-md flex-col gap-y-1">
+      <label class="text-gray-600 font-medium text-sm">{label}</label>
+      <div class="flex w-full max-w-md flex-row justify-between gap-x-3">
+        <md-outlined-select
+          required={true}
+          label="Day"
+          class="min-w-0 flex-1"
+          value={getDatePart(dateValue, 'day')}
+          onInput={(e: Event) => changeHandler(dateType, 'day', e)}
+        >
+          {days.map((day: number) => (
+            <md-select-option value={day.toString()} key={`${dateType}-day-${day}`}>
+              <div slot="headline">{day}</div>
+            </md-select-option>
+          ))}
+        </md-outlined-select>
+
+        <md-outlined-select
+          required={true}
+          label="Month"
+          class="min-w-0 flex-1"
+          value={getDatePart(dateValue, 'month')}
+          onInput={(e: Event) => changeHandler(dateType, 'month', e)}
+        >
+          {months.map((month: { value: number; name: string }) => (
+            <md-select-option
+              value={month.value.toString()}
+              key={`${dateType}-month-${month.value}`}
+            >
+              <div slot="headline">{month.name}</div>
+            </md-select-option>
+          ))}
+        </md-outlined-select>
+
+        <md-outlined-select
+          required={true}
+          label="Year"
+          class="min-w-0 flex-1"
+          value={getDatePart(dateValue, 'year')}
+          onInput={(e: Event) => changeHandler(dateType, 'year', e)}
+        >
+          {years.map((year: number) => (
+            <md-select-option value={year.toString()} key={`${dateType}-year-${year}`}>
+              <div slot="headline">{year}</div>
+            </md-select-option>
+          ))}
+        </md-outlined-select>
+      </div>
+    </div>
+  );
 };

@@ -76,6 +76,8 @@ export class App {
         );
       } else if (this.relativePath.startsWith('account')) {
         element = <xcastven-xkilian-project-account />;
+      } else {
+        element = <xcastven-xkilian-project-not-found />;
       }
     }
 

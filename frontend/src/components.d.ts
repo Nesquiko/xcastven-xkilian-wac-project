@@ -6,10 +6,10 @@
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 import { Api } from "./api/api";
-import { AppointmentDisplay, AppointmentStatus, Condition, ConditionDisplay, Doctor, DoctorAppointment, Equipment, Facility, Medicine, NewPrescription, PatientAppointment, Prescription, PrescriptionDisplay, UpdatePrescription, User, UserRole } from "./api/generated";
+import { AppointmentDisplay, AppointmentStatus, Condition, ConditionDisplay, Doctor, DoctorAppointment, Equipment, Facility, Medicine, NewPrescription, PatientAppointment, Prescription, PrescriptionDisplay, TimeSlot, UpdatePrescription, User, UserRole } from "./api/generated";
 import { User as User1 } from "./components";
 export { Api } from "./api/api";
-export { AppointmentDisplay, AppointmentStatus, Condition, ConditionDisplay, Doctor, DoctorAppointment, Equipment, Facility, Medicine, NewPrescription, PatientAppointment, Prescription, PrescriptionDisplay, UpdatePrescription, User, UserRole } from "./api/generated";
+export { AppointmentDisplay, AppointmentStatus, Condition, ConditionDisplay, Doctor, DoctorAppointment, Equipment, Facility, Medicine, NewPrescription, PatientAppointment, Prescription, PrescriptionDisplay, TimeSlot, UpdatePrescription, User, UserRole } from "./api/generated";
 export { User as User1 } from "./components";
 export namespace Components {
     interface XcastvenXkilianProjectAccount {
@@ -18,12 +18,24 @@ export namespace Components {
         "apiBase": string;
         "basePath": string;
     }
+    interface XcastvenXkilianProjectAppointmentCancel {
+        "cancelling": boolean;
+        "cancellingAppointmentReason": string;
+        "handleCancel": () => void;
+        "handleCancellingAppointmentReasonChange": (event: Event) => void;
+        "setCancelling": (cancelling: boolean) => void;
+    }
     interface XcastvenXkilianProjectAppointmentDetail {
         "api": Api;
         "appointmentId": string;
         "handleAcceptAppointment": (
     appointment: PatientAppointment | DoctorAppointment,
-  ) => Promise<void>;
+    resources: Partial<{
+      facility: Facility;
+      equipment: Equipment;
+      medicine: Medicine;
+    }>,
+  ) => Promise<DoctorAppointment | undefined>;
         "handleAddPrescriptionForAppointment": (
     appointment: DoctorAppointment,
     newPrescription: NewPrescription,
@@ -32,6 +44,10 @@ export namespace Components {
     appointment: PatientAppointment | DoctorAppointment,
     cancellationReason: string,
     by: UserRole,
+  ) => Promise<void>;
+        "handleDeletePrescriptionFromAppointment": (
+    appointment: DoctorAppointment,
+    prescriptionToDelete: PrescriptionDisplay,
   ) => Promise<void>;
         "handleDenyAppointment": (
     appointment: PatientAppointment | DoctorAppointment,
@@ -59,6 +75,77 @@ export namespace Components {
   ) => Promise<Prescription | undefined>;
         "isDoctor": boolean;
         "user": User;
+    }
+    interface XcastvenXkilianProjectAppointmentPrescriptions {
+        "addingPrescription": boolean;
+        "addingPrescriptionDoctorsNote": string;
+        "addingPrescriptionEnd": Date;
+        "addingPrescriptionName": string;
+        "addingPrescriptionStart": Date;
+        "appointment": PatientAppointment | DoctorAppointment;
+        "deletingPrescription": PrescriptionDisplay;
+        "editingPrescription": PrescriptionDisplay;
+        "editingPrescriptionNewDoctorsNote": string;
+        "editingPrescriptionNewEnd": Date;
+        "editingPrescriptionNewName": string;
+        "editingPrescriptionNewStart": Date;
+        "handleAddPrescription": () => void;
+        "handleAddPrescriptionDateChange": (
+    type: 'start' | 'end',
+    part: 'day' | 'month' | 'year',
+    event: Event,
+  ) => void;
+        "handleAddPrescriptionDoctorsNoteChange": (event: Event) => void;
+        "handleAddPrescriptionNameChange": (event: Event) => void;
+        "handleDeletePrescription": () => void;
+        "handleSelectPrescription": (prescription: PrescriptionDisplay) => void;
+        "handleUpdatePrescription": () => void;
+        "handleUpdatePrescriptionDateChange": (
+    type: 'start' | 'end',
+    part: 'day' | 'month' | 'year',
+    event: Event,
+  ) => void;
+        "handleUpdatePrescriptionDoctorsNoteChange": (event: Event) => void;
+        "handleUpdatePrescriptionNameChange": (event: Event) => void;
+        "isDoctor": boolean;
+        "prescriptionsExpanded": boolean;
+        "setAddingPrescription": (addingPrescription: boolean) => void;
+        "setDeletingPrescription": (deletingPrescription: PrescriptionDisplay) => void;
+        "setEditingPrescription": (editingPrescription: PrescriptionDisplay) => void;
+    }
+    interface XcastvenXkilianProjectAppointmentReschedule {
+        "handleDateSelectInput": (
+    type: 'start' | 'end',
+    part: 'day' | 'month' | 'year',
+    event: Event,
+  ) => void;
+        "handleDoctorSelectInput": (event: Event) => void;
+        "handleReschedule": () => void;
+        "handleReschedulingAppointmentReasonChange": (event: Event) => void;
+        "handleTimeSelectInput": (event: Event) => void;
+        "rescheduling": boolean;
+        "reschedulingAppointmentDate": Date;
+        "reschedulingAppointmentDoctor": Doctor;
+        "reschedulingAppointmentReason": string;
+        "reschedulingAppointmentTime": string;
+        "reschedulingAvailableDoctors": Array<Doctor>;
+        "reschedulingAvailableTimes": Array<TimeSlot>;
+    }
+    interface XcastvenXkilianProjectAppointmentResources {
+        "appointment": PatientAppointment | DoctorAppointment;
+        "availableEquipment": Array<Equipment>;
+        "availableFacilities": Array<Facility>;
+        "availableMedicine": Array<Medicine>;
+        "editingResources": boolean;
+        "handleSaveResources": () => void;
+        "handleSelectEquipment": (event: Event) => void;
+        "handleSelectFacility": (event: Event) => void;
+        "handleSelectMedicine": (event: Event) => void;
+        "isDoctor": boolean;
+        "selectedEquipment": Equipment;
+        "selectedFacility": Facility;
+        "selectedMedicine": Medicine;
+        "setEditingResources": (editingResources: boolean) => void;
     }
     interface XcastvenXkilianProjectAppointmentScheduler {
         "api": Api;
@@ -133,7 +220,12 @@ export namespace Components {
         "getPrescriptionsForDate": (date: Date) => Array<PrescriptionDisplay>;
         "handleAcceptAppointment": (
     appointment: PatientAppointment | DoctorAppointment,
-  ) => Promise<void>;
+    resources: Partial<{
+      facility: Facility;
+      equipment: Equipment;
+      medicine: Medicine;
+    }>,
+  ) => Promise<DoctorAppointment | undefined>;
         "handleAddPrescriptionForAppointment": (
     appointment: DoctorAppointment,
     newPrescription: NewPrescription,
@@ -143,8 +235,13 @@ export namespace Components {
     cancellationReason: string,
     by: UserRole,
   ) => Promise<void>;
+        "handleDeletePrescriptionFromAppointment": (
+    appointment: DoctorAppointment,
+    prescriptionToDelete: PrescriptionDisplay,
+  ) => Promise<void>;
         "handleDenyAppointment": (
     appointment: PatientAppointment | DoctorAppointment,
+    denyReason: string,
   ) => Promise<void>;
         "handleRescheduleAppointment": (
     appointment: PatientAppointment | DoctorAppointment,
@@ -213,6 +310,8 @@ export namespace Components {
         "icon": string;
         "iconSize": number;
     }
+    interface XcastvenXkilianProjectNotFound {
+    }
     interface XcastvenXkilianProjectPrescriptionDetail {
         "api": Api;
         "handleResetSelection": () => void;
@@ -245,11 +344,35 @@ declare global {
         prototype: HTMLXcastvenXkilianProjectAppElement;
         new (): HTMLXcastvenXkilianProjectAppElement;
     };
+    interface HTMLXcastvenXkilianProjectAppointmentCancelElement extends Components.XcastvenXkilianProjectAppointmentCancel, HTMLStencilElement {
+    }
+    var HTMLXcastvenXkilianProjectAppointmentCancelElement: {
+        prototype: HTMLXcastvenXkilianProjectAppointmentCancelElement;
+        new (): HTMLXcastvenXkilianProjectAppointmentCancelElement;
+    };
     interface HTMLXcastvenXkilianProjectAppointmentDetailElement extends Components.XcastvenXkilianProjectAppointmentDetail, HTMLStencilElement {
     }
     var HTMLXcastvenXkilianProjectAppointmentDetailElement: {
         prototype: HTMLXcastvenXkilianProjectAppointmentDetailElement;
         new (): HTMLXcastvenXkilianProjectAppointmentDetailElement;
+    };
+    interface HTMLXcastvenXkilianProjectAppointmentPrescriptionsElement extends Components.XcastvenXkilianProjectAppointmentPrescriptions, HTMLStencilElement {
+    }
+    var HTMLXcastvenXkilianProjectAppointmentPrescriptionsElement: {
+        prototype: HTMLXcastvenXkilianProjectAppointmentPrescriptionsElement;
+        new (): HTMLXcastvenXkilianProjectAppointmentPrescriptionsElement;
+    };
+    interface HTMLXcastvenXkilianProjectAppointmentRescheduleElement extends Components.XcastvenXkilianProjectAppointmentReschedule, HTMLStencilElement {
+    }
+    var HTMLXcastvenXkilianProjectAppointmentRescheduleElement: {
+        prototype: HTMLXcastvenXkilianProjectAppointmentRescheduleElement;
+        new (): HTMLXcastvenXkilianProjectAppointmentRescheduleElement;
+    };
+    interface HTMLXcastvenXkilianProjectAppointmentResourcesElement extends Components.XcastvenXkilianProjectAppointmentResources, HTMLStencilElement {
+    }
+    var HTMLXcastvenXkilianProjectAppointmentResourcesElement: {
+        prototype: HTMLXcastvenXkilianProjectAppointmentResourcesElement;
+        new (): HTMLXcastvenXkilianProjectAppointmentResourcesElement;
     };
     interface HTMLXcastvenXkilianProjectAppointmentSchedulerElement extends Components.XcastvenXkilianProjectAppointmentScheduler, HTMLStencilElement {
     }
@@ -341,6 +464,12 @@ declare global {
         prototype: HTMLXcastvenXkilianProjectNoDataElement;
         new (): HTMLXcastvenXkilianProjectNoDataElement;
     };
+    interface HTMLXcastvenXkilianProjectNotFoundElement extends Components.XcastvenXkilianProjectNotFound, HTMLStencilElement {
+    }
+    var HTMLXcastvenXkilianProjectNotFoundElement: {
+        prototype: HTMLXcastvenXkilianProjectNotFoundElement;
+        new (): HTMLXcastvenXkilianProjectNotFoundElement;
+    };
     interface HTMLXcastvenXkilianProjectPrescriptionDetailElement extends Components.XcastvenXkilianProjectPrescriptionDetail, HTMLStencilElement {
     }
     var HTMLXcastvenXkilianProjectPrescriptionDetailElement: {
@@ -368,7 +497,11 @@ declare global {
     interface HTMLElementTagNameMap {
         "xcastven-xkilian-project-account": HTMLXcastvenXkilianProjectAccountElement;
         "xcastven-xkilian-project-app": HTMLXcastvenXkilianProjectAppElement;
+        "xcastven-xkilian-project-appointment-cancel": HTMLXcastvenXkilianProjectAppointmentCancelElement;
         "xcastven-xkilian-project-appointment-detail": HTMLXcastvenXkilianProjectAppointmentDetailElement;
+        "xcastven-xkilian-project-appointment-prescriptions": HTMLXcastvenXkilianProjectAppointmentPrescriptionsElement;
+        "xcastven-xkilian-project-appointment-reschedule": HTMLXcastvenXkilianProjectAppointmentRescheduleElement;
+        "xcastven-xkilian-project-appointment-resources": HTMLXcastvenXkilianProjectAppointmentResourcesElement;
         "xcastven-xkilian-project-appointment-scheduler": HTMLXcastvenXkilianProjectAppointmentSchedulerElement;
         "xcastven-xkilian-project-appointments-list": HTMLXcastvenXkilianProjectAppointmentsListElement;
         "xcastven-xkilian-project-calendar": HTMLXcastvenXkilianProjectCalendarElement;
@@ -384,6 +517,7 @@ declare global {
         "xcastven-xkilian-project-login": HTMLXcastvenXkilianProjectLoginElement;
         "xcastven-xkilian-project-menu": HTMLXcastvenXkilianProjectMenuElement;
         "xcastven-xkilian-project-no-data": HTMLXcastvenXkilianProjectNoDataElement;
+        "xcastven-xkilian-project-not-found": HTMLXcastvenXkilianProjectNotFoundElement;
         "xcastven-xkilian-project-prescription-detail": HTMLXcastvenXkilianProjectPrescriptionDetailElement;
         "xcastven-xkilian-project-prescriptions-list": HTMLXcastvenXkilianProjectPrescriptionsListElement;
         "xcastven-xkilian-project-register": HTMLXcastvenXkilianProjectRegisterElement;
@@ -397,12 +531,24 @@ declare namespace LocalJSX {
         "apiBase"?: string;
         "basePath"?: string;
     }
+    interface XcastvenXkilianProjectAppointmentCancel {
+        "cancelling"?: boolean;
+        "cancellingAppointmentReason"?: string;
+        "handleCancel"?: () => void;
+        "handleCancellingAppointmentReasonChange"?: (event: Event) => void;
+        "setCancelling"?: (cancelling: boolean) => void;
+    }
     interface XcastvenXkilianProjectAppointmentDetail {
         "api"?: Api;
         "appointmentId"?: string;
         "handleAcceptAppointment"?: (
     appointment: PatientAppointment | DoctorAppointment,
-  ) => Promise<void>;
+    resources: Partial<{
+      facility: Facility;
+      equipment: Equipment;
+      medicine: Medicine;
+    }>,
+  ) => Promise<DoctorAppointment | undefined>;
         "handleAddPrescriptionForAppointment"?: (
     appointment: DoctorAppointment,
     newPrescription: NewPrescription,
@@ -411,6 +557,10 @@ declare namespace LocalJSX {
     appointment: PatientAppointment | DoctorAppointment,
     cancellationReason: string,
     by: UserRole,
+  ) => Promise<void>;
+        "handleDeletePrescriptionFromAppointment"?: (
+    appointment: DoctorAppointment,
+    prescriptionToDelete: PrescriptionDisplay,
   ) => Promise<void>;
         "handleDenyAppointment"?: (
     appointment: PatientAppointment | DoctorAppointment,
@@ -438,6 +588,77 @@ declare namespace LocalJSX {
   ) => Promise<Prescription | undefined>;
         "isDoctor"?: boolean;
         "user"?: User;
+    }
+    interface XcastvenXkilianProjectAppointmentPrescriptions {
+        "addingPrescription"?: boolean;
+        "addingPrescriptionDoctorsNote"?: string;
+        "addingPrescriptionEnd"?: Date;
+        "addingPrescriptionName"?: string;
+        "addingPrescriptionStart"?: Date;
+        "appointment"?: PatientAppointment | DoctorAppointment;
+        "deletingPrescription"?: PrescriptionDisplay;
+        "editingPrescription"?: PrescriptionDisplay;
+        "editingPrescriptionNewDoctorsNote"?: string;
+        "editingPrescriptionNewEnd"?: Date;
+        "editingPrescriptionNewName"?: string;
+        "editingPrescriptionNewStart"?: Date;
+        "handleAddPrescription"?: () => void;
+        "handleAddPrescriptionDateChange"?: (
+    type: 'start' | 'end',
+    part: 'day' | 'month' | 'year',
+    event: Event,
+  ) => void;
+        "handleAddPrescriptionDoctorsNoteChange"?: (event: Event) => void;
+        "handleAddPrescriptionNameChange"?: (event: Event) => void;
+        "handleDeletePrescription"?: () => void;
+        "handleSelectPrescription"?: (prescription: PrescriptionDisplay) => void;
+        "handleUpdatePrescription"?: () => void;
+        "handleUpdatePrescriptionDateChange"?: (
+    type: 'start' | 'end',
+    part: 'day' | 'month' | 'year',
+    event: Event,
+  ) => void;
+        "handleUpdatePrescriptionDoctorsNoteChange"?: (event: Event) => void;
+        "handleUpdatePrescriptionNameChange"?: (event: Event) => void;
+        "isDoctor"?: boolean;
+        "prescriptionsExpanded"?: boolean;
+        "setAddingPrescription"?: (addingPrescription: boolean) => void;
+        "setDeletingPrescription"?: (deletingPrescription: PrescriptionDisplay) => void;
+        "setEditingPrescription"?: (editingPrescription: PrescriptionDisplay) => void;
+    }
+    interface XcastvenXkilianProjectAppointmentReschedule {
+        "handleDateSelectInput"?: (
+    type: 'start' | 'end',
+    part: 'day' | 'month' | 'year',
+    event: Event,
+  ) => void;
+        "handleDoctorSelectInput"?: (event: Event) => void;
+        "handleReschedule"?: () => void;
+        "handleReschedulingAppointmentReasonChange"?: (event: Event) => void;
+        "handleTimeSelectInput"?: (event: Event) => void;
+        "rescheduling"?: boolean;
+        "reschedulingAppointmentDate"?: Date;
+        "reschedulingAppointmentDoctor"?: Doctor;
+        "reschedulingAppointmentReason"?: string;
+        "reschedulingAppointmentTime"?: string;
+        "reschedulingAvailableDoctors"?: Array<Doctor>;
+        "reschedulingAvailableTimes"?: Array<TimeSlot>;
+    }
+    interface XcastvenXkilianProjectAppointmentResources {
+        "appointment"?: PatientAppointment | DoctorAppointment;
+        "availableEquipment"?: Array<Equipment>;
+        "availableFacilities"?: Array<Facility>;
+        "availableMedicine"?: Array<Medicine>;
+        "editingResources"?: boolean;
+        "handleSaveResources"?: () => void;
+        "handleSelectEquipment"?: (event: Event) => void;
+        "handleSelectFacility"?: (event: Event) => void;
+        "handleSelectMedicine"?: (event: Event) => void;
+        "isDoctor"?: boolean;
+        "selectedEquipment"?: Equipment;
+        "selectedFacility"?: Facility;
+        "selectedMedicine"?: Medicine;
+        "setEditingResources"?: (editingResources: boolean) => void;
     }
     interface XcastvenXkilianProjectAppointmentScheduler {
         "api"?: Api;
@@ -512,7 +733,12 @@ declare namespace LocalJSX {
         "getPrescriptionsForDate"?: (date: Date) => Array<PrescriptionDisplay>;
         "handleAcceptAppointment"?: (
     appointment: PatientAppointment | DoctorAppointment,
-  ) => Promise<void>;
+    resources: Partial<{
+      facility: Facility;
+      equipment: Equipment;
+      medicine: Medicine;
+    }>,
+  ) => Promise<DoctorAppointment | undefined>;
         "handleAddPrescriptionForAppointment"?: (
     appointment: DoctorAppointment,
     newPrescription: NewPrescription,
@@ -522,8 +748,13 @@ declare namespace LocalJSX {
     cancellationReason: string,
     by: UserRole,
   ) => Promise<void>;
+        "handleDeletePrescriptionFromAppointment"?: (
+    appointment: DoctorAppointment,
+    prescriptionToDelete: PrescriptionDisplay,
+  ) => Promise<void>;
         "handleDenyAppointment"?: (
     appointment: PatientAppointment | DoctorAppointment,
+    denyReason: string,
   ) => Promise<void>;
         "handleRescheduleAppointment"?: (
     appointment: PatientAppointment | DoctorAppointment,
@@ -592,6 +823,8 @@ declare namespace LocalJSX {
         "icon"?: string;
         "iconSize"?: number;
     }
+    interface XcastvenXkilianProjectNotFound {
+    }
     interface XcastvenXkilianProjectPrescriptionDetail {
         "api"?: Api;
         "handleResetSelection"?: () => void;
@@ -612,7 +845,11 @@ declare namespace LocalJSX {
     interface IntrinsicElements {
         "xcastven-xkilian-project-account": XcastvenXkilianProjectAccount;
         "xcastven-xkilian-project-app": XcastvenXkilianProjectApp;
+        "xcastven-xkilian-project-appointment-cancel": XcastvenXkilianProjectAppointmentCancel;
         "xcastven-xkilian-project-appointment-detail": XcastvenXkilianProjectAppointmentDetail;
+        "xcastven-xkilian-project-appointment-prescriptions": XcastvenXkilianProjectAppointmentPrescriptions;
+        "xcastven-xkilian-project-appointment-reschedule": XcastvenXkilianProjectAppointmentReschedule;
+        "xcastven-xkilian-project-appointment-resources": XcastvenXkilianProjectAppointmentResources;
         "xcastven-xkilian-project-appointment-scheduler": XcastvenXkilianProjectAppointmentScheduler;
         "xcastven-xkilian-project-appointments-list": XcastvenXkilianProjectAppointmentsList;
         "xcastven-xkilian-project-calendar": XcastvenXkilianProjectCalendar;
@@ -628,6 +865,7 @@ declare namespace LocalJSX {
         "xcastven-xkilian-project-login": XcastvenXkilianProjectLogin;
         "xcastven-xkilian-project-menu": XcastvenXkilianProjectMenu;
         "xcastven-xkilian-project-no-data": XcastvenXkilianProjectNoData;
+        "xcastven-xkilian-project-not-found": XcastvenXkilianProjectNotFound;
         "xcastven-xkilian-project-prescription-detail": XcastvenXkilianProjectPrescriptionDetail;
         "xcastven-xkilian-project-prescriptions-list": XcastvenXkilianProjectPrescriptionsList;
         "xcastven-xkilian-project-register": XcastvenXkilianProjectRegister;
@@ -640,7 +878,11 @@ declare module "@stencil/core" {
         interface IntrinsicElements {
             "xcastven-xkilian-project-account": LocalJSX.XcastvenXkilianProjectAccount & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectAccountElement>;
             "xcastven-xkilian-project-app": LocalJSX.XcastvenXkilianProjectApp & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectAppElement>;
+            "xcastven-xkilian-project-appointment-cancel": LocalJSX.XcastvenXkilianProjectAppointmentCancel & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectAppointmentCancelElement>;
             "xcastven-xkilian-project-appointment-detail": LocalJSX.XcastvenXkilianProjectAppointmentDetail & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectAppointmentDetailElement>;
+            "xcastven-xkilian-project-appointment-prescriptions": LocalJSX.XcastvenXkilianProjectAppointmentPrescriptions & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectAppointmentPrescriptionsElement>;
+            "xcastven-xkilian-project-appointment-reschedule": LocalJSX.XcastvenXkilianProjectAppointmentReschedule & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectAppointmentRescheduleElement>;
+            "xcastven-xkilian-project-appointment-resources": LocalJSX.XcastvenXkilianProjectAppointmentResources & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectAppointmentResourcesElement>;
             "xcastven-xkilian-project-appointment-scheduler": LocalJSX.XcastvenXkilianProjectAppointmentScheduler & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectAppointmentSchedulerElement>;
             "xcastven-xkilian-project-appointments-list": LocalJSX.XcastvenXkilianProjectAppointmentsList & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectAppointmentsListElement>;
             "xcastven-xkilian-project-calendar": LocalJSX.XcastvenXkilianProjectCalendar & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectCalendarElement>;
@@ -656,6 +898,7 @@ declare module "@stencil/core" {
             "xcastven-xkilian-project-login": LocalJSX.XcastvenXkilianProjectLogin & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectLoginElement>;
             "xcastven-xkilian-project-menu": LocalJSX.XcastvenXkilianProjectMenu & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectMenuElement>;
             "xcastven-xkilian-project-no-data": LocalJSX.XcastvenXkilianProjectNoData & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectNoDataElement>;
+            "xcastven-xkilian-project-not-found": LocalJSX.XcastvenXkilianProjectNotFound & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectNotFoundElement>;
             "xcastven-xkilian-project-prescription-detail": LocalJSX.XcastvenXkilianProjectPrescriptionDetail & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectPrescriptionDetailElement>;
             "xcastven-xkilian-project-prescriptions-list": LocalJSX.XcastvenXkilianProjectPrescriptionsList & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectPrescriptionsListElement>;
             "xcastven-xkilian-project-register": LocalJSX.XcastvenXkilianProjectRegister & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectRegisterElement>;

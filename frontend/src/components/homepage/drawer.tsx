@@ -67,9 +67,15 @@ export class Drawer {
 
   @Prop() handleAcceptAppointment: (
     appointment: PatientAppointment | DoctorAppointment,
-  ) => Promise<void>;
+    resources: Partial<{
+      facility: Facility;
+      equipment: Equipment;
+      medicine: Medicine;
+    }>,
+  ) => Promise<DoctorAppointment | undefined>;
   @Prop() handleDenyAppointment: (
     appointment: PatientAppointment | DoctorAppointment,
+    denyReason: string,
   ) => Promise<void>;
   @Prop() handleSaveResourcesOnAppointment: (
     appointment: PatientAppointment | DoctorAppointment,
@@ -87,6 +93,10 @@ export class Drawer {
     appointment: DoctorAppointment,
     newPrescription: NewPrescription,
   ) => Promise<Prescription | undefined>;
+  @Prop() handleDeletePrescriptionFromAppointment: (
+    appointment: DoctorAppointment,
+    prescriptionToDelete: PrescriptionDisplay,
+  ) => Promise<void>;
 
   @Prop() handleToggleConditionStatus: (condition: Condition) => Promise<Condition | undefined>;
 
@@ -232,6 +242,7 @@ export class Drawer {
               handleSelectPrescription={this.handleSelectPrescription}
               handleUpdatePrescriptionForAppointment={this.handleUpdatePrescriptionForAppointment}
               handleAddPrescriptionForAppointment={this.handleAddPrescriptionForAppointment}
+              handleDeletePrescriptionFromAppointment={this.handleDeletePrescriptionFromAppointment}
             />
           ) : this.selectedCondition ? (
             <xcastven-xkilian-project-condition-detail

@@ -180,14 +180,24 @@ export class Homepage {
     }
   };
 
-  private handleAcceptAppointment = async (appointment: PatientAppointment | DoctorAppointment) => {
-    // TODO kili when accepting an appointment, you can also pass resources
+  private handleAcceptAppointment = async (
+    appointment: PatientAppointment | DoctorAppointment,
+    resources: Partial<{
+      facility: Facility;
+      equipment: Equipment;
+      medicine: Medicine;
+    }>,
+  ): Promise<DoctorAppointment | undefined> => {
     try {
-      await this.api.appointments.decideAppointment({
+      return await this.api.appointments.decideAppointment({
         appointmentId: appointment.id,
-        appointmentDecision: { action: 'accept', medicine: [], facilities: [], equipment: [] },
+        appointmentDecision: {
+          action: 'accept',
+          medicine: [resources.medicine],
+          facilities: [resources.facility],
+          equipment: [resources.equipment],
+        },
       });
-      // TODO kili this returns DoctorAppointment, it is up to you how will you change the appointment status
     } catch (err) {
       if (!(err instanceof ApiError)) {
         toastService.showError(err);
@@ -199,15 +209,13 @@ export class Homepage {
 
   private handleDenyAppointment = async (
     appointment: PatientAppointment | DoctorAppointment,
-    // reason: string,
+    denyReason: string,
   ) => {
-    // TODO kili when denying an appointment there can be reason
     try {
       await this.api.appointments.decideAppointment({
         appointmentId: appointment.id,
-        appointmentDecision: { action: 'reject', reason: 'TODO kili reason' },
+        appointmentDecision: { action: 'reject', reason: denyReason },
       });
-      // TODO kili this returns DoctorAppointment, it is up to you how will you change the appointment status
     } catch (err) {
       if (!(err instanceof ApiError)) {
         toastService.showError(err);
@@ -277,6 +285,32 @@ export class Homepage {
           doctorsNote: newPrescription.doctorsNote,
         },
       });
+    } catch (err) {
+      if (!(err instanceof ApiError)) {
+        toastService.showError('Unknown server error');
+      } else {
+        toastService.showError(err.message);
+      }
+      return undefined;
+    }
+  };
+
+  private handleDeletePrescriptionFromAppointment = async (
+    appointment: DoctorAppointment,
+    prescriptionToDelete: PrescriptionDisplay,
+  ): Promise<void> => {
+    try {
+      // TODO luky: delete prescription
+      /*this.api.medicalHistory.deletePrescription({
+        newPrescription: {
+          name: newPrescription.name,
+          start: newPrescription.start,
+          end: newPrescription.end,
+          appointmentId: appointment.id,
+          patientId: appointment.patient.id,
+          doctorsNote: newPrescription.doctorsNote,
+        },
+      });*/
     } catch (err) {
       if (!(err instanceof ApiError)) {
         toastService.showError('Unknown server error');
@@ -483,6 +517,7 @@ export class Homepage {
           handleSaveResourcesOnAppointment={this.handleSaveResourcesOnAppointment}
           handleUpdatePrescriptionForAppointment={this.handleUpdatePrescriptionForAppointment}
           handleAddPrescriptionForAppointment={this.handleAddPrescriptionForAppointment}
+          handleDeletePrescriptionFromAppointment={this.handleDeletePrescriptionFromAppointment}
           handleToggleConditionStatus={this.handleToggleConditionStatus}
         />
       </StyledHost>

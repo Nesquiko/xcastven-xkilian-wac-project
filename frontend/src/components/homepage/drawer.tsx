@@ -13,6 +13,7 @@ import {
   PatientAppointment,
   Prescription,
   PrescriptionDisplay,
+  UpdatePrescription,
   User,
   UserRole,
 } from '../../api/generated';
@@ -79,10 +80,9 @@ export class Drawer {
     }>,
   ) => Promise<DoctorAppointment | undefined>;
   @Prop() handleUpdatePrescriptionForAppointment: (
-    appointment: PatientAppointment | DoctorAppointment,
     prescriptionId: string,
-    updatedPrescription: PrescriptionDisplay,
-  ) => Promise<void>;
+    updatedPrescription: UpdatePrescription,
+  ) => Promise<Prescription | undefined>;
   @Prop() handleAddPrescriptionForAppointment: (
     appointment: DoctorAppointment,
     newPrescription: NewPrescription,

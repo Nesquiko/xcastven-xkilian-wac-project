@@ -15,6 +15,7 @@ import {
   PatientsCalendar,
   Prescription,
   PrescriptionDisplay,
+  UpdatePrescription,
   User,
   UserRole,
 } from '../../api/generated';
@@ -243,19 +244,22 @@ export class Homepage {
   };
 
   private handleUpdatePrescriptionForAppointment = async (
-    appointment: PatientAppointment | DoctorAppointment,
     prescriptionId: string,
-    updatedPrescription: PrescriptionDisplay,
-  ) => {
-    // TODO luky /prescriptions/{prescriptionId}
-    console.log(
-      'Update prescription with ID:',
-      prescriptionId,
-      'on appointment',
-      appointment,
-      'with values',
-      updatedPrescription,
-    );
+    updatedPrescription: UpdatePrescription,
+  ): Promise<Prescription | undefined> => {
+    try {
+      return this.api.medicalHistory.updatePrescription({
+        prescriptionId,
+        updatePrescription: updatedPrescription,
+      });
+    } catch (err) {
+      if (!(err instanceof ApiError)) {
+        toastService.showError('Unknown server error');
+      } else {
+        toastService.showError(err.message);
+      }
+      return undefined;
+    }
   };
 
   private handleAddPrescriptionForAppointment = async (
@@ -263,7 +267,7 @@ export class Homepage {
     newPrescription: NewPrescription,
   ): Promise<Prescription | undefined> => {
     try {
-      await this.api.medicalHistory.createPrescription({
+      return this.api.medicalHistory.createPrescription({
         newPrescription: {
           name: newPrescription.name,
           start: newPrescription.start,
@@ -276,9 +280,9 @@ export class Homepage {
     } catch (err) {
       if (!(err instanceof ApiError)) {
         toastService.showError('Unknown server error');
-        return;
+      } else {
+        toastService.showError(err.message);
       }
-      toastService.showError(err.message);
       return undefined;
     }
   };

@@ -13,6 +13,7 @@ import {
   Prescription,
   PrescriptionDisplay,
   TimeSlot,
+  UpdatePrescription,
   User,
   UserRole,
 } from '../../api/generated';
@@ -71,10 +72,9 @@ export class AppointmentDetail {
   ) => Promise<DoctorAppointment | undefined>;
   @Prop() handleSelectPrescription: (prescription: PrescriptionDisplay) => void;
   @Prop() handleUpdatePrescriptionForAppointment: (
-    appointment: PatientAppointment | DoctorAppointment,
     prescriptionId: string,
-    updatedPrescription: PrescriptionDisplay,
-  ) => Promise<void>;
+    updatedPrescription: UpdatePrescription,
+  ) => Promise<Prescription | undefined>;
   @Prop() handleAddPrescriptionForAppointment: (
     appointment: DoctorAppointment,
     newPrescription: NewPrescription,
@@ -430,15 +430,15 @@ export class AppointmentDetail {
     };
 
     this.handleUpdatePrescriptionForAppointment(
-      this.appointment,
       this.editingPrescription.id,
       updatedPrescription,
-    ).then(() => {
+    ).then(presc => {
+      if (!presc) return;
       const index: number = this.appointment.prescriptions.findIndex(
-        (prescription: PrescriptionDisplay) => prescription.id === this.editingPrescription.id,
+        (prescription: PrescriptionDisplay) => prescription.id === presc.id,
       );
       if (index !== -1) {
-        this.appointment.prescriptions[index] = updatedPrescription;
+        this.appointment.prescriptions[index] = presc;
       }
       this.editingPrescription = null;
     });
@@ -849,14 +849,14 @@ export class AppointmentDetail {
 
                   {this.renderDateSelects(
                     'start',
-                    ["Day", "Month", "Year"],
+                    ['Day', 'Month', 'Year'],
                     this.editingPrescriptionNewStart,
                     this.handleUpdatePrescriptionDateChange,
                   )}
 
                   {this.renderDateSelects(
                     'end',
-                    ["Day", "Month", "Year"],
+                    ['Day', 'Month', 'Year'],
                     this.editingPrescriptionNewEnd,
                     this.handleUpdatePrescriptionDateChange,
                   )}
@@ -911,14 +911,14 @@ export class AppointmentDetail {
 
                   {this.renderDateSelects(
                     'start',
-                    ["Day", "Month", "Year"],
+                    ['Day', 'Month', 'Year'],
                     this.addingPrescriptionStart,
                     this.handleAddPrescriptionDateChange,
                   )}
 
                   {this.renderDateSelects(
                     'end',
-                    ["Day", "Month", "Year"],
+                    ['Day', 'Month', 'Year'],
                     this.addingPrescriptionEnd,
                     this.handleAddPrescriptionDateChange,
                   )}
@@ -1002,7 +1002,7 @@ export class AppointmentDetail {
             <div class="mb-3 flex w-full flex-col gap-y-3">
               {this.renderDateSelects(
                 'start',
-                ["Day", "Month", "Year"],
+                ['Day', 'Month', 'Year'],
                 this.reschedulingAppointmentDate,
                 (type: 'start' | 'end', part: 'day' | 'month' | 'year', event: Event) => {
                   const value: number = parseInt((event.target as HTMLSelectElement).value, 10);

@@ -85,9 +85,9 @@ export class AppointmentScheduler {
       toastService.showError(err.message);
     }
     if (this.conditionId) {
-      this.selectedCondition = this.activeConditions.find((condition: ConditionDisplay) => (
-        condition.id === this.conditionId
-      ));
+      this.selectedCondition = this.activeConditions.find(
+        (condition: ConditionDisplay) => condition.id === this.conditionId,
+      );
     }
   }
 
@@ -173,10 +173,7 @@ export class AppointmentScheduler {
     return (
       <div class="flex h-screen w-full flex-1 flex-col overflow-auto">
         {/* Header */}
-        <xcastven-xkilian-project-header
-          type="scheduleAppointment"
-          isDoctor={false}
-        />
+        <xcastven-xkilian-project-header type="scheduleAppointment" isDoctor={false} />
 
         {/* Content */}
         <div class="mx-auto flex w-full flex-1 flex-col md:flex-row">

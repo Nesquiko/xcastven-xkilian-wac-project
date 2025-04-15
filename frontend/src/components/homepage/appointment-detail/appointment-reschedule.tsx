@@ -1,5 +1,5 @@
-import { renderDateSelects } from '../../../utils/utils';
 import { Doctor, TimeSlot } from '../../../api/generated';
+import { renderDateSelects } from '../../../utils/utils';
 import { Component, h, Prop } from '@stencil/core';
 
 @Component({
@@ -35,11 +35,11 @@ export class AppointmentReschedule {
             'start',
             'New appointment date',
             this.reschedulingAppointmentDate,
-            this.handleDateSelectInput
+            this.handleDateSelectInput,
           )}
 
           <div class="flex w-full flex-col gap-y-1">
-            <label class="text-gray-600 font-medium text-sm">Doctor</label>
+            <label class="text-sm font-medium text-gray-600">Doctor</label>
             <md-outlined-select
               label="Doctor"
               class="w-full"
@@ -57,7 +57,7 @@ export class AppointmentReschedule {
           </div>
 
           <div class="flex w-full flex-col gap-y-1">
-            <label class="text-gray-600 font-medium text-sm">Time</label>
+            <label class="text-sm font-medium text-gray-600">Time</label>
             <md-outlined-select
               label="Time"
               class="w-full"
@@ -65,10 +65,7 @@ export class AppointmentReschedule {
               onInput={this.handleTimeSelectInput}
             >
               {this.reschedulingAvailableTimes.map((timeSlot: TimeSlot) => (
-                <md-select-option
-                  value={timeSlot.time}
-                  disabled={timeSlot.status !== 'available'}
-                >
+                <md-select-option value={timeSlot.time} disabled={timeSlot.status !== 'available'}>
                   <div slot="headline">{timeSlot.time}</div>
                 </md-select-option>
               ))}
@@ -76,7 +73,7 @@ export class AppointmentReschedule {
           </div>
 
           <div class="flex w-full flex-col gap-y-1">
-            <label class="text-gray-600 font-medium text-sm">Reason for re-scheduling</label>
+            <label class="text-sm font-medium text-gray-600">Reason for re-scheduling</label>
             <md-outlined-text-field
               label="Rescheduling reason (optional)"
               class="w-full"
@@ -107,5 +104,5 @@ export class AppointmentReschedule {
         </div>
       </div>
     );
-  };
+  }
 }

@@ -51,10 +51,7 @@ export class Header {
         </md-icon-button>
 
         {this.isMenuOpen && (
-          <div
-            class="fixed inset-0 z-99 bg-black/50"
-            onClick={() => (this.isMenuOpen = false)}
-          />
+          <div class="fixed inset-0 z-99 bg-black/50" onClick={() => (this.isMenuOpen = false)} />
         )}
 
         <xcastven-xkilian-project-menu
@@ -63,7 +60,7 @@ export class Header {
           handleResetMenu={() => (this.isMenuOpen = false)}
         />
 
-        {this.type === "calendar" ? (
+        {this.type === 'calendar' ? (
           <div class="flex flex-1 items-center justify-center gap-x-10">
             <md-icon-button onClick={this.handlePreviousMonth} title="Previous month">
               <md-icon class="text-white">chevron_left</md-icon>
@@ -95,9 +92,9 @@ export class Header {
         )}
 
         <md-icon-button onClick={() => window.navigation.navigate('account')}>
-        <md-icon class="text-white">account_circle</md-icon>
+          <md-icon class="text-white">account_circle</md-icon>
         </md-icon-button>
       </div>
     );
-  };
+  }
 }

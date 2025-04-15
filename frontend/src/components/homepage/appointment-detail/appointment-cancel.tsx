@@ -33,14 +33,11 @@ export class AppointmentCancel {
           >
             Confirm cancel
           </md-filled-button>
-          <md-outlined-button
-            class="w-1/2 rounded-full"
-            onClick={() => this.setCancelling(false)}
-          >
+          <md-outlined-button class="w-1/2 rounded-full" onClick={() => this.setCancelling(false)}>
             Back
           </md-outlined-button>
         </div>
       </div>
     );
-  };
+  }
 }

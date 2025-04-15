@@ -40,7 +40,7 @@ export class AppointmentResources {
           Resources
         </div>
 
-        {["scheduled", "requested"].includes(this.appointment.status) && (
+        {['scheduled', 'requested'].includes(this.appointment.status) && (
           <md-icon-button
             title="Edit resources"
             class="absolute top-1 left-32"
@@ -56,7 +56,8 @@ export class AppointmentResources {
             Facility
           </div>
           <span class="font-medium text-gray-600">
-            {instanceOfDoctorAppointment(this.appointment) && (this.appointment.equipment?.[0].name ?? "")}
+            {instanceOfDoctorAppointment(this.appointment) &&
+              (this.appointment.equipment?.[0].name ?? '')}
           </span>
         </div>
         <div class="flex w-full flex-row items-center justify-between">
@@ -65,7 +66,8 @@ export class AppointmentResources {
             Equipment
           </div>
           <span class="font-medium text-gray-600">
-            {instanceOfDoctorAppointment(this.appointment) && (this.appointment.equipment?.[0].name ?? "")}
+            {instanceOfDoctorAppointment(this.appointment) &&
+              (this.appointment.equipment?.[0].name ?? '')}
           </span>
         </div>
         <div class="flex w-full flex-row items-center justify-between">
@@ -74,15 +76,17 @@ export class AppointmentResources {
             Medicine
           </div>
           <span class="font-medium text-gray-600">
-            {instanceOfDoctorAppointment(this.appointment) && (this.appointment.medicine?.[0].name ?? "")}
+            {instanceOfDoctorAppointment(this.appointment) &&
+              (this.appointment.medicine?.[0].name ?? '')}
           </span>
         </div>
 
-        {this.isDoctor && instanceOfDoctorAppointment(this.appointment) &&
-          ["scheduled", "requested"].includes(this.appointment.status) &&
+        {this.isDoctor &&
+          instanceOfDoctorAppointment(this.appointment) &&
+          ['scheduled', 'requested'].includes(this.appointment.status) &&
           this.editingResources && (
             <div class="mt-3 w-full">
-              <h4 class="w-full text-center mb-2 font-medium text-[#7357be]">Edit resources</h4>
+              <h4 class="mb-2 w-full text-center font-medium text-[#7357be]">Edit resources</h4>
               <div class="mb-3 flex w-full flex-col gap-y-3">
                 <md-outlined-select
                   label="Facility"
@@ -133,7 +137,7 @@ export class AppointmentResources {
                 </md-outlined-select>
               </div>
 
-              {this.appointment.status === "scheduled" && (
+              {this.appointment.status === 'scheduled' && (
                 <div class="flex flex-row items-center justify-between gap-x-2">
                   <md-filled-button
                     class={`w-1/2 rounded-full bg-[#7357be]`}
@@ -154,5 +158,5 @@ export class AppointmentResources {
           )}
       </div>
     );
-  };
+  }
 }

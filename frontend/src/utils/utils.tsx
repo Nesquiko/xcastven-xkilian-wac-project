@@ -252,7 +252,7 @@ export const formatAppointmentType = (appointmentType: AppointmentType) => {
 };
 
 export const days: Array<number> = Array.from({ length: 31 }, (_, i) => i + 1);
-export const months: Array<{ value: number, name: string }> = [
+export const months: Array<{ value: number; name: string }> = [
   { value: 0, name: 'January' },
   { value: 1, name: 'February' },
   { value: 2, name: 'March' },
@@ -294,12 +294,9 @@ export const updateDatePart = (
   }
 
   return new Date(year, month, day);
-}
+};
 
-export const getDatePart = (
-  date: Date | null,
-  part: 'day' | 'month' | 'year'
-): number | '' => {
+export const getDatePart = (date: Date | null, part: 'day' | 'month' | 'year'): number | '' => {
   if (!date || isNaN(date.getTime())) return '';
   switch (part) {
     case 'day':
@@ -319,7 +316,7 @@ export const renderDateSelects = (
 ) => {
   return (
     <div class="flex w-full max-w-md flex-col gap-y-1">
-      <label class="text-gray-600 font-medium text-sm">{label}</label>
+      <label class="text-sm font-medium text-gray-600">{label}</label>
       <div class="flex w-full max-w-md flex-row justify-between gap-x-3">
         <md-outlined-select
           required={true}

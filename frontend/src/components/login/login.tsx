@@ -1,8 +1,8 @@
 import { Api, ApiError } from '../../api/api';
 import { User, UserRole } from '../../api/generated';
 import { StyledHost } from '../StyledHost';
-import { Component, h, Prop, State } from '@stencil/core';
 import { toastService } from '../services/toast-service';
+import { Component, h, Prop, State } from '@stencil/core';
 
 @Component({
   tag: 'xcastven-xkilian-project-login',

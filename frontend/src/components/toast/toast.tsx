@@ -14,11 +14,7 @@ export class Toast {
   private timeoutId: number;
 
   @Method()
-  async show(
-    message: string,
-    type: 'success' | 'error' | 'info' = 'info',
-    duration?: number
-  ) {
+  async show(message: string, type: 'success' | 'error' | 'info' = 'info', duration?: number) {
     this.message = message;
     this.type = type;
     this.isVisible = true;
@@ -27,7 +23,7 @@ export class Toast {
     this.timeoutId = window.setTimeout(() => {
       this.isVisible = false;
     }, duration || this.duration);
-  };
+  }
 
   render() {
     const typeClasses = {
@@ -44,19 +40,19 @@ export class Toast {
 
     return (
       <div
-        class={`fixed bottom-4 left-1/2 transform -translate-x-1/2 z-50 transition-all duration-300 ${
+        class={`fixed bottom-4 left-1/2 z-50 -translate-x-1/2 transform transition-all duration-300 ${
           this.isVisible
-            ? 'opacity-100 translate-y-0'
-            : 'opacity-0 translate-y-8 pointer-events-none'
+            ? 'translate-y-0 opacity-100'
+            : 'pointer-events-none translate-y-8 opacity-0'
         }`}
       >
         <md-elevated-card class={`border-l-4 ${typeClasses[this.type]}`}>
-          <div class="px-4 py-3 flex items-center">
+          <div class="flex items-center px-4 py-3">
             <md-icon class="mr-2">{iconNames[this.type]}</md-icon>
             <span>{this.message}</span>
           </div>
         </md-elevated-card>
       </div>
     );
-  };
+  }
 }

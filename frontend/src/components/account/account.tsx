@@ -25,10 +25,7 @@ export class Account {
 
     return (
       <StyledHost class="flex h-screen w-full flex-col overflow-hidden bg-gray-300">
-        <xcastven-xkilian-project-header
-          type="account"
-          isDoctor={this.user.role === "doctor"}
-        />
+        <xcastven-xkilian-project-header type="account" isDoctor={this.user.role === 'doctor'} />
 
         {/* Content */}
         <div class="relative flex h-full w-full flex-1 items-center justify-center">

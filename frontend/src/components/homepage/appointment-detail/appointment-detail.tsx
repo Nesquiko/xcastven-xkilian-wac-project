@@ -1,6 +1,7 @@
 import { Api, ApiError } from '../../../api/api';
 import {
-  AppointmentStatus, AvailableResources,
+  AppointmentStatus,
+  AvailableResources,
   Doctor,
   DoctorAppointment,
   Equipment,
@@ -271,7 +272,11 @@ export class AppointmentDetail {
     );
   };
 
-  private handleDateSelectInput = (type: 'start' | 'end', part: 'day' | 'month' | 'year', event: Event) => {
+  private handleDateSelectInput = (
+    type: 'start' | 'end',
+    part: 'day' | 'month' | 'year',
+    event: Event,
+  ) => {
     const value: number = parseInt((event.target as HTMLSelectElement).value, 10);
     this.reschedulingAppointmentDate = updateDatePart(
       this.reschedulingAppointmentDate,
@@ -395,17 +400,18 @@ export class AppointmentDetail {
 
     this.handleSaveResourcesOnAppointment(this.appointment, newResources).then(
       (appointment: DoctorAppointment) => {
-      console.log("Saving resources on appt:", appointment);
-      if (!appointment) return;
+        console.log('Saving resources on appt:', appointment);
+        if (!appointment) return;
 
-      this.appointment = {
-        ...this.appointment,
-        facilities: appointment.facilities,
-        equipment: appointment.equipment,
-        medicine: appointment.medicine,
-      };
-      this.editingResources = false;
-    });
+        this.appointment = {
+          ...this.appointment,
+          facilities: appointment.facilities,
+          equipment: appointment.equipment,
+          medicine: appointment.medicine,
+        };
+        this.editingResources = false;
+      },
+    );
   };
 
   private handleAddPrescriptionNameChange = (event: Event) => {
@@ -509,7 +515,7 @@ export class AppointmentDetail {
       }
       this.editingPrescription = null;
 
-      this.editingPrescriptionNewName = "";
+      this.editingPrescriptionNewName = '';
       this.editingPrescriptionNewStart = null;
       this.editingPrescriptionNewEnd = null;
       this.editingPrescriptionNewDoctorsNote = null;
@@ -521,19 +527,20 @@ export class AppointmentDetail {
       throw new Error('Unexpected state, appointment is not DoctorAppointment');
     }
 
-    this.handleDeletePrescriptionFromAppointment(
-      this.appointment,
-      this.deletingPrescription,
-    ).then(() => {
-      this.appointment = {
-        ...this.appointment,
-        prescriptions: this.appointment.prescriptions.filter(
-          (prescription: PrescriptionDisplay): boolean => prescription.id !== this.deletingPrescription.id)
-      };
-    });
+    this.handleDeletePrescriptionFromAppointment(this.appointment, this.deletingPrescription).then(
+      () => {
+        this.appointment = {
+          ...this.appointment,
+          prescriptions: this.appointment.prescriptions.filter(
+            (prescription: PrescriptionDisplay): boolean =>
+              prescription.id !== this.deletingPrescription.id,
+          ),
+        };
+      },
+    );
   };
 
-  private cancelledByStatus = (): " by doctor" | " by patient" | undefined => {
+  private cancelledByStatus = (): ' by doctor' | ' by patient' | undefined => {
     if (!this.appointment.canceledBy) return;
     return this.appointment.canceledBy === 'doctor' ? ' by doctor' : ' by patient';
   };
@@ -667,7 +674,9 @@ export class AppointmentDetail {
             isDoctor={this.isDoctor}
             appointment={this.appointment}
             editingResources={this.editingResources}
-            setEditingResources={(editingResources: boolean) => this.editingResources = editingResources}
+            setEditingResources={(editingResources: boolean) =>
+              (this.editingResources = editingResources)
+            }
             availableFacilities={this.availableFacilities}
             selectedFacility={this.selectedFacility}
             handleSelectFacility={this.handleSelectFacility}
@@ -682,14 +691,16 @@ export class AppointmentDetail {
         )}
 
         {/* Appointment Prescriptions */}
-        {["scheduled", "completed"].includes(this.appointment.status) && (
+        {['scheduled', 'completed'].includes(this.appointment.status) && (
           <xcastven-xkilian-project-appointment-prescriptions
             isDoctor={this.isDoctor}
             appointment={this.appointment}
             prescriptionsExpanded={this.prescriptionsExpanded}
             handleSelectPrescription={this.handleSelectPrescription}
             addingPrescription={this.addingPrescription}
-            setAddingPrescription={(addingPrescription: boolean) => this.addingPrescription = addingPrescription}
+            setAddingPrescription={(addingPrescription: boolean) =>
+              (this.addingPrescription = addingPrescription)
+            }
             addingPrescriptionName={this.addingPrescriptionName}
             addingPrescriptionStart={this.addingPrescriptionStart}
             addingPrescriptionEnd={this.addingPrescriptionEnd}
@@ -699,17 +710,23 @@ export class AppointmentDetail {
             handleAddPrescriptionDoctorsNoteChange={this.handleAddPrescriptionDoctorsNoteChange}
             handleAddPrescription={this.handleAddPrescription}
             editingPrescription={this.editingPrescription}
-            setEditingPrescription={(editingPrescription: PrescriptionDisplay) => this.editingPrescription = editingPrescription}
+            setEditingPrescription={(editingPrescription: PrescriptionDisplay) =>
+              (this.editingPrescription = editingPrescription)
+            }
             editingPrescriptionNewName={this.editingPrescriptionNewName}
             editingPrescriptionNewStart={this.editingPrescriptionNewStart}
             editingPrescriptionNewEnd={this.editingPrescriptionNewEnd}
             editingPrescriptionNewDoctorsNote={this.editingPrescriptionNewDoctorsNote}
             handleUpdatePrescriptionNameChange={this.handleUpdatePrescriptionNameChange}
             handleUpdatePrescriptionDateChange={this.handleUpdatePrescriptionDateChange}
-            handleUpdatePrescriptionDoctorsNoteChange={this.handleUpdatePrescriptionDoctorsNoteChange}
+            handleUpdatePrescriptionDoctorsNoteChange={
+              this.handleUpdatePrescriptionDoctorsNoteChange
+            }
             handleUpdatePrescription={this.handleUpdatePrescription}
             deletingPrescription={this.deletingPrescription}
-            setDeletingPrescription={(deletingPrescription: PrescriptionDisplay) => this.deletingPrescription = deletingPrescription}
+            setDeletingPrescription={(deletingPrescription: PrescriptionDisplay) =>
+              (this.deletingPrescription = deletingPrescription)
+            }
             handleDeletePrescription={this.handleDeletePrescription}
           />
         )}
@@ -727,27 +744,27 @@ export class AppointmentDetail {
 
         {this.isDoctor
           ? getDoctorAppointmentActions(
-            this.appointment.status,
-            () => {
-              this.cancelling = !this.cancelling;
-              this.rescheduling = false;
-              this.denying = false;
-            },
-            this.handleAccept,
-            () => {
-              this.denying = !this.denying;
-              this.cancelling = false;
-              this.rescheduling = false;
-            },
-          )
+              this.appointment.status,
+              () => {
+                this.cancelling = !this.cancelling;
+                this.rescheduling = false;
+                this.denying = false;
+              },
+              this.handleAccept,
+              () => {
+                this.denying = !this.denying;
+                this.cancelling = false;
+                this.rescheduling = false;
+              },
+            )
           : getPatientAppointmentActions(
-            this.appointment.status,
-            () => {
-              this.rescheduling = !this.rescheduling;
-              this.cancelling = false;
-              this.denying = false;
-              if (this.rescheduling) {
-                this.loadReschedulingDoctors();
+              this.appointment.status,
+              () => {
+                this.rescheduling = !this.rescheduling;
+                this.cancelling = false;
+                this.denying = false;
+                if (this.rescheduling) {
+                  this.loadReschedulingDoctors();
                 }
               },
               () => {
@@ -769,7 +786,9 @@ export class AppointmentDetail {
             handleDateSelectInput={this.handleDateSelectInput}
             handleDoctorSelectInput={this.handleDoctorSelectInput}
             handleTimeSelectInput={this.handleTimeSelectInput}
-            handleReschedulingAppointmentReasonChange={this.handleReschedulingAppointmentReasonChange}
+            handleReschedulingAppointmentReasonChange={
+              this.handleReschedulingAppointmentReasonChange
+            }
             handleReschedule={this.handleReschedule}
           />
         )}
@@ -777,7 +796,7 @@ export class AppointmentDetail {
         {this.cancelling && (
           <xcastven-xkilian-project-appointment-cancel
             cancelling={this.cancelling}
-            setCancelling={(cancelling: boolean) => this.cancelling = cancelling}
+            setCancelling={(cancelling: boolean) => (this.cancelling = cancelling)}
             cancellingAppointmentReason={this.cancellingAppointmentReason}
             handleCancellingAppointmentReasonChange={this.handleCancellingAppointmentReasonChange}
             handleCancel={this.handleCancel}
@@ -815,5 +834,5 @@ export class AppointmentDetail {
         )}
       </div>
     );
-  };
+  }
 }

@@ -1,16 +1,12 @@
 interface ToastElement extends HTMLElement {
-  show (
-    message: string,
-    type: 'success' | 'error' | 'info',
-    duration?: number
-  ): void;
+  show(message: string, type: 'success' | 'error' | 'info', duration?: number): void;
 }
 
 export class ToastService {
   private static instance: ToastService;
   private toastElement: ToastElement | null = null;
 
-  private constructor() {};
+  private constructor() {}
 
   public static getInstance(): ToastService {
     if (!ToastService.instance) {
@@ -24,7 +20,9 @@ export class ToastService {
       this.toastElement = document.querySelector('xcastven-xkilian-project-toast') as ToastElement;
 
       if (!this.toastElement) {
-        this.toastElement = document.createElement('xcastven-xkilian-project-toast') as ToastElement;
+        this.toastElement = document.createElement(
+          'xcastven-xkilian-project-toast',
+        ) as ToastElement;
         document.body.appendChild(this.toastElement);
       }
     }

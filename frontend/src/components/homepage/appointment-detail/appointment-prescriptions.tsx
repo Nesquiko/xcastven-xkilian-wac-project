@@ -5,8 +5,8 @@ import {
   PatientAppointment,
   PrescriptionDisplay,
 } from '../../../api/generated';
-import { Component, h, Prop } from '@stencil/core';
 import { renderDateSelects } from '../../../utils/utils';
+import { Component, h, Prop } from '@stencil/core';
 
 @Component({
   tag: 'xcastven-xkilian-project-appointment-prescriptions',
@@ -52,9 +52,7 @@ export class AppointmentPrescriptions {
   @Prop() setDeletingPrescription: (deletingPrescription: PrescriptionDisplay) => void;
   @Prop() handleDeletePrescription: () => void;
 
-  private toggleAddPrescriptionForm = (
-    event: Event,
-  ) => {
+  private toggleAddPrescriptionForm = (event: Event) => {
     event.stopPropagation();
 
     if (this.addingPrescription) {
@@ -67,10 +65,7 @@ export class AppointmentPrescriptions {
     this.setDeletingPrescription(null);
   };
 
-  private toggleEditPrescriptionForm = (
-    event: Event,
-    prescription: PrescriptionDisplay,
-  ) => {
+  private toggleEditPrescriptionForm = (event: Event, prescription: PrescriptionDisplay) => {
     event.stopPropagation();
 
     if (this.editingPrescription.id === prescription.id) {
@@ -79,22 +74,15 @@ export class AppointmentPrescriptions {
     }
 
     this.editingPrescriptionNewName = prescription.name;
-    this.editingPrescriptionNewStart = prescription.start
-      ? new Date(prescription.start)
-      : null;
-    this.editingPrescriptionNewEnd = prescription.end
-      ? new Date(prescription.end)
-      : null;
+    this.editingPrescriptionNewStart = prescription.start ? new Date(prescription.start) : null;
+    this.editingPrescriptionNewEnd = prescription.end ? new Date(prescription.end) : null;
     // this.editingPrescriptionNewDoctorsNote = prescription.doctorsNote ?? '';
     this.setEditingPrescription(prescription);
     this.setAddingPrescription(false);
     this.setDeletingPrescription(null);
   };
 
-  private toggleDeletePrescriptionForm = (
-    event: Event,
-    prescription: PrescriptionDisplay,
-  ) => {
+  private toggleDeletePrescriptionForm = (event: Event, prescription: PrescriptionDisplay) => {
     event.stopPropagation();
 
     if (this.deletingPrescription.id === prescription.id) {
@@ -162,12 +150,14 @@ export class AppointmentPrescriptions {
                   {prescription.name}
                 </div>
                 {instanceOfDoctorAppointment(this.appointment) &&
-                  ["completed", "scheduled"].includes(this.appointment.status) && (
+                  ['completed', 'scheduled'].includes(this.appointment.status) && (
                     <div class="flex flex-row items-center gap-x-2">
                       {/* Edit prescription */}
                       <md-icon-button
                         title="Edit prescription"
-                        onClick={(event: Event) => this.toggleEditPrescriptionForm(event, prescription)}
+                        onClick={(event: Event) =>
+                          this.toggleEditPrescriptionForm(event, prescription)
+                        }
                         style={{ width: '24px', height: '24px' }}
                       >
                         <md-icon style={{ fontSize: '16px' }}>edit</md-icon>
@@ -176,7 +166,9 @@ export class AppointmentPrescriptions {
                       {/* Delete prescription */}
                       <md-icon-button
                         title="Delete prescription"
-                        onClick={(event: Event) => this.toggleDeletePrescriptionForm(event, prescription)}
+                        onClick={(event: Event) =>
+                          this.toggleDeletePrescriptionForm(event, prescription)
+                        }
                         style={{ width: '24px', height: '24px' }}
                       >
                         <md-icon style={{ fontSize: '16px' }}>delete</md-icon>
@@ -201,10 +193,12 @@ export class AppointmentPrescriptions {
           instanceOfDoctorAppointment(this.appointment) &&
           this.addingPrescription && (
             <div class="mt-3 w-full pt-3">
-              <h4 class="w-full text-center mb-2 font-medium text-[#7357be]">Add a new prescription</h4>
+              <h4 class="mb-2 w-full text-center font-medium text-[#7357be]">
+                Add a new prescription
+              </h4>
               <div class="mb-3 flex w-full flex-col gap-y-3">
                 <div class="flex w-full flex-col gap-y-1">
-                  <label class="text-gray-600 font-medium text-sm">Prescription name</label>
+                  <label class="text-sm font-medium text-gray-600">Prescription name</label>
                   <md-outlined-text-field
                     required={true}
                     label="Prescription name"
@@ -216,20 +210,20 @@ export class AppointmentPrescriptions {
 
                 {renderDateSelects(
                   'start',
-                  "Prescription start date",
+                  'Prescription start date',
                   this.addingPrescriptionStart,
                   this.handleAddPrescriptionDateChange,
                 )}
 
                 {renderDateSelects(
                   'end',
-                  "Prescription end date",
+                  'Prescription end date',
                   this.addingPrescriptionEnd,
                   this.handleAddPrescriptionDateChange,
                 )}
 
                 <div class="flex w-full flex-col gap-y-1">
-                  <label class="text-gray-600 font-medium text-sm">Doctor's note</label>
+                  <label class="text-sm font-medium text-gray-600">Doctor's note</label>
                   <md-outlined-text-field
                     type="textarea"
                     rows={2}
@@ -268,10 +262,10 @@ export class AppointmentPrescriptions {
           instanceOfDoctorAppointment(this.appointment) &&
           this.editingPrescription && (
             <div class="mt-3 w-full pt-3">
-              <h4 class="w-full text-center mb-2 font-medium text-[#7357be]">Edit prescription</h4>
+              <h4 class="mb-2 w-full text-center font-medium text-[#7357be]">Edit prescription</h4>
               <div class="mb-3 flex w-full flex-col gap-y-3">
                 <div class="flex w-full flex-col gap-y-1">
-                  <label class="text-gray-600 font-medium text-sm">Prescription name</label>
+                  <label class="text-sm font-medium text-gray-600">Prescription name</label>
                   <md-outlined-text-field
                     required={true}
                     label="Prescription name"
@@ -295,7 +289,9 @@ export class AppointmentPrescriptions {
                   this.handleUpdatePrescriptionDateChange,
                 )}
                 <div class="flex w-full flex-col gap-y-1">
-                  <label class="text-gray-600 font-medium text-sm">Prescription doctor's note</label>
+                  <label class="text-sm font-medium text-gray-600">
+                    Prescription doctor's note
+                  </label>
                   <md-outlined-text-field
                     type="textarea"
                     rows={2}
@@ -334,8 +330,12 @@ export class AppointmentPrescriptions {
           instanceOfDoctorAppointment(this.appointment) &&
           this.deletingPrescription && (
             <div class="mt-3 w-full pt-3">
-              <h4 class="w-full text-center mb-2 font-medium text-[#7357be]">Delete prescription</h4>
-              <p class="w-full text-gray-600 text-sm text-center mb-3">Are you sure you want to delete this prescription?</p>
+              <h4 class="mb-2 w-full text-center font-medium text-[#7357be]">
+                Delete prescription
+              </h4>
+              <p class="mb-3 w-full text-center text-sm text-gray-600">
+                Are you sure you want to delete this prescription?
+              </p>
 
               <div class="flex gap-x-2">
                 <md-filled-button
@@ -355,5 +355,5 @@ export class AppointmentPrescriptions {
           )}
       </div>
     );
-  };
+  }
 }

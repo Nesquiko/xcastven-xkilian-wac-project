@@ -16,48 +16,48 @@ export class Menu {
   @Prop() handleResetMenu: () => void;
 
   private homeButton: MenuButton = {
-    title: "Home",
-    icon: "home",
+    title: 'Home',
+    icon: 'home',
     onClick: () => {
       this.handleResetMenu();
-      window.navigation.navigate("homepage");
+      window.navigation.navigate('homepage');
     },
   };
 
   private scheduleAppointmentButton: MenuButton = {
-    title: "Schedule an appointment",
-    icon: "event",
+    title: 'Schedule an appointment',
+    icon: 'event',
     onClick: () => {
       this.handleResetMenu();
-      window.navigation.navigate("scheduleAppointment");
+      window.navigation.navigate('scheduleAppointment');
     },
   };
 
   private registerConditionButton: MenuButton = {
-    title: "Register a condition",
-    icon: "coronavirus",
+    title: 'Register a condition',
+    icon: 'coronavirus',
     onClick: () => {
       this.handleResetMenu();
-      window.navigation.navigate("registerCondition");
+      window.navigation.navigate('registerCondition');
     },
   };
 
   private accountButton: MenuButton = {
-    title: "Account",
-    icon: "account_circle",
+    title: 'Account',
+    icon: 'account_circle',
     onClick: () => {
       this.handleResetMenu();
-      window.navigation.navigate("account");
+      window.navigation.navigate('account');
     },
   };
 
   private logoutButton: MenuButton = {
-    title: "Logout",
-    icon: "logout",
+    title: 'Logout',
+    icon: 'logout',
     onClick: () => {
       this.handleResetMenu();
-      sessionStorage.setItem("user", null);
-      window.navigation.navigate("login");
+      sessionStorage.setItem('user', null);
+      window.navigation.navigate('login');
     },
   };
 
@@ -76,7 +76,9 @@ export class Menu {
   ] satisfies Array<MenuButton>;
 
   render() {
-    const menuButtons: Array<MenuButton> = this.isDoctor ? this.doctorMenuButtons : this.patientMenuButtons;
+    const menuButtons: Array<MenuButton> = this.isDoctor
+      ? this.doctorMenuButtons
+      : this.patientMenuButtons;
 
     return (
       <div
@@ -86,14 +88,14 @@ export class Menu {
         onClick={(e: MouseEvent) => e.stopPropagation()}
       >
         <div class="flex h-full flex-col overflow-y-auto">
-          <h2 class="w-full text-center text-lg font-medium bg-[#7357be] text-white px-4 py-3">
+          <h2 class="w-full bg-[#7357be] px-4 py-3 text-center text-lg font-medium text-white">
             Menu
           </h2>
           <div class="flex w-full flex-col items-center justify-center p-3">
             {menuButtons.map((menuButton: MenuButton) => (
               <div
                 role="button"
-                class="cursor-pointer rounded-full px-4 py-3 w-full flex flex-row items-center justify-between border-2 border-transparent hover:border-[#d8c7ed]"
+                class="flex w-full cursor-pointer flex-row items-center justify-between rounded-full border-2 border-transparent px-4 py-3 hover:border-[#d8c7ed]"
                 onClick={menuButton.onClick}
               >
                 <span class="font-medium text-gray-600">{menuButton.title}</span>

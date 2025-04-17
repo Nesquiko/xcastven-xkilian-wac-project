@@ -6,7 +6,7 @@ import { Component, h, Prop, State, Method, Element } from '@stencil/core';
 })
 export class Toast {
   @Element() el: HTMLElement;
-  @Prop() duration: number = 300_000;
+  @Prop() duration: number = 3_000;
   @State() isVisible: boolean = false;
   @State() message: string = '';
   @State() type: 'success' | 'error' | 'info' = 'info';
@@ -34,7 +34,7 @@ export class Toast {
 
     return (
       <div
-        class={`fixed bottom-4 left-20 z-50 -translate-x-1/2 transform transition-all duration-300 flex flex-row justify-center items-center gap-x-2 ${
+        class={`fixed bottom-4 left-4 z-50 transform transition-all duration-300 flex flex-row justify-center items-center gap-x-2 bg-white rounded-md border-2 border-[#d8c7ed] px-4 py-3 ${
           this.isVisible
             ? 'translate-y-0 opacity-100'
             : 'pointer-events-none translate-y-8 opacity-0'

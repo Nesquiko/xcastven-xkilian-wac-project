@@ -5,14 +5,17 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
+import { Navigate } from "./utils/types";
 import { AppointmentDisplay, AppointmentStatus, Condition, ConditionDisplay, Doctor, DoctorAppointment, Equipment, Facility, Medicine, NewPrescription, PatientAppointment, Prescription, PrescriptionDisplay, TimeSlot, UpdatePrescription, User, UserRole } from "./api/generated";
 import { Api } from "./api/api";
 import { User as User1 } from "./components";
+export { Navigate } from "./utils/types";
 export { AppointmentDisplay, AppointmentStatus, Condition, ConditionDisplay, Doctor, DoctorAppointment, Equipment, Facility, Medicine, NewPrescription, PatientAppointment, Prescription, PrescriptionDisplay, TimeSlot, UpdatePrescription, User, UserRole } from "./api/generated";
 export { Api } from "./api/api";
 export { User as User1 } from "./components";
 export namespace Components {
     interface XcastvenXkilianProjectAccount {
+        "navigate": Navigate;
     }
     interface XcastvenXkilianProjectApp {
         "apiBase": string;
@@ -170,12 +173,14 @@ export namespace Components {
         "api": Api;
         "conditionId": string;
         "initialDate": Date;
+        "navigate": Navigate;
         "user": User;
     }
     interface XcastvenXkilianProjectAppointmentsList {
         "appointments": Array<AppointmentDisplay>;
         "handleSelectAppointment": (appointment: AppointmentDisplay) => void;
         "isDoctor": boolean;
+        "navigate": Navigate;
         "noDataMessage": string;
         "selectedDate": Date;
         "setSelectedDate": (date: Date) => void;
@@ -209,15 +214,18 @@ export namespace Components {
         "handleResetSelection": () => void;
         "handleSelectAppointment": (appointment: AppointmentDisplay) => void;
         "handleToggleConditionStatus": (condition: Condition) => Promise<Condition | undefined>;
+        "navigate": Navigate;
     }
     interface XcastvenXkilianProjectConditionRegisterer {
         "api": Api;
+        "navigate": Navigate;
         "startDate": Date;
         "user": User1;
     }
     interface XcastvenXkilianProjectConditionsList {
         "conditions": Array<ConditionDisplay>;
         "handleSelectCondition": (condition: ConditionDisplay) => void;
+        "navigate": Navigate;
         "selectedDate": Date;
         "setSelectedDate": (date: Date) => void;
     }
@@ -288,6 +296,7 @@ export namespace Components {
   ) => Promise<Prescription | undefined>;
         "isDoctor": boolean;
         "isDrawerOpen": boolean;
+        "navigate": Navigate;
         "selectedAppointment": AppointmentDisplay;
         "selectedAppointmentStatusGroup": AppointmentStatus;
         "selectedCondition": ConditionDisplay;
@@ -300,6 +309,7 @@ export namespace Components {
     interface XcastvenXkilianProjectFooter {
         "handleToggleLegendMenu": () => void;
         "isDoctor": boolean;
+        "navigate": Navigate;
     }
     interface XcastvenXkilianProjectHeader {
         "currentViewMonth"?: number;
@@ -308,21 +318,25 @@ export namespace Components {
         "handlePreviousMonth"?: () => void;
         "handleYearChange"?: (event: Event) => void;
         "isDoctor": boolean;
+        "navigate": Navigate;
         "type": 'calendar' | 'account' | 'scheduleAppointment' | 'registerCondition';
     }
     interface XcastvenXkilianProjectHomePage {
         "api": Api;
+        "navigate": Navigate;
     }
     interface XcastvenXkilianProjectLegend {
         "handleResetSelection": () => void;
     }
     interface XcastvenXkilianProjectLogin {
         "api": Api;
+        "navigate": Navigate;
     }
     interface XcastvenXkilianProjectMenu {
         "handleResetMenu": () => void;
         "isDoctor": boolean;
         "isMenuOpen": boolean;
+        "navigate": Navigate;
     }
     interface XcastvenXkilianProjectNoData {
         "displayTitle": string;
@@ -330,6 +344,7 @@ export namespace Components {
         "iconSize": number;
     }
     interface XcastvenXkilianProjectNotFound {
+        "navigate": Navigate;
     }
     interface XcastvenXkilianProjectPrescriptionDetail {
         "api": Api;
@@ -344,6 +359,7 @@ export namespace Components {
     }
     interface XcastvenXkilianProjectRegister {
         "api": Api;
+        "navigate": Navigate;
     }
     interface XcastvenXkilianProjectToast {
         "duration": number;
@@ -559,6 +575,7 @@ declare global {
 }
 declare namespace LocalJSX {
     interface XcastvenXkilianProjectAccount {
+        "navigate"?: Navigate;
     }
     interface XcastvenXkilianProjectApp {
         "apiBase"?: string;
@@ -716,12 +733,14 @@ declare namespace LocalJSX {
         "api"?: Api;
         "conditionId"?: string;
         "initialDate"?: Date;
+        "navigate"?: Navigate;
         "user"?: User;
     }
     interface XcastvenXkilianProjectAppointmentsList {
         "appointments"?: Array<AppointmentDisplay>;
         "handleSelectAppointment"?: (appointment: AppointmentDisplay) => void;
         "isDoctor"?: boolean;
+        "navigate"?: Navigate;
         "noDataMessage"?: string;
         "selectedDate"?: Date;
         "setSelectedDate"?: (date: Date) => void;
@@ -755,15 +774,18 @@ declare namespace LocalJSX {
         "handleResetSelection"?: () => void;
         "handleSelectAppointment"?: (appointment: AppointmentDisplay) => void;
         "handleToggleConditionStatus"?: (condition: Condition) => Promise<Condition | undefined>;
+        "navigate"?: Navigate;
     }
     interface XcastvenXkilianProjectConditionRegisterer {
         "api"?: Api;
+        "navigate"?: Navigate;
         "startDate"?: Date;
         "user"?: User1;
     }
     interface XcastvenXkilianProjectConditionsList {
         "conditions"?: Array<ConditionDisplay>;
         "handleSelectCondition"?: (condition: ConditionDisplay) => void;
+        "navigate"?: Navigate;
         "selectedDate"?: Date;
         "setSelectedDate"?: (date: Date) => void;
     }
@@ -834,6 +856,7 @@ declare namespace LocalJSX {
   ) => Promise<Prescription | undefined>;
         "isDoctor"?: boolean;
         "isDrawerOpen"?: boolean;
+        "navigate"?: Navigate;
         "selectedAppointment"?: AppointmentDisplay;
         "selectedAppointmentStatusGroup"?: AppointmentStatus;
         "selectedCondition"?: ConditionDisplay;
@@ -846,6 +869,7 @@ declare namespace LocalJSX {
     interface XcastvenXkilianProjectFooter {
         "handleToggleLegendMenu"?: () => void;
         "isDoctor"?: boolean;
+        "navigate"?: Navigate;
     }
     interface XcastvenXkilianProjectHeader {
         "currentViewMonth"?: number;
@@ -854,21 +878,25 @@ declare namespace LocalJSX {
         "handlePreviousMonth"?: () => void;
         "handleYearChange"?: (event: Event) => void;
         "isDoctor"?: boolean;
+        "navigate"?: Navigate;
         "type"?: 'calendar' | 'account' | 'scheduleAppointment' | 'registerCondition';
     }
     interface XcastvenXkilianProjectHomePage {
         "api"?: Api;
+        "navigate"?: Navigate;
     }
     interface XcastvenXkilianProjectLegend {
         "handleResetSelection"?: () => void;
     }
     interface XcastvenXkilianProjectLogin {
         "api"?: Api;
+        "navigate"?: Navigate;
     }
     interface XcastvenXkilianProjectMenu {
         "handleResetMenu"?: () => void;
         "isDoctor"?: boolean;
         "isMenuOpen"?: boolean;
+        "navigate"?: Navigate;
     }
     interface XcastvenXkilianProjectNoData {
         "displayTitle"?: string;
@@ -876,6 +904,7 @@ declare namespace LocalJSX {
         "iconSize"?: number;
     }
     interface XcastvenXkilianProjectNotFound {
+        "navigate"?: Navigate;
     }
     interface XcastvenXkilianProjectPrescriptionDetail {
         "api"?: Api;
@@ -890,6 +919,7 @@ declare namespace LocalJSX {
     }
     interface XcastvenXkilianProjectRegister {
         "api"?: Api;
+        "navigate"?: Navigate;
     }
     interface XcastvenXkilianProjectToast {
         "duration"?: number;

@@ -1,3 +1,4 @@
+import { Navigate } from '../../utils/types';
 import { MONTHS, TODAY } from '../../utils/utils';
 import { Component, h, Prop, State } from '@stencil/core';
 
@@ -6,6 +7,7 @@ import { Component, h, Prop, State } from '@stencil/core';
   shadow: false,
 })
 export class Header {
+  @Prop() navigate: Navigate;
   @Prop() isDoctor: boolean;
   @Prop() type: 'calendar' | 'account' | 'scheduleAppointment' | 'registerCondition';
   @Prop() currentViewMonth?: number;
@@ -55,6 +57,7 @@ export class Header {
         )}
 
         <xcastven-xkilian-project-menu
+          navigate={this.navigate}
           isDoctor={this.isDoctor}
           isMenuOpen={this.isMenuOpen}
           handleResetMenu={() => (this.isMenuOpen = false)}
@@ -91,7 +94,7 @@ export class Header {
           <h1 class="w-full text-center text-xl font-medium text-white">{this.getTitle()}</h1>
         )}
 
-        <md-icon-button onClick={() => window.navigation.navigate('account')}>
+        <md-icon-button onClick={() => this.navigate('./account')}>
           <md-icon class="text-white">account_circle</md-icon>
         </md-icon-button>
       </div>

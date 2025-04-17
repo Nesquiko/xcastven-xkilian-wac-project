@@ -7,6 +7,7 @@ import {
   TimeSlot,
   User,
 } from '../../api/generated';
+import { Navigate } from '../../utils/types';
 import {
   formatAppointmentType,
   formatDate,
@@ -22,6 +23,7 @@ import { Component, h, Prop, State } from '@stencil/core';
   shadow: false,
 })
 export class AppointmentScheduler {
+  @Prop() navigate: Navigate;
   @Prop() api: Api;
   @Prop() user: User;
   @Prop() initialDate: Date = null;
@@ -145,7 +147,7 @@ export class AppointmentScheduler {
 
     try {
       await this.api.appointments.requestAppointment({ newAppointmentRequest: newAppointment });
-      window.navigation.navigate('homepage');
+      this.navigate('./homepage');
     } catch (err) {
       if (!(err instanceof ApiError)) {
         toastService.showError('Unknown server error');
@@ -173,7 +175,11 @@ export class AppointmentScheduler {
     return (
       <div class="flex h-screen w-full flex-1 flex-col overflow-auto">
         {/* Header */}
-        <xcastven-xkilian-project-header type="scheduleAppointment" isDoctor={false} />
+        <xcastven-xkilian-project-header
+          navigate={this.navigate}
+          type="scheduleAppointment"
+          isDoctor={false}
+        />
 
         {/* Content */}
         <div class="mx-auto flex w-full flex-1 flex-col md:flex-row">

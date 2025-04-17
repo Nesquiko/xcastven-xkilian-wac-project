@@ -1,4 +1,5 @@
 import { AppointmentDisplay, User } from '../../api/generated';
+import { Navigate } from '../../utils/types';
 import { formatAppointmentType, formatTime, getDateAndTimeTitle, TODAY } from '../../utils/utils';
 import { Component, h, Prop } from '@stencil/core';
 
@@ -7,6 +8,7 @@ import { Component, h, Prop } from '@stencil/core';
   shadow: false,
 })
 export class AppointmentsList {
+  @Prop() navigate: Navigate;
   @Prop() user: User;
   @Prop() isDoctor: boolean;
   @Prop() appointments: Array<AppointmentDisplay>;
@@ -21,7 +23,7 @@ export class AppointmentsList {
     const day: number = this.selectedDate.getDate();
     const date = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
-    window.navigation.navigate(`scheduleAppointment?date=${date}`);
+    this.navigate(`./scheduleAppointment?date=${date}`);
   };
 
   render() {

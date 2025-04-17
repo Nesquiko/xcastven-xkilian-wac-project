@@ -1,3 +1,4 @@
+import { Navigate } from '../../utils/types';
 import { Component, h, Prop } from '@stencil/core';
 
 type MenuButton = {
@@ -11,6 +12,7 @@ type MenuButton = {
   shadow: false,
 })
 export class Menu {
+  @Prop() navigate: Navigate;
   @Prop() isDoctor: boolean;
   @Prop() isMenuOpen: boolean;
   @Prop() handleResetMenu: () => void;
@@ -20,7 +22,7 @@ export class Menu {
     icon: 'home',
     onClick: () => {
       this.handleResetMenu();
-      window.navigation.navigate('homepage');
+      this.navigate('./homepage');
     },
   };
 
@@ -29,7 +31,7 @@ export class Menu {
     icon: 'event',
     onClick: () => {
       this.handleResetMenu();
-      window.navigation.navigate('scheduleAppointment');
+      this.navigate('./scheduleAppointment');
     },
   };
 
@@ -38,7 +40,7 @@ export class Menu {
     icon: 'coronavirus',
     onClick: () => {
       this.handleResetMenu();
-      window.navigation.navigate('registerCondition');
+      this.navigate('./registerCondition');
     },
   };
 
@@ -47,7 +49,7 @@ export class Menu {
     icon: 'account_circle',
     onClick: () => {
       this.handleResetMenu();
-      window.navigation.navigate('account');
+      this.navigate('./account');
     },
   };
 
@@ -57,7 +59,7 @@ export class Menu {
     onClick: () => {
       this.handleResetMenu();
       sessionStorage.setItem('user', null);
-      window.navigation.navigate('login');
+      this.navigate('./login');
     },
   };
 

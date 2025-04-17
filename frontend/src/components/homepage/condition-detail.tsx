@@ -1,5 +1,6 @@
 import { Api, ApiError } from '../../api/api';
 import { AppointmentDisplay, Condition } from '../../api/generated';
+import { Navigate } from '../../utils/types';
 import { formatDate, formatDateDelta, getDateAndTimeTitle } from '../../utils/utils';
 import { toastService } from '../services/toast-service';
 import { Component, h, Prop, State } from '@stencil/core';
@@ -9,6 +10,7 @@ import { Component, h, Prop, State } from '@stencil/core';
   shadow: false,
 })
 export class ConditionDetail {
+  @Prop() navigate: Navigate;
   @Prop() api: Api;
   @Prop() conditionId: string;
   @Prop() handleResetSelection: () => void;
@@ -31,7 +33,7 @@ export class ConditionDetail {
   }
 
   private handleScheduleAppointmentFromCondition = () => {
-    window.navigation.navigate(`scheduleAppointment?conditionId=${this.conditionId}`);
+    this.navigate(`./scheduleAppointment?conditionId=${this.conditionId}`);
   };
 
   private handleToggleStatus = () => {

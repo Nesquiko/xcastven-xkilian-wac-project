@@ -1,6 +1,7 @@
 import { ApiError } from '../../api/api';
 import { Api } from '../../api/api';
 import { Registration, SpecializationEnum } from '../../api/generated';
+import { Navigate } from '../../utils/types';
 import { formatSpecialization } from '../../utils/utils';
 import { StyledHost } from '../StyledHost';
 import { toastService } from '../services/toast-service';
@@ -11,6 +12,7 @@ import { Component, h, Prop, State } from '@stencil/core';
   shadow: false,
 })
 export class Register {
+  @Prop() navigate: Navigate;
   @Prop() api: Api;
 
   @State() email: string = '';
@@ -91,7 +93,7 @@ export class Register {
 
     try {
       await this.api.auth.registerUser({ registration: request });
-      window.navigation.navigate('login');
+      this.navigate('./login');
     } catch (err) {
       if (!(err instanceof ApiError)) {
         toastService.showError('Unknown server error');
@@ -188,7 +190,7 @@ export class Register {
 
             <md-text-button
               class="mb-6 w-full rounded-full"
-              onClick={() => window.navigation.navigate('login')}
+              onClick={() => this.navigate('./login')}
             >
               Already have an account?
             </md-text-button>

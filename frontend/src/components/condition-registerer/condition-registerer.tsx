@@ -1,6 +1,7 @@
 import { Api, ApiError } from '../../api/api';
 import { NewCondition } from '../../api/generated';
 import { User } from '../../components';
+import { Navigate } from '../../utils/types';
 import { DAYS_OF_WEEK, formatDate, formatDateDelta, MONTHS, TODAY } from '../../utils/utils';
 import { toastService } from '../services/toast-service';
 import { Component, h, Prop, State } from '@stencil/core';
@@ -10,6 +11,7 @@ import { Component, h, Prop, State } from '@stencil/core';
   shadow: false,
 })
 export class ConditionRegisterer {
+  @Prop() navigate: Navigate;
   @Prop() api: Api;
   @Prop() user: User;
   @Prop() startDate: Date = null;
@@ -198,7 +200,7 @@ export class ConditionRegisterer {
         end: this.selectedEnd || undefined,
       };
       await this.api.conditions.createPatientCondition({ newCondition: request });
-      window.navigation.navigate('/homepage');
+      this.navigate('./homepage');
     } catch (err) {
       if (!(err instanceof ApiError)) {
         toastService.showError('Unknown server error');
@@ -234,7 +236,11 @@ export class ConditionRegisterer {
 
     return (
       <div class="flex h-screen w-full flex-1 flex-col overflow-auto">
-        <xcastven-xkilian-project-header type="registerCondition" isDoctor={false} />
+        <xcastven-xkilian-project-header
+          navigate={this.navigate}
+          type="registerCondition"
+          isDoctor={false}
+        />
 
         {/* Content */}
         <div class="mx-auto flex w-full flex-1 flex-col md:flex-row">

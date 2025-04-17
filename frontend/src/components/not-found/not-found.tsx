@@ -1,11 +1,13 @@
+import { Navigate } from '../../utils/types';
 import { StyledHost } from '../StyledHost';
-import { Component, h } from '@stencil/core';
+import { Component, h, Prop } from '@stencil/core';
 
 @Component({
   tag: 'xcastven-xkilian-project-not-found',
   shadow: false,
 })
 export class NotFound {
+  @Prop() navigate: Navigate;
   render() {
     return (
       <StyledHost class="flex h-screen w-full flex-col overflow-hidden bg-gray-300">
@@ -20,7 +22,7 @@ export class NotFound {
               </h1>
               <md-text-button
                 class="w-full rounded-full text-[#7357be]"
-                onClick={() => window.navigation.navigate('homepage')}
+                onClick={() => this.navigate('homepage')}
               >
                 Back to homepage
               </md-text-button>

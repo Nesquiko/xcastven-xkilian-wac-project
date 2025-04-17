@@ -1,13 +1,15 @@
 import { instanceOfDoctor, User } from '../../api/generated';
+import { Navigate } from '../../utils/types';
 import { formatSpecialization } from '../../utils/utils';
 import { StyledHost } from '../StyledHost';
-import { Component, h } from '@stencil/core';
+import { Component, h, Prop } from '@stencil/core';
 
 @Component({
   tag: 'xcastven-xkilian-project-account',
   shadow: false,
 })
 export class Account {
+  @Prop() navigate: Navigate;
   private user: User = JSON.parse(sessionStorage.getItem('user'));
 
   private handleBack = () => {
@@ -15,7 +17,7 @@ export class Account {
   };
 
   private handleLogOut = () => {
-    window.navigation.navigate('login');
+    this.navigate('./login');
 
     sessionStorage.setItem('user', null);
   };
@@ -25,7 +27,11 @@ export class Account {
 
     return (
       <StyledHost class="flex h-screen w-full flex-col overflow-hidden bg-gray-300">
-        <xcastven-xkilian-project-header type="account" isDoctor={this.user.role === 'doctor'} />
+        <xcastven-xkilian-project-header
+          navigate={this.navigate}
+          type="account"
+          isDoctor={this.user.role === 'doctor'}
+        />
 
         {/* Content */}
         <div class="relative flex h-full w-full flex-1 items-center justify-center">

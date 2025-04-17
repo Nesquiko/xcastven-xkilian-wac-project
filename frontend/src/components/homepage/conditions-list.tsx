@@ -1,4 +1,5 @@
 import { ConditionDisplay } from '../../api/generated';
+import { Navigate } from '../../utils/types';
 import { formatDate, TODAY } from '../../utils/utils';
 import { Component, h, Prop, State } from '@stencil/core';
 
@@ -7,6 +8,7 @@ import { Component, h, Prop, State } from '@stencil/core';
   shadow: false,
 })
 export class ConditionsList {
+  @Prop() navigate: Navigate;
   @Prop() conditions: Array<ConditionDisplay>;
   @Prop() handleSelectCondition: (condition: ConditionDisplay) => void;
   @Prop() selectedDate: Date;
@@ -20,7 +22,7 @@ export class ConditionsList {
     const day: number = this.selectedDate.getDate();
     const start = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
 
-    window.navigation.navigate(`registerCondition?start=${start}`);
+    this.navigate(`registerCondition?start=${start}`);
   };
 
   render() {

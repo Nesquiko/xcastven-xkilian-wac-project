@@ -19,6 +19,7 @@ import {
   User,
   UserRole,
 } from '../../api/generated';
+import { Navigate } from '../../utils/types';
 import { TODAY } from '../../utils/utils';
 import { StyledHost } from '../StyledHost';
 import { toastService } from '../services/toast-service';
@@ -32,6 +33,7 @@ export class Homepage {
   private user: User = JSON.parse(sessionStorage.getItem('user'));
   private isDoctor: boolean = this.user.role === 'doctor';
 
+  @Prop() navigate: Navigate;
   @Prop() api: Api;
 
   @State() appointments: Array<AppointmentDisplay> = [];
@@ -440,6 +442,7 @@ export class Homepage {
     return (
       <StyledHost class="flex h-screen w-full flex-col overflow-hidden">
         <xcastven-xkilian-project-header
+          navigate={this.navigate}
           type="calendar"
           isDoctor={this.isDoctor}
           currentViewMonth={this.currentViewMonth}
@@ -473,6 +476,7 @@ export class Homepage {
         />
 
         <xcastven-xkilian-project-footer
+          navigate={this.navigate}
           isDoctor={this.isDoctor}
           handleToggleLegendMenu={this.handleToggleLegendMenu}
         />
@@ -482,6 +486,7 @@ export class Homepage {
         )}
 
         <xcastven-xkilian-project-drawer
+          navigate={this.navigate}
           api={this.api}
           user={this.user}
           isDoctor={this.isDoctor}

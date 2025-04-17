@@ -1,3 +1,4 @@
+import { Navigate } from '../../utils/types';
 import { Component, h, Prop } from '@stencil/core';
 
 @Component({
@@ -5,6 +6,7 @@ import { Component, h, Prop } from '@stencil/core';
   shadow: false,
 })
 export class Footer {
+  @Prop() navigate: Navigate;
   @Prop() isDoctor: boolean;
   @Prop() handleToggleLegendMenu: () => void;
 
@@ -17,7 +19,7 @@ export class Footer {
           <div class="flex w-full flex-row items-center justify-center gap-x-3">
             <md-text-button
               class="relative w-18 pr-3 text-sm text-[#7357be] sm:w-56"
-              onClick={() => window.navigation.navigate('scheduleAppointment')}
+              onClick={() => this.navigate('./scheduleAppointment')}
               title="Schedule an appointment"
             >
               <md-icon class="absolute top-[10px] left-4" style={{ fontSize: '20px' }}>
@@ -34,7 +36,7 @@ export class Footer {
 
             <md-text-button
               class="relative w-18 pr-3 text-sm text-[#7357be] sm:w-48"
-              onClick={() => window.navigation.navigate('registerCondition')}
+              onClick={() => this.navigate('./registerCondition')}
               title="Register a condition"
             >
               <md-icon class="absolute top-[10px] left-4" style={{ fontSize: '20px' }}>

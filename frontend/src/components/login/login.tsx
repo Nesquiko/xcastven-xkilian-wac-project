@@ -1,5 +1,6 @@
 import { Api } from '../../api/api';
 import { User, UserRole } from '../../api/generated';
+import { Navigate } from '../../utils/types';
 import { StyledHost } from '../StyledHost';
 import { toastService } from '../services/toast-service';
 import { Component, h, Prop, State } from '@stencil/core';
@@ -10,6 +11,7 @@ import { Component, h, Prop, State } from '@stencil/core';
 })
 export class Login {
   @Prop() api: Api;
+  @Prop() navigate: Navigate;
 
   @State() email: string;
 
@@ -40,7 +42,7 @@ export class Login {
         loginRequest: { email: this.email, role },
       });
       sessionStorage.setItem('user', JSON.stringify(user));
-      window.navigation.navigate('homepage');
+      this.navigate('./homepage');
     } catch (err) {
       toastService.showError(err.message);
     }
@@ -71,7 +73,7 @@ export class Login {
 
             <md-text-button
               class="mb-3 w-full rounded-full"
-              onClick={() => window.navigation.navigate('register')}
+              onClick={() => this.navigate('./register')}
             >
               Don't have an account? Register now
             </md-text-button>

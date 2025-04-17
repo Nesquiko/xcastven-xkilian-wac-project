@@ -17,6 +17,7 @@ import {
   User,
   UserRole,
 } from '../../api/generated';
+import { Navigate } from '../../utils/types';
 import { formatDate } from '../../utils/utils';
 import { Component, h, Prop } from '@stencil/core';
 
@@ -25,6 +26,7 @@ import { Component, h, Prop } from '@stencil/core';
   shadow: false,
 })
 export class Drawer {
+  @Prop() navigate: Navigate;
   @Prop() api: Api;
   @Prop() user: User;
   @Prop() isDoctor: boolean;
@@ -149,6 +151,7 @@ export class Drawer {
                 {/* Appointments Tab Content */}
                 <div class={`w-full max-w-md ${this.activeTab === 0 ? 'block' : 'hidden'}`}>
                   <xcastven-xkilian-project-appointments-list
+                    navigate={this.navigate}
                     user={this.user}
                     isDoctor={this.isDoctor}
                     appointments={this.getAppointmentsForDate(this.selectedDate)}
@@ -162,6 +165,7 @@ export class Drawer {
                 {/* Conditions Tab Content */}
                 <div class={`w-full max-w-md ${this.activeTab === 1 ? 'block' : 'hidden'}`}>
                   <xcastven-xkilian-project-conditions-list
+                    navigate={this.navigate}
                     conditions={this.getConditionsForDate(this.selectedDate)}
                     handleSelectCondition={this.handleSelectCondition}
                     selectedDate={this.selectedDate}
@@ -213,6 +217,7 @@ export class Drawer {
                 {/* Appointments Tab Content */}
                 <div class={`w-full max-w-md`}>
                   <xcastven-xkilian-project-appointments-list
+                    navigate={this.navigate}
                     user={this.user}
                     isDoctor={this.isDoctor}
                     appointments={this.getAppointmentsForDateByStatus(
@@ -246,6 +251,7 @@ export class Drawer {
             />
           ) : this.selectedCondition ? (
             <xcastven-xkilian-project-condition-detail
+              navigate={this.navigate}
               api={this.api}
               conditionId={this.selectedCondition.id}
               handleResetSelection={this.handleResetSelection}

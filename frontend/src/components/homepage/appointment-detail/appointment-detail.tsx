@@ -801,7 +801,7 @@ export class AppointmentDetail {
         {this.denying && this.isDoctor && (
           <xcastven-xkilian-project-appointment-deny
             denying={this.denying}
-            setDenying={(denying: boolean) => this.denying = denying}
+            setDenying={(denying: boolean) => (this.denying = denying)}
             denyingAppointmentReason={this.denyingAppointmentReason}
             handleDenyingAppointmentReasonChange={(e: Event) => {
               this.denyingAppointmentReason = (e.target as HTMLInputElement).value;

@@ -141,10 +141,8 @@ export class Register {
               )
             )}
 
-            <div class="mb-6 flex flex-col w-full items-center justify-center gap-y-2">
-              <label class="w-full text-center text-gray-400 font-medium">
-                Register as
-              </label>
+            <div class="mb-6 flex w-full flex-col items-center justify-center gap-y-2">
+              <label class="w-full text-center font-medium text-gray-400">Register as</label>
               <div class="relative flex w-full max-w-xs cursor-pointer rounded-full border-2 border-[#d8c7ed] p-0.5">
                 <div
                   class={`absolute top-0 h-full w-1/2 rounded-full bg-[#7357be] transition-all duration-300 ease-in-out ${
@@ -156,7 +154,7 @@ export class Register {
                   class={`relative z-10 flex-1 rounded-full py-1 text-center transition-opacity duration-300 ${
                     !this.isDoctor ? 'text-white' : 'text-[#7357be] hover:bg-gray-100'
                   }`}
-                  onClick={() => this.isDoctor = false}
+                  onClick={() => (this.isDoctor = false)}
                 >
                   Patient
                 </div>

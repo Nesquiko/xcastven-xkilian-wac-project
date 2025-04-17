@@ -34,14 +34,11 @@ export class AppointmentDeny {
           >
             Confirm deny
           </md-filled-button>
-          <md-outlined-button
-            class="w-1/2 rounded-full"
-            onClick={() => this.setDenying(false)}
-          >
+          <md-outlined-button class="w-1/2 rounded-full" onClick={() => this.setDenying(false)}>
             Back
           </md-outlined-button>
         </div>
       </div>
     );
-  };
+  }
 }

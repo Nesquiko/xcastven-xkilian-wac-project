@@ -34,7 +34,7 @@ export class Toast {
 
     return (
       <div
-        class={`fixed bottom-4 left-4 z-50 transform transition-all duration-300 flex flex-row justify-center items-center gap-x-2 bg-white rounded-md border-2 border-[#d8c7ed] px-4 py-3 ${
+        class={`fixed bottom-4 left-4 z-50 flex transform flex-row items-center justify-center gap-x-2 rounded-md border-2 border-[#d8c7ed] bg-white px-4 py-3 transition-all duration-300 ${
           this.isVisible
             ? 'translate-y-0 opacity-100'
             : 'pointer-events-none translate-y-8 opacity-0'

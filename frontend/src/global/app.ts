@@ -1,3 +1,4 @@
+import { registerNavigationApi } from './navigation';
 import '@material/web/button/filled-button';
 import '@material/web/button/outlined-button';
 import '@material/web/button/text-button';
@@ -22,6 +23,5 @@ import '@material/web/textfield/filled-text-field';
 import '@material/web/textfield/outlined-text-field';
 
 export default function () {
-  // or export default async function()
-  // package initialization code
+  registerNavigationApi();
 }

@@ -9,5 +9,5 @@ spec:
     branch: main
   secretRef:
     name: repository-pat
-  timeout: 30s
+  timeout: 1m0s
   url: https://github.com/Nesquiko/xcastven-xkilian-wac-project

@@ -4,5 +4,5 @@ metadata:
   name: xcastven-xkilian-project
   namespace: wac-hospital
 spec:
-  image: nesquiko/xcastven-xkilian-wac-fe:latest
+  image: nesquiko/xcastven-xkilian-wac-fe
   interval: 1m0s

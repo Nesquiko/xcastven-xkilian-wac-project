@@ -8,7 +8,7 @@ spec:
   force: true
   dependsOn:
     - name: prepare
-  interval: 30s
+  interval: 120s
   path: gitops/clusters/localhost/install
   prune: true
   sourceRef:

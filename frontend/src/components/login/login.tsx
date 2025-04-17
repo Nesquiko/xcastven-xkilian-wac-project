@@ -1,4 +1,4 @@
-import { Api, ApiError } from '../../api/api';
+import { Api } from '../../api/api';
 import { User, UserRole } from '../../api/generated';
 import { StyledHost } from '../StyledHost';
 import { toastService } from '../services/toast-service';
@@ -42,10 +42,6 @@ export class Login {
       sessionStorage.setItem('user', JSON.stringify(user));
       window.navigation.navigate('homepage');
     } catch (err) {
-      if (!(err instanceof ApiError)) {
-        toastService.showError(err);
-        return;
-      }
       toastService.showError(err.message);
     }
   };

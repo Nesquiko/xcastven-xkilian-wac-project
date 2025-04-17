@@ -1,0 +1,25 @@
+apiVersion: polyfea.github.io/v1alpha1
+kind: WebComponent
+metadata:
+  name: xcastven-xkilian-project-link
+spec:
+  microFrontend: polyfea-md-shell # referencia na microfrontend, z ktorého sa načíta element
+  element: polyfea-md-app # element, ktorý bude vložený na stránku
+  attributes: # atribúty elementu polyfea-md-app
+    - name: headline
+      value: Castven Kilian project
+    - name: short-headline
+      value: Castven Kilian project
+    - name: supporting-text
+      value: |
+        Project for WAC by Lukas Castven and Michal Kilian
+    - name: material-icon
+      value: event
+    - name: href # presmerovanie po kliknutí na element polyfea-md-app
+      value: ./xcastven-xkilian-project
+  priority: 10000
+  displayRules: # pravidlá, kde sa má element vložiť v obálke
+    - anyOf:
+        - context-name: applications
+        - context-name: rail-content
+        - context-name: drawer-content

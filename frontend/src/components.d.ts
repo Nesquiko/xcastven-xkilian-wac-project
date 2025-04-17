@@ -36,6 +36,14 @@ export namespace Components {
         "handleCancellingAppointmentReasonChange": (event: Event) => void;
         "setCancelling": (cancelling: boolean) => void;
     }
+    interface XcastvenXkilianProjectAppointmentDeny {
+        "denying": boolean;
+        "denyingAppointmentReason": string;
+        "disabled": boolean;
+        "handleDeny": () => void;
+        "handleDenyingAppointmentReasonChange": (event: Event) => void;
+        "setDenying": (denying: boolean) => void;
+    }
     interface XcastvenXkilianProjectAppointmentDetail {
         "api": Api;
         "appointmentId": string;
@@ -367,6 +375,12 @@ declare global {
         prototype: HTMLXcastvenXkilianProjectAppointmentCancelElement;
         new (): HTMLXcastvenXkilianProjectAppointmentCancelElement;
     };
+    interface HTMLXcastvenXkilianProjectAppointmentDenyElement extends Components.XcastvenXkilianProjectAppointmentDeny, HTMLStencilElement {
+    }
+    var HTMLXcastvenXkilianProjectAppointmentDenyElement: {
+        prototype: HTMLXcastvenXkilianProjectAppointmentDenyElement;
+        new (): HTMLXcastvenXkilianProjectAppointmentDenyElement;
+    };
     interface HTMLXcastvenXkilianProjectAppointmentDetailElement extends Components.XcastvenXkilianProjectAppointmentDetail, HTMLStencilElement {
     }
     var HTMLXcastvenXkilianProjectAppointmentDetailElement: {
@@ -516,6 +530,7 @@ declare global {
         "xcastven-xkilian-project-app": HTMLXcastvenXkilianProjectAppElement;
         "xcastven-xkilian-project-appointment-actions": HTMLXcastvenXkilianProjectAppointmentActionsElement;
         "xcastven-xkilian-project-appointment-cancel": HTMLXcastvenXkilianProjectAppointmentCancelElement;
+        "xcastven-xkilian-project-appointment-deny": HTMLXcastvenXkilianProjectAppointmentDenyElement;
         "xcastven-xkilian-project-appointment-detail": HTMLXcastvenXkilianProjectAppointmentDetailElement;
         "xcastven-xkilian-project-appointment-prescriptions": HTMLXcastvenXkilianProjectAppointmentPrescriptionsElement;
         "xcastven-xkilian-project-appointment-reschedule": HTMLXcastvenXkilianProjectAppointmentRescheduleElement;
@@ -566,6 +581,14 @@ declare namespace LocalJSX {
         "handleCancel"?: () => void;
         "handleCancellingAppointmentReasonChange"?: (event: Event) => void;
         "setCancelling"?: (cancelling: boolean) => void;
+    }
+    interface XcastvenXkilianProjectAppointmentDeny {
+        "denying"?: boolean;
+        "denyingAppointmentReason"?: string;
+        "disabled"?: boolean;
+        "handleDeny"?: () => void;
+        "handleDenyingAppointmentReasonChange"?: (event: Event) => void;
+        "setDenying"?: (denying: boolean) => void;
     }
     interface XcastvenXkilianProjectAppointmentDetail {
         "api"?: Api;
@@ -876,6 +899,7 @@ declare namespace LocalJSX {
         "xcastven-xkilian-project-app": XcastvenXkilianProjectApp;
         "xcastven-xkilian-project-appointment-actions": XcastvenXkilianProjectAppointmentActions;
         "xcastven-xkilian-project-appointment-cancel": XcastvenXkilianProjectAppointmentCancel;
+        "xcastven-xkilian-project-appointment-deny": XcastvenXkilianProjectAppointmentDeny;
         "xcastven-xkilian-project-appointment-detail": XcastvenXkilianProjectAppointmentDetail;
         "xcastven-xkilian-project-appointment-prescriptions": XcastvenXkilianProjectAppointmentPrescriptions;
         "xcastven-xkilian-project-appointment-reschedule": XcastvenXkilianProjectAppointmentReschedule;
@@ -910,6 +934,7 @@ declare module "@stencil/core" {
             "xcastven-xkilian-project-app": LocalJSX.XcastvenXkilianProjectApp & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectAppElement>;
             "xcastven-xkilian-project-appointment-actions": LocalJSX.XcastvenXkilianProjectAppointmentActions & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectAppointmentActionsElement>;
             "xcastven-xkilian-project-appointment-cancel": LocalJSX.XcastvenXkilianProjectAppointmentCancel & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectAppointmentCancelElement>;
+            "xcastven-xkilian-project-appointment-deny": LocalJSX.XcastvenXkilianProjectAppointmentDeny & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectAppointmentDenyElement>;
             "xcastven-xkilian-project-appointment-detail": LocalJSX.XcastvenXkilianProjectAppointmentDetail & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectAppointmentDetailElement>;
             "xcastven-xkilian-project-appointment-prescriptions": LocalJSX.XcastvenXkilianProjectAppointmentPrescriptions & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectAppointmentPrescriptionsElement>;
             "xcastven-xkilian-project-appointment-reschedule": LocalJSX.XcastvenXkilianProjectAppointmentReschedule & JSXBase.HTMLAttributes<HTMLXcastvenXkilianProjectAppointmentRescheduleElement>;

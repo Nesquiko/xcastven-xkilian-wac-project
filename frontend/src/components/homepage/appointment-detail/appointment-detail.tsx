@@ -799,33 +799,16 @@ export class AppointmentDetail {
         )}
 
         {this.denying && this.isDoctor && (
-          <div class="my-6 w-full max-w-md rounded-md bg-gray-200 px-4 py-3">
-            <h4 class="mb-2 text-sm font-medium text-[#7357be]">Deny appointment request</h4>
-            <div class="mb-3 flex w-full flex-col gap-y-3">
-              <md-outlined-text-field
-                required={true}
-                label="Reason for denying"
-                class="w-full"
-                value={this.denyingAppointmentReason}
-                onInput={(e: Event) => {
-                  this.denyingAppointmentReason = (e.target as HTMLInputElement).value;
-                }}
-              />
-            </div>
-
-            <div class="flex flex-row items-center justify-between gap-x-2">
-              <md-filled-button
-                class={`w-1/2 rounded-full bg-[#7357be]`}
-                onClick={this.handleDeny}
-                disabled={this.denyingAppointmentReason === ''}
-              >
-                Confirm deny
-              </md-filled-button>
-              <md-outlined-button class="w-1/2 rounded-full" onClick={() => (this.denying = false)}>
-                Back
-              </md-outlined-button>
-            </div>
-          </div>
+          <xcastven-xkilian-project-appointment-deny
+            denying={this.denying}
+            setDenying={(denying: boolean) => this.denying = denying}
+            denyingAppointmentReason={this.denyingAppointmentReason}
+            handleDenyingAppointmentReasonChange={(e: Event) => {
+              this.denyingAppointmentReason = (e.target as HTMLInputElement).value;
+            }}
+            handleDeny={this.handleDeny}
+            disabled={this.denyingAppointmentReason === ''}
+          />
         )}
       </div>
     );

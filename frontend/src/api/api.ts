@@ -36,6 +36,7 @@ const fetchApi: FetchAPI = async (input, init): Promise<Response> => {
   });
   const end = Date.now();
 
+  // TODO luky when the response fails, it isn't in the catch but here, check if it is not ok
   const url = input instanceof Request ? input.url : input;
   console.log(`[FETCH] ${url} took ${end - start}ms to execute`);
 
@@ -58,6 +59,6 @@ export function newApi(apiBase: string): Api {
 export class ApiError extends Error {
   override name: 'ApiError' = 'ApiError' as const;
   constructor(public errDetail: ErrorDetail) {
-    super();
+    super(errDetail.detail);
   }
 }

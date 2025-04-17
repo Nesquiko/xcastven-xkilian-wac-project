@@ -36,10 +36,6 @@ export class Register {
     this.lastName = (event.target as HTMLTextAreaElement).value;
   };
 
-  private handleRoleChange = () => {
-    this.isDoctor = !this.isDoctor;
-  };
-
   private handleSpecializationChange = (event: Event) => {
     this.specialization = (event.target as HTMLSelectElement).value as SpecializationEnum;
   };
@@ -107,7 +103,7 @@ export class Register {
 
   render() {
     return (
-      <StyledHost class="flex h-screen w-full flex-row items-center justify-center overflow-hidden bg-gray-300">
+      <StyledHost class="flex h-screen w-full flex-row items-center justify-center overflow-x-hidden overflow-y-auto bg-gray-300">
         <div class="mx-6 w-full max-w-md rounded-md bg-white shadow-lg md:mx-0">
           <h1 class="mb-3 w-full rounded-t-lg bg-[#7357be] px-4 py-3 text-center text-2xl">
             <span class="font-normal text-gray-200">Register at </span>
@@ -145,34 +141,52 @@ export class Register {
               )
             )}
 
-            {/* TODO kili: change to radio button or full width switch with labels */}
-            <div class="mb-6 flex max-w-md min-w-md flex-row items-center justify-center gap-x-3">
-              <label htmlFor="doctor-switch" class="font-medium text-gray-600">
-                {this.isDoctor ? "I'm a doctor" : "I'm a patient"}
+            <div class="mb-6 flex flex-col w-full items-center justify-center gap-y-2">
+              <label class="w-full text-center text-gray-400 font-medium">
+                Register as
               </label>
-              <md-switch
-                id="doctor-switch"
-                checked={this.isDoctor}
-                onChange={this.handleRoleChange}
-              />
+              <div class="relative flex w-full max-w-xs cursor-pointer rounded-full border-2 border-[#d8c7ed] p-0.5">
+                <div
+                  class={`absolute top-0 h-full w-1/2 rounded-full bg-[#7357be] transition-all duration-300 ease-in-out ${
+                    !this.isDoctor ? 'left-0' : 'left-1/2'
+                  }`}
+                ></div>
+
+                <div
+                  class={`relative z-10 flex-1 rounded-full py-1 text-center transition-opacity duration-300 ${
+                    !this.isDoctor ? 'text-white' : 'text-[#7357be] hover:bg-gray-100'
+                  }`}
+                  onClick={() => this.isDoctor = false}
+                >
+                  Patient
+                </div>
+
+                <div
+                  class={`relative z-10 flex-1 rounded-full py-1 text-center transition-opacity duration-300 ${
+                    this.isDoctor ? 'text-white' : 'text-[#7357be] hover:bg-gray-100'
+                  }`}
+                  onClick={() => (this.isDoctor = true)}
+                >
+                  Doctor
+                </div>
+              </div>
             </div>
 
-            {this.isDoctor && (
-              <div class="mb-6 w-full animate-[slideInFromRight_0.5s_ease-out]">
-                <md-filled-select
-                  label="Specialization"
-                  class="w-full"
-                  value={this.specialization}
-                  onInput={(e: Event) => this.handleSpecializationChange(e)}
-                >
-                  {Object.values(SpecializationEnum).map((specialization: SpecializationEnum) => (
-                    <md-select-option value={specialization}>
-                      <div slot="headline">{formatSpecialization(specialization)}</div>
-                    </md-select-option>
-                  ))}
-                </md-filled-select>
-              </div>
-            )}
+            <div class="mb-6 w-full animate-[slideInFromRight_0.5s_ease-out]">
+              <md-filled-select
+                label="Specialization"
+                class="w-full"
+                value={this.specialization}
+                onInput={(e: Event) => this.handleSpecializationChange(e)}
+                disabled={!this.isDoctor}
+              >
+                {Object.values(SpecializationEnum).map((specialization: SpecializationEnum) => (
+                  <md-select-option value={specialization}>
+                    <div slot="headline">{formatSpecialization(specialization)}</div>
+                  </md-select-option>
+                ))}
+              </md-filled-select>
+            </div>
 
             <md-text-button
               class="mb-6 w-full rounded-full"

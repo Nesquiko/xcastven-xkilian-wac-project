@@ -22,8 +22,6 @@ import {
   formatAppointmentType,
   formatDate,
   formatTime,
-  getDoctorAppointmentActions,
-  getPatientAppointmentActions,
   updateDatePart,
 } from '../../../utils/utils';
 import { toastService } from '../../services/toast-service';
@@ -742,37 +740,34 @@ export class AppointmentDetail {
           </p>
         )}
 
-        {this.isDoctor
-          ? getDoctorAppointmentActions(
-              this.appointment.status,
-              () => {
-                this.cancelling = !this.cancelling;
-                this.rescheduling = false;
-                this.denying = false;
-              },
-              this.handleAccept,
-              () => {
-                this.denying = !this.denying;
-                this.cancelling = false;
-                this.rescheduling = false;
-              },
-            )
-          : getPatientAppointmentActions(
-              this.appointment.status,
-              () => {
-                this.rescheduling = !this.rescheduling;
-                this.cancelling = false;
-                this.denying = false;
-                if (this.rescheduling) {
-                  this.loadReschedulingDoctors();
-                }
-              },
-              () => {
-                this.cancelling = !this.cancelling;
-                this.rescheduling = false;
-                this.denying = false;
-              },
-            )}
+        <xcastven-xkilian-project-appointment-actions
+          isDoctor={this.isDoctor}
+          appointment={this.appointment}
+          handleCancelDoctorAppointment={() => {
+            this.cancelling = !this.cancelling;
+            this.rescheduling = false;
+            this.denying = false;
+          }}
+          handleAcceptAppointment={this.handleAccept}
+          handleDenyAppointment={() => {
+            this.denying = !this.denying;
+            this.cancelling = false;
+            this.rescheduling = false;
+          }}
+          handleRescheduleAppointment={() => {
+            this.rescheduling = !this.rescheduling;
+            this.cancelling = false;
+            this.denying = false;
+            if (this.rescheduling) {
+              this.loadReschedulingDoctors();
+            }
+          }}
+          handleCancelPatientAppointment={() => {
+            this.cancelling = !this.cancelling;
+            this.rescheduling = false;
+            this.denying = false;
+          }}
+        />
 
         {this.rescheduling && !this.isDoctor && (
           <xcastven-xkilian-project-appointment-reschedule

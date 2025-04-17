@@ -3,7 +3,9 @@ import { User } from '../../api/generated';
 import { StyledHost } from '../StyledHost';
 import { Component, h, Prop, State } from '@stencil/core';
 
-@Component({ tag: 'xcastven-xkilian-project-app' })
+@Component({
+  tag: 'xcastven-xkilian-project-app'
+})
 export class App {
   @Prop() apiBase: string;
   @Prop() basePath: string = '';

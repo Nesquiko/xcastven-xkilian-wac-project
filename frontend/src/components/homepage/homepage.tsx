@@ -302,14 +302,7 @@ export class Homepage {
     try {
       // TODO luky: delete prescription
       /*this.api.medicalHistory.deletePrescription({
-        newPrescription: {
-          name: newPrescription.name,
-          start: newPrescription.start,
-          end: newPrescription.end,
-          appointmentId: appointment.id,
-          patientId: appointment.patient.id,
-          doctorsNote: newPrescription.doctorsNote,
-        },
+
       });*/
     } catch (err) {
       if (!(err instanceof ApiError)) {

@@ -73,7 +73,7 @@ export class Login {
               class="mb-3 w-full rounded-full"
               onClick={() => window.navigation.navigate('register')}
             >
-              Don't have an account?
+              Don't have an account? Create one!
             </md-text-button>
 
             <div class="mb-6 flex flex-row items-center justify-between gap-x-3">

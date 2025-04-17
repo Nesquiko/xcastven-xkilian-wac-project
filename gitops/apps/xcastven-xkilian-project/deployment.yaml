@@ -3,7 +3,7 @@ kind: Deployment
 metadata:
   name: xcastven-xkilian-project-deployment # meno deployment-u od ktorého sa odvádza meno podu
 spec:
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       pod:

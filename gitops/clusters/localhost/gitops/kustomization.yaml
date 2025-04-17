@@ -12,3 +12,6 @@ resources:
   - cd.kustomization.yaml
   - install.kustomization.yaml
   - git-repository.yaml
+  - fe.image-repository.yaml
+  - fe.image-policy.yaml
+  - image-update-automation.yaml

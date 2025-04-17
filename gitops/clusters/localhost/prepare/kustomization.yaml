@@ -4,3 +4,6 @@ kind: Kustomization
 resources:
   - ../../../infrastructure/polyfea
   - ../../../infrastructure/fluxcd
+
+components:
+  - ../../../components/version-developers

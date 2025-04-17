@@ -10,3 +10,6 @@ labels:
 
 resources:
   - ../../../apps/xcastven-xkilian-project
+
+components:
+  - ../../../components/version-developers

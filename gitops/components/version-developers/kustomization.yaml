@@ -3,4 +3,4 @@ kind: Component
 images:
   - name: nesquiko/xcastven-xkilian-wac-fe
     newName: nesquiko/xcastven-xkilian-wac-fe # {"$imagepolicy":  "wac-hospital:xcastven-xkilian-project:name"}
-    newTag: main.20250417.1952 # {"$imagepolicy": "wac-hospital:xcastven-xkilian-project:tag"}
+    newTag: main.20250417.2049 # {"$imagepolicy": "wac-hospital:xcastven-xkilian-project:tag"}

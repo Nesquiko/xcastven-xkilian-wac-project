@@ -4,7 +4,7 @@ import { StyledHost } from '../StyledHost';
 import { Component, h, Prop, State } from '@stencil/core';
 
 @Component({
-  tag: 'xcastven-xkilian-project-app'
+  tag: 'xcastven-xkilian-project-app',
 })
 export class App {
   @Prop() apiBase: string;
@@ -42,7 +42,7 @@ export class App {
   }
 
   render() {
-    let element: string;
+    let element: Element;
     const user: User | null = JSON.parse(sessionStorage.getItem('user'));
 
     if (!user && !this.relativePath.startsWith('register')) {

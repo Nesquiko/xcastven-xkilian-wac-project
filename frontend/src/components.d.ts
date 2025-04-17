@@ -20,18 +20,12 @@ export namespace Components {
     }
     interface XcastvenXkilianProjectAppointmentActions {
         "appointment": PatientAppointment | DoctorAppointment;
-        "handleAcceptAppointment": (
-    appointment: PatientAppointment | DoctorAppointment
-  ) => void;
+        "handleAcceptAppointment": (appointment: PatientAppointment | DoctorAppointment) => void;
         "handleCancelDoctorAppointment": (
-    appointment: PatientAppointment | DoctorAppointment
+    appointment: PatientAppointment | DoctorAppointment,
   ) => void;
-        "handleCancelPatientAppointment": (
-    appointment: PatientAppointment
-  ) => void;
-        "handleDenyAppointment": (
-    appointment: PatientAppointment | DoctorAppointment
-  ) => void;
+        "handleCancelPatientAppointment": (appointment: PatientAppointment) => void;
+        "handleDenyAppointment": (appointment: PatientAppointment | DoctorAppointment) => void;
         "handleRescheduleAppointment": () => void;
         "isDoctor": boolean;
     }
@@ -557,18 +551,12 @@ declare namespace LocalJSX {
     }
     interface XcastvenXkilianProjectAppointmentActions {
         "appointment"?: PatientAppointment | DoctorAppointment;
-        "handleAcceptAppointment"?: (
-    appointment: PatientAppointment | DoctorAppointment
-  ) => void;
+        "handleAcceptAppointment"?: (appointment: PatientAppointment | DoctorAppointment) => void;
         "handleCancelDoctorAppointment"?: (
-    appointment: PatientAppointment | DoctorAppointment
+    appointment: PatientAppointment | DoctorAppointment,
   ) => void;
-        "handleCancelPatientAppointment"?: (
-    appointment: PatientAppointment
-  ) => void;
-        "handleDenyAppointment"?: (
-    appointment: PatientAppointment | DoctorAppointment
-  ) => void;
+        "handleCancelPatientAppointment"?: (appointment: PatientAppointment) => void;
+        "handleDenyAppointment"?: (appointment: PatientAppointment | DoctorAppointment) => void;
         "handleRescheduleAppointment"?: () => void;
         "isDoctor"?: boolean;
     }

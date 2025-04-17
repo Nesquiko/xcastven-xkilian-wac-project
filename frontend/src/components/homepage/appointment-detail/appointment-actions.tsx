@@ -1,4 +1,3 @@
-import { Component, h, Prop } from '@stencil/core';
 import {
   AppointmentStatus,
   DoctorAppointment,
@@ -7,6 +6,7 @@ import {
   Medicine,
   PatientAppointment,
 } from '../../../api/generated';
+import { Component, h, Prop } from '@stencil/core';
 
 @Component({
   tag: 'xcastven-xkilian-project-appointment-actions',
@@ -16,18 +16,12 @@ export class AppointmentActions {
   @Prop() isDoctor: boolean;
   @Prop() appointment: PatientAppointment | DoctorAppointment;
   @Prop() handleCancelDoctorAppointment: (
-    appointment: PatientAppointment | DoctorAppointment
+    appointment: PatientAppointment | DoctorAppointment,
   ) => void;
-  @Prop() handleAcceptAppointment: (
-    appointment: PatientAppointment | DoctorAppointment
-  ) => void;
-  @Prop() handleDenyAppointment: (
-    appointment: PatientAppointment | DoctorAppointment
-  ) => void;
+  @Prop() handleAcceptAppointment: (appointment: PatientAppointment | DoctorAppointment) => void;
+  @Prop() handleDenyAppointment: (appointment: PatientAppointment | DoctorAppointment) => void;
   @Prop() handleRescheduleAppointment: () => void;
-  @Prop() handleCancelPatientAppointment: (
-    appointment: PatientAppointment
-  ) => void;
+  @Prop() handleCancelPatientAppointment: (appointment: PatientAppointment) => void;
 
   private patientButton = (
     displayTitle: string,
@@ -111,22 +105,18 @@ export class AppointmentActions {
 
   render() {
     if (this.isDoctor) {
-      return (
-        this.getDoctorAppointmentActions(
-          this.appointment.status,
-          this.handleCancelDoctorAppointment,
-          this.handleAcceptAppointment,
-          this.handleDenyAppointment,
-        )
+      return this.getDoctorAppointmentActions(
+        this.appointment.status,
+        this.handleCancelDoctorAppointment,
+        this.handleAcceptAppointment,
+        this.handleDenyAppointment,
       );
     } else {
-      return (
-        this.getPatientAppointmentActions(
-          this.appointment.status,
-          this.handleRescheduleAppointment,
-          this.handleCancelPatientAppointment,
-        )
+      return this.getPatientAppointmentActions(
+        this.appointment.status,
+        this.handleRescheduleAppointment,
+        this.handleCancelPatientAppointment,
       );
     }
-  };
+  }
 }

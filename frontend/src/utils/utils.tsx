@@ -1,13 +1,4 @@
-import {
-  AppointmentStatus,
-  AppointmentType,
-  DoctorAppointment,
-  Equipment,
-  Facility,
-  Medicine,
-  PatientAppointment,
-  SpecializationEnum,
-} from '../api/generated';
+import { AppointmentType, SpecializationEnum } from '../api/generated';
 import { h } from '@stencil/core';
 
 export const DAYS_OF_WEEK: Array<{ short: string; long: string }> = [

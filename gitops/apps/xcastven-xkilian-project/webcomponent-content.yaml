@@ -9,7 +9,7 @@ spec:
     - name: base-path
       value: /xcastven-xkilian-project/
     - name: api-base
-      value: http://localhost:30081/api
+      value: /xcastven-xkilian-api
 
   displayRules:
     - allOf:

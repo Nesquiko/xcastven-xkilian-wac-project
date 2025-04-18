@@ -1,0 +1,14 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: xcastven-xkilian-project-webapi
+spec:
+  template:
+    spec:
+      containers:
+        - name: openapi-ui
+          env:
+            - name: URL
+              value: /xcastven-xkilian-openapi
+            - name: BASE_URL
+              value: /xcastven-xkilian-openapi-ui

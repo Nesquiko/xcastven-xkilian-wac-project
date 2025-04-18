@@ -1,0 +1,52 @@
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: xcastven-xkilian-project-webapi
+spec:
+  parentRefs:
+    - name: wac-hospital-gateway
+      namespace: wac-hospital
+    - name: wac-hospital-gateway # Hack to make it work for common cluster
+      namespace: wac-hospital-system
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /xcastven-xkilian-api
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplacePrefixMatch
+              replacePrefixMatch: /api
+      backendRefs:
+        - group: ""
+          kind: Service
+          name: xcastven-xkilian-project-webapi
+          port: 80
+
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /xcastven-xkilian-openapi-ui
+      backendRefs:
+        - group: ""
+          kind: Service
+          name: xcastven-xkilian-openapi-ui
+          port: 80
+
+    - matches:
+        - path:
+            type: Exact
+            value: /xcastven-xkilian-openapi
+      filters:
+        - type: URLRewrite
+          urlRewrite:
+            path:
+              type: ReplaceFullPath
+              replaceFullPath: /openapi
+      backendRefs:
+        - group: ""
+          kind: Service
+          name: xcastven-xkilian-project-webapi
+          port: 80

@@ -1,8 +1,8 @@
 import { Api } from '../../api/api';
 import { Prescription } from '../../api/generated';
 import { formatDate, formatDateDelta } from '../../utils/utils';
-import { Component, Prop, State, h } from '@stencil/core';
 import { toastService } from '../services/toast-service';
+import { Component, Prop, State, h } from '@stencil/core';
 
 @Component({
   tag: 'xcastven-xkilian-project-prescription-detail',

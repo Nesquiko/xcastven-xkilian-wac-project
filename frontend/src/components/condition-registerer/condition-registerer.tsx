@@ -1,4 +1,4 @@
-import { Api, ApiError } from '../../api/api';
+import { Api } from '../../api/api';
 import { NewCondition } from '../../api/generated';
 import { User } from '../../components';
 import { Navigate } from '../../utils/types';
@@ -202,10 +202,6 @@ export class ConditionRegisterer {
       await this.api.conditions.createPatientCondition({ newCondition: request });
       this.navigate('./homepage');
     } catch (err) {
-      if (!(err instanceof ApiError)) {
-        toastService.showError('Unknown server error');
-        return;
-      }
       toastService.showError(err.message);
     }
   };

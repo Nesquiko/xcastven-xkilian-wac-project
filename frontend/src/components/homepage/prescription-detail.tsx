@@ -1,7 +1,8 @@
-import { Api, ApiError } from '../../api/api';
+import { Api } from '../../api/api';
 import { Prescription } from '../../api/generated';
 import { formatDate, formatDateDelta } from '../../utils/utils';
 import { Component, Prop, State, h } from '@stencil/core';
+import { toastService } from '../services/toast-service';
 
 @Component({
   tag: 'xcastven-xkilian-project-prescription-detail',
@@ -20,12 +21,7 @@ export class PrescriptionDetail {
         prescriptionId: this.prescriptionId,
       });
     } catch (err) {
-      console.log(err);
-      if (!(err instanceof ApiError)) {
-        // TODO kili handle generic non server error
-        return;
-      }
-      // TODO kili handle server failed error
+      toastService.showError(err.message);
     }
   }
 

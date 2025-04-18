@@ -37,7 +37,7 @@ export function registerNavigationApi() {
   if (!window.navigation) {
     // provide pollyfill only if not present
     // simplified version of navigation api
-    // @ts-ignore this is ok, because it doesn't exists
+    // @ts-ignore this is ok, because it doesn't exist
     window.navigation = new EventTarget();
     const oldPushState = window.history.pushState.bind(window.history);
 

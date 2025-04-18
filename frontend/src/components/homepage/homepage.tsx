@@ -1,4 +1,4 @@
-import { Api, ApiError } from '../../api/api';
+import { Api } from '../../api/api';
 import {
   AppointmentDisplay,
   AppointmentStatus,
@@ -84,14 +84,7 @@ export class Homepage {
         this.prescriptions = calendar.prescriptions ?? [];
       }
     } catch (err) {
-      if (!(err instanceof ApiError)) {
-        toastService.showError(err);
-        return;
-      }
-
-      if (err.errDetail.status === 500) {
-        toastService.showError(err.message);
-      }
+      toastService.showError(err.message);
     }
   }
 
@@ -154,10 +147,6 @@ export class Homepage {
         },
       });
     } catch (err) {
-      if (!(err instanceof ApiError)) {
-        toastService.showError(err);
-        return;
-      }
       toastService.showError(err.message);
     }
   };
@@ -172,12 +161,7 @@ export class Homepage {
         appointmentId: appointment.id,
         appointmentCancellation: { reason: cancellationReason, by },
       });
-      // TODO kili this doesn't return anything, it is up to you how will you change the appointment status
     } catch (err) {
-      if (!(err instanceof ApiError)) {
-        toastService.showError(err);
-        return;
-      }
       toastService.showError(err.message);
     }
   };
@@ -201,10 +185,6 @@ export class Homepage {
         },
       });
     } catch (err) {
-      if (!(err instanceof ApiError)) {
-        toastService.showError(err);
-        return;
-      }
       toastService.showError(err.message);
     }
   };
@@ -219,10 +199,6 @@ export class Homepage {
         appointmentDecision: { action: 'reject', reason: denyReason },
       });
     } catch (err) {
-      if (!(err instanceof ApiError)) {
-        toastService.showError(err);
-        return;
-      }
       toastService.showError(err.message);
     }
   };
@@ -246,9 +222,6 @@ export class Homepage {
         },
       });
     } catch (err) {
-      if (!(err instanceof ApiError)) {
-        toastService.showError(err);
-      }
       toastService.showError(err.message);
     }
   };
@@ -263,11 +236,7 @@ export class Homepage {
         updatePrescription: updatedPrescription,
       });
     } catch (err) {
-      if (!(err instanceof ApiError)) {
-        toastService.showError('Unknown server error');
-      } else {
-        toastService.showError(err.message);
-      }
+      toastService.showError(err.message);
       return undefined;
     }
   };
@@ -288,11 +257,7 @@ export class Homepage {
         },
       });
     } catch (err) {
-      if (!(err instanceof ApiError)) {
-        toastService.showError('Unknown server error');
-      } else {
-        toastService.showError(err.message);
-      }
+      toastService.showError(err.message);
       return undefined;
     }
   };
@@ -307,11 +272,7 @@ export class Homepage {
 
       });*/
     } catch (err) {
-      if (!(err instanceof ApiError)) {
-        toastService.showError('Unknown server error');
-      } else {
-        toastService.showError(err.message);
-      }
+      toastService.showError(err.message);
       return undefined;
     }
   };
@@ -382,11 +343,7 @@ export class Homepage {
         updateCondition: { end },
       });
     } catch (err) {
-      if (!(err instanceof ApiError)) {
-        toastService.showError(err);
-      } else {
-        toastService.showError(err.message);
-      }
+      toastService.showError(err.message);
       return undefined;
     }
   };

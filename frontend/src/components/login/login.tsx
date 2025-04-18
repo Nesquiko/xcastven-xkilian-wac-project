@@ -78,7 +78,7 @@ export class Login {
               Don't have an account? Register now
             </md-text-button>
 
-            <div class="mb-6 flex flex-row items-center justify-between gap-x-3">
+            <div class="flex flex-row items-center justify-between gap-x-3">
               <md-outlined-button
                 class="w-1/2 rounded-full px-4 py-3"
                 onClick={() => this.handleLogin(UserRole.Doctor)}

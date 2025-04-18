@@ -1,4 +1,4 @@
-import { Api, ApiError } from '../../api/api';
+import { Api } from '../../api/api';
 import {
   AppointmentType,
   ConditionDisplay,
@@ -51,10 +51,6 @@ export class AppointmentScheduler {
       const docs = await this.api.doctors.getDoctors();
       this.availableDoctors = docs.doctors ?? [];
     } catch (err) {
-      if (!(err instanceof ApiError)) {
-        toastService.showError('Unknown server error');
-        return;
-      }
       toastService.showError(err.message);
     }
   }
@@ -67,10 +63,6 @@ export class AppointmentScheduler {
       });
       this.availableTimes = slots.slots;
     } catch (err) {
-      if (!(err instanceof ApiError)) {
-        toastService.showError('Unknown server error');
-        return;
-      }
       toastService.showError(err.message);
     }
   }
@@ -80,10 +72,6 @@ export class AppointmentScheduler {
       const conds = await this.api.conditions.conditionsInDate({ date, patientId });
       this.activeConditions = conds.conditions;
     } catch (err) {
-      if (!(err instanceof ApiError)) {
-        toastService.showError('Unknown server error');
-        return;
-      }
       toastService.showError(err.message);
     }
     if (this.conditionId) {
@@ -149,10 +137,6 @@ export class AppointmentScheduler {
       await this.api.appointments.requestAppointment({ newAppointmentRequest: newAppointment });
       this.navigate('./homepage');
     } catch (err) {
-      if (!(err instanceof ApiError)) {
-        toastService.showError('Unknown server error');
-        return;
-      }
       toastService.showError(err.message);
     }
   };

@@ -1,4 +1,4 @@
-import { Api, ApiError } from '../../../api/api';
+import { Api } from '../../../api/api';
 import {
   AppointmentStatus,
   AvailableResources,
@@ -160,10 +160,6 @@ export class AppointmentDetail {
         });
       }
     } catch (err) {
-      if (!(err instanceof ApiError)) {
-        toastService.showError(err);
-        return;
-      }
       toastService.showError(err.message);
     }
   }
@@ -177,11 +173,6 @@ export class AppointmentDetail {
       this.availableFacilities = resources.facilities;
       this.availableEquipment = resources.equipment;
     } catch (err) {
-      console.log(err);
-      if (!(err instanceof ApiError)) {
-        toastService.showError(err);
-        return;
-      }
       toastService.showError(err.message);
     }
   }
@@ -191,10 +182,6 @@ export class AppointmentDetail {
       const doctors = await this.api.doctors.getDoctors();
       this.reschedulingAvailableDoctors = doctors.doctors ?? [];
     } catch (err) {
-      if (!(err instanceof ApiError)) {
-        toastService.showError('Unknown server error');
-        return;
-      }
       toastService.showError(err.message);
     }
   }
@@ -207,10 +194,6 @@ export class AppointmentDetail {
       });
       this.reschedulingAvailableTimes = slots.slots;
     } catch (err) {
-      if (!(err instanceof ApiError)) {
-        toastService.showError('Unknown server error');
-        return;
-      }
       toastService.showError(err.message);
     }
   }

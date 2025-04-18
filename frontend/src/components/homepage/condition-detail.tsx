@@ -1,4 +1,4 @@
-import { Api, ApiError } from '../../api/api';
+import { Api } from '../../api/api';
 import { AppointmentDisplay, Condition } from '../../api/generated';
 import { Navigate } from '../../utils/types';
 import { formatDate, formatDateDelta, getDateAndTimeTitle } from '../../utils/utils';
@@ -24,10 +24,6 @@ export class ConditionDetail {
     try {
       this.condition = await this.api.conditions.conditionDetail({ conditionId: this.conditionId });
     } catch (err) {
-      if (!(err instanceof ApiError)) {
-        toastService.showError(err);
-        return;
-      }
       toastService.showError(err.message);
     }
   }

@@ -50,7 +50,7 @@ func NewServer(app app.App, spec *openapi3.T, middlewareLogger *httplog.Logger) 
 	}
 
 	return api.HandlerWithOptions(srv, api.ChiServerOptions{
-		BaseURL:     "",
+		BaseURL:     "/api",
 		BaseRouter:  r,
 		Middlewares: middleware(middlewareLogger, validationOpts),
 		ErrorHandlerFunc: func(w http.ResponseWriter, r *http.Request, err error) {
@@ -85,6 +85,20 @@ func NewServer(app app.App, spec *openapi3.T, middlewareLogger *httplog.Logger) 
 
 func validationErrorHandler(w http.ResponseWriter, message string, statusCode int) {
 	slog.Warn("validationErrorHandler", "message", message)
+
+	if message == "no matching operation was found" {
+		validationErr := &ApiError{
+			ErrorDetail: api.ErrorDetail{
+				Code:   NotFoundCode,
+				Title:  "Route not found",
+				Detail: "Route not found",
+				Status: http.StatusNotFound,
+			},
+		}
+		encodeError(w, validationErr)
+		return
+	}
+
 	split := strings.Split(message, ": ")
 	hashIndex := strings.Index(split[1], "#")
 

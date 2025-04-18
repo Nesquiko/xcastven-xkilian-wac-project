@@ -40,7 +40,7 @@ func middleware(
 }
 
 func heartbeat() func(http.Handler) http.Handler {
-	return chi_middleware.Heartbeat("/monitoring/heartbeat")
+	return chi_middleware.Heartbeat("/api/monitoring/heartbeat")
 }
 
 func optionsMiddleware(next http.Handler) http.Handler {

@@ -24,4 +24,5 @@ Port forward the app:
 
 ```bash
 kubectl --namespace polyfea port-forward svc/polyfea-controller 30331:80
+kubectl --namespace wac-hospital port-forward svc/xcastven-xkilian-project-webapi 30081:80
 ```

@@ -21,7 +21,7 @@ spec:
               containerPort: 8080
           env:
             - name: WAC_LOG_LEVEL
-              value: 0
+              value: "0"
             - name: WAC_APP_TIMEZONE
               value: "Europe/Bratislava"
             - name: WAC_APP_PORT

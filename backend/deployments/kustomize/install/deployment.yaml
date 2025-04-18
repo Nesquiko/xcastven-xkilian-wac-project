@@ -24,6 +24,8 @@ spec:
               value: "0"
             - name: WAC_APP_TIMEZONE
               value: "Europe/Bratislava"
+            - name: WAC_APP_HOST
+            - value: "0.0.0.0"
             - name: WAC_APP_PORT
               value: "8080"
             - name: WAC_MONGO_HOST

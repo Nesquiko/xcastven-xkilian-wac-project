@@ -10,6 +10,11 @@ labels:
 
 resources:
   - ../../../apps/xcastven-xkilian-project
+  - ../../../apps/xcastven-xkilian-project-webapi
+
+patches:
+  - path: patches/webapi.service.yaml
 
 components:
   - ../../../components/version-developers
+  - "https://github.com/Nesquiko/xcastven-xkilian-wac-project//backend/deployments/kustomize/components/mongodb" # ?ref=v1.0.1

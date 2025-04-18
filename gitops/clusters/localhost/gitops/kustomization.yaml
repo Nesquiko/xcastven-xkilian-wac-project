@@ -15,3 +15,5 @@ resources:
   - fe.image-repository.yaml
   - fe.image-policy.yaml
   - image-update-automation.yaml
+  - webapi.image-repository.yaml
+  - webapi.image-policy.yaml

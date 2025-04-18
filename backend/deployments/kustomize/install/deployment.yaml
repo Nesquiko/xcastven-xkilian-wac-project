@@ -30,7 +30,7 @@ spec:
               value: "27017"
               # change to actual value
             - name: AMBULANCE_API_MONGODB_USERNAME
-              value: ""
+              value: "root"
               #change to actual value
             - name: AMBULANCE_API_MONGODB_PASSWORD
               value: ""

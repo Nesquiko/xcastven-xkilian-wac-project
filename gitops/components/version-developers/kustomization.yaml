@@ -6,4 +6,4 @@ images:
     newTag: main.20250418.0735 # {"$imagepolicy": "wac-hospital:xcastven-xkilian-project:tag"}
   - name: nesquiko/xcastven-xkilian-wac-be
     newName: nesquiko/xcastven-xkilian-wac-be # {"$imagepolicy":  "wac-hospital:xcastven-xkilian-project-webapi:name"}
-    newTag: main.20250418.0830 # {"$imagepolicy": "wac-hospital:xcastven-xkilian-project-webapi:tag"}
+    newTag: main.20250418.0834 # {"$imagepolicy": "wac-hospital:xcastven-xkilian-project-webapi:tag"}

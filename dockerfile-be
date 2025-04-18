@@ -41,14 +41,14 @@ LABEL org.opencontainers.image.authors="Lukas Castven, Michal Kilian"
 LABEL org.opencontainers.image.title="Castven Kilian project WebAPI Service"
 LABEL org.opencontainers.image.description="WEBAPI for managing patient and doctors calendars"
 
-ENV AMBULANCE_API_ENVIRONMENT=production
-ENV AMBULANCE_API_PORT=8080
-ENV AMBULANCE_API_MONGODB_HOST=mongo
-ENV AMBULANCE_API_MONGODB_PORT=27017
-ENV AMBULANCE_API_MONGODB_DATABASE=xcastven-xkilian-db
-ENV AMBULANCE_API_MONGODB_USERNAME=root
-# ENV AMBULANCE_API_MONGODB_PASSWORD=
-ENV AMBULANCE_API_MONGODB_TIMEOUT_SECONDS=5
+ENV WAC_APP_PORT=8080
+ENV WAC_MONGO_HOST=mongo
+ENV WAC_MONGO_PORT=27017
+ENV WAC_MONGO_DB=xcastven-xkilian-db
+ENV WAC_MONGO_USER=root
+ENV WAC_MONGO_PASSWORD=
+ENV WAC_LOG_LEVEL=0
+ENV WAC_APP_TIMEZONE=Europe/Bratislava
 
 COPY --from=build /app/xcastven-xkilian-project-srv ./
 

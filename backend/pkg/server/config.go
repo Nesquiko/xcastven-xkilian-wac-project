@@ -29,19 +29,6 @@ type Config struct {
 }
 
 func (c Config) MongoURI() string {
-	slog.Info(
-		"Creating URI for Mongo",
-		"user",
-		c.Mongo.User,
-		"host",
-		c.Mongo.Host,
-		"port",
-		c.Mongo.Port,
-		"db",
-		c.Mongo.Db,
-		"password",
-		c.Mongo.Password,
-	)
 	return fmt.Sprintf(
 		"mongodb://%s:%s@%s:%d/%s?authSource=admin",
 		c.Mongo.User,

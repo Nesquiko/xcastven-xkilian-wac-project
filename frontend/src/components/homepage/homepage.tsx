@@ -179,9 +179,9 @@ export class Homepage {
         appointmentId: appointment.id,
         appointmentDecision: {
           action: 'accept',
-          medicine: [resources.medicine],
-          facilities: [resources.facility],
-          equipment: [resources.equipment],
+          medicine: resources.medicine ? [resources.medicine] : undefined,
+          facilities: resources.facility ? [resources.facility] : undefined,
+          equipment: resources.equipment ? [resources.equipment] : undefined,
         },
       });
     } catch (err) {
@@ -263,17 +263,15 @@ export class Homepage {
   };
 
   private handleDeletePrescriptionFromAppointment = async (
-    appointment: DoctorAppointment,
+    _appointment: DoctorAppointment,
     prescriptionToDelete: PrescriptionDisplay,
   ): Promise<void> => {
     try {
-      // TODO luky: delete prescription
-      /*this.api.medicalHistory.deletePrescription({
-
-      });*/
+      await this.api.medicalHistory.deletePrescription({
+        prescriptionId: prescriptionToDelete.id,
+      });
     } catch (err) {
       toastService.showError(err.message);
-      return undefined;
     }
   };
 

@@ -224,3 +224,19 @@ func (a monolithApp) PrescriptionById(
 
 	return dataPrescToPresc(prescription, apptData, &patient, doctorData), nil
 }
+
+func (a monolithApp) DeletePrescription(ctx context.Context, id uuid.UUID) error {
+	err := a.db.DeletePrescription(ctx, id)
+	if err != nil {
+		if errors.Is(err, data.ErrNotFound) {
+			return fmt.Errorf(
+				"DeletePrescription prescription with id %s not found: %w",
+				id,
+				ErrNotFound,
+			)
+		}
+		return fmt.Errorf("DeletePrescription failed: %w", err)
+	}
+
+	return nil
+}

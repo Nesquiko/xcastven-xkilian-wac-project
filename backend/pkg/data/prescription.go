@@ -180,3 +180,19 @@ func (m *MongoDb) PrescriptionByAppointmentId(
 
 	return prescriptions, nil
 }
+
+func (m *MongoDb) DeletePrescription(ctx context.Context, id uuid.UUID) error {
+	collection := m.Database.Collection(prescriptionsCollection)
+	filter := bson.M{"_id": id}
+
+	result, err := collection.DeleteOne(ctx, filter)
+	if err != nil {
+		return fmt.Errorf("DeletePrescription failed: %w", err)
+	}
+
+	if result.DeletedCount == 0 {
+		return ErrNotFound
+	}
+
+	return nil
+}

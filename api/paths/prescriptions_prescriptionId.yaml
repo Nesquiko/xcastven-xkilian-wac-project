@@ -40,3 +40,17 @@ patch:
 
     "500":
       $ref: "../components/responses/InternalServerErrorResponse.yaml"
+
+delete:
+  tags:
+    - Medical History
+  summary: Delete prescription
+  operationId: deletePrescription
+  parameters:
+    - $ref: "../components/parameters/path/prescriptionId.yaml"
+  responses:
+    "204":
+      description: Deleted
+
+    "500":
+      $ref: "../components/responses/InternalServerErrorResponse.yaml"

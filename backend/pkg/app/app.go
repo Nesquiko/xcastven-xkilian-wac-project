@@ -105,6 +105,7 @@ type App interface {
 		updateData api.UpdatePrescription,
 	) (api.Prescription, error)
 	PrescriptionById(ctx context.Context, prescriptionId uuid.UUID) (api.Prescription, error)
+	DeletePrescription(ctx context.Context, id uuid.UUID) error
 
 	CreateResource(ctx context.Context, resource api.NewResource) (api.NewResource, error)
 	ReserveResource(

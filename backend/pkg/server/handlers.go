@@ -607,3 +607,32 @@ func (s Server) ConditionsInDate(
 
 	encode(w, http.StatusOK, api.Conditions{Conditions: conditions})
 }
+
+// DeletePrescription implements api.ServerInterface.
+func (s Server) DeletePrescription(
+	w http.ResponseWriter,
+	r *http.Request,
+	prescriptionId api.PrescriptionId,
+) {
+	err := s.app.DeletePrescription(r.Context(), prescriptionId)
+	if err != nil {
+		if errors.Is(err, app.ErrNotFound) {
+			encodeError(w, notFoundId("Prescription", prescriptionId))
+			return
+		}
+
+		slog.Error(
+			UnexpectedError,
+			"error",
+			err.Error(),
+			"where",
+			"DeletePrescription",
+			"prescriptionId",
+			prescriptionId.String(),
+		)
+		encodeError(w, internalServerError())
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}

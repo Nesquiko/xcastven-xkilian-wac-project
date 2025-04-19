@@ -99,6 +99,7 @@ type Db interface {
 		ctx context.Context,
 		appointmentId uuid.UUID,
 	) ([]Prescription, error)
+	DeletePrescription(ctx context.Context, id uuid.UUID) error
 
 	CreateResource(ctx context.Context, name string, typ ResourceType) (Resource, error)
 	ResourceById(ctx context.Context, id uuid.UUID) (Resource, error)

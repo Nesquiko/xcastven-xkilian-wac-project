@@ -68,7 +68,7 @@ export class AppointmentPrescriptions {
   private toggleEditPrescriptionForm = (event: Event, prescription: PrescriptionDisplay) => {
     event.stopPropagation();
 
-    if (this.editingPrescription.id === prescription.id) {
+    if (this.editingPrescription && this.editingPrescription.id === prescription.id) {
       this.setEditingPrescription(null);
       return;
     }
@@ -85,7 +85,7 @@ export class AppointmentPrescriptions {
   private toggleDeletePrescriptionForm = (event: Event, prescription: PrescriptionDisplay) => {
     event.stopPropagation();
 
-    if (this.deletingPrescription.id === prescription.id) {
+    if (this.deletingPrescription && this.deletingPrescription.id === prescription.id) {
       this.setDeletingPrescription(null);
       return;
     }

@@ -8,3 +8,6 @@ resources:
 
 patches:
   - path: patches/webapi.deployment.yaml
+# TODO ask what is the task in https://wac-fiit.milung.eu/dojo/03.ServiceMesh/010-gateway
+# "Upravte manifesty v repozitári ambulance-webapi..." and why I don't have anyting
+# on localhost as mentioned?

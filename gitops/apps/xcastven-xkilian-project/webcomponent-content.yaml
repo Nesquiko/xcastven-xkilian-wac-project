@@ -7,7 +7,7 @@ spec:
   element: xcastven-xkilian-project-app
   attributes:
     - name: base-path
-      value: /xcastven-xkilian-project/
+      value: /fea/xcastven-xkilian-project/
     - name: api-base
       value: /xcastven-xkilian-api
 

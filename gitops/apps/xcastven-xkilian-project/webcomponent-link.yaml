@@ -16,7 +16,7 @@ spec:
     - name: material-icon
       value: event
     - name: href # presmerovanie po kliknutí na element polyfea-md-app
-      value: ./xcastven-xkilian-project
+      value: ./fea/xcastven-xkilian-project
   priority: 10000
   displayRules: # pravidlá, kde sa má element vložiť v obálke
     - anyOf:

@@ -3,7 +3,7 @@ kind: Component
 images:
   - name: nesquiko/xcastven-xkilian-wac-fe
     newName: nesquiko/xcastven-xkilian-wac-fe # {"$imagepolicy":  "wac-hospital:xcastven-xkilian-project:name"}
-    newTag: main.20250422.1111 # {"$imagepolicy": "wac-hospital:xcastven-xkilian-project:tag"}
+    newTag: main.20250422.1124 # {"$imagepolicy": "wac-hospital:xcastven-xkilian-project:tag"}
   - name: nesquiko/xcastven-xkilian-wac-be
     newName: nesquiko/xcastven-xkilian-wac-be # {"$imagepolicy":  "wac-hospital:xcastven-xkilian-project-webapi:name"}
     newTag: main.20250419.0639 # {"$imagepolicy": "wac-hospital:xcastven-xkilian-project-webapi:tag"}

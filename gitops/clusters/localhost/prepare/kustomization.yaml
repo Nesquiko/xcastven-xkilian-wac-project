@@ -5,8 +5,8 @@ resources:
   - ../../../infrastructure/polyfea
   - ../../../infrastructure/fluxcd
   - ../../../infrastructure/envoy-gateway
+  - github.com/metallb/metallb/config/native?ref=v0.14.9
+  - metallb-config.yaml
 
 components:
   - ../../../components/version-developers
-  - https://raw.githubusercontent.com/metallb/metallb/v0.13.7/config/manifests/metallb-native.yaml
-  - metallb-config.yaml

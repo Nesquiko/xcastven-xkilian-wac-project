@@ -8,3 +8,5 @@ resources:
 
 components:
   - ../../../components/version-developers
+  - https://raw.githubusercontent.com/metallb/metallb/v0.13.7/config/manifests/metallb-native.yaml
+  - metallb-config.yaml

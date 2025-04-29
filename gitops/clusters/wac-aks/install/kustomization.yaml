@@ -12,6 +12,7 @@ labels:
 
 resources:
   - ../../../apps/xcastven-xkilian-project
+  - ../../../apps/xcastven-xkilian-project-webapi
 
 components:
   - ../../../components/version-release

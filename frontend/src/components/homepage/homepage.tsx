@@ -395,7 +395,7 @@ export class Homepage {
 
   render() {
     return (
-      <StyledHost class="flex h-screen w-full flex-col overflow-hidden">
+      <StyledHost class="flex h-full w-full flex-col overflow-hidden">
         <xcastven-xkilian-project-header
           navigate={this.navigate}
           type="calendar"

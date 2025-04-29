@@ -8,7 +8,8 @@ import {
 import {
   AppointmentStatusColor,
   ConditionOrderColors,
-  DAYS_OF_WEEK, formatAppointmentType,
+  DAYS_OF_WEEK,
+  formatAppointmentType,
   formatDate,
   formatTime,
   PrescriptionOrderColors,
@@ -640,7 +641,7 @@ export class Calendar {
           ))}
         </div>
 
-        <div class="relative z-20 grid flex-1 grid-cols-7 grid-rows-6 divide-x divide-y divide-amber-500 border-x border-t border-[#d8c7ed]">
+        <div class="relative z-20 grid flex-1 grid-cols-7 grid-rows-6 divide-x divide-y divide-gray-300 border-x border-t border-[#d8c7ed]">
           {!this.isDoctor ? this.renderPatientsCalendar() : this.renderDoctorsCalendar()}
         </div>
       </div>

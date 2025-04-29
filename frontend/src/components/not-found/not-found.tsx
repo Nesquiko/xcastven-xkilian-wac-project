@@ -10,7 +10,7 @@ export class NotFound {
   @Prop() navigate: Navigate;
   render() {
     return (
-      <StyledHost class="flex h-screen w-full flex-col overflow-hidden bg-gray-300">
+      <StyledHost class="flex h-full w-full flex-col overflow-hidden bg-gray-300">
         <div class="relative flex h-full w-full flex-1 items-center justify-center">
           <div class="mx-6 w-full max-w-md rounded-md bg-white p-6 shadow-lg md:mx-0">
             <div class="flex max-w-sm flex-col items-center justify-center gap-y-3 font-medium text-gray-600">

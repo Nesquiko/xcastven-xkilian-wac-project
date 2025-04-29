@@ -231,7 +231,7 @@ export class ConditionRegisterer {
     const showDetails = this.showDetailsPanel();
 
     return (
-      <div class="flex h-screen w-full flex-1 flex-col overflow-auto">
+      <div class="flex h-full w-full flex-1 flex-col overflow-auto">
         <xcastven-xkilian-project-header
           navigate={this.navigate}
           type="registerCondition"

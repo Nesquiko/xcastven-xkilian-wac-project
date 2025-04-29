@@ -1,7 +1,7 @@
 import { Api } from '../../api/api';
 import { AppointmentDisplay, Condition } from '../../api/generated';
 import { Navigate } from '../../utils/types';
-import { formatDate, formatDateDelta, getDateAndTimeTitle } from '../../utils/utils';
+import { formatAppointmentType, formatDate, formatDateDelta, getDateAndTimeTitle } from '../../utils/utils';
 import { toastService } from '../services/toast-service';
 import { Component, h, Prop, State } from '@stencil/core';
 
@@ -145,7 +145,7 @@ export class ConditionDetail {
                     </md-icon>
                     {getDateAndTimeTitle(appointment.appointmentDateTime, 'text-sm')}
                   </div>
-                  <div class="text-xs font-medium text-gray-600">{appointment.type}</div>
+                  <div class="text-xs font-medium text-gray-600">{formatAppointmentType(appointment.type)}</div>
                 </div>
               ))}
             </div>

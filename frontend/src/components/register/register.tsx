@@ -100,7 +100,7 @@ export class Register {
 
   render() {
     return (
-      <StyledHost class="flex h-screen w-full flex-row items-center justify-center overflow-x-hidden overflow-y-auto bg-gray-300">
+      <StyledHost class="flex h-full flex-1 w-full flex-row items-center justify-center overflow-y-auto bg-gray-300">
         <div class="mx-6 w-full max-w-md rounded-md bg-white shadow-lg md:mx-0">
           <h1 class="mb-3 w-full rounded-t-lg bg-[#7357be] px-4 py-3 text-center text-2xl">
             <span class="font-normal text-gray-200">Register at </span>
@@ -169,7 +169,7 @@ export class Register {
               </div>
             </div>
 
-            <div class="mb-6 w-full animate-[slideInFromRight_0.5s_ease-out]">
+            <div class="mb-6 w-full">
               <md-filled-select
                 label="Specialization"
                 class="w-full"

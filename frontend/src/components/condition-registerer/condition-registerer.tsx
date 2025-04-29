@@ -278,7 +278,7 @@ export class ConditionRegisterer {
               </div>
             </div>
             {this.selectedStart && (
-              <div class="flex max-w-md min-w-md animate-[slideInFromBottom_0.5s_ease-out] flex-row items-center justify-center gap-x-3">
+              <div class="flex max-w-md min-w-md flex-row items-center justify-center gap-x-3">
                 <label htmlFor="switch" class="font-medium text-gray-600">
                   Condition is still ongoing
                 </label>
@@ -297,7 +297,7 @@ export class ConditionRegisterer {
           {/* Right panel - Details */}
           {showDetails && (
             <div
-              class={`relative m-auto flex h-full w-full max-w-lg flex-1 transform animate-[slideInFromBottom_0.5s_ease-out] flex-col justify-center p-6 opacity-100 transition-all duration-500 ease-in-out md:w-1/2 md:animate-[slideInFromRight_0.5s_ease-out]`}
+              class={`relative m-auto flex h-full w-full max-w-lg flex-1 transform flex-col justify-center p-6 opacity-100 transition-all duration-500 ease-in-out md:w-1/2`}
             >
               <md-icon-button class="absolute top-5 left-5" onClick={this.resetSelection}>
                 <md-icon>arrow_back</md-icon>

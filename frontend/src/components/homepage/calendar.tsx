@@ -8,7 +8,7 @@ import {
 import {
   AppointmentStatusColor,
   ConditionOrderColors,
-  DAYS_OF_WEEK,
+  DAYS_OF_WEEK, formatAppointmentType,
   formatDate,
   formatTime,
   PrescriptionOrderColors,
@@ -62,7 +62,7 @@ export class Calendar {
         }}
       >
         <div class="flex w-full flex-col gap-y-1">
-          <span class="w-full text-center">{appointment.type}</span>
+          <span class="w-full text-center">{formatAppointmentType(appointment.type)}</span>
 
           <div class="flex flex-col items-center justify-center gap-y-1">
             <div class="flex items-center space-x-1 text-gray-400">

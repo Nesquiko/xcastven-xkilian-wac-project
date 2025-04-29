@@ -157,7 +157,7 @@ export class AppointmentScheduler {
     const showDetails: boolean = this.showDetailsPanel();
 
     return (
-      <div class="flex h-screen w-full flex-1 flex-col overflow-auto">
+      <div class="flex h-full w-full flex-0 flex-1 flex-col overflow-auto">
         {/* Header */}
         <xcastven-xkilian-project-header
           navigate={this.navigate}
@@ -200,7 +200,7 @@ export class AppointmentScheduler {
           {/* Right panel - Details */}
           {showDetails && (
             <div
-              class={`m-auto flex w-full max-w-lg transform animate-[slideInFromBottom_0.5s_ease-out] flex-col justify-center p-6 opacity-100 transition-all duration-500 ease-in-out md:w-1/2 md:animate-[slideInFromRight_0.5s_ease-out]`}
+              class={`m-auto flex w-full max-w-lg transform flex-col justify-center p-6 opacity-100 transition-all duration-500 ease-in-out md:w-1/2`}
             >
               <div class="mb-6 font-medium text-[#7357be]">{formatDate(this.selectedDate)}</div>
 

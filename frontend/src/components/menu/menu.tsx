@@ -84,7 +84,7 @@ export class Menu {
 
     return (
       <div
-        class={`fixed top-0 left-0 z-100 h-full max-w-xs min-w-xs transform bg-white shadow-lg transition-transform duration-300 ${
+        class={`fixed top-0 left-0 z-100 h-full max-w-xs min-w-xs translate-y-0 transform bg-white shadow-lg transition-transform duration-300 ${
           this.isMenuOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
         onClick={(e: MouseEvent) => e.stopPropagation()}

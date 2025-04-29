@@ -119,7 +119,7 @@ export class Drawer {
 
     return (
       <div
-        class={`fixed top-0 right-0 z-100 h-full max-w-md min-w-md transform bg-white shadow-lg transition-transform duration-300 ${
+        class={`fixed top-0 right-0 z-100 h-full max-w-md min-w-md translate-y-0 transform bg-white shadow-lg transition-transform duration-300 ${
           this.isDrawerOpen ? 'translate-x-0' : 'translate-x-full'
         }`}
         onClick={(e: MouseEvent) => e.stopPropagation()}

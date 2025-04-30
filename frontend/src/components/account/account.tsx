@@ -26,7 +26,7 @@ export class Account {
     if (!this.user) return;
 
     return (
-      <StyledHost class="flex h-full flex-1 w-full flex-col overflow-hidden bg-gray-300">
+      <StyledHost class="flex h-full w-full flex-1 flex-col overflow-hidden bg-gray-300">
         <xcastven-xkilian-project-header
           navigate={this.navigate}
           type="account"

@@ -169,9 +169,9 @@ export class AppointmentScheduler {
               selectedDate={this.selectedDate}
               selectDate={this.selectDate}
               currentViewMonth={this.currentViewMonth}
-              setCurrentViewMonth={(newMonth: number) => this.currentViewMonth = newMonth}
+              setCurrentViewMonth={(newMonth: number) => (this.currentViewMonth = newMonth)}
               currentViewYear={this.currentViewYear}
-              setCurrentViewYear={(newYear: number) => this.currentViewYear = newYear}
+              setCurrentViewYear={(newYear: number) => (this.currentViewYear = newYear)}
             />
 
             <div class="w-full max-w-md px-4">

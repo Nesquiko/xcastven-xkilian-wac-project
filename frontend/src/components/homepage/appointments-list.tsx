@@ -1,6 +1,11 @@
 import { AppointmentDisplay, User } from '../../api/generated';
 import { Navigate } from '../../utils/types';
-import {compareDates, formatAppointmentType, formatTime, getDateAndTimeTitle } from '../../utils/utils';
+import {
+  compareDates,
+  formatAppointmentType,
+  formatTime,
+  getDateAndTimeTitle,
+} from '../../utils/utils';
 import { Component, h, Prop } from '@stencil/core';
 
 @Component({

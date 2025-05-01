@@ -3,7 +3,7 @@ kind: Component
 images:
   - name: nesquiko/xcastven-xkilian-wac-fe
     newName: nesquiko/xcastven-xkilian-wac-fe
-    newTag: 1.1.6
+    newTag: 1.1.7
   - name: nesquiko/xcastven-xkilian-wac-be
     newName: nesquiko/xcastven-xkilian-wac-be
-    newTag: 1.1.6
+    newTag: 1.1.7

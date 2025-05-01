@@ -57,7 +57,7 @@ export class AppointmentResources {
           </div>
           <span class="font-medium text-gray-600">
             {instanceOfDoctorAppointment(this.appointment) &&
-              (this.appointment.equipment?.[0].name ?? '')}
+              (this.appointment.facilities?.[0].name ?? '')}
           </span>
         </div>
         <div class="flex w-full flex-row items-center justify-between">

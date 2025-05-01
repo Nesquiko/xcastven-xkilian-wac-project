@@ -1,0 +1,7 @@
+api/node_modules
+api/api.bundled.yaml
+backend/pkg/api/api.gen.go
+backend/tmp
+backend/c.out
+frontend/src/api/generated/.openapi-generator
+frontend/src/api/generated

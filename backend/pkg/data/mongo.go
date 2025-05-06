@@ -74,7 +74,12 @@ func ConnectMongo(ctx context.Context, uri string, db string) (*MongoDb, error) 
 		return nil, fmt.Errorf("ConnectMongo: failed to init indexes: %w", err)
 	}
 
-	return &MongoDb{Database: mongoDb}, nil
+	mongoDB := &MongoDb{Database: mongoDb}
+	if err = mongoDB.seedResources(ctx); err != nil {
+		return nil, fmt.Errorf("ConnectMongo: failed to seed resources: %w", err)
+	}
+
+	return mongoDB, nil
 }
 
 func initCollections(ctx context.Context, mongoDb *mongo.Database, cols []string) error {
